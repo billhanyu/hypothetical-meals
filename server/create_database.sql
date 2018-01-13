@@ -60,24 +60,3 @@ CREATE TABLE Logs(
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	PRIMARY KEY(id)
 );
-
-
-'CREATE TABLE Users('+
-
-	'id int not null AUTO_INCREMENT, '+
-	'temporary boolean not null, '+
-	'name varchar(70), '+
-	'email varchar(255) not null UNIQUE, '+
-	'hash text(1024) not null, '+
-	'salt character(32) not null, '+
-
-	'binance_api_key character(64), '+
-	'binance_secret_key character(64), '+
-	'bittrex_api_key character(32), '+
-	'bittrex_secret_key character(32), '+
-
-	'bitcoin_public_key character(34), '+
-	'ethereum_public_key character(42), '+
-	'litecoin_public_key character(34), '+
-
-	'PRIMARY KEY (id))');
