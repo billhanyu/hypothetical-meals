@@ -4,6 +4,8 @@
   "description": "ECE-458 Project",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon --exec babel-node server/server.js --presets env",
+    "test": "mocha"
   },
   "author": "Eric Song, Bill Yu, Brian Zhou, Christine Zhou",
   "license": "ISC",
@@ -16,8 +18,15 @@
     "webpack": "^3.10.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "cross-env": "^5.1.3",
     "eslint": "^4.15.0",
     "eslint-config-google": "^0.9.1",
-    "eslint-plugin-react": "^7.5.1"
+    "eslint-plugin-react": "^7.5.1",
+    "mocha": "^4.1.0",
+    "nodemon": "^1.14.11"
   }
 }
