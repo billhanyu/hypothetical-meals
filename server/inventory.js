@@ -1,5 +1,5 @@
 export function view(req, res, next) {
-  connection.query('SELECT * from inventories', (error, results, fields) => {
+  connection.query('SELECT * FROM Inventories', (error, results, fields) => {
     if (error) {
       console.error(error);
       res.status(500).send('Database error');
