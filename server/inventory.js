@@ -1,5 +1,11 @@
 export function view(req, res, next) {
-  res.status(501).send('todo');
+  connection.query('SELECT * FROM Inventories', (error, results, fields) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Database error');
+    }
+    res.status(200).send(results);
+  });
 }
 
 export function modifyQuantities(req, res, next) {
