@@ -1,6 +1,7 @@
 const express = require('express');
 const mysql = require('mysql');
 const alasql = require('alasql');
+const auth = require('./auth');
 import * as user from './user';
 import * as ingredient from './ingredient';
 import * as storage from './storage';
@@ -29,33 +30,42 @@ if (process.env.NODE_ENV === 'test') {
     },
   };
 } else {
-  global.connection = mysql.createConnection({
-    host: config.host,
-    user: config.user,
-    password: config.password,
-    database: config.database,
+  const pool = mysql.createPool({
+    connectionLimit : config.mySqlParams.connectionLimit,
+    host: config.mySqlParams.host,
+    user: config.mySqlParams.user,
+    password: config.mySqlParams.password,
+    database: config.mySqlParams.database,
   });
-  connection.connect();
+  global.connection = {
+    query: (queryBody, callback) => {
+      pool.getConnection(function(err, connection) {
+        if(err) callback(err, null, null);
+        connection.query(queryBody, callback);
+      });
+    }
+  }
 }
 
 const app = express();
 
-app.post('/users/admin', user.signup);
+app.post('/users/admin', user.signupAdmin);
+app.post('/users/noob', user.signupNoob);
 app.post('/users/login', user.login);
-app.get('/users', user.getInfo);
+app.get('/users', auth.required, user.getInfo);
 
-app.post('/ingredients', ingredient.addIngredient);
-app.put('/ingredients/:id', ingredient.modifyIngredient);
-app.delete('/ingredients/:id', ingredient.deleteIngredient);
+app.post('/ingredients', auth.required, ingredient.addIngredient);
+app.put('/ingredients/:id', auth.required, ingredient.modifyIngredient);
+app.delete('/ingredients/:id', auth.required, ingredient.deleteIngredient);
 
-app.put('/storage', storage.changeStorage);
+app.put('/storage', auth.required, storage.changeStorage);
 
-app.get('/log/:ingredient_id', log.viewLogForIngredient);
-app.post('/log', log.addEntry);
+app.get('/log/:ingredient_id', auth.required, log.viewLogForIngredient);
+app.post('/log', auth.required, log.addEntry);
 
-app.get('/inventory', inventory.view);
-app.put('/inventory/admin', inventory.modifyQuantities);
-app.put('/inventory', inventory.commitCart);
+app.get('/inventory', auth.required, inventory.view);
+app.put('/inventory/admin', auth.required, inventory.modifyQuantities);
+app.put('/inventory', auth.required, inventory.commitCart);
 
 app.listen(1717, () => {
   console.log('Node app start at port 1717');

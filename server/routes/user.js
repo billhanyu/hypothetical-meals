@@ -1,4 +1,8 @@
-export function signup(req, res, next) {
+export function signupAdmin(req, res, next) {
+  res.status(501).send('todo');
+}
+
+export function signupNoob(req, res, next) {
   res.status(501).send('todo');
 }
 
