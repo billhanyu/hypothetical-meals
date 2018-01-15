@@ -58,7 +58,7 @@ CREATE TABLE Logs(
 	id int not null AUTO_INCREMENT,
 	user_id int not null,
 	ingredient_id int not null,
-	quantitfy int not null,
+	quantity int not null,
 	created_at timestamp DEFAULT now() not null,
  
 	FOREIGN KEY (user_id) REFERENCES Users(id),
