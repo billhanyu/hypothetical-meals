@@ -6,7 +6,13 @@ import * as ingredient from './ingredient';
 import * as storage from './storage';
 import * as log from './log';
 import * as inventory from './inventory';
-import config from './config';
+
+let config;
+try {
+  config = require('./config');
+} catch (e) {
+  config = require('./config.example');
+}
 
 if (process.env.NODE_ENV === 'test') {
   alasql('SOURCE "./server/create_database.sql"');
