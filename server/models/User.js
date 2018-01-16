@@ -13,12 +13,12 @@ class User {
     return this.hash === hash;
   }
 
-  setPassword(password){
+  setPassword(password) {
     this.salt = crypto.randomBytes(16).toString('hex');
     this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
   }
 
-  generateJWT(){
+  generateJWT() {
     let today = new Date();
     let exp = new Date(today);
     exp.setDate(today.getDate() + 60);
@@ -27,15 +27,15 @@ class User {
       id: this.id,
       name: this.name,
       email: this.email,
-      exp: parseInt(exp.getTime() / 1000)
+      exp: parseInt(exp.getTime() / 1000),
     }, config.secret);
   }
 
-  getBasicInfo(){
+  getBasicInfo() {
     return {
       name: this.name,
       email: this.email,
-      token: this.generateJWT()
+      token: this.generateJWT(),
     };
   }
 }
