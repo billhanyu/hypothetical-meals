@@ -2,11 +2,11 @@ const express = require('express');
 const mysql = require('mysql');
 const alasql = require('alasql');
 const auth = require('./auth');
-import * as user from './user';
-import * as ingredient from './ingredient';
-import * as storage from './storage';
-import * as log from './log';
-import * as inventory from './inventory';
+import * as user from './routes/user';
+import * as ingredient from './routes/ingredient';
+import * as storage from './routes/storage';
+import * as log from './routes/log';
+import * as inventory from './routes/inventory';
 
 let config;
 try {
@@ -52,20 +52,20 @@ const app = express();
 app.post('/users/admin', user.signupAdmin);
 app.post('/users/noob', user.signupNoob);
 app.post('/users/login', user.login);
-app.get('/users', auth.required, user.getInfo);
+app.get('/users', user.getInfo);
 
-app.post('/ingredients', auth.required, ingredient.addIngredient);
-app.put('/ingredients/:id', auth.required, ingredient.modifyIngredient);
-app.delete('/ingredients/:id', auth.required, ingredient.deleteIngredient);
+app.post('/ingredients', ingredient.addIngredient);
+app.put('/ingredients/:id', ingredient.modifyIngredient);
+app.delete('/ingredients/:id', ingredient.deleteIngredient);
 
-app.put('/storage', auth.required, storage.changeStorage);
+app.put('/storage', storage.changeStorage);
 
-app.get('/log/:ingredient_id', auth.required, log.viewLogForIngredient);
-app.post('/log', auth.required, log.addEntry);
+app.get('/log/:ingredient_id', log.viewLogForIngredient);
+app.post('/log', log.addEntry);
 
-app.get('/inventory', auth.required, inventory.view);
-app.put('/inventory/admin', auth.required, inventory.modifyQuantities);
-app.put('/inventory', auth.required, inventory.commitCart);
+app.get('/inventory', inventory.view);
+app.put('/inventory/admin', inventory.modifyQuantities);
+app.put('/inventory', inventory.commitCart);
 
 app.listen(1717, () => {
   console.log('Node app start at port 1717');
