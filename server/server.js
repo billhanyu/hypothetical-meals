@@ -21,12 +21,12 @@ if (process.env.NODE_ENV === 'test') {
   global.connection = {
     query: (queryBody, callback) => {
       alasql
-        .promise(queryBody)
-        .then(res => {
-          callback(null, res, null);
-        }).catch(err => {
-          callback(err, null, null);
-        });
+      .promise(queryBody)
+      .then(res => {
+        callback(null, res, null);
+      }).catch(err => {
+        callback(err, null, null);
+      });
     },
   };
 } else {
