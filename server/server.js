@@ -25,7 +25,7 @@ if (process.env.NODE_ENV === 'test') {
       const queryBody = args.slice(0, args.length - 1);
       const callback = args[args.length - 1];
       alasql
-      .promise.apply(null, queryBody)
+      .promise(...queryBody)
       .then(res => {
         callback(null, res, null);
       }).catch(err => {
