@@ -1,6 +1,8 @@
 const express = require('express');
 const mysql = require('mysql');
 const alasql = require('alasql');
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const auth = require('./auth');
 import * as user from './routes/user';
 import * as ingredient from './routes/ingredient';
@@ -48,6 +50,10 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 const app = express();
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.post('/users/admin', user.signupAdmin);
 app.post('/users/noob', user.signupNoob);
