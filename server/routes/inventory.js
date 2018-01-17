@@ -29,11 +29,11 @@ export function modifyQuantities(req, res, next) {
   const ingredientIds = [];
   const cases = [];
   for (const idString in changes) {
-    if (!isPositiveInteger(idString)) {
+    if (!isNonNegativeInteger(idString)) {
       return res.status(400).send(`Ingredient ID ${idString} is invalid.`);
     }
     const quantity = changes[idString];
-    if (!isPositiveInteger(quantity)) {
+    if (!isNonNegativeInteger(quantity)) {
       return res.status(400).send(`New quantity ${quantity} is invalid.`);
     }
     ingredientIds.push(idString);
@@ -47,7 +47,15 @@ export function modifyQuantities(req, res, next) {
         console.error(error);
         return res.status(500).send('Database error');
       }
-      return res.status(200).send('success');
+      connection.query(
+        'DELETE FROM Inventories WHERE num_packages = 0',
+        (error, results, fields) => {
+          if (error) {
+            console.error(error);
+            return res.status(500).send('Database error');
+          }
+          return res.status(200).send('success');
+        });
     });
 }
 
@@ -55,7 +63,7 @@ export function commitCart(req, res, next) {
   res.status(501).send('todo');
 }
 
-function isPositiveInteger(s) {
+function isNonNegativeInteger(s) {
   const num = Number(s);
-  return !isNaN(num) && Number.isInteger(num) && num > 0;
+  return !isNaN(num) && Number.isInteger(num) && num >= 0;
 }

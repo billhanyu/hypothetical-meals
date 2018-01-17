@@ -28,8 +28,26 @@ describe('Inventory', () => {
         .end((err, res) => {
           res.should.have.status(200);
           const changed = alasql('SELECT * FROM Inventories');
-          assert(changed[0]['num_packages'] === 999, 'Inventory item 1 should be 999 packages.');
-          assert(changed[1]['num_packages'] === 99, 'Inventory item 2 should be 99 packages.');
+          assert(changed[0]['num_packages'] === 999, 'Inventory item 1 packages.');
+          assert(changed[1]['num_packages'] === 99, 'Inventory item 2 packages.');
+          done();
+        });
+    });
+
+    it('should delete from inventory when quantity is zero.', (done) => {
+      chai.request(server)
+        .put('/inventory/admin')
+        .send({
+          'changes': {
+            '1': 0,
+            '2': 99,
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const changed = alasql('SELECT * FROM Inventories');
+          changed.length.should.be.eql(1);
+          assert(changed[0]['num_packages'] === 99, 'Inventory item 2 packages.');
           done();
         });
     });
