@@ -1,3 +1,5 @@
+import * as checkNumber from './common/checkNumber';
+
 export function view(req, res, next) {
   connection.query('SELECT * FROM Inventories', (error, results, fields) => {
     if (error) {
@@ -29,11 +31,11 @@ export function modifyQuantities(req, res, next) {
   const ingredientIds = [];
   const cases = [];
   for (const idString in changes) {
-    if (!isPositiveInteger(idString)) {
+    if (!checkNumber.isPositiveInteger(idString)) {
       return res.status(400).send(`Ingredient ID ${idString} is invalid.`);
     }
     const quantity = changes[idString];
-    if (!isNonNegativeInteger(quantity)) {
+    if (!checkNumber.isNonNegativeInteger(quantity)) {
       return res.status(400).send(`New quantity ${quantity} is invalid.`);
     }
     ingredientIds.push(idString);
@@ -79,11 +81,11 @@ export function commitCart(req, res, next) {
   }
   const ingredientIds = [];
   for (const idString in cart) {
-    if (!isPositiveInteger(idString)) {
+    if (!checkNumber.isPositiveInteger(idString)) {
       return res.status(400).send(`Ingredient ID ${idString} is invalid.`);
     }
     const quantity = cart[idString];
-    if (!isPositiveInteger(quantity)) {
+    if (!checkNumber.isPositiveInteger(quantity)) {
       return res.status(400).send(`Request quantity ${quantity} is invalid.`);
     }
     ingredientIds.push(idString);
@@ -130,14 +132,4 @@ export function commitCart(req, res, next) {
         });
     }
   );
-}
-
-function isNonNegativeInteger(s) {
-  const num = Number(s);
-  return !isNaN(num) && Number.isInteger(num) && num >= 0;
-}
-
-function isPositiveInteger(s) {
-  const num = Number(s);
-  return !isNaN(num) && Number.isInteger(num) && num > 0;
 }

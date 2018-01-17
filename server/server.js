@@ -9,6 +9,7 @@ import * as ingredient from './routes/ingredient';
 import * as storage from './routes/storage';
 import * as log from './routes/log';
 import * as inventory from './routes/inventory';
+import * as vendor from './routes/vendor';
 
 let config;
 try {
@@ -60,14 +61,19 @@ app.post('/users/noob', user.signupNoob);
 app.post('/users/login', user.login);
 app.get('/users', user.getInfo);
 
+app.get('/vendors', vendor.view);
+
+app.get('/ingredients', ingredient.view);
 app.post('/ingredients', ingredient.addIngredient);
 app.put('/ingredients/:id', ingredient.modifyIngredient);
 app.delete('/ingredients/:id', ingredient.deleteIngredient);
 
-app.put('/storage', storage.changeStorage);
+app.get('/storages', storage.view);
+app.put('/storages', storage.changeStorage);
 
-app.get('/log/:ingredient_id', log.viewLogForIngredient);
-app.post('/log', log.addEntry);
+app.get('/logs', log.view);
+app.get('/logs/:ingredient_id', log.viewLogForIngredient);
+app.post('/logs', log.addEntry);
 
 app.get('/inventory', inventory.view);
 app.put('/inventory/admin', inventory.modifyQuantities);
