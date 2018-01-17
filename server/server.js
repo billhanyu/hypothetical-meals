@@ -71,6 +71,7 @@ app.delete('/ingredients/:id', ingredient.deleteIngredient);
 app.get('/storages', storage.view);
 app.put('/storages', storage.changeStorage);
 
+app.get('/logs', log.view);
 app.get('/logs/:ingredient_id', log.viewLogForIngredient);
 app.post('/logs', log.addEntry);
 
