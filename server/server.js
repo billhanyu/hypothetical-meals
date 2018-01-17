@@ -18,8 +18,6 @@ try {
 }
 
 if (process.env.NODE_ENV === 'test') {
-  alasql('SOURCE "./server/create_database.sql"');
-  alasql('SOURCE "./server/sample_data.sql"');
   global.connection = {
     query: (...args) => {
       const queryBody = args.slice(0, args.length - 1);
