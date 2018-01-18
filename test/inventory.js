@@ -33,8 +33,8 @@ describe('Inventory', () => {
         .end((err, res) => {
           res.should.have.status(200);
           const changed = alasql('SELECT * FROM Inventories');
-          assert.strictEqual(changed[0]['num_packages'], 999, 'Inventory item 1 packages.');
-          assert.strictEqual(changed[1]['num_packages'], 99, 'Inventory item 2 packages.');
+          assert.strictEqual(changed[0]['total_weight'], 999, 'Inventory item 1 total weight.');
+          assert.strictEqual(changed[1]['total_weight'], 99, 'Inventory item 2 total weight.');
           done();
         });
     });
@@ -52,7 +52,7 @@ describe('Inventory', () => {
           res.should.have.status(200);
           const changed = alasql('SELECT * FROM Inventories');
           changed.length.should.be.eql(1);
-          assert.strictEqual(changed[0]['num_packages'], 99, 'Inventory item 2 packages.');
+          assert.strictEqual(changed[0]['total_weight'], 99, 'Inventory item 2 total weight.');
           done();
         });
     });
@@ -104,8 +104,8 @@ describe('Inventory', () => {
         .end((err, res) => {
           res.should.have.status(200);
           const changed = alasql('SELECT * FROM Inventories');
-          assert.strictEqual(changed[0]['num_packages'], 9, 'Inventory item 1 packages.');
-          assert.strictEqual(changed[1]['num_packages'], 4, 'Inventory item 2 packages.');
+          assert.strictEqual(changed[0]['total_weight'], 9, 'Inventory item 1 total weight.');
+          assert.strictEqual(changed[1]['total_weight'], 19, 'Inventory item 2 total weight.');
           done();
         });
     });
@@ -123,7 +123,7 @@ describe('Inventory', () => {
           res.should.have.status(200);
           const changed = alasql('SELECT * FROM Inventories');
           changed.length.should.be.eql(1);
-          assert.strictEqual(changed[0]['num_packages'], 3, 'Inventory item 2 packages.');
+          assert.strictEqual(changed[0]['total_weight'], 18, 'Inventory item 2 total weight.');
           done();
         });
     });
