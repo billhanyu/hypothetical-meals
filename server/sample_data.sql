@@ -9,4 +9,4 @@ INSERT INTO VendorsIngredients VALUES(1, 1, 'sack', 10, 1);
 INSERT INTO VendorsIngredients VALUES(2, 2, 'pail', 20, 1);
 INSERT INTO Inventories VALUES(1, 1, 5, 10);
 INSERT INTO Inventories VALUES(2, 2, 15, 20);
-INSERT INTO Logs (id, user_id, ingredient_id, quantity) VALUES (1, 1, 1, 18);
+INSERT INTO Logs (id, user_id, vendor_ingredient_id, quantity) VALUES (1, 1, 1, 18);

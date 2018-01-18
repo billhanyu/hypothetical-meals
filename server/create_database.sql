@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS SpendingLogs;
 DROP TABLE IF EXISTS Logs;
 DROP TABLE IF EXISTS Inventories;
 DROP TABLE IF EXISTS VendorsIngredients;
@@ -67,11 +68,21 @@ CREATE TABLE Inventories(
 CREATE TABLE Logs(
 	id int not null AUTO_INCREMENT,
 	user_id int not null,
-	ingredient_id int not null,
+	vendor_ingredient_id int not null,
 	quantity int not null,
 	created_at timestamp DEFAULT now() not null,
  
 	FOREIGN KEY (user_id) REFERENCES Users(id),
+	FOREIGN KEY (vendor_ingredient_id) REFERENCES VendorsIngredients(id),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE SpendingLogs(
+	id int not null AUTO_INCREMENT,
+	ingredient_id int not null,
+	total double not null,
+	consumed double not null,
+
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	PRIMARY KEY (id)
 );
