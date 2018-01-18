@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS Logs;
 DROP TABLE IF EXISTS Inventories;
+DROP TABLE IF EXISTS VendorsIngredients;
 DROP TABLE IF EXISTS Ingredients;
 DROP TABLE IF EXISTS Storages;
 DROP TABLE IF EXISTS Vendors;
@@ -35,12 +36,20 @@ CREATE TABLE Storages(
 CREATE TABLE Ingredients(
 	id int not null AUTO_INCREMENT,
 	name varchar(70) not null,
-	package_type enum('sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar') not null,
 	storage_id int not null,
+
+	FOREIGN KEY (storage_id) REFERENCES Storages(id),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE VendorsIngredients(
+	id int not null AUTO_INCREMENT,
+	ingredient_id int not null,
+	package_type enum('sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar') not null,
 	price double not null,
 	vendor_id int not null,
 
-	FOREIGN KEY (storage_id) REFERENCES Storages(id),
+	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	FOREIGN KEY (vendor_id) REFERENCES Vendors(id),
 	PRIMARY KEY (id)
 );
@@ -48,7 +57,8 @@ CREATE TABLE Ingredients(
 CREATE TABLE Inventories(
 	id int not null AUTO_INCREMENT,
 	ingredient_id int not null,
-	num_packages int not null,
+	storage_weight int not null,
+	total_weight int not null,
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	PRIMARY KEY (id)

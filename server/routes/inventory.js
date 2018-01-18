@@ -20,7 +20,7 @@ export function view(req, res, next) {
  *   "1": 123,
  *   "2": 456
  * }
- * This changes ingredient 1's num_packages to 123 and 2's num_packages to 456
+ * This changes ingredient 1's total_weight to 123 and 2's total_weight to 456
  */
 export function modifyQuantities(req, res, next) {
   // TODO: add authorization
@@ -43,14 +43,14 @@ export function modifyQuantities(req, res, next) {
   }
 
   connection.query(
-    `UPDATE Inventories SET num_packages = (case ${cases.join(' ')} end) WHERE ingredient_id IN (${ingredientIds.join(', ')})`,
+    `UPDATE Inventories SET total_weight = (case ${cases.join(' ')} end) WHERE ingredient_id IN (${ingredientIds.join(', ')})`,
     (error, results, fields) => {
       if (error) {
         console.error(error);
         return res.status(500).send('Database error');
       }
       connection.query(
-        'DELETE FROM Inventories WHERE num_packages = 0',
+        'DELETE FROM Inventories WHERE total_weight = 0',
         (error, results, fields) => {
           if (error) {
             console.error(error);
@@ -71,7 +71,7 @@ export function modifyQuantities(req, res, next) {
  *   "1": 123,
  *   "2": 456
  * }
- * This decreases ingredient 1's num_packages by 123 and 2's num_packages by 456
+ * This decreases ingredient 1's total_weight by 123 and 2's total_weight by 456
  */
 export function commitCart(req, res, next) {
   // TODO: log the commit cart action?
@@ -102,7 +102,7 @@ export function commitCart(req, res, next) {
       const cases = [];
       for (let i = 0; i < results.length; i++) {
         const item = results[i];
-        const newQuantity = item['num_packages'] - parseInt(cart[item['ingredient_id']]);
+        const newQuantity = item['total_weight'] - parseInt(cart[item['ingredient_id']]);
         if (newQuantity < 0) {
           return res.status(400).send(`Requesting more then what's in the inventory.`);
         }
@@ -114,14 +114,14 @@ export function commitCart(req, res, next) {
       }
 
       connection.query(
-        `UPDATE Inventories SET num_packages = (case ${cases.join(' ')} end) WHERE ingredient_id IN (${ingredientIds.join(', ')})`,
+        `UPDATE Inventories SET total_weight = (case ${cases.join(' ')} end) WHERE ingredient_id IN (${ingredientIds.join(', ')})`,
         (error, results, fields) => {
           if (error) {
             console.error(error);
             return res.status(500).send('Database error');
           }
           connection.query(
-            'DELETE FROM Inventories WHERE num_packages = 0',
+            'DELETE FROM Inventories WHERE total_weight = 0',
             (error, results, fields) => {
               if (error) {
                 console.error(error);
