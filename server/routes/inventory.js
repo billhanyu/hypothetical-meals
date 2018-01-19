@@ -39,7 +39,7 @@ export function modifyQuantities(req, res, next) {
  * This decreases ingredient 1's total_weight by 123 and 2's total_weight by 456
  */
 export function commitCart(req, res, next) {
-  // TODO: log the commit cart action?
+  // TODO: log to spendinglog
   changeHelper(req.body.cart, true, req, res, next);
 }
 
