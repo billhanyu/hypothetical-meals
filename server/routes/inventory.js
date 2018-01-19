@@ -1,13 +1,12 @@
 import * as checkNumber from './common/checkNumber';
 
 export function view(req, res, next) {
-  connection.query('SELECT * FROM Inventories', (error, results, fields) => {
-    if (error) {
+  connection.query('SELECT * FROM Inventories')
+    .then(results => res.status(200).send(results))
+    .catch(err => {
       console.error(error);
       return res.status(500).send('Database error');
-    }
-    return res.status(200).send(results);
-  });
+    });
 }
 
 /* request body format:
@@ -43,21 +42,12 @@ export function modifyQuantities(req, res, next) {
   }
 
   connection.query(
-    `UPDATE Inventories SET total_weight = (case ${cases.join(' ')} end) WHERE ingredient_id IN (${ingredientIds.join(', ')})`,
-    (error, results, fields) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).send('Database error');
-      }
-      connection.query(
-        'DELETE FROM Inventories WHERE total_weight = 0',
-        (error, results, fields) => {
-          if (error) {
-            console.error(error);
-            return res.status(500).send('Database error');
-          }
-          return res.status(200).send('success');
-        });
+    `UPDATE Inventories SET total_weight = (case ${cases.join(' ')} end) WHERE ingredient_id IN (${ingredientIds.join(', ')})`)
+    .then(() => connection.query('DELETE FROM Inventories WHERE total_weight = 0'))
+    .then(() => res.status(200).send('success'))
+    .catch(err => {
+      console.error(error);
+      return res.status(500).send('Database error');
     });
 }
 
@@ -92,44 +82,37 @@ export function commitCart(req, res, next) {
   }
 
   connection.query(
-    `SELECT * FROM Inventories WHERE ingredient_id IN (${ingredientIds.join(', ')})`,
-    (error, results, fields) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).send('Database error');
-      }
-
+    `SELECT * FROM Inventories WHERE ingredient_id IN (${ingredientIds.join(', ')})`)
+    .then(results => {
       const cases = [];
       for (let i = 0; i < results.length; i++) {
         const item = results[i];
         const newQuantity = item['total_weight'] - parseInt(cart[item['ingredient_id']]);
         if (newQuantity < 0) {
-          return res.status(400).send(`Requesting more then what's in the inventory.`);
+          const err = {
+            custom: `Requesting more then what's in the inventory.`,
+          };
+          throw err;
         }
         cases.push(`when ingredient_id = ${item['ingredient_id']} then ${newQuantity}`);
       }
 
       if (cases.length < ingredientIds.length) {
-        return res.status(400).send(`Requesting something not in the inventory.`);
+        const err = {
+          custom: `Requesting something not in the inventory.`,
+        };
+        throw err;
       }
 
-      connection.query(
-        `UPDATE Inventories SET total_weight = (case ${cases.join(' ')} end) WHERE ingredient_id IN (${ingredientIds.join(', ')})`,
-        (error, results, fields) => {
-          if (error) {
-            console.error(error);
-            return res.status(500).send('Database error');
-          }
-          connection.query(
-            'DELETE FROM Inventories WHERE total_weight = 0',
-            (error, results, fields) => {
-              if (error) {
-                console.error(error);
-                return res.status(500).send('Database error');
-              }
-              return res.status(200).send('success');
-            });
-        });
-    }
-  );
+      return connection.query(
+        `UPDATE Inventories SET total_weight = (case ${cases.join(' ')} end) WHERE ingredient_id IN (${ingredientIds.join(', ')})`);
+    })
+    .then(() => connection.query('DELETE FROM Inventories WHERE total_weight = 0'))
+    .then(() => res.status(200).send('success'))
+    .catch(err => {
+      if (err.custom) {
+        return res.status(400).send(err.custom);
+      }
+      return res.status(500).send('Database error');
+    });
 }
