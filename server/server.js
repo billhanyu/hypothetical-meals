@@ -20,17 +20,7 @@ try {
 
 if (process.env.NODE_ENV === 'test') {
   global.connection = {
-    query: (...args) => {
-      const queryBody = args.slice(0, args.length - 1);
-      const callback = args[args.length - 1];
-      alasql
-      .promise(...queryBody)
-      .then(res => {
-        callback(null, res, null);
-      }).catch(err => {
-        callback(err, null, null);
-      });
-    },
+    query: alasql.promise,
   };
 } else {
   const pool = mysql.createPool({
@@ -42,9 +32,14 @@ if (process.env.NODE_ENV === 'test') {
   });
   global.connection = {
     query: (...args) => {
-      pool.getConnection(function(err, connection) {
-        if (err) callback(err, null, null);
-        connection.query(...args);
+      return new Promise((resolve, reject) => {
+        pool.getConnection(function(err, connection) {
+          if (err) reject(err);
+          connection.query(...args, (err, results, fields) => {
+            if (err) reject(err);
+            resolve(results);
+          });
+        });
       });
     },
   };

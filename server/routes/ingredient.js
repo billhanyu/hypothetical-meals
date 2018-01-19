@@ -1,11 +1,10 @@
 export function view(req, res, next) {
-  connection.query('SELECT * FROM Ingredients', (error, results, fields) => {
-    if (error) {
+  connection.query('SELECT * FROM Ingredients')
+    .then(results => res.status(200).send(results))
+    .catch(err => {
       console.error(error);
       return res.status(500).send('Database error');
-    }
-    return res.status(200).send(results);
-  });
+    });
 }
 
 /* request body format:
