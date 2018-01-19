@@ -61,6 +61,18 @@ describe('Storage', () => {
         });
     });
 
+    it('should not reject storage id not in storages table', (done) => {
+      chai.request(server)
+        .put('/storages')
+        .send({
+          '3': 100,
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
     it('should not reject invalid storage capacity', (done) => {
       chai.request(server)
         .put('/storages')
