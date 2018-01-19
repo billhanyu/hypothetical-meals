@@ -23,6 +23,7 @@ export function view(req, res, next) {
  */
 export function modifyQuantities(req, res, next) {
   // TODO: add authorization
+  // TODO: check that the storage weight does not exceed capacity
   changeHelper(req.body.changes, false, req, res, next);
 }
 
@@ -63,7 +64,7 @@ function changeHelper(items, isCart, req, res, next) {
   }
 
   connection.query(
-    `SELECT * FROM Inventories WHERE ingredient_id IN (${ingredientIds.join(', ')})`)
+    `SELECT ingredient_id, storage_weight, total_weight FROM Inventories WHERE ingredient_id IN (${ingredientIds.join(', ')})`)
     .then(results => {
       if (results.length < ingredientIds.length) {
         const err = {
@@ -99,26 +100,12 @@ function calcNewStorageAndTotalWeights(oldItems, isCart, request) {
     const reqNum = parseInt(request[id]);
     const oldTotal = item['total_weight'];
     const oldStorage = item['storage_weight'];
-    let newTotal;
-    let newStorage;
-    if (isCart) {
-      newTotal = oldTotal - reqNum;
-      if (newTotal < 0) {
-        const err = {
-          custom: `Requesting more then what's in the inventory.`,
-        };
-        throw err;
-      }
-      newStorage = oldStorage > reqNum > 0 ? oldStorage - reqNum : 0;
-    } else {
-      newTotal = reqNum;
-      const reduce = oldTotal - newTotal;
-      if (reduce > 0) {
-        newStorage = oldStorage > reduce ? oldStorage - reduce : 0;
-      } else {
-        newStorage = oldStorage;
-      }
-    }
+    const newWeights = isCart
+      ? calcIndStorageTotalWeightsCart(oldStorage, oldTotal, reqNum)
+      : calcIndStorageTotalWeightsAdmin(oldStorage, oldTotal, reqNum);
+    const newTotal = newWeights.newTotal;
+    const newStorage = newWeights.newStorage;
+
     totalCases.push(`when ingredient_id = ${id} then ${newTotal}`);
     storageCases.push(`when ingredient_id = ${id} then ${newStorage}`);
   }
@@ -126,5 +113,33 @@ function calcNewStorageAndTotalWeights(oldItems, isCart, request) {
   return {
     totalCases,
     storageCases,
+  };
+}
+
+function calcIndStorageTotalWeightsAdmin(oldStorage, oldTotal, reqNum) {
+  const newTotal = reqNum;
+  let newStorage = oldStorage;
+  const reduce = oldTotal - newTotal;
+  if (reduce > 0) {
+    newStorage = oldStorage > reduce ? oldStorage - reduce : 0;
+  }
+  return {
+    newTotal,
+    newStorage,
+  };
+}
+
+function calcIndStorageTotalWeightsCart(oldStorage, oldTotal, reqNum) {
+  const newTotal = oldTotal - reqNum;
+  if (newTotal < 0) {
+    const err = {
+      custom: `Requesting more then what's in the inventory.`,
+    };
+    throw err;
+  }
+  const newStorage = oldStorage > reqNum > 0 ? oldStorage - reqNum : 0;
+  return {
+    newTotal,
+    newStorage,
   };
 }

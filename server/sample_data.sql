@@ -1,7 +1,7 @@
 INSERT INTO Users (id, name, hash, salt, user_group) VALUES (1, 'Bill', 'hash', 'salt', 'admin');
 INSERT INTO Users (id, name, hash, salt, user_group) VALUES (2, 'Eric', 'hash', 'salt', 'noob');
 INSERT INTO Vendors (id, name, contact, code) VALUES (1, 'Duke', 'contact', 'code');
-INSERT INTO Storages (id, name, capacity) VALUES (1, 'freezer', 10);
+INSERT INTO Storages (id, name, capacity) VALUES (1, 'freezer', 20);
 INSERT INTO Storages (id, name, capacity) VALUES (2, 'refrigerator', 20);
 INSERT INTO Ingredients (id, name, storage_id) VALUES (1, 'poop', 1);
 INSERT INTO Ingredients (id, name, storage_id) VALUES (2, 'beans', 1);

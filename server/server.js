@@ -40,6 +40,7 @@ if (process.env.NODE_ENV === 'test') {
           connection.query(...args, (err, results, fields) => {
             if (err) reject(err);
             resolve(results);
+            connection.release();
           });
         });
       });
