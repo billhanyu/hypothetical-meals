@@ -10,6 +10,7 @@ import * as storage from './routes/storage';
 import * as log from './routes/log';
 import * as inventory from './routes/inventory';
 import * as vendor from './routes/vendor';
+import * as vendorIngredient from './routes/vendorIngredient';
 
 let config;
 try {
@@ -62,6 +63,8 @@ app.get('/ingredients', ingredient.view);
 app.post('/ingredients', ingredient.addIngredient);
 app.put('/ingredients/:id', ingredient.modifyIngredient);
 app.delete('/ingredients/:id', ingredient.deleteIngredient);
+
+app.get('/vendoringredients/:ingredient_id', vendorIngredient.getVendorsForIngredient);
 
 app.get('/storages', storage.view);
 app.put('/storages', storage.changeStorage);
