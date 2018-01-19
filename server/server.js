@@ -11,6 +11,7 @@ import * as log from './routes/log';
 import * as inventory from './routes/inventory';
 import * as vendor from './routes/vendor';
 import * as vendorIngredient from './routes/vendorIngredient';
+import * as spendinglog from './routes/spendinglog';
 
 let config;
 try {
@@ -72,6 +73,8 @@ app.put('/storages', storage.changeStorage);
 app.get('/logs', log.view);
 app.get('/logs/:ingredient_id', log.viewLogForIngredient);
 app.post('/logs', log.addEntry);
+
+app.get('/spendinglogs', spendinglog.view);
 
 app.get('/inventory', inventory.view);
 app.put('/inventory/admin', inventory.modifyQuantities);
