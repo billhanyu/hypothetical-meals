@@ -23,32 +23,7 @@ export function view(req, res, next) {
  */
 export function modifyQuantities(req, res, next) {
   // TODO: add authorization
-  const changes = req.body.changes;
-  if (!changes || Object.keys(changes).length < 1) {
-    return res.status(400).send('Changes has nothing.');
-  }
-  const ingredientIds = [];
-  const cases = [];
-  for (const idString in changes) {
-    if (!checkNumber.isPositiveInteger(idString)) {
-      return res.status(400).send(`Ingredient ID ${idString} is invalid.`);
-    }
-    const quantity = changes[idString];
-    if (!checkNumber.isNonNegativeInteger(quantity)) {
-      return res.status(400).send(`New quantity ${quantity} is invalid.`);
-    }
-    ingredientIds.push(idString);
-    cases.push(`when ingredient_id = ${idString} then ${quantity}`);
-  }
-
-  connection.query(
-    `UPDATE Inventories SET total_weight = (case ${cases.join(' ')} end) WHERE ingredient_id IN (${ingredientIds.join(', ')})`)
-    .then(() => connection.query('DELETE FROM Inventories WHERE total_weight = 0'))
-    .then(() => res.status(200).send('success'))
-    .catch(err => {
-      console.error(error);
-      return res.status(500).send('Database error');
-    });
+  changeHelper(req.body.changes, false, req, res, next);
 }
 
 /* request body format:
@@ -65,18 +40,24 @@ export function modifyQuantities(req, res, next) {
  */
 export function commitCart(req, res, next) {
   // TODO: log the commit cart action?
-  const cart = req.body.cart;
-  if (!cart || Object.keys(cart).length < 1) {
-    return res.status(400).send('Cart has nothing.');
+  changeHelper(req.body.cart, true, req, res, next);
+}
+
+function changeHelper(items, isCart, req, res, next) {
+  if (!items || Object.keys(items).length < 1) {
+    return res.status(400).send('Invalid input request, see doc.');
   }
   const ingredientIds = [];
-  for (const idString in cart) {
+  for (const idString in items) {
     if (!checkNumber.isPositiveInteger(idString)) {
       return res.status(400).send(`Ingredient ID ${idString} is invalid.`);
     }
-    const quantity = cart[idString];
-    if (!checkNumber.isPositiveInteger(quantity)) {
+    const quantity = items[idString];
+    if (!checkNumber.isPositiveInteger(quantity) && isCart) {
       return res.status(400).send(`Request quantity ${quantity} is invalid.`);
+    }
+    if (!checkNumber.isNonNegativeInteger(quantity) && !isCart) {
+      return res.status(400).send(`New quantity ${quantity} is invalid.`);
     }
     ingredientIds.push(idString);
   }
@@ -84,28 +65,20 @@ export function commitCart(req, res, next) {
   connection.query(
     `SELECT * FROM Inventories WHERE ingredient_id IN (${ingredientIds.join(', ')})`)
     .then(results => {
-      const cases = [];
-      for (let i = 0; i < results.length; i++) {
-        const item = results[i];
-        const newQuantity = item['total_weight'] - parseInt(cart[item['ingredient_id']]);
-        if (newQuantity < 0) {
-          const err = {
-            custom: `Requesting more then what's in the inventory.`,
-          };
-          throw err;
-        }
-        cases.push(`when ingredient_id = ${item['ingredient_id']} then ${newQuantity}`);
-      }
-
-      if (cases.length < ingredientIds.length) {
+      if (results.length < ingredientIds.length) {
         const err = {
-          custom: `Requesting something not in the inventory.`,
+          custom: `Changing quantity of something not in the inventory.`,
         };
         throw err;
       }
 
+      const newWeights = calcNewStorageAndTotalWeights(results, isCart, items);
+
       return connection.query(
-        `UPDATE Inventories SET total_weight = (case ${cases.join(' ')} end) WHERE ingredient_id IN (${ingredientIds.join(', ')})`);
+        `UPDATE Inventories
+          SET total_weight = (case ${newWeights.totalCases.join(' ')} end),
+              storage_weight = (case ${newWeights.storageCases.join(' ')} end)
+          WHERE ingredient_id IN (${ingredientIds.join(', ')})`);
     })
     .then(() => connection.query('DELETE FROM Inventories WHERE total_weight = 0'))
     .then(() => res.status(200).send('success'))
@@ -115,4 +88,43 @@ export function commitCart(req, res, next) {
       }
       return res.status(500).send('Database error');
     });
+}
+
+function calcNewStorageAndTotalWeights(oldItems, isCart, request) {
+  const totalCases = [];
+  const storageCases = [];
+  for (let i = 0; i < oldItems.length; i++) {
+    const item = oldItems[i];
+    const id = item['ingredient_id'];
+    const reqNum = parseInt(request[id]);
+    const oldTotal = item['total_weight'];
+    const oldStorage = item['storage_weight'];
+    let newTotal;
+    let newStorage;
+    if (isCart) {
+      newTotal = oldTotal - reqNum;
+      if (newTotal < 0) {
+        const err = {
+          custom: `Requesting more then what's in the inventory.`,
+        };
+        throw err;
+      }
+      newStorage = oldStorage > reqNum > 0 ? oldStorage - reqNum : 0;
+    } else {
+      newTotal = reqNum;
+      const reduce = oldTotal - newTotal;
+      if (reduce > 0) {
+        newStorage = oldStorage > reduce ? oldStorage - reduce : 0;
+      } else {
+        newStorage = oldStorage;
+      }
+    }
+    totalCases.push(`when ingredient_id = ${id} then ${newTotal}`);
+    storageCases.push(`when ingredient_id = ${id} then ${newStorage}`);
+  }
+
+  return {
+    totalCases,
+    storageCases,
+  };
 }

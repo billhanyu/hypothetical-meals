@@ -21,20 +21,42 @@ describe('Inventory', () => {
       alasql('SOURCE "./server/sample_data.sql"');
     });
 
-    it('should modify inventory quantities', (done) => {
+    it('should modify inventory quantities with storage_weight first', (done) => {
       chai.request(server)
         .put('/inventory/admin')
         .send({
           'changes': {
-            '1': 999,
-            '2': 99,
+            '1': 7,
+            '2': 17,
           },
         })
         .end((err, res) => {
           res.should.have.status(200);
           const changed = alasql('SELECT * FROM Inventories');
-          assert.strictEqual(changed[0]['total_weight'], 999, 'Inventory item 1 total weight.');
-          assert.strictEqual(changed[1]['total_weight'], 99, 'Inventory item 2 total weight.');
+          assert.strictEqual(changed[0]['total_weight'], 7, 'Inventory item 1 total weight.');
+          assert.strictEqual(changed[1]['total_weight'], 17, 'Inventory item 2 total weight.');
+          assert.strictEqual(changed[0]['storage_weight'], 2, 'Inventory item 1 storage weight.');
+          assert.strictEqual(changed[1]['storage_weight'], 12, 'Inventory item 2 storage weight.');
+          done();
+        });
+    });
+
+    it('should reduce total_weight when storage_weight is not enough', (done) => {
+      chai.request(server)
+        .put('/inventory/admin')
+        .send({
+          'changes': {
+            '1': 2,
+            '2': 12,
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const changed = alasql('SELECT * FROM Inventories');
+          assert.strictEqual(changed[0]['total_weight'], 2, 'Inventory item 1 total weight.');
+          assert.strictEqual(changed[1]['total_weight'], 12, 'Inventory item 2 total weight.');
+          assert.strictEqual(changed[0]['storage_weight'], 0, 'Inventory item 1 storage weight.');
+          assert.strictEqual(changed[1]['storage_weight'], 7, 'Inventory item 2 storage weight.');
           done();
         });
     });
@@ -45,14 +67,49 @@ describe('Inventory', () => {
         .send({
           'changes': {
             '1': 0,
-            '2': 99,
+            '2': 20,
           },
         })
         .end((err, res) => {
           res.should.have.status(200);
           const changed = alasql('SELECT * FROM Inventories');
           changed.length.should.be.eql(1);
-          assert.strictEqual(changed[0]['total_weight'], 99, 'Inventory item 2 total weight.');
+          assert.strictEqual(changed[0]['total_weight'], 20, 'Inventory item 2 total weight.');
+          done();
+        });
+    });
+
+    it('should add to total_weight first', (done) => {
+      chai.request(server)
+        .put('/inventory/admin')
+        .send({
+          'changes': {
+            '1': 100,
+            '2': 100,
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const changed = alasql('SELECT * FROM Inventories');
+          assert.strictEqual(changed[0]['total_weight'], 100, 'Inventory item 1 total weight.');
+          assert.strictEqual(changed[1]['total_weight'], 100, 'Inventory item 2 total weight.');
+          assert.strictEqual(changed[0]['storage_weight'], 5, 'Inventory item 1 storage weight.');
+          assert.strictEqual(changed[1]['storage_weight'], 15, 'Inventory item 2 storage weight.');
+          done();
+        });
+    });
+
+    it('should decline ingredients not in inventory', (done) => {
+      chai.request(server)
+        .put('/inventory/admin')
+        .send({
+          'changes': {
+            '100': 999,
+            '2': 99,
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
           done();
         });
     });
@@ -92,7 +149,7 @@ describe('Inventory', () => {
       alasql('SOURCE "./server/sample_data.sql"');
     });
 
-    it('should reduce inventory quantities', (done) => {
+    it('should reduce inventory quantities with storage_weight reduced first', (done) => {
       chai.request(server)
         .put('/inventory')
         .send({
@@ -106,6 +163,28 @@ describe('Inventory', () => {
           const changed = alasql('SELECT * FROM Inventories');
           assert.strictEqual(changed[0]['total_weight'], 9, 'Inventory item 1 total weight.');
           assert.strictEqual(changed[1]['total_weight'], 19, 'Inventory item 2 total weight.');
+          assert.strictEqual(changed[0]['storage_weight'], 4, 'Inventory item 1 storage weight.');
+          assert.strictEqual(changed[1]['storage_weight'], 14, 'Inventory item 2 storage weight.');
+          done();
+        });
+    });
+
+    it('should reduce total_weight when storage_weight is not enough', (done) => {
+      chai.request(server)
+        .put('/inventory')
+        .send({
+          'cart': {
+            '1': 6,
+            '2': 6,
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const changed = alasql('SELECT * FROM Inventories');
+          assert.strictEqual(changed[0]['total_weight'], 4, 'Inventory item 1 total weight.');
+          assert.strictEqual(changed[1]['total_weight'], 14, 'Inventory item 2 total weight.');
+          assert.strictEqual(changed[0]['storage_weight'], 0, 'Inventory item 1 storage weight.');
+          assert.strictEqual(changed[1]['storage_weight'], 9, 'Inventory item 2 storage weight.');
           done();
         });
     });
@@ -188,7 +267,7 @@ describe('Inventory', () => {
         });
     });
 
-    it('should decline empty changes object', (done) => {
+    it('should decline empty cart object', (done) => {
       chai.request(server)
         .put('/inventory')
         .send({
