@@ -29,7 +29,7 @@ function addIngredientHelper(ingredients, req, res, next) {
     return res.status(400).send('Invalid input reqest, see doc.');
   }
   connection.query('INSERT INTO Ingredients (name, storage_id) VALUES (${ingredients.join(', ')})')
-  .then(() => res.status(200.send('success')))
+  .then(() => res.status(200).send('success'))
   .catch(err => {
     return res.status(500).send('Database error');
   })
@@ -97,7 +97,7 @@ function modifyIngredientHelper(items, req, res, next) {
  */
 export function deleteIngredient(req, res, next) {
   //TODO: add auth
-  
+
   deleteIngredientHelper(req.body.ingredients, req, res, next);
 }
 
