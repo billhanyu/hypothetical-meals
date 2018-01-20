@@ -41,7 +41,7 @@ export function viewLogForIngredient(req, res, next) {
  * This adds a log to the Log Table.
  */
 export function addEntry(req, res, next) {
-  res.status(501).send('todo');
+  addLogEntryHelper(req.body.logs, req, res, next);
 }
 
 function addLogEntryHelper(logs, req, res, next) {
