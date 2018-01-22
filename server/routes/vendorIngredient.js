@@ -72,6 +72,17 @@ export function addVendorIngredients(req, res, next) {
     });
 }
 
+/* Request body format
+ * req.body.vendoringredients = [
+ *   '1': {
+ *     'price': 100,
+ *   },
+ *   '2': {
+ *     'vendor_id': 2,
+ *     'package_type': 'sack',
+ *   }
+ * ]
+ */
 export function modifyVendorIngredients(req, res, next) {
   // TODO: add auth
   res.status(501).send('todo');
