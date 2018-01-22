@@ -77,7 +77,27 @@ export function modifyVendorIngredients(req, res, next) {
   res.status(501).send('todo');
 }
 
+/* Request body format
+ * req.body.ids = [
+ *   1, 2, 3...
+ * ]
+ */
 export function deleteVendorIngredients(req, res, next) {
   // TODO: add auth
-  res.status(501).send('todo');
+  const ids = req.body.ids;
+  if (!ids || ids.length < 1) {
+    return res.status(400).send('Invalid input request, see doc.');
+  }
+  for (let i = 0; i < ids.length; i++) {
+    const id = ids[i];
+    if (!checkNumber.isPositiveInteger(id)) {
+      return res.status(400).send('Invalid Id detected, trying to inject? you lil b');
+    }
+  }
+  connection.query(`DELETE FROM VendorsIngredients WHERE id IN (${ids.join(',')})`)
+    .then(() => res.status(200).send('success'))
+    .catch(err => {
+      console.error(err);
+      res.status(500).send('Database error');
+    });
 }
