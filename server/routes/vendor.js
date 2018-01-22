@@ -6,3 +6,7 @@ export function view(req, res, next) {
       return res.status(500).send('Database error');
     });
 }
+
+export function addVendor(req, res, next) {
+  res.status(400).send('todo');
+}

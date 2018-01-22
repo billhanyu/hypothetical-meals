@@ -12,3 +12,7 @@ export function getVendorsForIngredient(req, res, next) {
       res.status(500).send('Database error');
     });
 }
+
+export function addVendorForIngredient(req, res, next) {
+  res.status(400).send('todo');
+}
