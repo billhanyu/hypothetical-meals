@@ -96,4 +96,47 @@ describe('VendorIngredient', () => {
         });
     });
   });
+
+  describe('#deleteVendorIngredient()', () => {
+    beforeEach(() => {
+      alasql('SOURCE "./server/create_database.sql"');
+      alasql('SOURCE "./server/sample_data.sql"');
+    });
+
+    it('should reject request body without an ids object', (done) => {
+      chai.request(server)
+        .delete('/vendoringredients')
+        .send({})
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should reject invalid ids', (done) => {
+      chai.request(server)
+        .delete('/vendoringredients')
+        .send({
+          'ids': ['aaa', 2],
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should delete multiple vendorsingredients', (done) => {
+      chai.request(server)
+        .delete('/vendoringredients')
+        .send({
+          'ids': [1, 2],
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const left = alasql('SELECT id FROM VendorsIngredients');
+          assert.strictEqual(left.length, 0, 'there should be nothing left');
+          done();
+        });
+    });
+  });
 });
