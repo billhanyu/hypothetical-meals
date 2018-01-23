@@ -72,7 +72,7 @@ app.get('/storages', storage.view);
 app.put('/storages', storage.changeStorage);
 
 app.get('/logs', log.view);
-app.get('/logs/:ingredient_id', log.viewLogForIngredient);
+app.get('/logs/ingredients', log.viewLogForIngredient);
 app.post('/logs', log.addEntry);
 
 app.get('/spendinglogs', spendinglog.view);
