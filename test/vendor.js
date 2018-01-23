@@ -137,4 +137,112 @@ describe('Vendor', () => {
         });
     });
   });
+
+  describe('#modifyVendors()', () => {
+    beforeEach(() => {
+      alasql('SOURCE "./server/create_database.sql"');
+      alasql('SOURCE "./server/sample_data.sql"');
+    });
+
+    it('should reject empty object request', (done) => {
+      chai.request(server)
+        .put('/vendors')
+        .send({})
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should reject duplicate name', (done) => {
+      chai.request(server)
+        .put('/vendors')
+        .send({
+          'vendors': {
+            '2': {
+              'name': 'Duke',
+            },
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should reject duplicate name within request', (done) => {
+      chai.request(server)
+        .put('/vendors')
+        .send({
+          'vendors': {
+            '1': {
+              'name': 'bill',
+            },
+            '2': {
+              'name': 'bill',
+            },
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should reject duplicate code', (done) => {
+      chai.request(server)
+        .put('/vendors')
+        .send({
+          'vendors': {
+            '2': {
+              'code': 'code_duke',
+            },
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should reject invalid id', (done) => {
+      chai.request(server)
+        .put('/vendors')
+        .send({
+          'vendors': {
+            '2a': {
+              'code': 'code_random',
+            },
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should modify vendors for valid requests', (done) => {
+      chai.request(server)
+        .put('/vendors')
+        .send({
+          'vendors': {
+            '1': {
+              'name': 'duke1',
+            },
+            '2': {
+              'contact': 'mcd@mcd.com',
+              'code': 'mcd',
+            },
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const changed = alasql('SELECT * FROM Vendors WHERE id IN (1, 2)');
+          assert.strictEqual(changed[0]['name'], 'duke1', 'duke new name');
+          assert.strictEqual(changed[1]['contact', 'mcd@mcd.com', 'unc new contact']);
+          assert.strictEqual(changed[1]['code'], 'mcd', 'unc new code');
+          done();
+        });
+    });
+  });
 });
