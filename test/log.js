@@ -14,7 +14,7 @@ describe('Log', () => {
         });
     });
   });
-  
+
   describe('#viewLogForIngredient()', () => {
     beforeEach(() => {
       alasql('SOURCE "./server/create_database.sql"');
@@ -50,18 +50,17 @@ describe('Log', () => {
           'user_id': 2,
           'vendor_ingredient_id': 2,
           'quantity': 10,
-        },]
+        }],
       })
       .end((err, res) => {
         res.should.have.status(200);
         const changed = alasql('SELECT * FROM Logs');
-        console.log(changed[0]);
         assert.strictEqual(changed[0]['user_id'], 1, 'User id for log 1.');
         assert.strictEqual(changed[0]['vendor_ingredient_id'], 1, 'Vendor id for log 1.');
-        assert.strictEqual(changed[0]['quantity'], 18, 'Quantity for log 1.')
+        assert.strictEqual(changed[0]['quantity'], 18, 'Quantity for log 1.');
         assert.strictEqual(changed[2]['user_id'], 2, 'User id for log 2.');
         assert.strictEqual(changed[2]['vendor_ingredient_id'], 2, 'Vendor id for log 2.');
-        assert.strictEqual(changed[2]['quantity'], 10, 'Quantity for log 2.')
+        assert.strictEqual(changed[2]['quantity'], 10, 'Quantity for log 2.');
         done();
       });
     });
