@@ -82,6 +82,7 @@ app.get('/logs/ingredients', log.viewLogForIngredient);
 app.post('/logs', log.addEntry);
 
 app.get('/spendinglogs', spendinglog.view);
+app.get('/spendinglogs/:ingredient_id', spendinglogs.logsForIngredient);
 
 app.get('/inventory', inventory.view);
 app.put('/inventory/admin', inventory.modifyQuantities);
