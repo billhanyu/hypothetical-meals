@@ -67,6 +67,9 @@ app.put('/ingredients/:id', ingredient.modifyIngredient);
 app.delete('/ingredients/:id', ingredient.deleteIngredient);
 
 app.get('/vendoringredients/:ingredient_id', vendorIngredient.getVendorsForIngredient);
+app.post('/vendoringredients', vendorIngredient.addVendorIngredients);
+app.put('/vendoringredients', vendorIngredient.modifyVendorIngredients);
+app.delete('/vendoringredients', vendorIngredient.deleteVendorIngredients);
 
 app.get('/storages', storage.view);
 app.put('/storages', storage.changeStorage);
