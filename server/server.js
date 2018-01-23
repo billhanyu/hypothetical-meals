@@ -3,6 +3,8 @@ const mysql = require('mysql');
 const alasql = require('alasql');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 // const auth = require('./auth');
 import * as user from './routes/user';
 import * as ingredient from './routes/ingredient';
@@ -65,6 +67,7 @@ app.get('/ingredients', ingredient.view);
 app.post('/ingredients', ingredient.addIngredient);
 app.put('/ingredients/:id', ingredient.modifyIngredient);
 app.delete('/ingredients/:id', ingredient.deleteIngredient);
+app.post('/ingredients/import', upload.single('bulk'), ingredient.bulkImport);
 
 app.get('/vendoringredients/:ingredient_id', vendorIngredient.getVendorsForIngredient);
 app.post('/vendoringredients', vendorIngredient.addVendorIngredients);

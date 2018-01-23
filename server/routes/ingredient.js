@@ -1,4 +1,5 @@
 import * as checkNumber from './common/checkNumber';
+const fs = require('fs');
 
 export function view(req, res, next) {
   connection.query('SELECT * FROM Ingredients')
@@ -130,4 +131,10 @@ function deleteIngredientHelper(items, req, res, next) {
     }
     return res.status(500).send('Database error');
   });
+}
+
+export function bulkImport(req, res, next) {
+  const content = fs.readFileSync(req.file.path);
+  console.log(content.toString());
+  res.status(501).send('todo');
 }
