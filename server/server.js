@@ -3,6 +3,8 @@ const mysql = require('mysql');
 const alasql = require('alasql');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 // const auth = require('./auth');
 import * as user from './routes/user';
 import * as ingredient from './routes/ingredient';
@@ -60,11 +62,15 @@ app.post('/users/login', user.login);
 app.get('/users', user.getInfo);
 
 app.get('/vendors', vendor.view);
+app.post('/vendors', vendor.addVendors);
+app.put('/vendors', vendor.modifyVendors);
+app.delete('/vendors', vendor.deleteVendors);
 
 app.get('/ingredients', ingredient.view);
 app.post('/ingredients', ingredient.addIngredient);
 app.put('/ingredients', ingredient.modifyIngredient);
 app.delete('/ingredients', ingredient.deleteIngredient);
+app.post('/ingredients/import', upload.single('bulk'), ingredient.bulkImport);
 
 app.get('/vendoringredients/:ingredient_id', vendorIngredient.getVendorsForIngredient);
 app.post('/vendoringredients', vendorIngredient.addVendorIngredients);
@@ -79,6 +85,7 @@ app.get('/logs/ingredients', log.viewLogForIngredient);
 app.post('/logs', log.addEntry);
 
 app.get('/spendinglogs', spendinglog.view);
+app.get('/spendinglogs/:ingredient_id', spendinglog.logsForIngredient);
 
 app.get('/inventory', inventory.view);
 app.put('/inventory/admin', inventory.modifyQuantities);

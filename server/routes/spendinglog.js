@@ -6,3 +6,7 @@ export function view(req, res, next) {
       return res.status(500).send('Database error');
     });
 }
+
+export function logsForIngredient(req, res, next) {
+  res.status(501).send('todo');
+}
