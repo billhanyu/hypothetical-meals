@@ -245,4 +245,51 @@ describe('Vendor', () => {
         });
     });
   });
+
+  describe('#deleteVendors()', () => {
+    beforeEach(() => {
+      alasql('SOURCE "./server/create_database.sql"');
+      alasql('SOURCE "./server/sample_data.sql"');
+    });
+
+    it('should reject invalid input object', (done) => {
+      chai.request(server)
+        .delete('/vendors')
+        .send({        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should reject invalid id', (done) => {
+      chai.request(server)
+        .delete('/vendors')
+        .send({
+          'ids': [
+            1, 2, 'fw',
+          ],
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should delete multiple vendors for valid request', (done) => {
+      chai.request(server)
+        .delete('/vendors')
+        .send({
+          'ids': [
+            1, 2
+          ],
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const left = alasql('SELECT id FROM Vendors');
+          assert.strictEqual(left.length, 0, 'no vendor left');
+          done();
+        });
+    });
+  });
 });
