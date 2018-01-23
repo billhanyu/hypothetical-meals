@@ -25,14 +25,14 @@ export function addIngredient(req, res, next) {
 }
 
 function addIngredientHelper(ingredients, req, res, next) {
-  if(!ingredients || Object.keys(ingredients).length < 1) {
+  if (!ingredients || Object.keys(ingredients).length < 1) {
     return res.status(400).send('Invalid input reqest, see doc.');
   }
   connection.query('INSERT INTO Ingredients (name, storage_id) VALUES (${ingredients.join(', ')})')
   .then(() => res.status(200).send('success'))
   .catch(err => {
     return res.status(500).send('Database error');
-  })
+  });
 }
 
 /* request body format:
@@ -45,13 +45,13 @@ function addIngredientHelper(ingredients, req, res, next) {
  * This changes the storage_id of the ingredient.
  */
 export function modifyIngredient(req, res, next) {
-  //TODO: add auth
+  // TODO: add auth
 
   modifyIngredientHelper(req.body.ingredients, req, res, next);
 }
 
 function modifyIngredientHelper(items, req, res, next) {
-  if(!items || Object.keys(items).length < 1) {
+  if (!items || Object.keys(items).length < 1) {
     return res.status(400).send('Invalid input reqest, see doc.');
   }
   const ingredientIds = [];
@@ -60,7 +60,7 @@ function modifyIngredientHelper(items, req, res, next) {
       return res.status(400).send(`Ingredient ID ${idString} is invalid.`);
     }
     const storageId = items[idString];
-    if(!checkNumbe.isNonNegativeInteger(storageId) && storageId > 2) {
+    if (!checkNumbe.isNonNegativeInteger(storageId) && storageId > 2) {
       return res.status(400).send(`New storage id ${storageId} is invalid`);
     }
     ingredientIds.push(idString);
@@ -68,14 +68,14 @@ function modifyIngredientHelper(items, req, res, next) {
 
   connection.query(`SELECT id, storage_id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
   .then(results => {
-    if(results.length < ingredientIds.length) {
+    if (results.length < ingredientIds.length) {
       const err = {
-        custom: 'Changing storage id of invalid ingredient.'
+        custom: 'Changing storage id of invalid ingredient.',
       };
       throw err;
     }
 
-    return connection.query(`UPDATE Ingredients SET storage_id = (${storageId.join(', ')} WHERE id IN (${ingredientIds.join(', ')}`);    
+    return connection.query(`UPDATE Ingredients SET storage_id = (${storageId.join(', ')} WHERE id IN (${ingredientIds.join(', ')}`);
   })
   .then(() => res.status(200).send('success'))
   .catch(err => {
@@ -96,13 +96,13 @@ function modifyIngredientHelper(items, req, res, next) {
  * This deletes an ingredient from the ingredients table.
  */
 export function deleteIngredient(req, res, next) {
-  //TODO: add auth
+  // TODO: add auth
 
   deleteIngredientHelper(req.body.ingredients, req, res, next);
 }
 
 function deleteIngredientHelper(items, req, res, next) {
-  if(!items || items.length < 1) {
+  if (!items || items.length < 1) {
     return res.status(400).send('Invalid input reqest, see doc.');
   }
   const ingredientIds = [];
@@ -115,9 +115,9 @@ function deleteIngredientHelper(items, req, res, next) {
 
   connection.query(`SELECT id, storage_id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
   .then(results => {
-    if(results.length < ingredientIds.length) {
+    if (results.length < ingredientIds.length) {
       const err = {
-        custom: 'Deleting nonexistent ingredient.'
+        custom: 'Deleting nonexistent ingredient.',
       };
       throw err;
     }
