@@ -34,6 +34,20 @@ describe('Log', () => {
         done();
       });
     });
+
+    it('should return no logs for a vendor ingredient not in table', (done) => {
+      chai.request(server)
+      .get('/logs/ingredients')
+      .send({
+        'vendor_ingredient_ids': [10],
+      })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.a('array');
+        res.body.length.should.be.eql(0);
+        done();
+      });
+    });
   });
 
   describe('#addEntry()', () => {

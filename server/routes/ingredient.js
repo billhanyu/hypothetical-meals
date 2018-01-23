@@ -28,7 +28,11 @@ function addIngredientHelper(ingredients, req, res, next) {
   if (!ingredients || Object.keys(ingredients).length < 1) {
     return res.status(400).send('Invalid input reqest, see doc.');
   }
-  connection.query('INSERT INTO Ingredients (name, storage_id) VALUES (${ingredients.join(', ')})')
+  const ingredientsToAdd = [];
+  for (let ingredient of ingredients) {
+    ingredientsToAdd.push(`('${ingredient.name}', ${ingredient.storage_id})`);
+  }
+  connection.query(`INSERT INTO Ingredients (name, storage_id) VALUES ${ingredientsToAdd.join(', ')}`)
   .then(() => res.status(200).send('success'))
   .catch(err => {
     return res.status(500).send('Database error');
@@ -36,12 +40,11 @@ function addIngredientHelper(ingredients, req, res, next) {
 }
 
 /* request body format:
- * request.body.ingredients = [
+ * request.body.ingredients =
  *   {
  *     'ingredient_id1': storage_id_change1,
  *     'ingredient_id2': storage_id_change2,
  *   }, ...
- * ]
  * This changes the storage_id of the ingredient.
  */
 export function modifyIngredient(req, res, next) {
@@ -55,15 +58,17 @@ function modifyIngredientHelper(items, req, res, next) {
     return res.status(400).send('Invalid input reqest, see doc.');
   }
   const ingredientIds = [];
+  const storageCases = [];
   for (const idString in items) {
     if (!checkNumber.isPositiveInteger(idString)) {
       return res.status(400).send(`Ingredient ID ${idString} is invalid.`);
     }
     const storageId = items[idString];
-    if (!checkNumbe.isNonNegativeInteger(storageId) && storageId > 2) {
+    if (!checkNumber.isNonNegativeInteger(storageId) || storageId > 2) {
       return res.status(400).send(`New storage id ${storageId} is invalid`);
     }
     ingredientIds.push(idString);
+    storageCases.push(`when id = ${idString} then ${storageId}`);
   }
 
   connection.query(`SELECT id, storage_id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
@@ -74,8 +79,7 @@ function modifyIngredientHelper(items, req, res, next) {
       };
       throw err;
     }
-
-    return connection.query(`UPDATE Ingredients SET storage_id = (${storageId.join(', ')} WHERE id IN (${ingredientIds.join(', ')}`);
+    return connection.query(`UPDATE Ingredients SET storage_id = (case ${storageCases.join(' ')} end) WHERE id IN (${ingredientIds.join(', ')})`);
   })
   .then(() => res.status(200).send('success'))
   .catch(err => {
@@ -106,7 +110,7 @@ function deleteIngredientHelper(items, req, res, next) {
     return res.status(400).send('Invalid input reqest, see doc.');
   }
   const ingredientIds = [];
-  for (const idString in items) {
+  for (let idString of items) {
     if (!checkNumber.isPositiveInteger(idString)) {
       return res.status(400).send(`Ingredient ID ${idString} is invalid.`);
     }
@@ -122,7 +126,7 @@ function deleteIngredientHelper(items, req, res, next) {
       throw err;
     }
   })
-  .then(() => connection.query('DELETE FROM Ingredients WHERE id = (${ingredientIds.join(', ')})'))
+  .then(() => connection.query(`DELETE FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`))
   .then(() => res.status(200).send('success'))
   .catch(err => {
     if (err.custom) {
