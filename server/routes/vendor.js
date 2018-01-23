@@ -7,6 +7,14 @@ export function view(req, res, next) {
     });
 }
 
-export function addVendor(req, res, next) {
-  res.status(400).send('todo');
+export function addVendors(req, res, next) {
+  res.status(501).send('todo');
+}
+
+export function modifyVendors(req, res, next) {
+  res.status(501).send('todo');
+}
+
+export function deleteVendors(req, res, next) {
+  res.status(501).send('todo');
 }

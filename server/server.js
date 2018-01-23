@@ -62,6 +62,9 @@ app.post('/users/login', user.login);
 app.get('/users', user.getInfo);
 
 app.get('/vendors', vendor.view);
+app.post('/vendors', vendor.addVendors);
+app.put('/vendors', vendor.modifyVendors);
+app.delete('/vendors', vendor.deleteVendors);
 
 app.get('/ingredients', ingredient.view);
 app.post('/ingredients', ingredient.addIngredient);
