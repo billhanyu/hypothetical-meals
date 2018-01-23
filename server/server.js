@@ -3,7 +3,7 @@ const mysql = require('mysql');
 const alasql = require('alasql');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-// const auth = require('./auth');
+const auth = require('./auth');
 import * as user from './routes/user';
 import * as ingredient from './routes/ingredient';
 import * as storage from './routes/storage';
@@ -55,34 +55,34 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.post('/users/admin', user.signupAdmin);
-app.post('/users/noob', user.signupNoob);
+app.post('/users/noob', auth.required, user.signupNoob);
 app.post('/users/login', user.login);
-app.get('/users', user.getInfo);
+app.get('/users', auth.required, user.getInfo);
 
-app.get('/vendors', vendor.view);
+app.get('/vendors', auth.required, vendor.view);
 
-app.get('/ingredients', ingredient.view);
-app.post('/ingredients', ingredient.addIngredient);
-app.put('/ingredients/:id', ingredient.modifyIngredient);
-app.delete('/ingredients/:id', ingredient.deleteIngredient);
+app.get('/ingredients', auth.required, ingredient.view);
+app.post('/ingredients', auth.required, ingredient.addIngredient);
+app.put('/ingredients/:id', auth.required, ingredient.modifyIngredient);
+app.delete('/ingredients/:id', auth.required, ingredient.deleteIngredient);
 
-app.get('/vendoringredients/:ingredient_id', vendorIngredient.getVendorsForIngredient);
-app.post('/vendoringredients', vendorIngredient.addVendorIngredients);
-app.put('/vendoringredients', vendorIngredient.modifyVendorIngredients);
-app.delete('/vendoringredients', vendorIngredient.deleteVendorIngredients);
+app.get('/vendoringredients/:ingredient_id', auth.required, vendorIngredient.getVendorsForIngredient);
+app.post('/vendoringredients', auth.required, vendorIngredient.addVendorIngredients);
+app.put('/vendoringredients', auth.required, vendorIngredient.modifyVendorIngredients);
+app.delete('/vendoringredients', auth.required, vendorIngredient.deleteVendorIngredients);
 
-app.get('/storages', storage.view);
-app.put('/storages', storage.changeStorage);
+app.get('/storages', auth.required, storage.view);
+app.put('/storages', auth.required, storage.changeStorage);
 
-app.get('/logs', log.view);
-app.get('/logs/ingredients', log.viewLogForIngredient);
-app.post('/logs', log.addEntry);
+app.get('/logs', auth.required, log.view);
+app.get('/logs/ingredients', auth.required, log.viewLogForIngredient);
+app.post('/logs', auth.required, log.addEntry);
 
-app.get('/spendinglogs', spendinglog.view);
+app.get('/spendinglogs', auth.required, spendinglog.view);
 
-app.get('/inventory', inventory.view);
-app.put('/inventory/admin', inventory.modifyQuantities);
-app.put('/inventory', inventory.commitCart);
+app.get('/inventory', auth.required, inventory.view);
+app.put('/inventory/admin', auth.required, inventory.modifyQuantities);
+app.put('/inventory', auth.required, inventory.commitCart);
 
 app.listen(1717, () => {
   console.log('Node app start at port 1717');
