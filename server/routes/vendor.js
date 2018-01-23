@@ -143,6 +143,25 @@ function duplicationCheckHelper(names, codes, nextQuery, res) {
     });
 }
 
+/* req.body.ids = [
+ *   1, 2, 3
+ * ];
+ *
+ */
 export function deleteVendors(req, res, next) {
-  res.status(501).send('todo');
+  const ids = req.body.ids;
+  if (!ids || ids.length < 1) {
+    return res.status(400).send('Invalid input object, see doc.');
+  }
+  for (let id of ids) {
+    if (!checkNumber.isPositiveInteger(id)) {
+      return res.status(400).send(`Invalid id ${id}`);
+    }
+  }
+  connection.query(`DELETE FROM Vendors WHERE id IN (${ids.join(', ')})`)
+    .then(() => res.status(200).send('success'))
+    .catch(err => {
+      console.error(err);
+      res.status(500).send('Database error');
+    });
 }
