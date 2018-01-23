@@ -23,3 +23,7 @@ yarn-error.log*
 
 # uploads
 /uploads
+
+# apidoc
+/apidoc/_book
+/apidoc/node_modules
