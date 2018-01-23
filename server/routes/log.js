@@ -17,12 +17,12 @@ export function view(req, res, next) {
  */
 export function viewLogForIngredient(req, res, next) {
   const vendorIngredients = req.body.vendor_ingredient_ids;
-  if(!vendorIngredients || vendorIngredients.length < 1) {
-  	return res.status(400).send('Invalid input request, see doc.');
+  if (!vendorIngredients || vendorIngredients.length < 1) {
+    return res.status(400).send('Invalid input request, see doc.');
   }
   const vendorIngredientIds = [];
   for (let idString of vendorIngredients) {
-  	if (!checkNumber.isPositiveInteger(idString)) {
+    if (!checkNumber.isPositiveInteger(idString)) {
       return res.status(400).send(`Vendor ingredient ID ${idString} is invalid.`);
     }
     vendorIngredientIds.push(idString);
@@ -47,17 +47,17 @@ export function addEntry(req, res, next) {
 }
 
 function addLogEntryHelper(logs, req, res, next) {
-  if(!logs || logs.length < 1) {
-  	return res.status(400).send('Invalid input request, see doc.');
+  if (!logs || logs.length < 1) {
+    return res.status(400).send('Invalid input request, see doc.');
   }
   const userLogs = [];
   for (let log of logs) {
-  	userLogs.push(`('${log.user_id}', '${log.vendor_ingredient_id}', '${log.quantity}')`);
+    userLogs.push(`('${log.user_id}', '${log.vendor_ingredient_id}', '${log.quantity}')`);
   }
   connection.query(`INSERT INTO Logs (user_id, vendor_ingredient_id, quantity) VALUES ${userLogs.join(', ')}`)
     .then(() => res.status(200).send('success'))
     .catch(err => {
-  	  console.log(err);
-  	  return res.status(500).send('Database error');
+      console.log(err);
+      return res.status(500).send('Database error');
     });
 }
