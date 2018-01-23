@@ -17,6 +17,8 @@
     "express": "^4.16.2",
     "express-jwt": "3.3.0",
     "mysql": "^2.15.0",
+    "passport": "0.3.2",
+    "passport-local": "1.0.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "webpack": "^3.10.0"
