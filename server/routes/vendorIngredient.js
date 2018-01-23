@@ -73,19 +73,49 @@ export function addVendorIngredients(req, res, next) {
 }
 
 /* Request body format
- * req.body.vendoringredients = [
+ * req.body.vendoringredients = {
  *   '1': {
  *     'price': 100,
  *   },
  *   '2': {
- *     'vendor_id': 2,
  *     'package_type': 'sack',
  *   }
- * ]
+ * }
  */
 export function modifyVendorIngredients(req, res, next) {
   // TODO: add auth
-  res.status(501).send('todo');
+  const items = req.body.vendoringredients;
+  if (!items || Object.keys(items).length < 1) {
+    return res.status(400).send('Invalid input request, see doc.');
+  }
+  const keys = Object.keys(items);
+  const ids = [];
+  for (let i = 0; i < keys.length; i++) {
+    const id = keys[i];
+    if (!checkNumber.isPositiveInteger(id)) {
+      return res.status(400).send(`Invalid id ${id}`);
+    }
+    ids.push(id);
+  }
+
+  connection.query(`SELECT * FROM VendorsIngredients WHERE id IN (${ids.join(', ')})`)
+    .then(olds => {
+      const cases = getCases(olds, items);
+      console.log(`UPDATE VendorsIngredients
+          SET price = (case ${cases.prices.join(' ')} end),
+              package_type = (case ${cases.packageTypes.join(' ')} end)
+          WHERE id IN (${ids.join(', ')})`);
+      return connection.query(
+        `UPDATE VendorsIngredients
+          SET price = (case ${cases.prices.join(' ')} end),
+              package_type = (case ${cases.packageTypes.join(' ')} end)
+          WHERE id IN (${ids.join(', ')})`);
+    })
+    .then(() => res.status(200).send('success'))
+    .catch(err => {
+      console.error(err);
+      res.status(500).send('Database error');
+    });
 }
 
 /* Request body format
@@ -111,4 +141,22 @@ export function deleteVendorIngredients(req, res, next) {
       console.error(err);
       res.status(500).send('Database error');
     });
+}
+
+function getCases(olds, items) {
+  const prices = [];
+  const packageTypes = [];
+  for (let i = 0; i < olds.length; i++) {
+    const old = olds[i];
+    const id = old['ingredient_id'];
+    const change = items[id];
+    const price = 'price' in change ? change['price'] : old['price'];
+    const packageType = 'package_type' in change ? change['package_type'] : old['package_type'];
+    prices.push(`when id = ${id} then ${price}`);
+    packageTypes.push(`when id = ${id} then '${packageType}'`);
+  }
+  return {
+    prices,
+    packageTypes,
+  };
 }

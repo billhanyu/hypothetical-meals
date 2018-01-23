@@ -15,7 +15,7 @@ describe('VendorIngredient', () => {
     });
   });
 
-  describe('#addVendorIngredient()', () => {
+  describe('#addVendorIngredients()', () => {
     beforeEach(() => {
       alasql('SOURCE "./server/create_database.sql"');
       alasql('SOURCE "./server/sample_data.sql"');
@@ -97,7 +97,64 @@ describe('VendorIngredient', () => {
     });
   });
 
-  describe('#deleteVendorIngredient()', () => {
+  describe('#modifyVendorIngredients()', () => {
+    beforeEach(() => {
+      alasql('SOURCE "./server/create_database.sql"');
+      alasql('SOURCE "./server/sample_data.sql"');
+    });
+
+    it('should reject request body without a vendoringredients object', (done) => {
+      chai.request(server)
+        .put('/vendoringredients')
+        .send({})
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should reject request with invalid id', (done) => {
+      chai.request(server)
+        .put('/vendoringredients')
+        .send({
+          'vendoringredients': {
+            '1a': {
+              'price': 100,
+            },
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should modify vendoringredients with valid requests', (done) => {
+      chai.request(server)
+        .put('/vendoringredients')
+        .send({
+          'vendoringredients': {
+            '1': {
+              'price': 999,
+              'package_type': 'truckload',
+            },
+            '2': {
+              'price': 99,
+            },
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const changed = alasql('SELECT * FROM VendorsIngredients WHERE id IN (1, 2)');
+          assert.equal(changed[0]['price'], 999, 'price for id 1');
+          assert.strictEqual(changed[0]['package_type'], 'truckload', 'package_type for id 1');
+          assert.equal(changed[1]['price'], 99, 'price for id 2');
+          done();
+        });
+    });
+  });
+
+  describe('#deleteVendorIngredients()', () => {
     beforeEach(() => {
       alasql('SOURCE "./server/create_database.sql"');
       alasql('SOURCE "./server/sample_data.sql"');
