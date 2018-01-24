@@ -1,11 +1,14 @@
 const alasql = require('alasql');
 const assert = require('chai').assert;
+const testTokens = require('./testTokens');
+
 
 describe('Log', () => {
   describe('#view()', () => {
     it('should return all logs', (done) => {
       chai.request(server)
         .get('/logs')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
@@ -24,6 +27,7 @@ describe('Log', () => {
     it('should return all logs for a vendor ingredient', (done) => {
       chai.request(server)
       .get('/logs/ingredients')
+      .set('Authorization', `Token ${testTokens.noobTestToken}`)
       .send({
         'vendor_ingredient_ids': [3],
       })
@@ -45,6 +49,7 @@ describe('Log', () => {
     it('should add an entry for a vendor ingredient', (done) => {
       chai.request(server)
       .post('/logs')
+      .set('Authorization', `Token ${testTokens.noobTestToken}`)
       .send({
         'logs': [{
           'user_id': 2,

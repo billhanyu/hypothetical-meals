@@ -13,6 +13,8 @@ import * as vendor from './routes/vendor';
 import * as vendorIngredient from './routes/vendorIngredient';
 import * as spendinglog from './routes/spendinglog';
 
+require('./routes/common/passport');
+
 let config;
 try {
   config = require('./config');
@@ -57,7 +59,6 @@ app.use(cookieParser());
 app.post('/users/admin', user.signupAdmin);
 app.post('/users/noob', auth.required, user.signupNoob);
 app.post('/users/login', user.login);
-app.get('/users', auth.required, user.getInfo);
 
 app.get('/vendors', auth.required, vendor.view);
 

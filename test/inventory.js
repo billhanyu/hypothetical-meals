@@ -1,11 +1,13 @@
 const alasql = require('alasql');
 const assert = require('chai').assert;
+const testTokens = require('./testTokens');
 
 describe('Inventory', () => {
   describe('#view()', () => {
     it('should return inventory items', (done) => {
       chai.request(server)
         .get('/inventory')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
@@ -21,9 +23,26 @@ describe('Inventory', () => {
       alasql('SOURCE "./server/sample_data.sql"');
     });
 
+    it('should fail modify inventory quantity as noob', (done) => {
+      chai.request(server)
+        .put('/inventory/admin')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .send({
+          'changes': {
+            '1': 7,
+            '2': 17,
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
     it('should modify inventory quantities with storage_weight first', (done) => {
       chai.request(server)
         .put('/inventory/admin')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'changes': {
             '1': 7,
@@ -44,6 +63,7 @@ describe('Inventory', () => {
     it('should reduce total_weight when storage_weight is not enough', (done) => {
       chai.request(server)
         .put('/inventory/admin')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'changes': {
             '1': 2,
@@ -64,6 +84,7 @@ describe('Inventory', () => {
     it('should delete from inventory when quantity is zero', (done) => {
       chai.request(server)
         .put('/inventory/admin')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'changes': {
             '1': 0,
@@ -82,6 +103,7 @@ describe('Inventory', () => {
     it('should add to total_weight first', (done) => {
       chai.request(server)
         .put('/inventory/admin')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'changes': {
             '1': 100,
@@ -102,6 +124,7 @@ describe('Inventory', () => {
     it('should decline ingredients not in inventory', (done) => {
       chai.request(server)
         .put('/inventory/admin')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'changes': {
             '100': 999,
@@ -117,6 +140,7 @@ describe('Inventory', () => {
     it('should decline invalid numbers', (done) => {
       chai.request(server)
         .put('/inventory/admin')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'changes': {
             '1a': 999,
@@ -132,6 +156,7 @@ describe('Inventory', () => {
     it('should decline empty changes object', (done) => {
       chai.request(server)
         .put('/inventory/admin')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'changes': {
           },
@@ -152,6 +177,7 @@ describe('Inventory', () => {
     it('should reduce inventory quantities with storage_weight reduced first', (done) => {
       chai.request(server)
         .put('/inventory')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'cart': {
             '1': 1,
@@ -172,6 +198,7 @@ describe('Inventory', () => {
     it('should reduce total_weight when storage_weight is not enough', (done) => {
       chai.request(server)
         .put('/inventory')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'cart': {
             '1': 6,
@@ -192,6 +219,7 @@ describe('Inventory', () => {
     it('should delete from inventory when quantity is zero', (done) => {
       chai.request(server)
         .put('/inventory')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'cart': {
             '1': 10,
@@ -210,6 +238,7 @@ describe('Inventory', () => {
     it('should decline requests too large', (done) => {
       chai.request(server)
         .put('/inventory')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'cart': {
             '1': 999,
@@ -225,6 +254,7 @@ describe('Inventory', () => {
     it('should decline item not in inventory', (done) => {
       chai.request(server)
         .put('/inventory')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'cart': {
             '3': 1,
@@ -240,6 +270,7 @@ describe('Inventory', () => {
     it('should decline invalid numbers', (done) => {
       chai.request(server)
         .put('/inventory')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'cart': {
             '1a': 999,
@@ -255,6 +286,7 @@ describe('Inventory', () => {
     it('should decline nonpositive numbers', (done) => {
       chai.request(server)
         .put('/inventory')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'cart': {
             '1': 0,
@@ -270,6 +302,7 @@ describe('Inventory', () => {
     it('should decline empty cart object', (done) => {
       chai.request(server)
         .put('/inventory')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'cart': {
           },

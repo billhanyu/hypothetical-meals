@@ -14,19 +14,24 @@ export function view(req, res, next) {
  * if the new capacity is lower than what's in the inventory, reject
  */
 export function changeStorage(req, res, next) {
-  const keys = Object.keys(req.body);
-  if (keys.length !== 1 || !checkNumber.isPositiveInteger(keys[0])) {
-    return res.status(400).send('Invalid storage id');
-  }
+  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
+  .then((results) => {
+    if (results.length == 0) res.status(500).send('Database error');
+    if (results[0].user_group != 'admin') res.status(401).send('User must be an admin to access this endpoint.');
 
-  const storageId = keys[0];
-  const quantityString = req.body[storageId];
-  if (!checkNumber.isNonNegativeInteger(quantityString)) {
-    return res.status(400).send('Invalid new quantity number');
-  }
-  const newCapacity = parseInt(quantityString);
+    const keys = Object.keys(req.body);
+    if (keys.length !== 1 || !checkNumber.isPositiveInteger(keys[0])) {
+      return res.status(400).send('Invalid storage id');
+    }
 
-  connection.query(`SELECT id FROM Storages WHERE id = ${storageId}`)
+    const storageId = keys[0];
+    const quantityString = req.body[storageId];
+    if (!checkNumber.isNonNegativeInteger(quantityString)) {
+      return res.status(400).send('Invalid new quantity number');
+    }
+    const newCapacity = parseInt(quantityString);
+
+    connection.query(`SELECT id FROM Storages WHERE id = ${storageId}`)
     .then(results => {
       if (results.length < 1) {
         const err = {
@@ -64,4 +69,5 @@ export function changeStorage(req, res, next) {
       console.error(err);
       return res.status(500).send('Database error');
     });
+  });
 }

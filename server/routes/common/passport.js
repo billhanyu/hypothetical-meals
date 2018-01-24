@@ -6,17 +6,17 @@ const User = require('../../models/User');
 passport.use(new LocalStrategy({
   usernameField: 'user[username]',
   passwordField: 'user[password]',
-}, function(email, password, done) {
-  connection.query(`SELECT * FROM Users WHERE username = ${email}`)
+}, function(username, password, done) {
+  connection.query(`SELECT * FROM Users WHERE username = '${username}'`)
   .then(results => {
     if (results.length==0) {
-      return res.status(401).send(`Username or password is invalid`);
+      return done(null, false, `Username or password is invalid`);
     }
     let user = new User(results[0]);
-    if (!user.vaalidPassword(password)) {
-      return res.status(401).send(`Username or password is invalid`);
+    if (!user.validPassword(password)) {
+      return done(null, false, `Username or password is invalid`);
     }
-    return res.status(200).send(user);
+    return done(null, user);
   })
   .catch((error) => {
     connection.release();
