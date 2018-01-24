@@ -16,4 +16,19 @@ describe('SpendingLog', () => {
         });
     });
   });
+
+  describe('#logsForIngredient()', () => {
+    it('should return the logs for ingredient 1', (done) => {
+      chai.request(server)
+      .get('/spendinglogs/1')
+      .set('Authorization', `Token ${testTokens.noobTestToken}`)
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.a('array');
+        res.body.length.should.be.eql(1);
+        assert.strictEqual(res.body[0]['total'], 100, 'total cost');
+        done();
+      });
+    });
+  });
 });

@@ -3,6 +3,8 @@ const mysql = require('mysql');
 const alasql = require('alasql');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 const auth = require('./auth');
 import * as user from './routes/user';
 import * as ingredient from './routes/ingredient';
@@ -61,11 +63,15 @@ app.post('/users/noob', auth.required, user.signupNoob);
 app.post('/users/login', user.login);
 
 app.get('/vendors', auth.required, vendor.view);
+app.post('/vendors', auth.required, vendor.addVendors);
+app.put('/vendors', auth.required, vendor.modifyVendors);
+app.delete('/vendors', auth.required, vendor.deleteVendors);
 
 app.get('/ingredients', auth.required, ingredient.view);
 app.post('/ingredients', auth.required, ingredient.addIngredient);
-app.put('/ingredients/:id', auth.required, ingredient.modifyIngredient);
-app.delete('/ingredients/:id', auth.required, ingredient.deleteIngredient);
+app.put('/ingredients', auth.required, ingredient.modifyIngredient);
+app.delete('/ingredients', auth.required, ingredient.deleteIngredient);
+app.post('/ingredients/import', upload.single('bulk'), ingredient.bulkImport);
 
 app.get('/vendoringredients/:ingredient_id', auth.required, vendorIngredient.getVendorsForIngredient);
 app.post('/vendoringredients', auth.required, vendorIngredient.addVendorIngredients);
@@ -80,6 +86,7 @@ app.get('/logs/ingredients', auth.required, log.viewLogForIngredient);
 app.post('/logs', auth.required, log.addEntry);
 
 app.get('/spendinglogs', auth.required, spendinglog.view);
+app.get('/spendinglogs/:ingredient_id', auth.required, spendinglog.logsForIngredient);
 
 app.get('/inventory', auth.required, inventory.view);
 app.put('/inventory/admin', auth.required, inventory.modifyQuantities);
