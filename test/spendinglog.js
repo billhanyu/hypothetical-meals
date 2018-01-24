@@ -1,10 +1,12 @@
 const assert = require('chai').assert;
+const testTokens = require('./testTokens');
 
 describe('SpendingLog', () => {
   describe('#view()', () => {
     it('should return all spending logs', (done) => {
       chai.request(server)
         .get('/spendinglogs')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');

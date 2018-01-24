@@ -7,6 +7,7 @@ const config = {
     database: 'meals',
   },
   secret: process.env.NODE_ENV === 'production' ? process.env.SECRET : 'secret',
+
 };
 
 module.exports = config;

@@ -1,11 +1,13 @@
 const alasql = require('alasql');
 const assert = require('chai').assert;
+const testTokens = require('./testTokens');
 
 describe('Storage', () => {
   describe('#view()', () => {
     it('should return all storages', (done) => {
       chai.request(server)
         .get('/storages')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
@@ -21,9 +23,23 @@ describe('Storage', () => {
       alasql('SOURCE "./server/sample_data.sql"');
     });
 
+    it('should fail change storage as noob', (done) => {
+      chai.request(server)
+        .put('/storages')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .send({
+          '1': 100,
+        })
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
     it('should change storage capacity', (done) => {
       chai.request(server)
         .put('/storages')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           '1': 100,
         })
@@ -38,6 +54,7 @@ describe('Storage', () => {
     it('should not change storage capacity if new capacity too small', (done) => {
       chai.request(server)
         .put('/storages')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           '1': 19,
         })
@@ -52,6 +69,7 @@ describe('Storage', () => {
     it('should not reject invalid storage id', (done) => {
       chai.request(server)
         .put('/storages')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           '1a': 19,
         })
@@ -64,6 +82,7 @@ describe('Storage', () => {
     it('should not reject storage id not in storages table', (done) => {
       chai.request(server)
         .put('/storages')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           '3': 100,
         })
@@ -76,6 +95,7 @@ describe('Storage', () => {
     it('should not reject invalid storage capacity', (done) => {
       chai.request(server)
         .put('/storages')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           '1': 'woefjweo',
         })
@@ -88,6 +108,7 @@ describe('Storage', () => {
     it('should not reject multiple inputs', (done) => {
       chai.request(server)
         .put('/storages')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           '1': 100,
           '2': 900,

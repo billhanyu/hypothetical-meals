@@ -1,8 +1,21 @@
 import * as checkParams from './common/checkParams';
 import User from '../models/User';
-import passport from './common/passport';
+const passport = require('passport');
 
 export function signupAdmin(req, res, next) {
+  signupUser(req, res, next, true);
+}
+
+export function signupNoob(req, res, next) {
+  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
+  .then((results) => {
+    if (results.length == 0) res.status(500).send('Database error');
+    if (results[0].user_group != 'admin') res.status(401).send('User must be an admin to access this endpoint.');
+    signupUser(req, res, next, false);
+  });
+}
+
+function signupUser(req, res, next, isAdmin) {
   const error = checkParams.checkBlankParams(req.body.user, ['name', 'username', 'password']);
   if (error) return res.status(422).send(error);
 
@@ -12,12 +25,13 @@ export function signupAdmin(req, res, next) {
   let user = new User(req.body.user);
   user.setPassword(req.body.user.password);
 
-  connection.query(`INSERT INTO Users (username, name, hash, salt, user_group) VALUES ('${user.username}', '${user.name}', '${user.hash}', '${user.salt}', 'admin');`)
+  const userGroup = isAdmin ? 'admin' : 'noob';
+  connection.query(`INSERT INTO Users (username, name, hash, salt, user_group) VALUES ('${user.username}', '${user.name}', '${user.hash}', '${user.salt}', '${userGroup}');`)
   .then(() => connection.query(`SELECT id FROM Users WHERE username = '${user.username}';`))
   .then((results) => {
-    if (results.length ==0) res.status(500).send('Database error'); ;
+    if (results.length == 0) res.status(500).send('Database error');
     user.id = results[0].id;
-    return res.json({user: user.getBasicInfo()});
+    return res.status(200).json({user: user.getBasicInfo()});
   })
   .catch((error) => {
     if (error.code == 'ER_DUP_ENTRY') return res.status(422).json('Username is already registered');
@@ -26,21 +40,13 @@ export function signupAdmin(req, res, next) {
   });
 }
 
-export function signupNoob(req, res, next) {
-  res.status(501).send('todo');
-}
-
 export function login(req, res, next) {
-  const error = checkParams.checkBlankParams(req.body.user, ['email', 'password']);
+  const error = checkParams.checkBlankParams(req.body.user, ['username', 'password']);
   if (error) return res.status(422).send(error);
   passport.authenticate('local', {session: false}, function(err, user, info) {
     if (err) return next(err);
 
     if (user) return res.json({user: user.getBasicInfo()});
-    else return res.status(422).json({alerts: [ErrorHandler.createErrorAlert('E-mail or password is incorrect')]});
+    else return res.status(422).send('E-mail or password is incorrect');
   })(req, res, next);
-}
-
-export function getInfo(req, res, next) {
-  res.status(501).send('todo');
 }
