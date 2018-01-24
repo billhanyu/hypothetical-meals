@@ -1,3 +1,4 @@
+const testTokens = require('./testTokens');
 const alasql = require('alasql');
 const assert = require('chai').assert;
 
@@ -6,6 +7,7 @@ describe('Vendor', () => {
     it('should return all vendors', (done) => {
       chai.request(server)
         .get('/vendors')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
@@ -21,9 +23,21 @@ describe('Vendor', () => {
       alasql('SOURCE "./server/sample_data.sql"');
     });
 
+    it('should fail add vendor as noob', (done) => {
+      chai.request(server)
+        .post('/vendors')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .send({})
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
     it('should reject empty object request', (done) => {
       chai.request(server)
         .post('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({})
         .end((err, res) => {
           res.should.have.status(400);
@@ -34,6 +48,7 @@ describe('Vendor', () => {
     it('should reject request lack of properties', (done) => {
       chai.request(server)
         .post('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'vendors': [
             {
@@ -56,6 +71,7 @@ describe('Vendor', () => {
     it('should reject duplicate name', (done) => {
       chai.request(server)
         .post('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'vendors': [
             {
@@ -74,6 +90,7 @@ describe('Vendor', () => {
     it('should reject duplicate name within request', (done) => {
       chai.request(server)
         .post('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'vendors': [
             {
@@ -97,6 +114,7 @@ describe('Vendor', () => {
     it('should reject duplicate code', (done) => {
       chai.request(server)
         .post('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'vendors': [
             {
@@ -115,6 +133,7 @@ describe('Vendor', () => {
     it('should add vendors for valid requests', (done) => {
       chai.request(server)
         .post('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'vendors': [
             {
@@ -140,6 +159,7 @@ describe('Vendor', () => {
     it('should add new vendors', (done) => {
       chai.request(server)
         .post('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'vendors': [
             {
@@ -175,9 +195,21 @@ describe('Vendor', () => {
       alasql('SOURCE "./server/sample_data.sql"');
     });
 
+    it('should fail modify vendor as noob', (done) => {
+      chai.request(server)
+        .put('/vendors')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .send({})
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
     it('should reject empty object request', (done) => {
       chai.request(server)
         .put('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({})
         .end((err, res) => {
           res.should.have.status(400);
@@ -188,6 +220,7 @@ describe('Vendor', () => {
     it('should reject duplicate name', (done) => {
       chai.request(server)
         .put('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'vendors': {
             '2': {
@@ -204,6 +237,7 @@ describe('Vendor', () => {
     it('should reject duplicate name within request', (done) => {
       chai.request(server)
         .put('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'vendors': {
             '1': {
@@ -223,6 +257,7 @@ describe('Vendor', () => {
     it('should reject duplicate code', (done) => {
       chai.request(server)
         .put('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'vendors': {
             '2': {
@@ -239,6 +274,7 @@ describe('Vendor', () => {
     it('should reject invalid id', (done) => {
       chai.request(server)
         .put('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'vendors': {
             '2a': {
@@ -255,6 +291,7 @@ describe('Vendor', () => {
     it('should modify vendors for valid requests', (done) => {
       chai.request(server)
         .put('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'vendors': {
             '1': {
@@ -283,9 +320,21 @@ describe('Vendor', () => {
       alasql('SOURCE "./server/sample_data.sql"');
     });
 
+    it('should fail delete vendor as noob', (done) => {
+      chai.request(server)
+        .delete('/vendors')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .send({})
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
     it('should reject invalid input object', (done) => {
       chai.request(server)
         .delete('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({})
         .end((err, res) => {
           res.should.have.status(400);
@@ -296,6 +345,7 @@ describe('Vendor', () => {
     it('should reject invalid id', (done) => {
       chai.request(server)
         .delete('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'ids': [
             1, 2, 'fw',
@@ -310,6 +360,7 @@ describe('Vendor', () => {
     it('should delete multiple vendors for valid request', (done) => {
       chai.request(server)
         .delete('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'ids': [
             1, 2,
