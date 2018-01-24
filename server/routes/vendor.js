@@ -77,7 +77,7 @@ export function modifyVendors(req, res, next) {
       if (name) names.push(name);
       if (code) codes.push(code);
     }
-  
+
     const changeQuery = () =>
       connection.query(`SELECT * FROM Vendors WHERE id IN (${Object.keys(vendors).join(', ')})`)
         .then(olds => {
