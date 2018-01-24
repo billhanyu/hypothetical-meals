@@ -2,12 +2,14 @@ import server from '../server/server';
 
 const alasql = require('alasql');
 const assert = require('chai').assert;
+const testTokens = require('./testTokens');
 
 describe('Ingredient', () => {
   describe('#view()', () => {
     it('should return all ingredients', (done) => {
       chai.request(server)
         .get('/ingredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
@@ -23,9 +25,21 @@ describe('Ingredient', () => {
       alasql('SOURCE "./server/sample_data.sql"');
     });
 
+    it('should fail add ingredient as noob', (done) => {
+      chai.request(server)
+        .post('/ingredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .send({})
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
     it('should add a new ingredient', (done) => {
       chai.request(server)
       .post('/ingredients')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
       .send({
         'ingredients': [
           {
@@ -52,6 +66,7 @@ describe('Ingredient', () => {
     it('should decline if request body empty', (done) => {
       chai.request(server)
         .post('/ingredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'ingredients': [],
         })
@@ -68,9 +83,21 @@ describe('Ingredient', () => {
       alasql('SOURCE "./server/sample_data.sql"');
     });
 
+    it('should fail modify ingredient as noob', (done) => {
+      chai.request(server)
+        .put('/ingredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .send({})
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
     it('should modify the storage id of the ingredient', (done) => {
       chai.request(server)
       .put('/ingredients')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
       .send({
         'ingredients': {
           '1': '2',
@@ -91,6 +118,7 @@ describe('Ingredient', () => {
     it('should decline if invalid storage id', (done) => {
       chai.request(server)
         .put('/ingredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'ingredients': {
             '3': '2',
@@ -106,6 +134,7 @@ describe('Ingredient', () => {
     it('should decline if ingredient not in table', (done) => {
       chai.request(server)
         .put('/ingredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'ingredients': {
             '3': '2',
@@ -125,9 +154,21 @@ describe('Ingredient', () => {
       alasql('SOURCE "./server/sample_data.sql"');
     });
 
+    it('should fail delete ingredient as noob', (done) => {
+      chai.request(server)
+        .delete('/ingredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .send({})
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
     it('should delete the the ingredients with the ids given', (done) => {
       chai.request(server)
       .delete('/ingredients')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
       .send({
         'ingredients': [1, 2],
       })
@@ -144,6 +185,7 @@ describe('Ingredient', () => {
     it('should decline if ingredient not in table', (done) => {
       chai.request(server)
         .delete('/ingredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'ingredients': [1, 10],
         })

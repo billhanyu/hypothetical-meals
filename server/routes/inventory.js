@@ -22,9 +22,13 @@ export function view(req, res, next) {
  * This changes ingredient 1's total_weight to 123 and 2's total_weight to 456
  */
 export function modifyQuantities(req, res, next) {
-  // TODO: add authorization
-  // TODO: check that the storage weight does not exceed capacity
-  changeHelper(req.body.changes, false, req, res, next);
+  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
+  .then((results) => {
+    if (results.length == 0) return res.status(500).send('Database error');
+    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
+    // TODO: check that the storage weight does not exceed capacity
+    changeHelper(req.body.changes, false, req, res, next);
+  });
 }
 
 /* request body format:

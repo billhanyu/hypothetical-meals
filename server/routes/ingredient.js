@@ -20,9 +20,12 @@ export function view(req, res, next) {
  * This adds a new ingredient into the Ingredients table.
  */
 export function addIngredient(req, res, next) {
-  // TODO: add auth
-
-  addIngredientHelper(req.body.ingredients, req, res, next);
+  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
+  .then((results) => {
+    if (results.length == 0) return status(500).send('Database error');
+    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
+    addIngredientHelper(req.body.ingredients, req, res, next);
+  });
 }
 
 function addIngredientHelper(ingredients, req, res, next) {
@@ -49,9 +52,12 @@ function addIngredientHelper(ingredients, req, res, next) {
  * This changes the storage_id of the ingredient.
  */
 export function modifyIngredient(req, res, next) {
-  // TODO: add auth
-
-  modifyIngredientHelper(req.body.ingredients, req, res, next);
+  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
+  .then((results) => {
+    if (results.length == 0) return res.status(500).send('Database error');
+    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
+    modifyIngredientHelper(req.body.ingredients, req, res, next);
+  });
 }
 
 function modifyIngredientHelper(items, req, res, next) {
@@ -101,9 +107,12 @@ function modifyIngredientHelper(items, req, res, next) {
  * This deletes an ingredient from the ingredients table.
  */
 export function deleteIngredient(req, res, next) {
-  // TODO: add auth
-
-  deleteIngredientHelper(req.body.ingredients, req, res, next);
+  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
+  .then((results) => {
+    if (results.length == 0) return res.status(500).send('Database error');
+    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
+    deleteIngredientHelper(req.body.ingredients, req, res, next);
+  });
 }
 
 function deleteIngredientHelper(items, req, res, next) {

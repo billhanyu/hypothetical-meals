@@ -1,0 +1,6 @@
+const testTokens = {
+  adminTestToken: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MywibmFtZSI6Im1pa2Uga3J6eXpld3NraSIsImV4cCI6MTUyMjAwODM4OCwiaWF0IjoxNTE2ODI3OTg4fQ.eJn7I-7wibxOLnSOEUwd9SN6-NlOgQjHVOVsfsLqePU',
+  noobTestToken: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NCwibmFtZSI6Im1pa2Ugd2F6b3dza2kiLCJleHAiOjE1MjIwMDgzODgsImlhdCI6MTUxNjgyNzk4OH0.faHRtk9TtsqCf5lQSzWgaNcf5SX-Gm-_LYsa2X9XoOk',
+};
+
+module.exports = testTokens;

@@ -1,11 +1,13 @@
 const alasql = require('alasql');
 const assert = require('chai').assert;
+const testTokens = require('./testTokens');
 
 describe('VendorIngredient', () => {
   describe('#getVendorsForIngredient()', () => {
     it('should return all vendors for an ingredient', (done) => {
       chai.request(server)
         .get('/vendoringredients/1')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
@@ -24,6 +26,7 @@ describe('VendorIngredient', () => {
     it('should reject request body without a vendoringredients object', (done) => {
       chai.request(server)
         .post('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({})
         .end((err, res) => {
           res.should.have.status(400);
@@ -34,6 +37,7 @@ describe('VendorIngredient', () => {
     it('should reject request with incomplete fields', (done) => {
       chai.request(server)
         .post('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'vendoringredients': [
             {
@@ -52,6 +56,7 @@ describe('VendorIngredient', () => {
     it('should reject vendoringredient already existing', (done) => {
       chai.request(server)
         .post('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'vendoringredients': [
             {
@@ -71,6 +76,7 @@ describe('VendorIngredient', () => {
     it('should add vendoringredients for valid requests', (done) => {
       chai.request(server)
         .post('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'vendoringredients': [
             {
@@ -106,6 +112,7 @@ describe('VendorIngredient', () => {
     it('should reject request body without a vendoringredients object', (done) => {
       chai.request(server)
         .put('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({})
         .end((err, res) => {
           res.should.have.status(400);
@@ -116,6 +123,7 @@ describe('VendorIngredient', () => {
     it('should reject request with invalid id', (done) => {
       chai.request(server)
         .put('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'vendoringredients': {
             '1a': {
@@ -132,6 +140,7 @@ describe('VendorIngredient', () => {
     it('should modify vendoringredients with valid requests', (done) => {
       chai.request(server)
         .put('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'vendoringredients': {
             '1': {
@@ -163,6 +172,7 @@ describe('VendorIngredient', () => {
     it('should reject request body without an ids object', (done) => {
       chai.request(server)
         .delete('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({})
         .end((err, res) => {
           res.should.have.status(400);
@@ -173,6 +183,7 @@ describe('VendorIngredient', () => {
     it('should reject invalid ids', (done) => {
       chai.request(server)
         .delete('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'ids': ['aaa', 2],
         })
@@ -185,6 +196,7 @@ describe('VendorIngredient', () => {
     it('should delete multiple vendorsingredients', (done) => {
       chai.request(server)
         .delete('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'ids': [1, 2, 3],
         })
