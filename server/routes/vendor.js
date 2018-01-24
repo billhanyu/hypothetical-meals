@@ -21,8 +21,8 @@ export function view(req, res, next) {
 export function addVendors(req, res, next) {
   connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
   .then((results) => {
-    if (results.length == 0) res.status(500).send('Database error');
-    if (results[0].user_group != 'admin') res.status(401).send('User must be an admin to access this endpoint.');
+    if (results.length == 0) return res.status(500).send('Database error');
+    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
     const vendors = req.body.vendors;
   if (!vendors || vendors.length < 1) {
     return res.status(400).send('Invalid request object, see doc.');
@@ -60,8 +60,8 @@ export function addVendors(req, res, next) {
 export function modifyVendors(req, res, next) {
   connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
   .then((results) => {
-    if (results.length == 0) res.status(500).send('Database error');
-    if (results[0].user_group != 'admin') res.status(401).send('User must be an admin to access this endpoint.');
+    if (results.length == 0) return res.status(500).send('Database error');
+    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
     const vendors = req.body.vendors;
     if (!vendors || Object.keys(vendors).length < 1) {
       return res.status(400).send('Invalid request object, see doc.');
@@ -161,8 +161,8 @@ function duplicationCheckHelper(names, codes, nextQuery, res) {
 export function deleteVendors(req, res, next) {
   connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
   .then((results) => {
-    if (results.length == 0) res.status(500).send('Database error');
-    if (results[0].user_group != 'admin') res.status(401).send('User must be an admin to access this endpoint.');
+    if (results.length == 0) return res.status(500).send('Database error');
+    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
     const ids = req.body.ids;
     if (!ids || ids.length < 1) {
       return res.status(400).send('Invalid input object, see doc.');

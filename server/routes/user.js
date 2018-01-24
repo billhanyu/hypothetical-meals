@@ -9,8 +9,8 @@ export function signupAdmin(req, res, next) {
 export function signupNoob(req, res, next) {
   connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
   .then((results) => {
-    if (results.length == 0) res.status(500).send('Database error');
-    if (results[0].user_group != 'admin') res.status(401).send('User must be an admin to access this endpoint.');
+    if (results.length == 0) return res.status(500).send('Database error');
+    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
     signupUser(req, res, next, false);
   });
 }
@@ -29,7 +29,7 @@ function signupUser(req, res, next, isAdmin) {
   connection.query(`INSERT INTO Users (username, name, hash, salt, user_group) VALUES ('${user.username}', '${user.name}', '${user.hash}', '${user.salt}', '${userGroup}');`)
   .then(() => connection.query(`SELECT id FROM Users WHERE username = '${user.username}';`))
   .then((results) => {
-    if (results.length == 0) res.status(500).send('Database error');
+    if (results.length == 0) return res.status(500).send('Database error');
     user.id = results[0].id;
     return res.status(200).json({user: user.getBasicInfo()});
   })

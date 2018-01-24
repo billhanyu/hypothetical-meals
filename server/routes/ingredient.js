@@ -22,8 +22,8 @@ export function view(req, res, next) {
 export function addIngredient(req, res, next) {
   connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
   .then((results) => {
-    if (results.length == 0) res.status(500).send('Database error');
-    if (results[0].user_group != 'admin') res.status(401).send('User must be an admin to access this endpoint.');
+    if (results.length == 0) return status(500).send('Database error');
+    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
     addIngredientHelper(req.body.ingredients, req, res, next);
   });
 }
@@ -54,8 +54,8 @@ function addIngredientHelper(ingredients, req, res, next) {
 export function modifyIngredient(req, res, next) {
   connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
   .then((results) => {
-    if (results.length == 0) res.status(500).send('Database error');
-    if (results[0].user_group != 'admin') res.status(401).send('User must be an admin to access this endpoint.');
+    if (results.length == 0) return res.status(500).send('Database error');
+    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
     modifyIngredientHelper(req.body.ingredients, req, res, next);
   });
 }
@@ -109,8 +109,8 @@ function modifyIngredientHelper(items, req, res, next) {
 export function deleteIngredient(req, res, next) {
   connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
   .then((results) => {
-    if (results.length == 0) res.status(500).send('Database error');
-    if (results[0].user_group != 'admin') res.status(401).send('User must be an admin to access this endpoint.');
+    if (results.length == 0) return res.status(500).send('Database error');
+    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
     deleteIngredientHelper(req.body.ingredients, req, res, next);
   });
 }
