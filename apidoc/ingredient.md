@@ -30,11 +30,9 @@ request.body.ingredients = [
 {% endmethod %}
 
 {% method %}
-## PUT '/ingredients/:id'
+## PUT '/ingredients'
 
-Modify an ingredient.
-
-** There was a misunderstanding about the API between Christine and me. We're resolving this. **
+Modify ingredients.
 
 {% sample lang="js" %}
 ```js
@@ -42,5 +40,19 @@ request.body.ingredients = {
   'ingredient_id1': storage_id_change1,
   'ingredient_id2': storage_id_change2,
 }
+```
+{% endmethod %}
+
+{% method %}
+## DELETE '/ingredients's
+
+Delete ingredients.
+
+{% sample lang="js" %}
+```js
+request.body.ingredients = [
+  1,
+  2,
+]
 ```
 {% endmethod %}
