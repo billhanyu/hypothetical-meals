@@ -77,9 +77,9 @@ CREATE TABLE Logs(
 	created_at timestamp DEFAULT now() not null,
  
 	FOREIGN KEY (user_id) REFERENCES Users(id)
-		ON DELETE SET NULL,
+		ON DELETE CASCADE,
 	FOREIGN KEY (vendor_ingredient_id) REFERENCES VendorsIngredients(id)
-		ON DELETE SET NULL,
+		ON DELETE CASCADE,
 	PRIMARY KEY (id)
 );
 
@@ -90,6 +90,6 @@ CREATE TABLE SpendingLogs(
 	consumed double not null,
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id)
-		ON DELETE SET NULL,
+		ON DELETE CASCADE,
 	PRIMARY KEY (id)
 );
