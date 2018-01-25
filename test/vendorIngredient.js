@@ -26,7 +26,7 @@ describe('VendorIngredient', () => {
     it('should reject request body without a vendoringredients object', (done) => {
       chai.request(server)
         .post('/vendoringredients')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({})
         .end((err, res) => {
           res.should.have.status(400);
@@ -37,7 +37,7 @@ describe('VendorIngredient', () => {
     it('should reject request with incomplete fields', (done) => {
       chai.request(server)
         .post('/vendoringredients')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'vendoringredients': [
             {
@@ -56,7 +56,7 @@ describe('VendorIngredient', () => {
     it('should reject vendoringredient already existing', (done) => {
       chai.request(server)
         .post('/vendoringredients')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'vendoringredients': [
             {
@@ -73,10 +73,36 @@ describe('VendorIngredient', () => {
         });
     });
 
-    it('should add vendoringredients for valid requests', (done) => {
+    it('should reject noobs', (done) => {
       chai.request(server)
         .post('/vendoringredients')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .send({
+          'vendoringredients': [
+            {
+              'ingredient_id': 1,
+              'vendor_id': 2,
+              'package_type': 'sack',
+              'price': 100,
+            },
+            {
+              'ingredient_id': 2,
+              'vendor_id': 1,
+              'package_type': 'sack',
+              'price': 100,
+            },
+          ],
+        })
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
+    it('should add vendoringredients for valid requests', (done) => {
+      chai.request(server)
+        .post('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'vendoringredients': [
             {
@@ -112,7 +138,7 @@ describe('VendorIngredient', () => {
     it('should reject request body without a vendoringredients object', (done) => {
       chai.request(server)
         .put('/vendoringredients')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({})
         .end((err, res) => {
           res.should.have.status(400);
@@ -123,7 +149,7 @@ describe('VendorIngredient', () => {
     it('should reject request with invalid id', (done) => {
       chai.request(server)
         .put('/vendoringredients')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'vendoringredients': {
             '1a': {
@@ -137,10 +163,51 @@ describe('VendorIngredient', () => {
         });
     });
 
-    it('should modify vendoringredients with valid requests', (done) => {
+    it('should reject request with id not in table', (done) => {
+      chai.request(server)
+        .put('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'vendoringredients': {
+            '1': {
+              'price': 100,
+            },
+            '100': {
+              'price': 100,
+            },
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should reject noobs', (done) => {
       chai.request(server)
         .put('/vendoringredients')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .send({
+          'vendoringredients': {
+            '1': {
+              'price': 999,
+              'package_type': 'truckload',
+            },
+            '2': {
+              'price': 99,
+            },
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
+    it('should modify vendoringredients with valid requests', (done) => {
+      chai.request(server)
+        .put('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'vendoringredients': {
             '1': {
@@ -172,7 +239,7 @@ describe('VendorIngredient', () => {
     it('should reject request body without an ids object', (done) => {
       chai.request(server)
         .delete('/vendoringredients')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({})
         .end((err, res) => {
           res.should.have.status(400);
@@ -183,7 +250,7 @@ describe('VendorIngredient', () => {
     it('should reject invalid ids', (done) => {
       chai.request(server)
         .delete('/vendoringredients')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'ids': ['aaa', 2],
         })
@@ -193,10 +260,23 @@ describe('VendorIngredient', () => {
         });
     });
 
-    it('should delete multiple vendorsingredients', (done) => {
+    it('should reject noobs', (done) => {
       chai.request(server)
         .delete('/vendoringredients')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .send({
+          'ids': [1, 2, 3],
+        })
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
+    it('should delete multiple vendorsingredients', (done) => {
+      chai.request(server)
+        .delete('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'ids': [1, 2, 3],
         })
