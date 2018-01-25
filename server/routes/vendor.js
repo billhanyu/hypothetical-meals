@@ -1,5 +1,6 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
+import success from './common/success';
 
 export function view(req, res, next) {
   connection.query('SELECT * FROM Vendors')

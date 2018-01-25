@@ -1,5 +1,6 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
+import success from './common/success';
 const ALL_PACKAGE_TYPES = ['sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar'];
 
 export function getVendorsForIngredient(req, res, next) {
@@ -61,7 +62,7 @@ export function addVendorIngredients(req, res, next) {
       }
       return connection.query(`INSERT INTO VendorsIngredients (ingredient_id, vendor_id, package_type, price) VALUES ${values.join(', ')}`);
     })
-    .then(() => res.status(200).send('success'))
+    .then(() => success(res))
     .catch(err => handleError(err, res));
 }
 
@@ -104,7 +105,7 @@ export function modifyVendorIngredients(req, res, next) {
               package_type = (case ${cases.packageTypes.join(' ')} end)
           WHERE id IN (${ids.join(', ')})`);
     })
-    .then(() => res.status(200).send('success'))
+    .then(() => success(res))
     .catch(err => handleError(err, res));
 }
 
@@ -130,7 +131,7 @@ export function deleteVendorIngredients(req, res, next) {
       }
       return connection.query(`DELETE FROM VendorsIngredients WHERE id IN (${ids.join(',')})`);
     })
-    .then(() => res.status(200).send('success'))
+    .then(() => success(res))
     .catch(err => handleError(err, res));
 }
 
