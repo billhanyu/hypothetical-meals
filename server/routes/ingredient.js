@@ -1,4 +1,5 @@
 import * as checkNumber from './common/checkNumber';
+import { createError, handleError } from './common/customError';
 const fs = require('fs');
 
 export function view(req, res, next) {
@@ -38,9 +39,7 @@ function addIngredientHelper(ingredients, req, res, next) {
   }
   connection.query(`INSERT INTO Ingredients (name, storage_id) VALUES ${ingredientsToAdd.join(', ')}`)
   .then(() => res.status(200).send('success'))
-  .catch(err => {
-    return res.status(500).send('Database error');
-  });
+  .catch(err => handleError(err, res));
 }
 
 /* request body format:
@@ -81,20 +80,12 @@ function modifyIngredientHelper(items, req, res, next) {
   connection.query(`SELECT id, storage_id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
   .then(results => {
     if (results.length < ingredientIds.length) {
-      const err = {
-        custom: 'Changing storage id of invalid ingredient.',
-      };
-      throw err;
+      throw createError('Changing storage id of invalid ingredient.');
     }
     return connection.query(`UPDATE Ingredients SET storage_id = (case ${storageCases.join(' ')} end) WHERE id IN (${ingredientIds.join(', ')})`);
   })
   .then(() => res.status(200).send('success'))
-  .catch(err => {
-    if (err.custom) {
-      return res.status(400).send(err.custom);
-    }
-    return res.status(500).send('Database error');
-  });
+  .catch(err => handleError(err, res));
 }
 
 
@@ -130,20 +121,12 @@ function deleteIngredientHelper(items, req, res, next) {
   connection.query(`SELECT id, storage_id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
   .then(results => {
     if (results.length < ingredientIds.length) {
-      const err = {
-        custom: 'Deleting nonexistent ingredient.',
-      };
-      throw err;
+      throw createError('Deleting nonexistent ingredient.');
     }
   })
   .then(() => connection.query(`DELETE FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`))
   .then(() => res.status(200).send('success'))
-  .catch(err => {
-    if (err.custom) {
-      return res.status(400).send(err.custom);
-    }
-    return res.status(500).send('Database error');
-  });
+  .catch(err => handleError(err, res));
 }
 
 export function bulkImport(req, res, next) {

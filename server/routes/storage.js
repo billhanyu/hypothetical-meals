@@ -1,4 +1,5 @@
 import * as checkNumber from './common/checkNumber';
+import { createError, handleError } from './common/customError';
 
 export function view(req, res, next) {
   connection.query('SELECT * FROM Storages')
@@ -34,10 +35,7 @@ export function changeStorage(req, res, next) {
     connection.query(`SELECT id FROM Storages WHERE id = ${storageId}`)
     .then(results => {
       if (results.length < 1) {
-        const err = {
-          custom: 'Storage ID not in Storages Table',
-        };
-        throw err;
+        throw createError('Storage ID not in Storages Table');
       }
       return connection.query(
         `SELECT Inventories.storage_weight 
@@ -52,22 +50,13 @@ export function changeStorage(req, res, next) {
         sum += weight['storage_weight'];
       });
       if (newCapacity < sum) {
-        const err = {
-          custom: `New capacity ${newCapacity} is smaller than current total storage weight ${sum}`,
-        };
-        throw err;
+        throw createError(`New capacity ${newCapacity} is smaller than current total storage weight ${sum}`);
       }
       return connection.query(`UPDATE Storages SET capacity = ${newCapacity} WHERE id = ${storageId}`);
     })
     .then(() => {
       res.status(200).send('success');
     })
-    .catch(err => {
-      if (err.custom) {
-        return res.status(400).send(err.custom);
-      }
-      console.error(err);
-      return res.status(500).send('Database error');
-    });
+    .catch(err => handleError(err, res));
   });
 }
