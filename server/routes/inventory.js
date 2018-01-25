@@ -1,12 +1,10 @@
 import * as checkNumber from './common/checkNumber';
+import { createError, handleError } from './common/customError';
 
 export function view(req, res, next) {
   connection.query('SELECT * FROM Inventories')
     .then(results => res.status(200).send(results))
-    .catch(err => {
-      console.error(error);
-      return res.status(500).send('Database error');
-    });
+    .catch(err => handleError(err, res));
 }
 
 /* request body format:
@@ -71,10 +69,7 @@ function changeHelper(items, isCart, req, res, next) {
     `SELECT ingredient_id, storage_weight, total_weight FROM Inventories WHERE ingredient_id IN (${ingredientIds.join(', ')})`)
     .then(results => {
       if (results.length < ingredientIds.length) {
-        const err = {
-          custom: `Changing quantity of something not in the inventory.`,
-        };
-        throw err;
+        throw createError(`Changing quantity of something not in the inventory.`);
       }
 
       const newWeights = calcNewStorageAndTotalWeights(results, isCart, items);
@@ -87,12 +82,7 @@ function changeHelper(items, isCart, req, res, next) {
     })
     .then(() => connection.query('DELETE FROM Inventories WHERE total_weight = 0'))
     .then(() => res.status(200).send('success'))
-    .catch(err => {
-      if (err.custom) {
-        return res.status(400).send(err.custom);
-      }
-      return res.status(500).send('Database error');
-    });
+    .catch(err => handleError(err, res));
 }
 
 function calcNewStorageAndTotalWeights(oldItems, isCart, request) {
@@ -136,10 +126,7 @@ function calcIndStorageTotalWeightsAdmin(oldStorage, oldTotal, reqNum) {
 function calcIndStorageTotalWeightsCart(oldStorage, oldTotal, reqNum) {
   const newTotal = oldTotal - reqNum;
   if (newTotal < 0) {
-    const err = {
-      custom: `Requesting more then what's in the inventory.`,
-    };
-    throw err;
+    throw createError(`Requesting more then what's in the inventory.`);
   }
   const newStorage = oldStorage > reqNum > 0 ? oldStorage - reqNum : 0;
   return {

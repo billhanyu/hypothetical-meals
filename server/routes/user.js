@@ -1,4 +1,5 @@
 import * as checkParams from './common/checkParams';
+import { createError, handleError } from './common/customError';
 import User from '../models/User';
 const passport = require('passport');
 
