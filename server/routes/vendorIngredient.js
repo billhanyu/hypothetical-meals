@@ -98,6 +98,9 @@ export function modifyVendorIngredients(req, res, next) {
       return connection.query(`SELECT * FROM VendorsIngredients WHERE id IN (${ids.join(', ')})`);
     })
     .then(olds => {
+      if (olds.length < ids.length) {
+        throw createError('One or more id(s) does not exist in the table.');
+      }
       const cases = getCases(olds, items);
       return connection.query(
         `UPDATE VendorsIngredients
