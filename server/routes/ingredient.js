@@ -1,6 +1,5 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
-import success from './common/success';
 const fs = require('fs');
 
 export function view(req, res, next) {
