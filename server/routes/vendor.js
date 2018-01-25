@@ -1,4 +1,6 @@
 import * as checkNumber from './common/checkNumber';
+import { createError, handleError } from './common/customError';
+import success from './common/success';
 
 export function view(req, res, next) {
   connection.query('SELECT * FROM Vendors')
@@ -126,31 +128,20 @@ function duplicationCheckHelper(names, codes, nextQuery, res) {
     .then(results => {
       const oldNames = results.map(vendor => vendor['name']);
       const oldCodes = results.map(vendor => vendor['code']);
-      const err = {
-        custom: '',
-      };
       for (let name of names) {
         if (oldNames.indexOf(name) > -1) {
-          err.custom = 'One or more of your names has duplications with the database.';
-          throw err;
+          throw createError('One or more of your names has duplications with the database.');
         }
       }
       for (let code of codes) {
         if (oldCodes.indexOf(code) > -1) {
-          err.custom = 'One of more of your codes has duplications with the database.';
-          throw err;
+          throw createError('One of more of your codes has duplications with the database.');
         }
       }
       return nextQuery();
     })
     .then(() => res.status(200).send('success'))
-    .catch(err => {
-      if (err.custom) {
-        return res.status(400).send(err.custom);
-      }
-      console.error(err);
-      res.status(500).send('Database error');
-    });
+    .catch(err => handleError(err, res));
 }
 
 /* req.body.ids = [
