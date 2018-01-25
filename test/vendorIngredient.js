@@ -163,6 +163,26 @@ describe('VendorIngredient', () => {
         });
     });
 
+    it('should reject request with id not in table', (done) => {
+      chai.request(server)
+        .put('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'vendoringredients': {
+            '1': {
+              'price': 100,
+            },
+            '100': {
+              'price': 100,
+            },
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
     it('should reject noobs', (done) => {
       chai.request(server)
         .put('/vendoringredients')
