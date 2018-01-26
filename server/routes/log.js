@@ -56,7 +56,7 @@ function addLogEntryHelper(logs, req, res, next) {
     userLogs.push(`('${log.user_id}', '${log.vendor_ingredient_id}', '${log.quantity}')`);
   }
   connection.query(`INSERT INTO Logs (user_id, vendor_ingredient_id, quantity) VALUES ${userLogs.join(', ')}`)
-    .then(() => res.status(200).send('success'))
+    .then(() => success(res))
     .catch(err => {
       console.log(err);
       return res.status(500).send('Database error');

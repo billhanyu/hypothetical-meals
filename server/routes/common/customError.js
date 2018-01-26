@@ -14,3 +14,7 @@ export function handleError(err, res) {
   console.error(err);
   res.status(500).send('Database error');
 }
+
+export function returnError(res, code, msg) {
+  return res.status(code).send(msg);
+}

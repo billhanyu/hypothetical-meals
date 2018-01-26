@@ -1,5 +1,5 @@
 import * as checkNumber from './common/checkNumber';
-import { createError, handleError } from './common/customError';
+import { createError, handleError, returnError } from './common/customError';
 import success from './common/success';
 const ALL_PACKAGE_TYPES = ['sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar'];
 
@@ -30,32 +30,27 @@ export function getVendorsForIngredient(req, res, next) {
 export function addVendorIngredients(req, res, next) {
   const values = [];
   const items = req.body.vendoringredients;
-  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
-    .then((results) => {
-      if (results.length == 0) throw createError('Database error', 500);
-      if (results[0].user_group != 'admin') throw createError('User must be an admin to access this endpoint.', 401);
-      if (!items || items.length < 1) {
-        throw createError('Invalid input request, see doc.');
-      }
-      const dup = [];
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        const ingredientId = item['ingredient_id'];
-        const vendorId = item['vendor_id'];
-        const packageType = item['package_type'];
-        const price = item['price'];
+  if (!items || items.length < 1) {
+    return returnError(res, 400, 'Invalid input request, see doc.');
+  }
+  const dup = [];
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const ingredientId = item['ingredient_id'];
+    const vendorId = item['vendor_id'];
+    const packageType = item['package_type'];
+    const price = item['price'];
 
-        if (!checkNumber.isPositiveInteger(ingredientId)
-          || !checkNumber.isPositiveInteger(vendorId)
-          || !checkNumber.isPositiveInteger(price)
-          || ALL_PACKAGE_TYPES.indexOf(packageType) < 0) {
-          throw createError('Invalid input, check your property names and values.');
-        }
-        values.push(`(${ingredientId}, ${vendorId}, '${packageType}', ${price})`);
-        dup.push(`(ingredient_id = ${ingredientId} AND vendor_id = ${vendorId} AND package_type = '${packageType}')`);
-      }
-      return connection.query(`SELECT id FROM VendorsIngredients WHERE ${dup.join(' OR ')}`);
-    })
+    if (!checkNumber.isPositiveInteger(ingredientId)
+      || !checkNumber.isPositiveInteger(vendorId)
+      || !checkNumber.isPositiveInteger(price)
+      || ALL_PACKAGE_TYPES.indexOf(packageType) < 0) {
+      return returnError(res, 400, 'Invalid input, check your property names and values.');
+    }
+    values.push(`(${ingredientId}, ${vendorId}, '${packageType}', ${price})`);
+    dup.push(`(ingredient_id = ${ingredientId} AND vendor_id = ${vendorId} AND package_type = '${packageType}')`);
+  }
+  connection.query(`SELECT id FROM VendorsIngredients WHERE ${dup.join(' OR ')}`)
     .then(results => {
       if (results.length > 0) {
         throw createError('There exists duplicate(s) in your input: same ingredient_id, vendor_id and package_type');
@@ -79,24 +74,19 @@ export function addVendorIngredients(req, res, next) {
 export function modifyVendorIngredients(req, res, next) {
   const items = req.body.vendoringredients;
   const ids = [];
-  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
-    .then((results) => {
-      if (results.length == 0) throw createError('Database error', 500);
-      if (results[0].user_group != 'admin') throw createError('User must be an admin to access this endpoint.', 401);
-      if (!items || Object.keys(items).length < 1) {
-        throw createError('Invalid input request, see doc.');
-      }
-      const keys = Object.keys(items);
-      for (let i = 0; i < keys.length; i++) {
-        const id = keys[i];
-        if (!checkNumber.isPositiveInteger(id)) {
-          throw createError(`Invalid id ${id}`);
-        }
-        ids.push(id);
-      }
+  if (!items || Object.keys(items).length < 1) {
+    return returnError(res, 400, 'Invalid input request, see doc.');
+  }
+  const keys = Object.keys(items);
+  for (let i = 0; i < keys.length; i++) {
+    const id = keys[i];
+    if (!checkNumber.isPositiveInteger(id)) {
+      return returnError(res, 400, `Invalid id ${id}`);
+    }
+    ids.push(id);
+  }
 
-      return connection.query(`SELECT * FROM VendorsIngredients WHERE id IN (${ids.join(', ')})`);
-    })
+  connection.query(`SELECT * FROM VendorsIngredients WHERE id IN (${ids.join(', ')})`)
     .then(olds => {
       if (olds.length < ids.length) {
         throw createError('One or more id(s) does not exist in the table.');
@@ -118,22 +108,17 @@ export function modifyVendorIngredients(req, res, next) {
  * ]
  */
 export function deleteVendorIngredients(req, res, next) {
-  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
-    .then((results) => {
-      if (results.length == 0) throw createError('Database error', 500);
-      if (results[0].user_group != 'admin') throw createError('User must be an admin to access this endpoint.', 401);
-      const ids = req.body.ids;
-      if (!ids || ids.length < 1) {
-        throw createError('Invalid input request, see doc.');
-      }
-      for (let i = 0; i < ids.length; i++) {
-        const id = ids[i];
-        if (!checkNumber.isPositiveInteger(id)) {
-          throw createError('Invalid Id detected, trying to inject? you lil b');
-        }
-      }
-      return connection.query(`DELETE FROM VendorsIngredients WHERE id IN (${ids.join(',')})`);
-    })
+  const ids = req.body.ids;
+  if (!ids || ids.length < 1) {
+    return returnError(res, 400, 'Invalid input request, see doc.');
+  }
+  for (let i = 0; i < ids.length; i++) {
+    const id = ids[i];
+    if (!checkNumber.isPositiveInteger(id)) {
+      return returnError(res, 400, 'Invalid Id detected, trying to inject? you lil b');
+    }
+  }
+  connection.query(`DELETE FROM VendorsIngredients WHERE id IN (${ids.join(',')})`)
     .then(() => success(res))
     .catch(err => handleError(err, res));
 }

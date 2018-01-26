@@ -15,48 +15,42 @@ export function view(req, res, next) {
  * if the new capacity is lower than what's in the inventory, reject
  */
 export function changeStorage(req, res, next) {
-  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
-  .then((results) => {
-    if (results.length == 0) return res.status(500).send('Database error');
-    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
+  const keys = Object.keys(req.body);
+  if (keys.length !== 1 || !checkNumber.isPositiveInteger(keys[0])) {
+    return res.status(400).send('Invalid storage id');
+  }
 
-    const keys = Object.keys(req.body);
-    if (keys.length !== 1 || !checkNumber.isPositiveInteger(keys[0])) {
-      return res.status(400).send('Invalid storage id');
+  const storageId = keys[0];
+  const quantityString = req.body[storageId];
+  if (!checkNumber.isNonNegativeInteger(quantityString)) {
+    return res.status(400).send('Invalid new quantity number');
+  }
+  const newCapacity = parseInt(quantityString);
+
+  connection.query(`SELECT id FROM Storages WHERE id = ${storageId}`)
+  .then(results => {
+    if (results.length < 1) {
+      throw createError('Storage ID not in Storages Table');
     }
-
-    const storageId = keys[0];
-    const quantityString = req.body[storageId];
-    if (!checkNumber.isNonNegativeInteger(quantityString)) {
-      return res.status(400).send('Invalid new quantity number');
+    return connection.query(
+      `SELECT Inventories.storage_weight 
+      FROM Inventories
+      INNER JOIN Ingredients 
+      ON Ingredients.id = Inventories.ingredient_id 
+      WHERE Ingredients.storage_id = ${storageId}`);
+  })
+  .then(storageWeights => {
+    let sum = 0;
+    storageWeights.forEach(weight => {
+      sum += weight['storage_weight'];
+    });
+    if (newCapacity < sum) {
+      throw createError(`New capacity ${newCapacity} is smaller than current total storage weight ${sum}`);
     }
-    const newCapacity = parseInt(quantityString);
-
-    connection.query(`SELECT id FROM Storages WHERE id = ${storageId}`)
-    .then(results => {
-      if (results.length < 1) {
-        throw createError('Storage ID not in Storages Table');
-      }
-      return connection.query(
-        `SELECT Inventories.storage_weight 
-        FROM Inventories
-        INNER JOIN Ingredients 
-        ON Ingredients.id = Inventories.ingredient_id 
-        WHERE Ingredients.storage_id = ${storageId}`);
-    })
-    .then(storageWeights => {
-      let sum = 0;
-      storageWeights.forEach(weight => {
-        sum += weight['storage_weight'];
-      });
-      if (newCapacity < sum) {
-        throw createError(`New capacity ${newCapacity} is smaller than current total storage weight ${sum}`);
-      }
-      return connection.query(`UPDATE Storages SET capacity = ${newCapacity} WHERE id = ${storageId}`);
-    })
-    .then(() => {
-      res.status(200).send('success');
-    })
-    .catch(err => handleError(err, res));
-  });
+    return connection.query(`UPDATE Storages SET capacity = ${newCapacity} WHERE id = ${storageId}`);
+  })
+  .then(() => {
+    res.status(200).send('success');
+  })
+  .catch(err => handleError(err, res));
 }
