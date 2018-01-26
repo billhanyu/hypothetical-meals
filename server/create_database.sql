@@ -51,8 +51,8 @@ CREATE TABLE VendorsIngredients(
 	price double not null,
 	vendor_id int not null,
 
-	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id) ON DELETE CASCADE,
-	FOREIGN KEY (vendor_id) REFERENCES Vendors(id) ON DELETE CASCADE,
+	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
+	FOREIGN KEY (vendor_id) REFERENCES Vendors(id),
 	PRIMARY KEY (id)
 );
 
@@ -62,7 +62,7 @@ CREATE TABLE Inventories(
 	storage_weight int not null,
 	total_weight int not null,
 
-	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id) ON DELETE CASCADE,
+	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	PRIMARY KEY (id)
 );
 
@@ -73,8 +73,8 @@ CREATE TABLE Logs(
 	quantity int not null,
 	created_at timestamp DEFAULT now() not null,
  
-	FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,
-	FOREIGN KEY (vendor_ingredient_id) REFERENCES VendorsIngredients(id) ON DELETE CASCADE,
+	FOREIGN KEY (user_id) REFERENCES Users(id),
+	FOREIGN KEY (vendor_ingredient_id) REFERENCES VendorsIngredients(id),
 	PRIMARY KEY (id)
 );
 
@@ -84,6 +84,6 @@ CREATE TABLE SpendingLogs(
 	total double not null,
 	consumed double not null,
 
-	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id) ON DELETE CASCADE,
+	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	PRIMARY KEY (id)
 );

@@ -1,5 +1,6 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
+import success from './common/success';
 
 export function view(req, res, next) {
   connection.query('SELECT * FROM Vendors')
@@ -20,11 +21,7 @@ export function view(req, res, next) {
  * ]
  */
 export function addVendors(req, res, next) {
-  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
-  .then((results) => {
-    if (results.length == 0) return res.status(500).send('Database error');
-    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
-    const vendors = req.body.vendors;
+  const vendors = req.body.vendors;
   if (!vendors || vendors.length < 1) {
     return res.status(400).send('Invalid request object, see doc.');
   }
@@ -46,7 +43,6 @@ export function addVendors(req, res, next) {
 
   const changeQuery = () => connection.query(`INSERT INTO Vendors (name, contact, code) VALUES ${values.join(', ')}`);
   duplicationCheckHelper(names, codes, changeQuery, res);
-  });
 }
 
 /* req.body.vendors = {
@@ -59,54 +55,49 @@ export function addVendors(req, res, next) {
  * };
  */
 export function modifyVendors(req, res, next) {
-  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
-  .then((results) => {
-    if (results.length == 0) return res.status(500).send('Database error');
-    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
-    const vendors = req.body.vendors;
-    if (!vendors || Object.keys(vendors).length < 1) {
-      return res.status(400).send('Invalid request object, see doc.');
+  const vendors = req.body.vendors;
+  if (!vendors || Object.keys(vendors).length < 1) {
+    return res.status(400).send('Invalid request object, see doc.');
+  }
+  const names = [];
+  const codes = [];
+  for (let key in vendors) {
+    if (!checkNumber.isPositiveInteger(key)) {
+      return res.status(400).send(`Invalid key ${key}.`);
     }
-    const names = [];
-    const codes = [];
-    for (let key in vendors) {
-      if (!checkNumber.isPositiveInteger(key)) {
-        return res.status(400).send(`Invalid key ${key}.`);
-      }
-      const name = vendors[key]['name'];
-      const code = vendors[key]['code'];
-      if (name) names.push(name);
-      if (code) codes.push(code);
-    }
+    const name = vendors[key]['name'];
+    const code = vendors[key]['code'];
+    if (name) names.push(name);
+    if (code) codes.push(code);
+  }
 
-    const changeQuery = () =>
-      connection.query(`SELECT * FROM Vendors WHERE id IN (${Object.keys(vendors).join(', ')})`)
-        .then(olds => {
-          const nameCases = [];
-          const contactCases = [];
-          const codeCases = [];
-          for (let old of olds) {
-            const id = old['id'];
-            const oldName = old['name'];
-            const oldContact = old['contact'];
-            const oldCode = old['code'];
-            const change = vendors[id];
-            const newName = change['name'];
-            const newContact = change['contact'];
-            const newCode = change['code'];
-            nameCases.push(`when id = ${id} then '${newName || oldName}'`);
-            contactCases.push(`when id = ${id} then '${newContact || oldContact}'`);
-            codeCases.push(`when id = ${id} then '${newCode || oldCode}'`);
-          }
-          return connection.query(`
-            UPDATE Vendors
-              SET name = (case ${nameCases.join(' ')} end),
-                contact = (case ${contactCases.join(' ')} end),
-                code = (case ${codeCases.join(' ')} end)
-              WHERE id IN (${Object.keys(vendors).join(', ')})`);
-        });
-    duplicationCheckHelper(names, codes, changeQuery, res);
-  });
+  const changeQuery = () =>
+    connection.query(`SELECT * FROM Vendors WHERE id IN (${Object.keys(vendors).join(', ')})`)
+      .then(olds => {
+        const nameCases = [];
+        const contactCases = [];
+        const codeCases = [];
+        for (let old of olds) {
+          const id = old['id'];
+          const oldName = old['name'];
+          const oldContact = old['contact'];
+          const oldCode = old['code'];
+          const change = vendors[id];
+          const newName = change['name'];
+          const newContact = change['contact'];
+          const newCode = change['code'];
+          nameCases.push(`when id = ${id} then '${newName || oldName}'`);
+          contactCases.push(`when id = ${id} then '${newContact || oldContact}'`);
+          codeCases.push(`when id = ${id} then '${newCode || oldCode}'`);
+        }
+        return connection.query(`
+          UPDATE Vendors
+            SET name = (case ${nameCases.join(' ')} end),
+              contact = (case ${contactCases.join(' ')} end),
+              code = (case ${codeCases.join(' ')} end)
+            WHERE id IN (${Object.keys(vendors).join(', ')})`);
+      });
+  duplicationCheckHelper(names, codes, changeQuery, res);
 }
 
 function duplicationCheckHelper(names, codes, nextQuery, res) {
@@ -139,7 +130,7 @@ function duplicationCheckHelper(names, codes, nextQuery, res) {
       }
       return nextQuery();
     })
-    .then(() => res.status(200).send('success'))
+    .then(() => success(res))
     .catch(err => handleError(err, res));
 }
 
@@ -149,24 +140,19 @@ function duplicationCheckHelper(names, codes, nextQuery, res) {
  *
  */
 export function deleteVendors(req, res, next) {
-  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
-  .then((results) => {
-    if (results.length == 0) return res.status(500).send('Database error');
-    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
-    const ids = req.body.ids;
-    if (!ids || ids.length < 1) {
-      return res.status(400).send('Invalid input object, see doc.');
+  const ids = req.body.ids;
+  if (!ids || ids.length < 1) {
+    return res.status(400).send('Invalid input object, see doc.');
+  }
+  for (let id of ids) {
+    if (!checkNumber.isPositiveInteger(id)) {
+      return res.status(400).send(`Invalid id ${id}`);
     }
-    for (let id of ids) {
-      if (!checkNumber.isPositiveInteger(id)) {
-        return res.status(400).send(`Invalid id ${id}`);
-      }
-    }
-    connection.query(`DELETE FROM Vendors WHERE id IN (${ids.join(', ')})`)
-      .then(() => res.status(200).send('success'))
-      .catch(err => {
-        console.error(err);
-        res.status(500).send('Database error');
-    });
+  }
+  connection.query(`DELETE FROM Vendors WHERE id IN (${ids.join(', ')})`)
+    .then(() => success(res))
+    .catch(err => {
+      console.error(err);
+      res.status(500).send('Database error');
   });
 }
