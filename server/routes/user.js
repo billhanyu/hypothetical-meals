@@ -7,12 +7,7 @@ export function signupAdmin(req, res, next) {
 }
 
 export function signupNoob(req, res, next) {
-  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
-  .then((results) => {
-    if (results.length == 0) return res.status(500).send('Database error');
-    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
-    signupUser(req, res, next, false);
-  });
+  signupUser(req, res, next, false);
 }
 
 function signupUser(req, res, next, isAdmin) {

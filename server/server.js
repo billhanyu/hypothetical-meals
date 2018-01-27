@@ -14,6 +14,7 @@ import * as inventory from './routes/inventory';
 import * as vendor from './routes/vendor';
 import * as vendorIngredient from './routes/vendorIngredient';
 import * as spendinglog from './routes/spendinglog';
+import { adminRequired, noobRequired } from './authMiddleware';
 
 require('./routes/common/passport');
 
@@ -58,39 +59,42 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+const beAdmin = [auth.required, adminRequired];
+const beNoob = [auth.required, noobRequired];
+
 app.post('/users/admin', user.signupAdmin);
-app.post('/users/noob', auth.required, user.signupNoob);
+app.post('/users/noob', beAdmin, user.signupNoob);
 app.post('/users/login', user.login);
 
-app.get('/vendors', auth.required, vendor.view);
-app.post('/vendors', auth.required, vendor.addVendors);
-app.put('/vendors', auth.required, vendor.modifyVendors);
-app.delete('/vendors', auth.required, vendor.deleteVendors);
+app.get('/vendors', beNoob, vendor.view);
+app.post('/vendors', beAdmin, vendor.addVendors);
+app.put('/vendors', beAdmin, vendor.modifyVendors);
+app.delete('/vendors', beAdmin, vendor.deleteVendors);
 
-app.get('/ingredients', auth.required, ingredient.view);
-app.post('/ingredients', auth.required, ingredient.addIngredient);
-app.put('/ingredients', auth.required, ingredient.modifyIngredient);
-app.delete('/ingredients', auth.required, ingredient.deleteIngredient);
-app.post('/ingredients/import', upload.single('bulk'), ingredient.bulkImport);
+app.get('/ingredients', beNoob, ingredient.view);
+app.post('/ingredients', beAdmin, ingredient.addIngredient);
+app.put('/ingredients', beAdmin, ingredient.modifyIngredient);
+app.delete('/ingredients', beAdmin, ingredient.deleteIngredient);
+app.post('/ingredients/import', [auth.required, adminRequired, upload.single('bulk')], ingredient.bulkImport);
 
-app.get('/vendoringredients/:ingredient_id', auth.required, vendorIngredient.getVendorsForIngredient);
-app.post('/vendoringredients', auth.required, vendorIngredient.addVendorIngredients);
-app.put('/vendoringredients', auth.required, vendorIngredient.modifyVendorIngredients);
-app.delete('/vendoringredients', auth.required, vendorIngredient.deleteVendorIngredients);
+app.get('/vendoringredients/:ingredient_id', beNoob, vendorIngredient.getVendorsForIngredient);
+app.post('/vendoringredients', beAdmin, vendorIngredient.addVendorIngredients);
+app.put('/vendoringredients', beAdmin, vendorIngredient.modifyVendorIngredients);
+app.delete('/vendoringredients', beAdmin, vendorIngredient.deleteVendorIngredients);
 
-app.get('/storages', auth.required, storage.view);
-app.put('/storages', auth.required, storage.changeStorage);
+app.get('/storages', beNoob, storage.view);
+app.put('/storages', beAdmin, storage.changeStorage);
 
-app.get('/logs', auth.required, log.view);
-app.get('/logs/ingredients', auth.required, log.viewLogForIngredient);
-app.post('/logs', auth.required, log.addEntry);
+app.get('/logs', beNoob, log.view);
+app.get('/logs/ingredients', beNoob, log.viewLogForIngredient);
+app.post('/logs', beNoob, log.addEntry);
 
-app.get('/spendinglogs', auth.required, spendinglog.view);
-app.get('/spendinglogs/:ingredient_id', auth.required, spendinglog.logsForIngredient);
+app.get('/spendinglogs', beNoob, spendinglog.view);
+app.get('/spendinglogs/:ingredient_id', beNoob, spendinglog.logsForIngredient);
 
-app.get('/inventory', auth.required, inventory.view);
-app.put('/inventory/admin', auth.required, inventory.modifyQuantities);
-app.put('/inventory', auth.required, inventory.commitCart);
+app.get('/inventory', beNoob, inventory.view);
+app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
+app.put('/inventory', beNoob, inventory.commitCart);
 
 app.listen(1717, () => {
   console.log('Node app start at port 1717');

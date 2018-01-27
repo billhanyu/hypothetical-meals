@@ -1,5 +1,6 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
+import success from './common/success';
 const fs = require('fs');
 
 export function view(req, res, next) {
@@ -21,12 +22,7 @@ export function view(req, res, next) {
  * This adds a new ingredient into the Ingredients table.
  */
 export function addIngredient(req, res, next) {
-  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
-  .then((results) => {
-    if (results.length == 0) return status(500).send('Database error');
-    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
-    addIngredientHelper(req.body.ingredients, req, res, next);
-  });
+  addIngredientHelper(req.body.ingredients, req, res, next);
 }
 
 function addIngredientHelper(ingredients, req, res, next) {
@@ -38,7 +34,7 @@ function addIngredientHelper(ingredients, req, res, next) {
     ingredientsToAdd.push(`('${ingredient.name}', ${ingredient.storage_id})`);
   }
   connection.query(`INSERT INTO Ingredients (name, storage_id) VALUES ${ingredientsToAdd.join(', ')}`)
-  .then(() => res.status(200).send('success'))
+  .then(() => success(res))
   .catch(err => handleError(err, res));
 }
 
@@ -51,12 +47,7 @@ function addIngredientHelper(ingredients, req, res, next) {
  * This changes the storage_id of the ingredient.
  */
 export function modifyIngredient(req, res, next) {
-  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
-  .then((results) => {
-    if (results.length == 0) return res.status(500).send('Database error');
-    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
-    modifyIngredientHelper(req.body.ingredients, req, res, next);
-  });
+  modifyIngredientHelper(req.body.ingredients, req, res, next);
 }
 
 function modifyIngredientHelper(items, req, res, next) {
@@ -84,7 +75,7 @@ function modifyIngredientHelper(items, req, res, next) {
     }
     return connection.query(`UPDATE Ingredients SET storage_id = (case ${storageCases.join(' ')} end) WHERE id IN (${ingredientIds.join(', ')})`);
   })
-  .then(() => res.status(200).send('success'))
+  .then(() => success(res))
   .catch(err => handleError(err, res));
 }
 
@@ -98,12 +89,7 @@ function modifyIngredientHelper(items, req, res, next) {
  * This deletes an ingredient from the ingredients table.
  */
 export function deleteIngredient(req, res, next) {
-  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
-  .then((results) => {
-    if (results.length == 0) return res.status(500).send('Database error');
-    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
-    deleteIngredientHelper(req.body.ingredients, req, res, next);
-  });
+  deleteIngredientHelper(req.body.ingredients, req, res, next);
 }
 
 function deleteIngredientHelper(items, req, res, next) {
@@ -125,7 +111,7 @@ function deleteIngredientHelper(items, req, res, next) {
     }
   })
   .then(() => connection.query(`DELETE FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`))
-  .then(() => res.status(200).send('success'))
+  .then(() => success(res))
   .catch(err => handleError(err, res));
 }
 
