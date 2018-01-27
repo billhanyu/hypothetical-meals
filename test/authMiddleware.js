@@ -1,5 +1,8 @@
 const assert = require('chai').assert;
+const testTokens = require('./testTokens');
 import { adminRequired, noobRequired } from '../server/authMiddleware';
+import server from '../server/server';
+import auth from '../server/auth';
 
 class FakeRes {
   constructor() {
@@ -44,15 +47,15 @@ describe('authMiddleware', () => {
       });
     });
 
-    xit('should reject noobs', (done) => {
-      req = fakeReq(2); // Eric - noob
-      adminRequired(req, res, () => {
-        assert.strictEqual(req.user.name, 'Eric', 'User 2 name');
-        assert.strictEqual(req.user.username, 'eric', 'User 2 username');
-        assert.strictEqual(req.user.user_group, 'noob', 'User 2 user group');
-        assert.strictEqual(res.code, 401, 'Response status code');
-        done();
-      });
+    it('should reject noobs', (done) => {
+      server.get('/testAdmin', [auth.required, adminRequired], (req, res, next) => {});
+      chai.request(server)
+        .get('/testAdmin')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
     });
   });
 

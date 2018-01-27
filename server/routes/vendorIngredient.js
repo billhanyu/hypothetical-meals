@@ -1,5 +1,5 @@
 import * as checkNumber from './common/checkNumber';
-import { createError, handleError, returnError } from './common/customError';
+import { createError, handleError } from './common/customError';
 import success from './common/success';
 const ALL_PACKAGE_TYPES = ['sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar'];
 
@@ -31,7 +31,7 @@ export function addVendorIngredients(req, res, next) {
   const values = [];
   const items = req.body.vendoringredients;
   if (!items || items.length < 1) {
-    return returnError(res, 400, 'Invalid input request, see doc.');
+    return res.status(400).send('Invalid input request, see doc.');
   }
   const dup = [];
   for (let i = 0; i < items.length; i++) {
@@ -45,7 +45,7 @@ export function addVendorIngredients(req, res, next) {
       || !checkNumber.isPositiveInteger(vendorId)
       || !checkNumber.isPositiveInteger(price)
       || ALL_PACKAGE_TYPES.indexOf(packageType) < 0) {
-      return returnError(res, 400, 'Invalid input, check your property names and values.');
+      return res.status(400).send('Invalid input, check your property names and values.');
     }
     values.push(`(${ingredientId}, ${vendorId}, '${packageType}', ${price})`);
     dup.push(`(ingredient_id = ${ingredientId} AND vendor_id = ${vendorId} AND package_type = '${packageType}')`);
@@ -75,13 +75,13 @@ export function modifyVendorIngredients(req, res, next) {
   const items = req.body.vendoringredients;
   const ids = [];
   if (!items || Object.keys(items).length < 1) {
-    return returnError(res, 400, 'Invalid input request, see doc.');
+    return res.status(400).send('Invalid input request, see doc.');
   }
   const keys = Object.keys(items);
   for (let i = 0; i < keys.length; i++) {
     const id = keys[i];
     if (!checkNumber.isPositiveInteger(id)) {
-      return returnError(res, 400, `Invalid id ${id}`);
+      return res.status(400).send(`Invalid id ${id}`);
     }
     ids.push(id);
   }
@@ -110,12 +110,12 @@ export function modifyVendorIngredients(req, res, next) {
 export function deleteVendorIngredients(req, res, next) {
   const ids = req.body.ids;
   if (!ids || ids.length < 1) {
-    return returnError(res, 400, 'Invalid input request, see doc.');
+    return res.status(400).send('Invalid input request, see doc.');
   }
   for (let i = 0; i < ids.length; i++) {
     const id = ids[i];
     if (!checkNumber.isPositiveInteger(id)) {
-      return returnError(res, 400, 'Invalid Id detected, trying to inject? you lil b');
+      return res.status(400).send('Invalid Id detected, trying to inject? you lil b');
     }
   }
   connection.query(`DELETE FROM VendorsIngredients WHERE id IN (${ids.join(',')})`)

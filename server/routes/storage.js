@@ -1,5 +1,6 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
+import success from './common/success';
 
 export function view(req, res, next) {
   connection.query('SELECT * FROM Storages')
@@ -49,8 +50,6 @@ export function changeStorage(req, res, next) {
     }
     return connection.query(`UPDATE Storages SET capacity = ${newCapacity} WHERE id = ${storageId}`);
   })
-  .then(() => {
-    res.status(200).send('success');
-  })
+  .then(() => success(res))
   .catch(err => handleError(err, res));
 }
