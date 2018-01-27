@@ -21,13 +21,7 @@ export function view(req, res, next) {
  * This changes ingredient 1's total_weight to 123 and 2's total_weight to 456
  */
 export function modifyQuantities(req, res, next) {
-  connection.query(`SELECT user_group from Users where id=${req.payload.id};`)
-  .then((results) => {
-    if (results.length == 0) return res.status(500).send('Database error');
-    if (results[0].user_group != 'admin') return res.status(401).send('User must be an admin to access this endpoint.');
-    // TODO: check that the storage weight does not exceed capacity
-    changeHelper(req.body.changes, false, req, res, next);
-  });
+  changeHelper(req.body.changes, false, req, res, next);
 }
 
 /* request body format:
@@ -82,7 +76,7 @@ function changeHelper(items, isCart, req, res, next) {
           WHERE ingredient_id IN (${ingredientIds.join(', ')})`);
     })
     .then(() => connection.query('DELETE FROM Inventories WHERE total_weight = 0'))
-    .then(() => res.status(200).send('success'))
+    .then(() => success(res))
     .catch(err => handleError(err, res));
 }
 
