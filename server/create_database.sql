@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS Users;
 
 CREATE TABLE Users(
 	id int not null AUTO_INCREMENT,
+	username varchar(70) not null UNIQUE,
 	name varchar(70) not null,
 	hash text(1024) not null, 
 	salt character(32) not null, 

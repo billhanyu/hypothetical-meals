@@ -25,17 +25,19 @@ request.body.vendor_ingredient_ids = [
 
 Add a log entry or multiple log entries. This is effectively ordering vendoringredients.
 
-** Note: The quantity property should be in pounds, calculate this with num packages before you call the API. **
+** Note: The quantity property should be in number of packages. **
 
 {% sample lang="js" %}
 ```js
 request.body.logs = [
   {
     'vendor_ingredient_id': 2,
+    'package_type': 'pail',
     'quantity': 10,
   },
   {
     'vendor_ingredient_id': 3,
+    'package_type': 'sack',
     'quantity': 100,
   },
 ]
