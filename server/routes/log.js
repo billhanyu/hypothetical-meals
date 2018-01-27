@@ -1,6 +1,8 @@
 import * as checkNumber from './common/checkNumber';
 import * as packageCalc from './common/packageUtilies';
-import {updateLogForIngredient} from './spendinglog';
+import { updateLogForIngredient } from './spendinglog';
+import { createError } from './common/customError';
+import success from './common/success';
 
 export function view(req, res, next) {
   connection.query('SELECT * FROM Logs')
@@ -38,7 +40,6 @@ export function viewLogForIngredient(req, res, next) {
 }
 /* Request body format:
  * req.body.logs = [{
- *   'user_id': 1,
  *   'vendor_ingredient_id': 2,
  *   'package_type': 'pail',
  *   'quantity': 10,
@@ -68,10 +69,7 @@ function addLogEntryHelper(logs, req, res, next) {
   connection.query(`SELECT id, package_type, ingredient_id, price FROM VendorsIngredients WHERE id IN (${Object.keys(vendorIngredientMap).join(', ')}) AND package_type IN (${packageTypes.join(', ')})`)
   .then(results => {
     if (results.length < Object.keys(vendorIngredientMap).length) {
-      const err = {
-        custom: 'Placing order for nonexistent vendor ingredient for package type.',
-      };
-      throw err;
+      throw createError('Placing order for nonexistent vendor ingredient for package type.');
     }
     const spendingLogReq = {};
     for (let vendorIngredient of results) {
@@ -79,7 +77,7 @@ function addLogEntryHelper(logs, req, res, next) {
         let unitWeight = packageCalc.getWeight(vendorIngredient['package_type']);
         let quantity = vendorIngredientMap[vendorIngredient['ingredient_id']];
         spendingLogReq[vendorIngredient['ingredient_id']] = quantity * vendorIngredient['price'];
-        userLogs.push(`('1', ${vendorIngredient['id']}, ${unitWeight * quantity})`);
+        userLogs.push(`(${req.payload.id}, ${vendorIngredient['id']}, ${unitWeight * quantity})`);
       } catch (err) {
         throw err;
       }
@@ -99,7 +97,6 @@ function addLogEntryHelper(logs, req, res, next) {
     });
   })
   .catch(err => {
-    // console.log(err);
     if (err.custom) {
       return res.status(500).send(err.custom);
     }

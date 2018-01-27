@@ -2,12 +2,22 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 let config;
 try {
-  config = require('./config');
+  config = require('../config');
 } catch (e) {
-  config = require('./config.example');
+  config = require('../config.example');
 }
 
 class User {
+  constructor(mysqlData) {
+    if (!mysqlData) return;
+    this.id = mysqlData.id;
+    this.username = mysqlData.username;
+    this.name = mysqlData.name;
+    this.hash = mysqlData.hash;
+    this.salt = mysqlData.salt;
+    this.userGroup = mysqlData.user_group;
+  }
+
   validPassword(password) {
     const hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
     return this.hash === hash;
@@ -26,7 +36,7 @@ class User {
     return jwt.sign({
       id: this.id,
       name: this.name,
-      email: this.email,
+      user_group: this.user_group,
       exp: parseInt(exp.getTime() / 1000),
     }, config.secret);
   }
@@ -34,7 +44,8 @@ class User {
   getBasicInfo() {
     return {
       name: this.name,
-      email: this.email,
+      username: this.username,
+      user_group: this.user_group,
       token: this.generateJWT(),
     };
   }

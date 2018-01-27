@@ -1,11 +1,14 @@
 const alasql = require('alasql');
 const assert = require('chai').assert;
+const testTokens = require('./testTokens');
+
 
 describe('Log', () => {
   describe('#view()', () => {
     it('should return all logs', (done) => {
       chai.request(server)
         .get('/logs')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
@@ -24,6 +27,7 @@ describe('Log', () => {
     it('should return all logs for a vendor ingredient', (done) => {
       chai.request(server)
       .get('/logs/ingredients')
+      .set('Authorization', `Token ${testTokens.noobTestToken}`)
       .send({
         'vendor_ingredient_ids': [3],
       })
@@ -38,6 +42,7 @@ describe('Log', () => {
     it('should return no logs for a vendor ingredient not in table', (done) => {
       chai.request(server)
       .get('/logs/ingredients')
+      .set('Authorization', `Token ${testTokens.noobTestToken}`)
       .send({
         'vendor_ingredient_ids': [10],
       })
@@ -59,10 +64,10 @@ describe('Log', () => {
     it('should throw error for nonexistent ingredient because of package type', (done) => {
       chai.request(server)
       .post('/logs')
+      .set('Authorization', `Token ${testTokens.noobTestToken}`)
       .send({
         'logs': [
           {
-            'user_id': 1,
             'vendor_ingredient_id': 1,
             'package_type': 'blob',
             'quantity': 10,
@@ -79,10 +84,10 @@ describe('Log', () => {
     it('should throw error for nonexistent ingredient with a package type', (done) => {
       chai.request(server)
       .post('/logs')
+      .set('Authorization', `Token ${testTokens.noobTestToken}`)
       .send({
         'logs': [
           {
-            'user_id': 1,
             'vendor_ingredient_id': 1,
             'package_type': 'railcar',
             'quantity': 10,
@@ -99,16 +104,15 @@ describe('Log', () => {
     it('should add two entries for a vendor ingredient', (done) => {
       chai.request(server)
       .post('/logs')
+      .set('Authorization', `Token ${testTokens.noobTestToken}`)
       .send({
         'logs': [
           {
-            'user_id': 1,
             'vendor_ingredient_id': 2,
             'package_type': 'pail',
             'quantity': 10,
           },
           {
-            'user_id': 1,
             'vendor_ingredient_id': 1,
             'package_type': 'sack',
             'quantity': 10,
@@ -118,10 +122,10 @@ describe('Log', () => {
       .end((err, res) => {
         res.should.have.status(200);
         const newLogs = alasql('SELECT * FROM Logs');
-        assert.strictEqual(newLogs[2]['user_id'], 1, 'User id for log 3.');
+        assert.strictEqual(newLogs[2]['user_id'], 4, 'User id for log 3.');
         assert.strictEqual(newLogs[2]['vendor_ingredient_id'], 1, 'Vendor id for log 3.');
         assert.strictEqual(newLogs[2]['quantity'], 500, 'Quantity for log 3.');
-        assert.strictEqual(newLogs[3]['user_id'], 1, 'User id for log 4.');
+        assert.strictEqual(newLogs[3]['user_id'], 4, 'User id for log 4.');
         assert.strictEqual(newLogs[3]['vendor_ingredient_id'], 2, 'Vendor id for log 4.');
         assert.strictEqual(newLogs[3]['quantity'], 500, 'Quantity for log 4.');
         assert.strictEqual(newLogs.length, 4, 'Length of logs.');
