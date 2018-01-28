@@ -1,0 +1,91 @@
+.LandingPageContainer {
+  min-width: 1200px;
+}
+
+.LandingPageContentContainer {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.geometryBG {
+  width: 100%;
+  height: 615px;
+  float: left;
+}
+
+/*** BEGIN HEADER STUFF ****/
+.LandingPageLogo {
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: white;
+  float: left;
+}
+
+.LandingPageHeaderContainer {
+    margin: 0 auto;
+    width: 1200px;
+}
+
+.LandingPageHeader {
+  height: 80px;
+  line-height: 80px;
+}
+
+.LandingPageOptions {
+  font-size: 20px;
+  color: white;
+  float: right;
+  margin-right: 10%;
+}
+
+.LandingPageOptions span {
+  color: #FFF;
+  font-size: 15px;
+  margin-right: 20px;
+}
+
+/*** BEGIN FOOTER STUFF *****/
+.LandingPageFooterContainer {
+  width: 100%;
+  padding: 24px;
+  background-color: #EDEFF0;
+  border-top: 1px solid #323232;
+  float: left;
+  color: #868ba0;
+  min-width: 800px;
+}
+
+.LandingPageFooterContent {
+  width: 80%;
+  margin: 0 auto;
+}
+
+.LandingPageColumn {
+  width: 25%;
+  text-align: left;
+  min-width: 200px;
+  float: left;
+}
+
+.LandingPageLogoText {
+  font-size: 12px;
+  clear: both;
+}
+
+.LandingPageColumnText {
+  float: left;
+  clear: both;
+  color: #868ba0 !important;
+}
+
+.LandingPageColumnText:hover {
+  text-decoration: none;
+}
+
+.LandingPageColumnHeader {
+  font-weight: 700;
+  color: #707483;
+  font-size: 15px;
+}

@@ -1,0 +1,42 @@
+.FeatureContentImageContainer {
+  width: 850px;
+  margin-left: 80px;
+  float: left;
+  margin-top: -36px;
+  margin-left: 80px;
+  position: relative;
+}
+
+.FeatureContentImage {
+  width: 850px;
+  height: auto;
+}
+
+
+.background {
+    width:800px;
+    height: 400px;
+    background-image:url('/images/PortfolioImage.png');
+    z-index:2;
+    position:absolute;
+}
+
+.bluredBackground {
+    width: 100%;
+    height: 100%;
+    display: block;
+    top:-200px;
+    background-image: url('/images/PortfolioImage.png');
+    position: absolute;
+    filter: blur(2px);
+    -webkit-filter: blur(2px);
+}
+
+.mask {
+    width: 800px;
+    height: 400px;
+    margin-top: 200px;
+    position: absolute;
+    z-index:10;
+    overflow:hidden;
+}

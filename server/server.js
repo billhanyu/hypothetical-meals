@@ -62,6 +62,12 @@ app.use(cookieParser());
 const beAdmin = [auth.required, adminRequired];
 const beNoob = [auth.required, noobRequired];
 
+
+app.use(express.static(`${__dirname}/../frontend/react-client/dist`));
+app.get('/', (req, res) => {
+  res.sendFile(path.resolve(`${__dirname}/../frontend/react-client/dist/index.html`));
+});
+
 app.post('/users/admin', user.signupAdmin);
 app.post('/users/noob', beAdmin, user.signupNoob);
 app.post('/users/login', user.login);
