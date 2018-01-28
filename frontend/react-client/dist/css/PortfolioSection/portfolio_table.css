@@ -1,0 +1,98 @@
+.homeCoinTable {
+  width: 100%;
+}
+
+.homeCoinTable table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.ColumnHeaders {
+  border-bottom: 1px solid black;
+  width: 100%;
+}
+
+.homeCoinTable td, th {
+    text-align: center;
+    padding: 4px;
+}
+
+.homeCoinTable td {
+    border-top: 1px dotted #d1d9e2;
+}
+
+.homeCoinTable th {
+    font-weight: 500;
+    text-align: center;
+    line-height: 15px;
+    padding-bottom: 10px;
+    width: 10%;
+}
+
+.homeCoinTable tbody tr:nth-child(odd) {
+    background-color: #f8f8f8;
+}
+
+
+/*********************************** CURRENCY COLUMN ***********************************/
+.currencyTextContainer {
+  text-align: left;
+  float:left;
+}
+
+.currencyColumnCell{
+    height: auto;
+    margin: 0 auto;
+    min-width: 116px;
+}
+
+.currencyFull {
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+.currencyAbbrev {
+  font-weight: bold;
+  font-size: 15px;
+  margin-left: 8px;
+}
+
+.currencyImage {
+  width: 22px;
+  height: auto;
+  float: left;
+  margin-top: 8px;
+  margin-left: 20%;
+}
+/*********************************** END CURRENCY COLUMN ***********************************/
+
+/*********************************** BEGIN VALUE COLUMN ***********************************/
+.ValueUSD {
+  text-align: right;
+  margin-right: 20%;
+  white-space: nowrap;
+}
+
+.ValueBTC {
+  font-size: 12px;
+  text-align: right;
+  margin-right: 20%;
+  color: #7b7b7b;
+}
+/*********************************** END VALUE COLUMN ***********************************/
+
+/*********************************** PRICE COLUMN ***********************************/
+.PriceUSD {
+  text-align: right;
+  margin-right: 15%;
+  white-space: nowrap;
+}
+
+.PriceBTC {
+  font-size: 12px;
+  text-align: right;
+  margin-right: 15%;
+    color: #7b7b7b;
+}
+/*********************************** END PRICE COLUMN ***********************************/

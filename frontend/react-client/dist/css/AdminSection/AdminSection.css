@@ -1,0 +1,30 @@
+.AdminButtonContainer {
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 48px;
+}
+
+.AdminButton {
+  width: 250px;
+  min-width: 250px;
+  height: 40px;
+  border: 1px solid grey;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 16px;
+  line-height: 40px;
+  float: left;
+  margin-right: 40px;
+  background-color: #FFF;
+  cursor: pointer;
+}
+
+.AdminButton:hover {
+  background-color: #BCC9D0;
+}
+
+/** ADD INGREDIENT WINDOW **/
+
+
+
+/** REMOVE INGREDIENT WINDOW ***/
