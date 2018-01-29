@@ -7,23 +7,31 @@ class PrimaryOptionBar extends Component {
   constructor(props){
     super(props);
     this.handleClick = this.handleClick.bind(this);
+    const buttons = [
+      {
+        name:'Records',
+        icon:'fas fa-columns fa-lg'
+      }
+    ];
+    console.log(props);
+
+    if(props.isAdmin == 'true') {
+      buttons.push(
+      {
+        name:'Admin',
+        icon:'fas fa-user fa-lg'
+      });
+    }
+
     this.state = {
       selectedButton:'Records',
-      buttons:[
-        {
-          name:'Records',
-          icon:'fas fa-columns fa-lg'
-        },
-        {
-          name:'Admin',
-          icon:'fas fa-user fa-lg'
-        },
-      ]
+      buttons,
     };
   }
   /**
     Required Props:
     1. changeTab (Func) Fired when u change tab
+    2. isAdmin (boolean)
   */
 
   handleClick(selectedButton){

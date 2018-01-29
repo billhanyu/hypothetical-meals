@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import CoinPortfolioTableRow from './CoinPortfolioTableRow.js';
 
 // COMPONENT INFO: Refers to the actual table for portfolio
-class CoinPortfolioTable extends Component {
+class MainTable extends Component {
   constructor(props) {
     super(props);
     this.state =
@@ -37,11 +36,6 @@ class CoinPortfolioTable extends Component {
           </tr>
         </thead>
         <tbody>
-          {
-            this.state.dummyData.map((element, index) => {
-              return <CoinPortfolioTableRow key={index} {...element}/>
-            })
-          }
           <tr>
             <td>
               <div className="currencyColumnCell">
@@ -244,4 +238,4 @@ class CoinPortfolioTable extends Component {
   }
 }
 
-export default CoinPortfolioTable;
+export default MainTable;

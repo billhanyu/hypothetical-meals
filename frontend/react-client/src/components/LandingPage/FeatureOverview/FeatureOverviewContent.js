@@ -7,16 +7,16 @@ class FeatureOverviewContent extends Component {
 
     this.BulletTexts = [
         {
-          titleText:'Detailed Coin Summary',
-          contentText:'Learn about the coin project with a general overview of recent developments.',
+          titleText:'Competitive Vendors',
+          contentText:'Find ingredients from all vendors, with all prices. We provide vendors across the country.',
         },
         {
-          titleText:'Detailed Coin Summary',
-          contentText:'Learn about the coin project with a general overview of recent developments.',
+          titleText:'Simple UI',
+          contentText:'Easy and self-explanatory UI interface, with simple options for purchasing ingredients.',
         },
         {
-          titleText:'Detailed Coin Summary',
-          contentText:'Learn about the coin project with a general overview of recent developments.',
+          titleText:'Best Prices',
+          contentText:'Best prices for all ingredients, always. We check our competitor prices and make sure we are better. Price match guarantee.',
         },
       ];
   }
@@ -25,7 +25,7 @@ class FeatureOverviewContent extends Component {
   render() {
       return (
         <div className="KnowledgeOverviewContainer">
-          <FeatureOverviewContentEntry BulletTexts={this.BulletTexts} ImageSRC='/images/KnowledgeImage.png'/>
+          <FeatureOverviewContentEntry BulletTexts={this.BulletTexts} ImageSRC='/images/NewIngredient.png'/>
         </div>
       );
   }

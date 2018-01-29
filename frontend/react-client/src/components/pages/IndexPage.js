@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import TopContentContainer from './../LandingPage/TopContent/TopContentContainer.js';
 import FeaturesOverviewContainer from './../LandingPage/FeatureOverview/FeaturesOverviewContainer.js';
 import LandingPageFooter from './../LandingPage/LandingPageFooter.js';
+import LoginWindow from './../LandingPage/LoginWindow.js';
 
 class IndexPage extends Component {
   componentDidMount() {
@@ -39,6 +40,7 @@ class IndexPage extends Component {
             <div className="LandingPageContainer">
               <div className="geometryBG" ref="geometryBG">
               </div>
+              <LoginWindow />
               <TopContentContainer />
               <FeaturesOverviewContainer />
               <LandingPageFooter />

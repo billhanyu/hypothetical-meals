@@ -28,12 +28,7 @@ class FeatureOverviewContentEntry extends Component {
             </div>
           </div>
 
-          <div className="FeatureContentImageContainer">
-            <div className="background"></div>
-            <div className="mask">
-              <div className="bluredBackground"></div>
-            </div>
-          </div>
+          <img src={this.props.ImageSRC} className="FeatureContentImage"/>
         </div>
       );
   }

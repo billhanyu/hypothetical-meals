@@ -15,6 +15,19 @@
   float: left;
 }
 
+/** BEGIN LOGIN STUFF **/
+.LoginWindow {
+  position: absolute;
+  right: 20%;
+  z-index: 3;
+  top: 120px;
+  width: 20%;
+  min-width: 430px;
+  border-radius: 6px;
+  padding: 12px 12px 24px 12px;
+  background-color: #FFF;
+}
+
 /*** BEGIN HEADER STUFF ****/
 .LandingPageLogo {
   font-size: 22px;
@@ -40,10 +53,12 @@
   margin-right: 10%;
 }
 
-.LandingPageOptions span {
+.LandingPageOption {
   color: #FFF;
   font-size: 15px;
   margin-right: 20px;
+  cursor: pointer;
+  float: left;
 }
 
 /*** BEGIN FOOTER STUFF *****/

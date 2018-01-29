@@ -6,7 +6,7 @@ class RegistrationAgreement extends Component {
   }
 
   /**** REQUIRED PROPS
-    1. onChange (Func)
+    1. handleClick (Func)
   */
 
   render() {
