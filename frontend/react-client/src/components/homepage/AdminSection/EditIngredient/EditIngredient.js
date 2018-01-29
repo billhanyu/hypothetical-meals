@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 
-import RegistrationHeader from './../../Registration/RegistrationHeader.js';
-import RegistrationInput from './../../Registration/RegistrationInput.js';
-import RegistrationAgreement from './../../Registration/RegistrationAgreement.js';
-import RegistrationSubmitButton from './../../Registration/RegistrationSubmitButton.js';
+import RegistrationHeader from './../../../Registration/RegistrationHeader.js';
+import RegistrationInput from './../../../Registration/RegistrationInput.js';
+import RegistrationAgreement from './../../../Registration/RegistrationAgreement.js';
+import RegistrationSubmitButton from './../../../Registration/RegistrationSubmitButton.js';
 
-import VendorComboBox from './VendorComboBox.js';
+import VendorComboBox from './../VendorComboBox.js';
 
 class AddIngredientWindow extends Component {
   constructor(props){
@@ -26,8 +25,7 @@ class AddIngredientWindow extends Component {
   }
 
   handleSubmitButtonClick() {
-    axios.get(`asdf`)
-    .then(response => this.setState(response.data));
+    //TODO: AJAX REQUEST
   }
 
   render() {
@@ -36,19 +34,16 @@ class AddIngredientWindow extends Component {
           <RegistrationHeader HeaderText="New Ingredient" HeaderIcon="fas fa-utensils fa-2x"/>
 
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Name" onChange={this.handleInputChange} id="name" />
-          <VendorComboBox Options={["Sack (50lbs)", 'Pail (50 lbs)',
-          'Drum (500 lb)',
-          'Supersack (2000 lbs)',
-          'Truckload (50000 lbs)',
-          'Railcar (280000 lbs)',]}/>
+          <VendorComboBox Options={["ASDF","ASDF","ASDF"]}/>
           <div className="RegistrationInfoText">* Package Type</div>
-          <VendorComboBox Options={["Frozen","Refrigerated","Room Temperature"]}/>
+          <VendorComboBox Options={["ASDF","ASDF","ASDF"]}/>
           <div className="RegistrationInfoText">* Temperature </div>
-          <VendorComboBox Options={["Global Mart"]}/>
+          <VendorComboBox Options={["ASDF","ASDF","ASDF"]}/>
           <div className="RegistrationInfoText">* Provided Vendors </div>
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Price" onChange={this.handleInputChange} id="price" />
 
-          <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>ADD INGREDIENT</div>
+          <RegistrationSubmitButton handleClick={this.handleSubmitButtonClick} />
+          <RegistrationAgreement />
       </div>
     );
   }

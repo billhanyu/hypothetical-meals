@@ -24,8 +24,8 @@ class HomePage extends Component {
     return (
       <div>
         <RegistrationNavBar />
-        <PrimaryOptionBar changeTab={this.changeTab}/>
-        <ContentMain selectedTab={this.state.selectedTab}/>
+        <PrimaryOptionBar changeTab={this.changeTab} isAdmin={this.props.match.params.isAdmin}/>
+        <ContentMain selectedTab={this.state.selectedTab} token={this.props.match.params.token}/>
       </div>
     )
   }

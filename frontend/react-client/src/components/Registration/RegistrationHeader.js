@@ -5,11 +5,16 @@ class RegistrationHeader extends Component {
     super(props);
   }
 
+  /*** REQUIRED PROPS
+    1. HeaderText (String)
+    2. HeaderIcon (String)
+  */
+
   render() {
     return (
       <div className="RegistrationHeader">
-        <i className="fas fa-user fa-2x RegistrationPersonIcon"></i>
-        <span className="RegistrationHeaderText">Account Creation</span>
+        <i className={`${this.props.HeaderIcon} RegistrationPersonIcon`}></i>
+        <span className="RegistrationHeaderText">{this.props.HeaderText}</span>
       </div>
     );
   }

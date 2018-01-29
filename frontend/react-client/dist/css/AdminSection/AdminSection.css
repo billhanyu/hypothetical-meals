@@ -2,6 +2,8 @@
   width: 90%;
   margin: 0 auto;
   margin-top: 48px;
+  margin-bottom: 40px;
+  padding-bottom: 40px;
 }
 
 .AdminButton {
@@ -23,8 +25,54 @@
   background-color: #BCC9D0;
 }
 
-/** ADD INGREDIENT WINDOW **/
+/** ADD VENDOR WINDOW **/
+.EditContainer {
+  width: 500px;
+  margin: 0 auto;
+  background-color: #FFF;
+  border-radius: 8px;
+  clear: both;
+  padding: 12px 0 40px;
+}
 
 
+/** EDIT VENDOR WINDOW ***/
+.AdminDropdown {
+  width: 80%;
+  clear: both;
+  margin: 0 auto;
+  height: 40px;
+  margin-left: 10%;
+  margin-top: 24px;
+}
 
-/** REMOVE INGREDIENT WINDOW ***/
+.VendorList {
+    width: 500px;
+    background-color: white;
+    padding: 20px 0;
+    border-radius: 6px;
+    margin: 0 auto;
+}
+
+.VendorContainer {
+  margin-top: 40px;
+}
+
+.Vendor {
+  width: 100%;
+  border-top: 1px solid #BED5DF;
+  border-bottom: 1px solid #BED5DF;
+  text-align: center;
+  height: 40px;
+  background-color: #FCFCFC;
+  text-transform: uppercase;
+  line-height: 40px;
+  font-size: 16px;
+  letter-spacing: 1px;
+  font-family: "Latos", sans-serif;
+  cursor: pointer;
+}
+
+.Vendor:hover {
+  background-color: #F4F4F4;
+}

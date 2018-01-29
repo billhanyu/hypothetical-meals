@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import AdminButton from './AdminButton.js';
 import AddIngredientWindow from './AddIngredientWindow.js';
-import EditIngredientWindow from './EditIngredientWindow.js';
+import IngredientList from './EditIngredient/IngredientList.js';
 import AddVendor from './AddVendor.js';
-import EditVendor from './EditVendor.js'
+import VendorList from './EditVendor/VendorList.js';
 
 class AdminButtons extends Component {
   constructor(props) {
@@ -13,6 +13,9 @@ class AdminButtons extends Component {
     };
     this.handleClick = this.handleClick.bind(this);
   }
+  /** REQUIRED PROPS
+    1. token (String)
+  */
 
   handleClick(idOfButton) {
     this.setState({
@@ -23,27 +26,29 @@ class AdminButtons extends Component {
   _renderSelectedButton() {
     const selectedButton = this.state.renderedButton;
     if (selectedButton == "editVendor") {
-        return <EditVendor />
+        return <VendorList token={this.props.token}/>
     }
     else if (selectedButton == "addVendor") {
-        return <AddVendor />
+        return <AddVendor token={this.props.token}/>
     }
     if (selectedButton == "editIngredient") {
-        return <EditIngredientWindow />
+        return <IngredientList token={this.props.token}/>
     }
     else if (selectedButton == "addIngredient") {
-        return <AddIngredientWindow />
+        return <AddIngredientWindow token={this.props.token}/>
     }
 
   }
 
   render() {
     return (
-      <div className="AdminButtonContainer">
-        <AdminButton name="Edit Vendor" id="editVendor" handleClick={this.handleClick}/>
-        <AdminButton name="Add Vendor" id="addVendor" handleClick={this.handleClick}/>
-        <AdminButton name="Edit Ingredient" id="editIngredient" handleClick={this.handleClick}/>
-        <AdminButton name="Add Ingredient" id="addIngredient" handleClick={this.handleClick}/>
+      <div>
+        <div className="AdminButtonContainer">
+          <AdminButton name="Edit Vendor" id="editVendor" handleClick={this.handleClick}/>
+          <AdminButton name="Add Vendor" id="addVendor" handleClick={this.handleClick}/>
+          <AdminButton name="Edit Ingredient" id="editIngredient" handleClick={this.handleClick}/>
+          <AdminButton name="Add Ingredient" id="addIngredient" handleClick={this.handleClick}/>
+        </div>
         {
           this._renderSelectedButton()
         }

@@ -13,7 +13,7 @@ class FeatureButtons extends Component {
       return (
         <div className="FeatureTitleContainer">
           <hr className='FeatureLine' />
-          <div className="FeatureTitleText">Informative Portfolio Tracker</div>
+          <div className="FeatureTitleText">Informative Ingredient Interface</div>
           <hr className='FeatureLine' />
         </div>
       );

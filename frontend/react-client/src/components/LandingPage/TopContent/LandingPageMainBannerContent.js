@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import LandingPageHeaderBulletsContainer from './LandingPageHeaderBulletsContainer.js';
-import LandingPageHeaderSummary from './LandingPageHeaderSummary.js';
 
 class TopContentContainer extends Component {
   constructor(props){
@@ -10,7 +9,6 @@ class TopContentContainer extends Component {
   render() {
       return (
         <div className="LandingPageHeaderContainer">
-          <LandingPageHeaderSummary />
           <LandingPageHeaderBulletsContainer />
         </div>
       );

@@ -11,8 +11,8 @@ class LandingPageFooter extends Component {
         <div className="LandingPageFooterContainer">
           <div className="LandingPageFooterContent">
             <div className="LandingPageColumn">
-              <div className="LandingPageLogo" style={{color:'black'}}>COINSIGHTFUL</div>
-              <div className="LandingPageLogoText"> © 2018 Coinsightful</div>
+              <div className="LandingPageLogo" style={{color:'black'}}>KUNG FOODS</div>
+              <div className="LandingPageLogoText"> © 2018 Kung Foods</div>
             </div>
             <div className="LandingPageColumn">
               <div className="LandingPageColumnHeader">Legal</div>

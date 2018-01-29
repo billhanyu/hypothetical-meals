@@ -9,15 +9,16 @@ class ContentMain extends Component {
     /**
       Required Props:
       1. selectedTab (String)
+      2. token (String)
     */
   }
 
   _renderSelectedTab() {
     if(this.props.selectedTab == Enums.TAB_NAMES.RECORDS) {
-      return <AdminSection />;
+      return <AdminSection token={this.props.token}/>;
     }
     else if(this.props.selectedTab == Enums.TAB_NAMES.ADMIN){
-      return <AdminSection />;
+      return <AdminSection token={this.props.token}/>;
     }
   }
 

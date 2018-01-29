@@ -8,7 +8,7 @@ class NavBar extends Component {
       <header className="borderBottom GeneralThemeColor">
         <ul className="headerButtons unselectable">
           <li className="navButton navLogo">
-            <Link to="" className="navButtonText navLogoText">C O I N S I G H T F U L</Link>
+            <Link to="" className="navButtonText navLogoText">KUNG FOODS</Link>
           </li>
           <li className="navBarAccount">
             <LoggedInAccountHeader />

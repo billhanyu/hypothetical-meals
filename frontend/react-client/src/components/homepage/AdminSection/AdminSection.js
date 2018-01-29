@@ -6,10 +6,14 @@ class AdminSection extends Component {
     super(props);
   }
 
+  /*** REQUIRED PROPS
+  1. token (String)
+  */
+
   render() {
     return (
       <div>
-        <AdminButtons />
+        <AdminButtons token={this.props.token}/>
       </div>
     )
   }
