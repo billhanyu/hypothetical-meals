@@ -1,0 +1,53 @@
+registrationheader {
+  display: block;
+  width: 100%;
+  height: 60px;
+  color: white;
+  border-bottom: 1px solid rgba(0,0,0,0.2);
+}
+
+.RegistrationThemeColor {
+  background-image: -o-linear-gradient(right, rgb(254,133,107) 24%, rgb(35,171,17) 62%);
+  background-image: -moz-linear-gradient(right, rgb(254,133,107) 24%, rgb(35,171,17) 62%);
+  background-image: -webkit-linear-gradient(right, rgb(254,133,107) 24%, rgb(35,171,17) 62%);
+  background-image: -ms-linear-gradient(right, #4ea4e8 0%, #40b4bc 50%, #2ec778 100%);
+  /* This last line is all you need for modern browsers */
+  background-image: linear-gradient(to right, #4ca2e6 0%, #3fb5be 50%, #30c678 100%);
+}
+
+.RegistrationLogoText {
+  width: 217px;
+  margin: 0 auto;
+  line-height: 60px;
+  text-align: center;
+  color: white;
+  font-size: 20px;
+}
+
+.RegistrationLogoText:focus {
+  text-decoration: none;
+  color: black;
+}
+
+.RegistrationLogoText:hover {
+  text-decoration: none;
+  color: black;
+}
+
+.RegistrationLogo {
+  min-width: 300px;
+}
+
+.RegistrationButtons li {
+  width: 25%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.RegistrationButtons {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 90%;
+  margin: 0 auto;
+}

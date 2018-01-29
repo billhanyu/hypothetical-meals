@@ -1,0 +1,82 @@
+header {
+  display: block;
+  background-color: black;
+  width: 100%;
+  height: 60px;
+  color: white;
+/*    background-color: #37a88a;*/
+/*background-color: #1c7d61;*/
+}
+
+.navButton li {
+  float: left;
+}
+
+.navLogo {
+  min-width: 217px;
+  float: left;
+}
+
+.navButtonText {
+  line-height: 60px;
+  font-size: 20px;
+  color: white;
+  text-decoration: none;
+}
+
+.navButtonText:focus {
+  text-decoration: none;
+  color: white;
+}
+
+.navButtonText:hover {
+  text-decoration: none;
+}
+
+.navLogoText:hover {
+  color: black;
+}
+
+/**** BEGIN NAV BAR ACCOUNT STUFF */
+.navBarAccount {
+  float: right;
+  cursor: pointer;
+  text-align: right;
+}
+
+.navButtonAccountDropdownArrow {
+  float: right;
+  text-align: right;
+  cursor: pointer;
+  margin-left: 8px;
+  margin-top: 22px;
+  color: #dedede;
+}
+
+.navBarAccount:hover {
+  color: white;
+  float: right;
+  cursor: pointer;
+}
+
+.navButtonAccountSign {
+    margin-top: 8px;
+}
+
+.navButtonAccountName {
+  font-size: 15px;
+  margin-left: 8px;
+  float: right;
+}
+
+.headerButtons {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.headerButtons li {
+  width: 25%;
+}
