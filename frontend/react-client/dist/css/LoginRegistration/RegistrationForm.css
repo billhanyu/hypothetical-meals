@@ -1,0 +1,180 @@
+/****** REGISTRATION CONTAINER *******************/
+.RegistrationBG {
+/*  background-color: #d2dae5;*/
+  background-color: #fafafa;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.RegistrationContainer {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  margin: -300px 0 0 -250px;
+  min-width: 500px;
+  max-width: 500px;
+  overflow: auto;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0px 1px 46px -4px rgba(0,0,0,0.28);
+  padding: 16px 0 32px 0;
+}
+
+/****** REGISTRATION WINDOW INTERIOR ***********/
+.RegistrationHeader {
+  width: 400px;
+  margin: 0 auto;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.RegistrationPersonIcon {
+  color: #3b8fc6;
+  margin-top: 6px;
+  margin-left: -12px;
+}
+
+.RegistrationHeaderText {
+  font-size: 24px;
+  color: #3b8fc6;
+  margin-left: 8px;
+  font-weight: 600;
+}
+
+.RegistrationInputContainer {
+  width: 400px;
+  margin: 0 auto;
+}
+
+.RegistrationInput {
+  padding: 10px;
+  width: 400px;
+  margin: 0 auto;
+  margin-top: 12px;
+  box-shadow: 0 1px 0px 0 rgba(0,0,0,0.02) inset;
+  background-color: #FFF;
+  border: 1px solid #ddd;
+  line-height: 20px;
+  color: #555;
+  vertical-align: middle;
+  border-radius: 2px;
+  font-size: 20px;
+  color: black;
+  font-weight: 500;
+}
+
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #959595;
+}
+::-moz-placeholder { /* Firefox 19+ */
+  color: #959595;
+}
+:-ms-input-placeholder { /* IE 10+ */
+  color: #959595;
+}
+:-moz-placeholder { /* Firefox 18- */
+  color: #959595;
+}
+
+.RegistrationInputName {
+  width: 43.5% !important;
+}
+
+.marginLeftFivePercent {
+  margin-left: 3% !important;
+}
+
+.RegistrationInfoText {
+  width: 400px;
+  text-overflow: none;
+  margin: 0 auto;
+  font-size: 12px;
+  color: grey;
+  margin-top: 2px;
+}
+
+.CaptchaContainer {
+  width: 375px;
+  margin: 0 auto;
+  clear: both;
+  margin-top: 40px;
+  height: 100px;
+  padding: 10px 8px;
+  text-align: center;
+  border-radius: 2px;
+  border: 1px solid #ddd;
+  background-color: rgba(245,245,245,0.3);
+}
+
+.captchawidget {
+  width: 300px;
+  margin: 0 auto;
+}
+
+.PasswordStrengthContainer {
+  width: 400px;
+  margin: 0 auto;
+  left: -2px;
+  margin-top: 12px;
+  clear: both;
+}
+
+.PasswordBar {
+  width: 100px;
+  float: left;
+  height: 4px;
+  margin-left: 2px;
+  margin-top: 4px;
+  cursor: pointer;
+}
+
+.BlankPassword {
+  border: 1px solid #bebebe;
+}
+
+.PasswordStrengthText {
+  font-size: 10px;
+  float: right;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: right;
+  font-weight: 600;
+}
+
+.PasswordBarAnchor {
+  margin-left: 0px;
+}
+
+.AgreementAcceptanceContainer {
+  width: 400px;
+  margin: 0 auto;
+  margin-top: 16px;
+  clear: both;
+  text-overflow: none;
+  font-size: 12px;
+}
+
+.AgreementAcceptanceText {
+  float: left;
+  margin-left: 4px;
+}
+
+.RegistrationSubmitButton {
+  width: 400px;
+  margin: 0 auto;
+  text-align: center;
+  border-radius: 3px;
+  padding: 14px 10px;
+  color: white;
+  background-color: #3b8fc6;
+  margin-top: 20px;
+  font-size: 14px;
+  letter-spacing: 2px;
+  clear: both;
+  cursor: pointer;
+}
+
+.RegistrationSubmitButton:hover {
+  background-color: #2982bc;
+}

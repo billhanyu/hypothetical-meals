@@ -1,0 +1,40 @@
+.BTCColor {
+  /* color: #f68819; */
+  color: grey;
+}
+
+.ProfitGreen {
+  color: #00a500;
+}
+
+.LossRed {
+  color: red;
+}
+
+.GeneralThemeColor {
+  background-color: #31749d;
+}
+
+.ExcellentPasswordColor {
+  color: #54b218;
+}
+
+.GoodPasswordColor {
+  color: #e28f24;
+}
+
+.WeakPasswordColor {
+  color: #cc5223;
+}
+
+.ExcellentPasswordBGColor {
+  background-color: #54b218;
+}
+
+.GoodPasswordBGColor {
+  background-color: #e28f24;
+}
+
+.WeakPasswordBGColor {
+  background-color: #cc5223;
+}
