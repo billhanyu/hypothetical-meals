@@ -12,12 +12,28 @@ class OrderItem extends Component {
 
   selectedIngredient(event) {
     const ingredientId = event.target.value;
+    let vendorIngredients = [];
     axios.get(`/vendoringredients/${ingredientId}`, {
       headers: { Authorization: "Token " + this.props.token }
     })
       .then(response => {
+        vendorIngredients = response.data;
+        return axios.get(`/vendors`, {
+          headers: { Authorization: "Token " + this.props.token }
+        });
+      })
+      .then(response => {
+        const vendorData = response.data;
+        for (let vendorIngredient of vendorIngredients) {
+          for (let data of vendorData) {
+            if (vendorIngredient.vendor_id == data.id) {
+              vendorIngredient.vendorName = data.name;
+              break;
+            }
+          }
+        }
         this.setState({
-          vendorIngredients: response.data,
+          vendorIngredients
         });
       })
       .catch(err => {
@@ -27,24 +43,24 @@ class OrderItem extends Component {
 
   render() {
     return (
-      <div>
-        <select className="AdminDropdown" onChange={e => this.selectedIngredient(e)}>
+      <div className="orderitem">
+        <select className="inputitem" onChange={e => this.selectedIngredient(e)}>
           <option value="" disabled selected style={{display: "none"}}>None</option>
           {
             this.props.ingredients.map((element, key) => {
-              return <option value={element['id']} key={key}>{element['name']}</option>;
+              return <option value={element.id} key={key}>{element.name}</option>;
             })
           }
         </select>
-        <select className="AdminDropdown" onChange={e => this.props.selectedVendorIngredient(e, this.props.idx)}>
+        <select className="inputitem" onChange={e => this.props.selectedVendorIngredient(e, this.props.idx)}>
           <option value="" disabled selected style={{display: "none"}}>None</option>
           {
             this.state.vendorIngredients.map((element, key) => {
-              return <option value={element['id']} key={key}>{element['id']}</option>;
+              return <option value={element.id} key={key}>{element.vendorName}</option>;
             })
           }
         </select>
-        <input type="text" name="quantity" onChange={e => this.props.changedQuantity(e, this.props.idx)} />
+        <input className="inputitem" type="text" name="quantity" onChange={e => this.props.changedQuantity(e, this.props.idx)} />
       </div>
     );
   }

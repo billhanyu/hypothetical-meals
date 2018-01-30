@@ -83,6 +83,11 @@ class LogOrder extends Component {
       <div>
         {!this.state.completed &&
           <div>
+            <div>
+              <span className="OrderColumn">Ingredient</span>
+              <span className="OrderColumn">Vendor</span>
+              <span className="OrderColumn">Quantity</span>
+            </div>
             {
               this.state.orders.map((item, key) => 
                 <OrderItem
@@ -96,8 +101,10 @@ class LogOrder extends Component {
                 />
               )
             }
-            <button onClick={this.addOrderItem}>Add Another</button>
-            <button onClick={this.commitOrder}>Order</button>
+            <div className="OrderButtons">
+              <button className="AdminButton" onClick={this.addOrderItem}>Add Another</button>
+              <button className="AdminButton btn btn-primary" onClick={this.commitOrder}>Order</button>
+            </div>
           </div>
         }
         {this.state.completed &&
