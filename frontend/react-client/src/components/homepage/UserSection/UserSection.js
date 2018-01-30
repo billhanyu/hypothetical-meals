@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import AdminButtons from './AdminButtons.js';
+import UserButtons from './UserButtons.js';
 
-class AdminSection extends Component {
+class UserSection extends Component {
   constructor(props) {
     super(props);
   }
@@ -13,10 +13,10 @@ class AdminSection extends Component {
   render() {
     return (
       <div>
-        <AdminButtons token={this.props.token}/>
+        <UserButtons token={this.props.token} />
       </div>
     );
   }
 }
 
-export default AdminSection;
+export default UserSection;

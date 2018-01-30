@@ -10,7 +10,7 @@ class HomePage extends Component {
     super(props);
     this.changeTab = this.changeTab.bind(this);
     this.state = {
-      selectedTab: Enums.TAB_NAMES.ADMIN
+      selectedTab: Enums.TAB_NAMES.RECORDS
     };
   }
 
@@ -27,7 +27,7 @@ class HomePage extends Component {
         <PrimaryOptionBar changeTab={this.changeTab} isAdmin={this.props.match.params.isAdmin}/>
         <ContentMain selectedTab={this.state.selectedTab} token={this.props.match.params.token}/>
       </div>
-    )
+    );
   }
 }
 
