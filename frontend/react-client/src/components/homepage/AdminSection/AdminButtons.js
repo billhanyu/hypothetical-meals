@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import AdminButton from './AdminButton.js';
+import AdminButton from '../CommonComponent/UserButton';
 import AddIngredientWindow from './AddIngredientWindow.js';
 import IngredientList from './EditIngredient/IngredientList.js';
 import AddVendor from './AddVendor.js';

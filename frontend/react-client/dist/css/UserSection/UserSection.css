@@ -1,0 +1,59 @@
+.orderitem {
+  margin: 10px auto;
+}
+
+.orderitem > .inputitem {
+  height: 40px;
+  margin: 0 2%;
+  width: 29%;
+}
+
+.orderitem > input {
+  border: 1px solid lightgray;
+  border-radius: 4px;
+}
+
+.OrderButtons {
+  width: 99%;
+  margin: 20px auto;
+}
+
+.OrderButton {
+  float: right;
+}
+
+.OrderColumn {
+  width: 29%;
+  margin: 0 2%;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 16px;
+  float: left;
+  font-weight: 500;
+}
+
+.InventoryHead {
+  height: 40px;
+}
+
+.InventoryRow {
+  height: 40px;
+  border: 1px solid gray;
+  border-radius: 5px;
+  background-color: white;
+  margin: 5px 0;
+}
+
+.InventoryColumn {
+  width: 29%;
+  margin: 10px 2%;
+  font-size: 14px;
+  float: left;
+  font-weight: 400;
+  text-align: center;
+}
+
+.InventoryHead > .InventoryColumn {
+  font-size: 16px;
+  font-weight: 500;
+}

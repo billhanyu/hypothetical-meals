@@ -1,5 +1,5 @@
 # dependencies
-/node_modules
+node_modules/
 
 # testing
 /coverage
@@ -26,4 +26,3 @@ yarn-error.log*
 
 # apidoc
 /apidoc/_book
-/apidoc/node_modules
