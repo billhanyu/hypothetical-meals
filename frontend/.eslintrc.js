@@ -16,17 +16,13 @@ module.exports = {
         "react"
     ],
     "rules": {
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
-        "quotes": [
-            "error",
-            "double"
-        ],
+        "linebreak-style": "off",
+        "quotes": "off",
         "semi": [
             "error",
             "always"
-        ]
+        ],
+        "react/prop-types": "off",
+        "no-console": "warn",
     }
 };

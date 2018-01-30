@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-class AdminButton extends Component {
+class UserButton extends Component {
   constructor(props) {
     super(props);
     this._handleClick = this._handleClick.bind(this);
@@ -24,4 +24,4 @@ class AdminButton extends Component {
   }
 }
 
-export default AdminButton;
+export default UserButton;
