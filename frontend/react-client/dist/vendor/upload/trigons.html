@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Trigons - Create and Animate Abstract Images</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<meta charset="utf-8">
+	<meta name="author" content="DeeThemes">
+	<!-- Styles for Trigons -->
+	<link href='css/trigons.css' rel='stylesheet' type='text/css'>
+
+</head>
+<body>
+	
+	<h1>Simple example of using Trigons</h1>
+	<h3>Created via HTML5 data-attributes</h3>
+	<div id="via-data" class="trigons"
+		data-create = '{"width": "900",
+		 				"height": "500",
+		 				"size": "100",
+		 				"offset": "80",
+		 				"colors":"#DDD6BA,#FF7E66,#805A83,#3A4153,#0E2642",
+		 				"colorMode": "simple",
+		 				"colorBuild": "build7",
+		 				"colorSpace": "lab",
+		 				"colorWay": "0.5",
+		 				"lightDark":"2",
+		 				"responsive": "false",
+		 				"startVisible":"true"}'
+		data-animate= '{"animOrder": "out-in",
+		 				"animIn": "effect4-bottom",
+		 				"delayIn": "0",
+		 				"durationIn": "1500",
+		 				"easyIn": "linear",
+		 				"animOut": "effect30-left",
+		 				"delayOut": "0",
+		 				"durationOut": "1500",
+		 				"easyOut": "linear",
+		 				"eventOn": "self",
+		 				"eventType": "click",
+		 				"eventRepeat": "0",
+		 				"viewportShift": "one-half"}'>
+	</div>
+
+	<h3>Created via JavaScript</h3>
+	<div id="via-js"></div>
+		
+	<!-- Always place scripts for Trigons at the end of your page, before closing body tag-->
+	
+	<!-- The main d3 lib -->
+	<script src="js/d3.min.js"></script>
+	
+	<!-- Include canvg if you will use a convertion of Trigons to PNG image via .trigonsPng() method-->
+	<script src="js/rgbcolor.js"></script>
+	<script src="js/canvg.js"></script>
+	
+	<!-- Trigons script itself. It will also generate Trigons for target div above with class 'trigons' -->
+	<script src="js/trigons.min.js"></script>
+	
+	<!-- Place Trigons into target div --> 
+	<script>
+		d3.select('#via-js').trigons({
+			width:900,
+			height:500,
+			size:120,
+			offset:110,
+			colors:'#FF7E66,#805A83,#3A4153',
+			colorMode: 'build',
+			colorBuild: 'build11',
+			colorSpace: 'hcl',
+			colorWay: 0.62,
+			lightDark: 2.7,
+			responsive: false,
+			startVisible:true,
+			beforeCreate:false,
+			afterCreate:false
+		}).trigonsAnimInit({
+			animOrder: 'out-in',
+			animIn: 'effect22-left',
+			delayIn: 0,
+			durationIn: 1500,
+			easyIn : 'cubic-out',
+			animOut: 'effect3-right',
+			delayOut: 0,
+			durationOut: 1500,
+			easyOut: 'cubic-out',
+			eventOn: 'self',
+			eventType: 'click',
+			eventRepeat: true,
+			viewportShift: 'one-half',
+			beforeAnim:false,
+			afterAnim:false
+		});
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+.LandingPageHeaderContainer {
+  margin: 0 auto;
+  margin-top: 48px;
+  width: 1045px;
+}
+
+/** BEGIN LEFT COLUMN FOR HEADER ***/
+.LandingPageSummaryText {
+  width: 500px;
+  float: left;
+  padding: 40px 0 40px 40px;
+}
+
+.LandingPageMainHeaderText {
+  color: #FFF;
+  font-size: 32px;
+  margin-top: 40px;
+}
+
+.LandingPageHeaderSubText {
+  color: #DAE1E9;
+  font-size: 16px;
+  float: left;
+  margin-top: 20px;
+  width: 350px;
+}
+
+.LandingPageSignUpButton {
+  font-size: 17px;
+  border-radius: 4px;
+  font-family: 'proxima-nova', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  float: left;
+  text-shadow:0 1px 1px rgba(0,0,0,.15);
+  background-color: #509af0;
+  color: #FFF;
+  border: 1px solid black;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 0 auto;
+  margin-top: 16px;
+}
+
+/*** BEGIN HEADER BULLET STUFF */
+.LandingPageHeaderBulletsContainer {
+    float: left;
+    margin-left: 40px;
+    margin-top: -40px;
+    width: 505px;
+}
+
+.LandingPageHeaderBullet {
+  clear: both;
+  float: left;
+  margin-top: 24px;
+}
+
+.LandingPageFaIcon {
+  float: left;
+  color: white;
+  height: 100px;
+}
+
+.LandingPageBulletText {
+  float: left;
+  color: white;
+  margin-left: 12px;
+  margin-top: 4px;
+  font-size: 24px;
+}
