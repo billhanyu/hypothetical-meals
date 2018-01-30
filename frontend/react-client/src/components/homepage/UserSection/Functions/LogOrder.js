@@ -51,13 +51,11 @@ class LogOrder extends Component {
         headers: { Authorization: "Token " + this.props.token }
       })
       .then(function (response) {
-        console.log(response);
         self.setState({
           completed: true,
         });
       })
       .catch(error => {
-        console.log(error.response);
       });
   }
 
@@ -67,18 +65,15 @@ class LogOrder extends Component {
       headers: { Authorization: "Token " + this.props.token }
     })
       .then(function (response) {
-        console.log(response);
         self.setState({
           ingredients: response.data
         });
       })
       .catch(error => {
-        console.log(error);
       });
   }
 
   render() {
-    console.log(this.state.orders);
     return (
       <div>
         {!this.state.completed &&

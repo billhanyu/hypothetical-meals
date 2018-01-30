@@ -7,6 +7,7 @@ class ViewInventory extends Component {
     super(props);
     this.state = {
       inventories: [],
+      storages: [],
     };
   }
 
@@ -15,10 +16,17 @@ class ViewInventory extends Component {
     axios.get("/inventory", {
       headers: { Authorization: "Token " + this.props.token }
     })
-      .then(function (response) {
-        console.log(response);
+      .then(response => {
         self.setState({
           inventories: response.data
+        });
+        return axios.get('/storages', {
+          headers: { Authorization: "Token " + this.props.token }
+        });
+      })
+      .then(response => {
+        self.setState({
+          storages: response.data
         });
       })
       .catch(error => {
@@ -28,13 +36,21 @@ class ViewInventory extends Component {
 
   render() {
     return (
-      <table style={{width: '100%'}}>
-        <tr>
-          <th>Ingredient Name</th>
-          <th>Weight</th>
-        </tr>
-        {this.state.inventories.map((item, key) => <InventoryItem key={key} item={item} token={this.props.token}/>)}
-      </table>
+      <div>
+        <div className="InventoryHead">
+          <span className="InventoryColumn">Ingredient Name</span>
+          <span className="InventoryColumn">Temperature State</span>
+          <span className="InventoryColumn">Weight</span>
+        </div>
+        {this.state.inventories.map((item, key) =>
+          <InventoryItem
+            key={key}
+            item={item}
+            storages={this.state.storages}
+            token={this.props.token}
+          />
+        )}
+      </div>
     );
   }
 }

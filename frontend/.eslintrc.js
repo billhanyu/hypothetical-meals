@@ -17,10 +17,7 @@ module.exports = {
     ],
     "rules": {
         "linebreak-style": "off",
-        "quotes": [
-            "warn",
-            "double"
-        ],
+        "quotes": "off",
         "semi": [
             "error",
             "always"
