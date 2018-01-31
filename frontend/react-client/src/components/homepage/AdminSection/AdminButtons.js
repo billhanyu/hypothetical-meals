@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import AdminButton from './AdminButton.js';
+import AdminButton from '../CommonComponent/UserButton';
 import AddIngredientWindow from './AddIngredientWindow.js';
 import IngredientList from './EditIngredient/IngredientList.js';
 import AddVendor from './AddVendor.js';
@@ -31,10 +31,16 @@ class AdminButtons extends Component {
     else if (selectedButton == "addVendor") {
         return <AddVendor token={this.props.token}/>
     }
-    if (selectedButton == "editIngredient") {
+    else if (selectedButton == "editIngredient") {
         return <IngredientList token={this.props.token}/>
     }
     else if (selectedButton == "addIngredient") {
+        return <AddIngredientWindow token={this.props.token}/>
+    }
+    else if (selectedButton == "editVendorIngredient") {
+        return <IngredientList token={this.props.token}/>
+    }
+    else if (selectedButton == "addVendorIngredient") {
         return <AddIngredientWindow token={this.props.token}/>
     }
 
@@ -48,6 +54,8 @@ class AdminButtons extends Component {
           <AdminButton name="Add Vendor" id="addVendor" handleClick={this.handleClick}/>
           <AdminButton name="Edit Ingredient" id="editIngredient" handleClick={this.handleClick}/>
           <AdminButton name="Add Ingredient" id="addIngredient" handleClick={this.handleClick}/>
+          <AdminButton name="Edit VendorIngredient" id="editVendorIngredient" handleClick={this.handleClick}/>
+          <AdminButton name="Add VendorIngredient" id="addVendorIngredient" handleClick={this.handleClick}/>
         </div>
         {
           this._renderSelectedButton()

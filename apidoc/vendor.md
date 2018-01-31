@@ -37,7 +37,7 @@ Modify the vendors info. You can modify either name, contact or code.
 
 {% sample lang="js" %}
 ```js
-request.body.changes = {
+request.body.vendors = {
   '1': {
     'name': 'duke1',
   },

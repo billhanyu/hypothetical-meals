@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import AdminSection from './AdminSection/AdminSection.js';
+import UserSection from './UserSection/UserSection';
 import Enums from './../Constants/Enums.js';
 
 // COMPONENT INFO: Refers main content window
@@ -15,9 +16,9 @@ class ContentMain extends Component {
 
   _renderSelectedTab() {
     if(this.props.selectedTab == Enums.TAB_NAMES.RECORDS) {
-      return <AdminSection token={this.props.token}/>;
+      return <UserSection token={this.props.token}/>;
     }
-    else if(this.props.selectedTab == Enums.TAB_NAMES.ADMIN){
+    else if(this.props.selectedTab == Enums.TAB_NAMES.ADMIN) {
       return <AdminSection token={this.props.token}/>;
     }
   }
@@ -29,7 +30,7 @@ class ContentMain extends Component {
           this._renderSelectedTab()
         }
       </div>
-    )
+    );
   }
 }
 
