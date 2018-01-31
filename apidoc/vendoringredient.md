@@ -1,8 +1,24 @@
 # VendorIngredients API
+## GET '/vendoringredients'
+
+Get all vendorsingredients.
+
+No parameter required.
+{% endmethod %}
+
+## GET '/vendoringredients-available'
+
+Get all available vendorsingredients (removed = 0).
+
+No parameter required.
+{% endmethod %}
+
 {% method %}
 ## GET '/vendoringredients/:ingredient_id'
 
-Get all vendorsingredients that have the `ingredient_id`.
+Get all available vendorsingredients that have the `ingredient_id`.
+
+Note that this returns available stuff, so everything with removed as 1 will not be returned.
 
 No parameter required.
 {% endmethod %}
@@ -60,6 +76,10 @@ request.body.vendoringredients = {
 # DELETE '/vendoringredients'
 
 Delete multiple vendoringredients.
+
+This is a "fake delete" action where the api sets the 'removed' column to 1.
+
+As a result the get '/vendoringredients/:ingredient_id' api does not return what are deleted here.
 
 {% sample lang="js" %}
 ```js
