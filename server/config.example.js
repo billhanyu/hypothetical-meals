@@ -3,7 +3,7 @@ const config = {
     connectionLimit: 10,
     host: 'localhost',
     user: 'root',
-    password: 'c1d24cc9',
+    password: 'password',
     database: 'meals',
   },
   secret: process.env.NODE_ENV === 'production' ? process.env.SECRET : 'secret',
