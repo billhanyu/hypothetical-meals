@@ -61,7 +61,7 @@ function modifyIngredientHelper(items, req, res, next) {
       return res.status(400).send(`Ingredient ID ${idString} is invalid.`);
     }
     const storageId = items[idString];
-    if (!checkNumber.isNonNegativeInteger(storageId) || storageId > 2) {
+    if (!checkNumber.isNonNegativeInteger(storageId) || storageId > 3) {
       return res.status(400).send(`New storage id ${storageId} is invalid`);
     }
     ingredientIds.push(idString);
