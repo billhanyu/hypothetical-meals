@@ -3,12 +3,24 @@ import { createError, handleError } from './common/customError';
 import success from './common/success';
 const ALL_PACKAGE_TYPES = ['sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar'];
 
+export function view(req, res, next) {
+  connection.query(`SELECT * from VendorsIngredients`)
+    .then(results => res.status(200).send(results))
+    .catch(err => handleError(err, res));
+}
+
+export function viewAvailable(req, res, next) {
+  connection.query(`SELECT * from VendorsIngredients WHERE removed = 0`)
+    .then(results => res.status(200).send(results))
+    .catch(err => handleError(err, res));
+}
+
 export function getVendorsForIngredient(req, res, next) {
   const ingredientId = req.params.ingredient_id;
   if (!checkNumber.isPositiveInteger(ingredientId)) {
     res.status(400).send('Invalid Ingredient Id');
   }
-  connection.query(`SELECT * from VendorsIngredients WHERE ingredient_id = ${ingredientId}`)
+  connection.query(`SELECT * from VendorsIngredients WHERE ingredient_id = ${ingredientId} AND removed = 0`)
     .then(results => res.status(200).send(results))
     .catch(err => handleError(err, res));
 }
@@ -118,9 +130,14 @@ export function deleteVendorIngredients(req, res, next) {
       return res.status(400).send('Invalid Id detected, trying to inject? you lil b');
     }
   }
-  connection.query(`DELETE FROM VendorsIngredients WHERE id IN (${ids.join(',')})`)
+  fakeDeleteMultipleVendorIngredients(ids)
     .then(() => success(res))
     .catch(err => handleError(err, res));
+}
+
+export function fakeDeleteMultipleVendorIngredients(ids) {
+  if (ids.length == 0) return;
+  return connection.query(`UPDATE VendorsIngredients SET removed = 1 WHERE id IN (${ids.join(', ')})`);
 }
 
 function getCases(olds, items) {
