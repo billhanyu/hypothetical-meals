@@ -22,8 +22,6 @@ export function view(req, res, next) {
  */
 export function addVendors(req, res, next) {
   const vendors = req.body.vendors;
-  console.log('WTF');
-  console.log(req.body);
   if (!vendors || vendors.length < 1) {
     return res.status(400).send('Invalid request object, see doc.');
   }
