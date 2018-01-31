@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import IngredientListItem from './IngredientListItem.js';
+import VendorIngredientListItem from './VendorIngredientListItem.js';
 import RegistrationHeader from './../../../Registration/RegistrationHeader.js';
 import axios from 'axios';
-import EditIngredient from './EditIngredient.js';
+import EditVendorIngredient from './EditVendorIngredient.js';
 
 class IngredientList extends Component {
   constructor(props){
@@ -48,12 +48,12 @@ class IngredientList extends Component {
 
   render() {
     return (
-      this.state.hasPickedIngredient ? <EditIngredient token={this.props.token} id={this.state.activeId} storage_id={this.state.activeStorageID} name={this.state.activeName}/> :
+      this.state.hasPickedIngredient ? <EditVendorIngredient token={this.props.token} id={this.state.activeId} storage_id={this.state.activeStorageID} name={this.state.activeName}/> :
       <div className="VendorList borderAll">
         <RegistrationHeader HeaderText="Edit Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>
         {
           this.state.ingredients.map((element, key) => {
-            return <IngredientListItem onClick={this.clickedIngredient} key={key} id={element.id} name={element.name} storage_id={element.storage_id}/>
+            return <VendorIngredientListItem onClick={this.clickedIngredient} key={key} id={element.id} name={element.name} storage_id={element.storage_id}/>
           })
         }
       </div>
