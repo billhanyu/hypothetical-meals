@@ -4,6 +4,8 @@ import AddIngredientWindow from './AddIngredientWindow.js';
 import IngredientList from './EditIngredient/IngredientList.js';
 import AddVendor from './AddVendor.js';
 import VendorList from './EditVendor/VendorList.js';
+import VendorIngredientList from './EditVendorIngredient/VendorIngredientList.js';
+import AddVendorIngredientList from './EditVendorIngredient/AddVendorIngredientList.js';
 
 class AdminButtons extends Component {
   constructor(props) {
@@ -38,10 +40,10 @@ class AdminButtons extends Component {
         return <AddIngredientWindow token={this.props.token}/>
     }
     else if (selectedButton == "editVendorIngredient") {
-        return <IngredientList token={this.props.token}/>
+        return <VendorIngredientList token={this.props.token}/>
     }
     else if (selectedButton == "addVendorIngredient") {
-        return <AddIngredientWindow token={this.props.token}/>
+        return <AddVendorIngredientList token={this.props.token}/>
     }
 
   }
@@ -54,7 +56,7 @@ class AdminButtons extends Component {
           <AdminButton name="Add Vendor" id="addVendor" handleClick={this.handleClick}/>
           <AdminButton name="Edit Ingredient" id="editIngredient" handleClick={this.handleClick}/>
           <AdminButton name="Add Ingredient" id="addIngredient" handleClick={this.handleClick}/>
-          <AdminButton name="Edit VendorIngredient" id="editVendorIngredient" handleClick={this.handleClick}/>
+          <AdminButton name="Edit VendorIngedient" id="editVendorIngredient" handleClick={this.handleClick}/>
           <AdminButton name="Add VendorIngredient" id="addVendorIngredient" handleClick={this.handleClick}/>
         </div>
         {

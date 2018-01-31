@@ -7,18 +7,13 @@ class VendorListItem extends Component {
   }
 
   /*** REQUIRED PROPS
-    1. id (Number)
-    2. name (String)
-    3. contact (String)
-    4. code (String)
-    5. clickedVendor (Func)
+    1. name (String)
+    2. onClick (Func)
+    3. id (Number)
   */
   _handleClick() {
     this.props.onClick({
-      code: this.props.code,
-      name: this.props.name,
       id: this.props.id,
-      contact: this.props.contact,
     });
   }
 
