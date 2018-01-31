@@ -73,16 +73,19 @@ app.post('/users/noob', beAdmin, user.signupNoob);
 app.post('/users/login', user.login);
 
 app.get('/vendors', beNoob, vendor.view);
+app.get('/vendors-available', beNoob, vendor.viewAvailable);
 app.post('/vendors', beAdmin, vendor.addVendors);
 app.put('/vendors', beAdmin, vendor.modifyVendors);
 app.delete('/vendors', beAdmin, vendor.deleteVendors);
 
 app.get('/ingredients', beNoob, ingredient.view);
+app.get('/ingredients-available', beNoob, ingredient.viewAvailable);
 app.post('/ingredients', beAdmin, ingredient.addIngredient);
 app.put('/ingredients', beAdmin, ingredient.modifyIngredient);
 app.delete('/ingredients', beAdmin, ingredient.deleteIngredient);
 app.post('/ingredients/import', [auth.required, adminRequired, upload.single('bulk')], ingredient.bulkImport);
 
+app.get('/vendoringredients', beNoob, vendorIngredient.view);
 app.get('/vendoringredients/:ingredient_id', beNoob, vendorIngredient.getVendorsForIngredient);
 app.post('/vendoringredients', beAdmin, vendorIngredient.addVendorIngredients);
 app.put('/vendoringredients', beAdmin, vendorIngredient.modifyVendorIngredients);

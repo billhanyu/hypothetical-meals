@@ -61,7 +61,7 @@ class LogOrder extends Component {
 
   componentDidMount() {
     const self = this;
-    axios.get("/ingredients", {
+    axios.get("/ingredients-available", {
       headers: { Authorization: "Token " + this.props.token }
     })
       .then(function (response) {

@@ -8,6 +8,15 @@ Get all ingredients in the `Ingredients` table, requires no parameter input.
 {% endmethod %}
 
 {% method %}
+## GET '/ingredients-available' {#view}
+
+Get all available ingredients in the `Ingredients` table for order etc (where removed == 0).
+
+Requires no parameter input.
+
+{% endmethod %}
+
+{% method %}
 ## POST '/ingredients' {#addIngredient}
 
 Add ingredients.
@@ -47,6 +56,12 @@ request.body.ingredients = {
 ## DELETE '/ingredients's
 
 Delete ingredients.
+
+This is a "fake delete" action where the api sets the 'removed' column to 1.
+
+As a result the get '/ingredients-available' api does not return the ingredients deleted here.
+
+Also fake deletes the corresponding VendorsIngredients.
 
 {% sample lang="js" %}
 ```js

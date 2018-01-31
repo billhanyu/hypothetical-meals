@@ -3,7 +3,26 @@ const assert = require('chai').assert;
 const testTokens = require('./testTokens');
 
 describe('VendorIngredient', () => {
+  describe('#view()', () => {
+    it('should return all vendorsingredients', (done) => {
+      chai.request(server)
+        .get('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          assert.strictEqual(res.body.length, 3, '3 vendorsingredients in total');
+          done();
+        });
+    });
+  });
+
   describe('#getVendorsForIngredient()', () => {
+    beforeEach(() => {
+      alasql('SOURCE "./server/create_database.sql"');
+      alasql('SOURCE "./server/sample_data.sql"');
+    });
+
     it('should return all vendors for an ingredient', (done) => {
       chai.request(server)
         .get('/vendoringredients/1')
@@ -12,6 +31,19 @@ describe('VendorIngredient', () => {
           res.should.have.status(200);
           res.body.should.be.a('array');
           assert.strictEqual(res.body[0]['vendor_id'], 1, 'vendor_id');
+          done();
+        });
+    });
+
+    it('should return only available vendors for an ingredient', (done) => {
+      alasql('UPDATE VendorsIngredients SET removed = 1 WHERE ingredient_id = 1');
+      chai.request(server)
+        .get('/vendoringredients/1')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          assert.strictEqual(res.body.length, 0, 'Nothing should be selected');
           done();
         });
     });
@@ -282,8 +314,11 @@ describe('VendorIngredient', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const left = alasql('SELECT id FROM VendorsIngredients');
-          assert.strictEqual(left.length, 0, 'there should be nothing left');
+          const left = alasql('SELECT removed FROM VendorsIngredients WHERE id IN (1, 2, 3)');
+          assert.strictEqual(left.length, 3, 'fake delete 3 stuff');
+          assert.strictEqual(left[0].removed, 1, 'fake delete 1');
+          assert.strictEqual(left[1].removed, 1, 'fake delete 2');
+          assert.strictEqual(left[2].removed, 1, 'fake delete 3');
           done();
         });
     });
