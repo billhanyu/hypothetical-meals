@@ -1,9 +1,19 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import success from './common/success';
+import { fakeDeleteMultipleVendorIngredients } from './vendorIngredient';
 
 export function view(req, res, next) {
   connection.query('SELECT * FROM Vendors')
+    .then(results => res.status(200).send(results))
+    .catch(err => {
+      console.error(error);
+      return res.status(500).send('Database error');
+    });
+}
+
+export function viewAvailable(req, res, next) {
+  connection.query('SELECT * FROM Vendors WHERE removed = 0')
     .then(results => res.status(200).send(results))
     .catch(err => {
       console.error(error);
@@ -149,7 +159,14 @@ export function deleteVendors(req, res, next) {
       return res.status(400).send(`Invalid id ${id}`);
     }
   }
-  connection.query(`DELETE FROM Vendors WHERE id IN (${ids.join(', ')})`)
+  connection.query(`UPDATE Vendors SET removed = 1 WHERE id IN (${ids.join(', ')})`)
+    .then(() => {
+      return connection.query(`SELECT id FROM VendorsIngredients WHERE vendor_id IN (${ids.join(', ')})`);
+    })
+    .then(results => {
+      const vendorIngredientIds = results.map(e => e.id);
+      return fakeDeleteMultipleVendorIngredients(vendorIngredientIds);
+    })
     .then(() => success(res))
     .catch(err => {
       console.error(err);

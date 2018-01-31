@@ -23,6 +23,7 @@ CREATE TABLE Vendors(
 	name varchar(70) not null UNIQUE,
 	contact varchar(255) not null,
 	code varchar(255) not null UNIQUE,
+	removed BIT DEFAULT 0,
 
 	PRIMARY KEY (id)
 );
@@ -39,6 +40,7 @@ CREATE TABLE Ingredients(
 	id int not null AUTO_INCREMENT,
 	name varchar(70) not null,
 	storage_id int not null,
+	removed BIT DEFAULT 0,
 
 	FOREIGN KEY (storage_id) REFERENCES Storages(id),
 	PRIMARY KEY (id)
@@ -50,6 +52,7 @@ CREATE TABLE VendorsIngredients(
 	package_type enum('sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar') not null,
 	price double not null,
 	vendor_id int not null,
+	removed BIT DEFAULT 0,
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	FOREIGN KEY (vendor_id) REFERENCES Vendors(id),
