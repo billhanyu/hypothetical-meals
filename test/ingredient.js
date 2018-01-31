@@ -211,7 +211,7 @@ describe('Ingredient', () => {
           assert.strictEqual(left.length, 3, 'Rows in Ingredients table still the same.');
           assert.strictEqual(left[0]['removed'], 1, 'ingredient 1 fake deleted');
           assert.strictEqual(left[1]['removed'], 0, 'ingredient 2 not fake deleted');
-          assert.strictEqual(left[2]['removed'], 0, 'ingredient 2 not fake deleted');
+          assert.strictEqual(left[2]['removed'], 0, 'ingredient 3 not fake deleted');
           done();
         });
     });

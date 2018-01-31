@@ -17,6 +17,21 @@ describe('VendorIngredient', () => {
     });
   });
 
+  describe('#viewAvailable()', () => {
+    it('should return all available vendorsingredients', (done) => {
+      alasql('UPDATE VendorsIngredients SET removed = 1 WHERE id = 1');
+      chai.request(server)
+        .get('/vendoringredients-available')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          assert.strictEqual(res.body.length, 2, '2 vendorsingredients available in total');
+          done();
+        });
+    });
+  });
+
   describe('#getVendorsForIngredient()', () => {
     beforeEach(() => {
       alasql('SOURCE "./server/create_database.sql"');
@@ -310,7 +325,7 @@ describe('VendorIngredient', () => {
         .delete('/vendoringredients')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
-          'ids': [1, 2, 3],
+          'ids': [1, 2],
         })
         .end((err, res) => {
           res.should.have.status(200);
@@ -318,7 +333,7 @@ describe('VendorIngredient', () => {
           assert.strictEqual(left.length, 3, 'fake delete 3 stuff');
           assert.strictEqual(left[0].removed, 1, 'fake delete 1');
           assert.strictEqual(left[1].removed, 1, 'fake delete 2');
-          assert.strictEqual(left[2].removed, 1, 'fake delete 3');
+          assert.strictEqual(left[2].removed, 0, 'not fake delete 3');
           done();
         });
     });

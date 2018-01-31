@@ -9,6 +9,12 @@ export function view(req, res, next) {
     .catch(err => handleError(err, res));
 }
 
+export function viewAvailable(req, res, next) {
+  connection.query(`SELECT * from VendorsIngredients WHERE removed = 0`)
+    .then(results => res.status(200).send(results))
+    .catch(err => handleError(err, res));
+}
+
 export function getVendorsForIngredient(req, res, next) {
   const ingredientId = req.params.ingredient_id;
   if (!checkNumber.isPositiveInteger(ingredientId)) {

@@ -6,6 +6,13 @@ Get all vendorsingredients.
 No parameter required.
 {% endmethod %}
 
+## GET '/vendoringredients-available'
+
+Get all available vendorsingredients (removed = 0).
+
+No parameter required.
+{% endmethod %}
+
 {% method %}
 ## GET '/vendoringredients/:ingredient_id'
 
