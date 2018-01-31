@@ -86,6 +86,7 @@ app.delete('/ingredients', beAdmin, ingredient.deleteIngredient);
 app.post('/ingredients/import', [auth.required, adminRequired, upload.single('bulk')], ingredient.bulkImport);
 
 app.get('/vendoringredients', beNoob, vendorIngredient.view);
+app.get('/vendoringredients-available', beNoob, vendorIngredient.viewAvailable);
 app.get('/vendoringredients/:ingredient_id', beNoob, vendorIngredient.getVendorsForIngredient);
 app.post('/vendoringredients', beAdmin, vendorIngredient.addVendorIngredients);
 app.put('/vendoringredients', beAdmin, vendorIngredient.modifyVendorIngredients);
