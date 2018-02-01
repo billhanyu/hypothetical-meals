@@ -1,10 +1,7 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
-import weightsConfig from './common/packageWeights';
+import { getWeight, ignoreWeights} from './common/packageUtilies';
 import success from './common/success';
-
-const packageWeights = weightsConfig.packageWeights;
-const ignoreWeights = weightsConfig.ignoreWeights;
 
 export function view(req, res, next) {
   connection.query('SELECT * FROM Storages')
@@ -48,7 +45,7 @@ export function changeStorage(req, res, next) {
     let sum = 0;
     results.forEach(item => {
       if (ignoreWeights.indexOf(item.package_type) < 0) {
-        sum += packageWeights[item.package_type] * item.num_packages;
+        sum += getWeight(item.package_type) * item.num_packages;
       }
     });
     if (newCapacity < sum) {

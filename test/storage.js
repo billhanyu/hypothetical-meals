@@ -52,8 +52,8 @@ describe('Storage', () => {
     });
 
     it('should ignore truckload or railcar', (done) => {
-      alasql('INSERT INTO Inventories (ingredient_id, package_type, num_packages) VALUES (3, 2, \'truckload\', 2)');
-      alasql('INSERT INTO Inventories (ingredient_id, package_type, num_packages) VALUES (3, 2, \'railcar\', 2)');
+      alasql('INSERT INTO Inventories (ingredient_id, package_type, num_packages) VALUES (2, \'truckload\', 2)');
+      alasql('INSERT INTO Inventories (ingredient_id, package_type, num_packages) VALUES (2, \'railcar\', 2)');
       chai.request(server)
         .put('/storages')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -61,6 +61,7 @@ describe('Storage', () => {
           '1': 1800,
         })
         .end((err, res) => {
+          console.log(res.message);
           res.should.have.status(200);
           const newCapacity = alasql('SELECT capacity FROM Storages WHERE id = 1')[0].capacity;
           assert.strictEqual(newCapacity, 1800, 'New storage capacity');
