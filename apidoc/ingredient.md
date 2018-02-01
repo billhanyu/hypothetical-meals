@@ -5,6 +5,11 @@
 
 Get all ingredients in the `Ingredients` table, requires no parameter input.
 
+Return parameters:
+All columns in Ingredients table AND
+- Storages.name as storage_name
+- Storages.capacity as storage_capacity
+
 {% endmethod %}
 
 {% method %}
@@ -13,6 +18,11 @@ Get all ingredients in the `Ingredients` table, requires no parameter input.
 Get all available ingredients in the `Ingredients` table for order etc (where removed == 0).
 
 Requires no parameter input.
+
+Return parameters:
+All columns in Ingredients table AND
+- Storages.name as storage_name
+- Storages.capacity as storage_capacity
 
 {% endmethod %}
 

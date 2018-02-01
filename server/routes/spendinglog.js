@@ -1,7 +1,9 @@
 import * as checkNumber from './common/checkNumber';
 
+const basicViewQueryString = 'SELECT SpendingLogs.*, Ingredients.name AS ingredient_name, Ingredients.storage_id AS ingredient_storage_id, Ingredients.removed AS ingredient_removed FROM SpendingLogs INNER JOIN Ingredients ON SpendingLogs.ingredient_id = Ingredients.id';
+
 export function view(req, res, next) {
-  connection.query('SELECT * FROM SpendingLogs')
+  connection.query(basicViewQueryString)
     .then(results => res.status(200).send(results))
     .catch(err => {
       console.error(error);
@@ -17,7 +19,7 @@ export function logsForIngredient(req, res, next) {
   if (!checkNumber.isPositiveInteger(ingredientId)) {
     return res.status(400).send(`Ingredient ID ${ingredientId} is invalid.`);
   }
-  connection.query(`SELECT * FROM SpendingLogs WHERE ingredient_id IN (${ingredientId})`)
+  connection.query(`${basicViewQueryString} WHERE ingredient_id IN (${ingredientId})`)
   .then(results => res.status(200).send(results))
   .catch(err => {
       console.error(error);
