@@ -1,4 +1,4 @@
-export function getWeight(type) {
+function getWeight(type) {
     let unitWeight = 0;
     switch (String(type).toLowerCase()) {
         case 'sack':
@@ -32,3 +32,7 @@ export function getWeight(type) {
         return unitWeight;
     }
 }
+
+const ignoreWeights = ['truckload', 'railcar'];
+
+export { getWeight, ignoreWeights};
