@@ -2,6 +2,7 @@ import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import {getWeight, ignoreWeights} from './common/packageUtilies';
 import success from './common/success';
+import { updateConsumedSpendingLogForCart } from './spendinglog';
 
 export function view(req, res, next) {
   connection.query('SELECT * FROM Inventories')
@@ -45,11 +46,16 @@ export function commitCart(req, res, next) {
     checkInputChanges(cart);
     checkChangesProperties(cart);
     const ids = Object.keys(cart);
-    connection.query(`SELECT id, num_packages FROM Inventories WHERE id IN (${ids.join(', ')})`)
+    let cartItems;
+    connection.query(`SELECT * FROM Inventories WHERE id IN (${ids.join(', ')})`)
       .then(results => {
         if (results.length < ids.length) {
           throw createError('Some inventory id not in database.');
         }
+        cartItems = results.map(a => Object.assign({}, a));
+        cartItems.forEach(item => {
+          item.num_packages = cart[item.id];
+        });
         for (let item of results) {
           const id = item.id;
           const newNum = item.num_packages - cart[id];
@@ -60,6 +66,7 @@ export function commitCart(req, res, next) {
         }
         return modifyInventoryQuantitiesPromise(cart);
       })
+      .then(() => updateConsumedSpendingLogForCart(cartItems))
       .then(() => success(res))
       .catch(err => {
         handleError(err, res);
