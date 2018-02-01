@@ -1,4 +1,5 @@
 import * as checkNumber from './common/checkNumber';
+import { getWeight } from './common/packageUtilies';
 
 export function view(req, res, next) {
   connection.query('SELECT * FROM SpendingLogs')
@@ -65,4 +66,42 @@ export function updateLogForIngredient(req) {
     .catch(err => {
       throw err;
     });
+}
+
+/* Request format:
+ * req = [
+ *   {'id(inventory)', 'ingredient_id', 'package_type', 'num_packages'},
+ *   ...
+ * ];
+ */
+export function updateConsumedSpendingLogForCart(req) {
+  return new Promise((resolve, reject) => {
+    const consumedWeights = {};
+    const ingredientIds = [];
+    for (let consumed of req) {
+      const ingredientId = consumed.ingredient_id;
+      if (!(ingredientId in consumedWeights)) {
+        consumedWeights[ingredientId] = 0;
+        ingredientIds.push(ingredientId);
+      }
+      consumedWeights[ingredientId] +=
+        getWeight(consumed.package_type) * consumed.num_packages;
+    }
+    const cases = [];
+    connection.query(`SELECT * FROM SpendingLogs
+                      WHERE ingredient_id
+                      IN (${ingredientIds.join(', ')})`)
+      .then(results => {
+        for (let entry of results) {
+          const cost =
+            consumedWeights[entry.ingredient_id] / entry.total_weight * entry.total;
+          cases.push(`when id = ${entry.id} then ${cost}`);
+        }
+      })
+      .then(() => connection.query(`UPDATE SpendingLogs 
+        SET consumed = consumed + (case ${cases.join(' ')} end)
+        WHERE ingredient_id IN (${ingredientIds.join(', ')})`))
+      .then(() => resolve())
+      .catch(err => reject(err));
+  });
 }
