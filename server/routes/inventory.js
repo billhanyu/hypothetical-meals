@@ -3,8 +3,10 @@ import { createError, handleError } from './common/customError';
 import {getWeight, ignoreWeights} from './common/packageUtilies';
 import success from './common/success';
 
+const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
+
 export function view(req, res, next) {
-  connection.query('SELECT * FROM Inventories')
+  connection.query(basicViewQueryString)
     .then(results => res.status(200).send(results))
     .catch(err => handleError(err, res));
 }

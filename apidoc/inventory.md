@@ -6,6 +6,13 @@
 Get all inventory ingredients.
 
 Requires no parameter input.
+
+Return parameters:
+All columns in Inventories table AND
+- Ingredients.name as ingredient_name
+- Ingredients.storage_id as ingredient_storage_id
+- Ingredients.removed as ingredient_removed
+
 {% endmethod %}
 
 {% method %}

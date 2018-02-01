@@ -3,8 +3,10 @@ import * as packageCalc from './common/packageUtilies';
 import { updateLogForIngredient } from './spendinglog';
 import { createError } from './common/customError';
 
+const basicViewQueryString = 'SELECT Logs.*, Users.username as user_username FROM Logs INNER JOIN Users ON Logs.user_id = Users.id';
+
 export function view(req, res, next) {
-  connection.query('SELECT * FROM Logs')
+  connection.query(basicViewQueryString)
     .then(results => res.status(200).send(results))
     .catch(err => {
       console.error(error);
@@ -30,7 +32,7 @@ export function viewLogForIngredient(req, res, next) {
     }
     vendorIngredientIds.push(idString);
   }
-  connection.query(`SELECT * FROM Logs WHERE vendor_ingredient_id IN (${vendorIngredientIds.join(', ')})`)
+  connection.query(`${basicViewQueryString} WHERE vendor_ingredient_id IN (${vendorIngredientIds.join(', ')})`)
   .then(results => res.status(200).send(results))
   .catch(err => {
       console.error(error);
