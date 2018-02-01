@@ -28,7 +28,7 @@ describe('Storage', () => {
         .put('/storages')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
-          '1': 100,
+          '1': 100000,
         })
         .end((err, res) => {
           res.should.have.status(401);
@@ -41,12 +41,29 @@ describe('Storage', () => {
         .put('/storages')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
-          '1': 100,
+          '1': 1800,
         })
         .end((err, res) => {
           res.should.have.status(200);
           const newCapacity = alasql('SELECT capacity FROM Storages WHERE id = 1')[0].capacity;
-          assert.strictEqual(newCapacity, 100, 'New storage capacity');
+          assert.strictEqual(newCapacity, 1800, 'New storage capacity');
+          done();
+        });
+    });
+
+    it('should ignore truckload or railcar', (done) => {
+      alasql('INSERT INTO Inventories (ingredient_id, package_type, num_packages) VALUES (3, 2, \'truckload\', 2)');
+      alasql('INSERT INTO Inventories (ingredient_id, package_type, num_packages) VALUES (3, 2, \'railcar\', 2)');
+      chai.request(server)
+        .put('/storages')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          '1': 1800,
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const newCapacity = alasql('SELECT capacity FROM Storages WHERE id = 1')[0].capacity;
+          assert.strictEqual(newCapacity, 1800, 'New storage capacity');
           done();
         });
     });
@@ -56,17 +73,17 @@ describe('Storage', () => {
         .put('/storages')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
-          '1': 19,
+          '1': 1400,
         })
         .end((err, res) => {
           res.should.have.status(400);
           const newCapacity = alasql('SELECT capacity FROM Storages WHERE id = 1')[0].capacity;
-          assert.strictEqual(newCapacity, 20, 'old storage capacity');
+          assert.strictEqual(newCapacity, 2000, 'old storage capacity');
           done();
         });
     });
 
-    it('should not reject invalid storage id', (done) => {
+    it('should reject invalid storage id', (done) => {
       chai.request(server)
         .put('/storages')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -79,12 +96,12 @@ describe('Storage', () => {
         });
     });
 
-    it('should not reject storage id not in storages table', (done) => {
+    it('should reject storage id not in storages table', (done) => {
       chai.request(server)
         .put('/storages')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
-          '3': 100,
+          '3': 100000,
         })
         .end((err, res) => {
           res.should.have.status(400);
@@ -92,7 +109,7 @@ describe('Storage', () => {
         });
     });
 
-    it('should not reject invalid storage capacity', (done) => {
+    it('should reject invalid storage capacity', (done) => {
       chai.request(server)
         .put('/storages')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -105,13 +122,13 @@ describe('Storage', () => {
         });
     });
 
-    it('should not reject multiple inputs', (done) => {
+    it('should reject multiple inputs', (done) => {
       chai.request(server)
         .put('/storages')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
-          '1': 100,
-          '2': 900,
+          '1': 100000,
+          '2': 900000,
         })
         .end((err, res) => {
           res.should.have.status(400);
