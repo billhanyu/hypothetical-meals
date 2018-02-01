@@ -20,4 +20,4 @@ INSERT INTO Inventories (id, ingredient_id, package_type, num_packages) VALUES (
 INSERT INTO Inventories (id, ingredient_id, package_type, num_packages) VALUES (3, 2, 'truckload', 2);
 INSERT INTO Logs (id, user_id, vendor_ingredient_id, quantity) VALUES (1, 1, 1, 18);
 INSERT INTO Logs (id, user_id, vendor_ingredient_id, quantity) VALUES (2, 1, 3, 5);
-INSERT INTO SpendingLogs (id, ingredient_id, total, consumed) VALUES (1, 1, 100, 50);
+INSERT INTO SpendingLogs (id, ingredient_id, total_weight, total, consumed) VALUES (1, 1, 500, 5000, 50);
