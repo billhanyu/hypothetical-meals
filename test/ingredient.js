@@ -5,10 +5,24 @@ const assert = require('chai').assert;
 const testTokens = require('./testTokens');
 
 describe('Ingredient', () => {
+  describe('#pages()', () => {
+    it('should return number of pages of data', (done) => {
+      chai.request(server)
+        .get('/ingredients/pages')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          assert.strictEqual(res.body['numPages'], 1, 'number of pages');
+          done();
+        });
+    });
+  });
+
   describe('#view()', () => {
     it('should return all ingredients', (done) => {
       chai.request(server)
-        .get('/ingredients')
+        .get('/ingredients/page/1')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
@@ -23,7 +37,7 @@ describe('Ingredient', () => {
     it('should return all ingredients available', (done) => {
       alasql('UPDATE Ingredients SET removed = 1 WHERE id = 1');
       chai.request(server)
-        .get('/ingredients-available')
+        .get('/ingredients-available/page/1')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);

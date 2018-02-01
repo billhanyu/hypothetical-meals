@@ -1,7 +1,17 @@
 # Vendors API
 
 {% method %}
-## GET '/vendors'
+## GET '/vendors/pages' {#pages}
+
+Get the number of pages in the `Vendors` table, requires no parameter input. Default 50 ids per page in numerical order (page 2 = id range 51 to 100).
+
+Return parameters:
+{numPages: 5}
+
+{% endmethod %}
+
+{% method %}
+## GET '/vendors/page/:page_num'
 
 Get all vendors.
 
@@ -9,7 +19,7 @@ No parameter required.
 {% endmethod %}
 
 {% method %}
-## GET '/vendors-available'
+## GET '/vendors-available/page/:page_num'
 
 Get all available vendors (where removed == 0).
 

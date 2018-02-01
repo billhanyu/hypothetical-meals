@@ -1,7 +1,17 @@
 # Inventories API
 
 {% method %}
-## GET '/inventory'
+## GET '/inventory/pages' {#pages}
+
+Get the number of pages in the `Inventory` table, requires no parameter input. Default 50 ids per page in numerical order (page 2 = id range 51 to 100).
+
+Return parameters:
+{numPages: 5}
+
+{% endmethod %}
+
+{% method %}
+## GET '/inventory/page/:page_num'
 
 Get all inventory ingredients.
 

@@ -1,7 +1,17 @@
 # Ingredients API
 
 {% method %}
-## GET '/ingredients' {#view}
+## GET '/ingredients/pages' {#pages}
+
+Get the number of pages in the `Ingredients` table, requires no parameter input. Default 50 ids per page in numerical order (page 2 = id range 51 to 100).
+
+Return parameters:
+{numPages: 5}
+
+{% endmethod %}
+
+{% method %}
+## GET '/ingredients/page/:page_num' {#view}
 
 Get all ingredients in the `Ingredients` table, requires no parameter input.
 
@@ -13,7 +23,7 @@ All columns in Ingredients table AND
 {% endmethod %}
 
 {% method %}
-## GET '/ingredients-available' {#view}
+## GET '/ingredients-available/page/:page_num' {#view}
 
 Get all available ingredients in the `Ingredients` table for order etc (where removed == 0).
 
