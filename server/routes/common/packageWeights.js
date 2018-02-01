@@ -1,4 +1,4 @@
-const weights = {
+const packageWeights = {
   'sack': 50,
   'pail': 50,
   'drum': 500,
@@ -7,4 +7,9 @@ const weights = {
   'railcar': 280000,
 };
 
-export default weights;
+const ignoreWeights = ['truckload', 'railcar'];
+
+export default {
+  packageWeights,
+  ignoreWeights,
+};
