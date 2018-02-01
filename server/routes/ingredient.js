@@ -4,8 +4,10 @@ import success from './common/success';
 import { fakeDeleteMultipleVendorIngredients } from './vendorIngredient';
 const fs = require('fs');
 
+const basicViewQueryString = 'SELECT Ingredients.*, Storages.name as storage_name, Storages.capacity as storage_capacity FROM Ingredients INNER JOIN Storages ON Storages.id = Ingredients.storage_id';
+
 export function view(req, res, next) {
-  connection.query('SELECT * FROM Ingredients')
+  connection.query(basicViewQueryString)
     .then(results => res.status(200).send(results))
     .catch(err => {
       console.error(error);
@@ -14,7 +16,7 @@ export function view(req, res, next) {
 }
 
 export function viewAvailable(req, res, next) {
-  connection.query('SELECT * FROM Ingredients WHERE removed = 0')
+  connection.query(`${basicViewQueryString} WHERE removed = 0`)
     .then(results => res.status(200).send(results))
     .catch(err => {
       console.error(error);

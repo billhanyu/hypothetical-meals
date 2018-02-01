@@ -5,6 +5,11 @@
 Get all of the ordering logs.
 
 No parameter required.
+
+Return parameters:
+All columns in Logs table AND
+- Users.username as user_username
+
 {% endmethod %}
 
 {% method %}
@@ -18,6 +23,11 @@ request.body.vendor_ingredient_ids = [
   1, 2, 3
 ];
 ```
+
+Return parameters:
+All columns in Logs table AND
+- Users.username as user_username
+
 {% endmethod %}
 
 {% method %}

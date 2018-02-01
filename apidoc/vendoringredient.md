@@ -1,11 +1,25 @@
 # VendorIngredients API
+
+{% method %}
 ## GET '/vendoringredients'
 
 Get all vendorsingredients.
 
 No parameter required.
+
+Return parameters:
+All columns in VendorsIngredients table AND
+- Vendors.name as vendor_name
+- Vendors.contact as vendor_contact
+- Vendors.code as vendor_code
+- Vendors.removed as vendor_removed
+- Ingredients.name as ingredient_name
+- Ingredients.storage_id as ingredient_storage_id
+- Ingredients.removed as ingredient_removed
+
 {% endmethod %}
 
+{% method %}
 ## GET '/vendoringredients-available'
 
 Get all available vendorsingredients (removed = 0).
