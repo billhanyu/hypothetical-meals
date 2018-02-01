@@ -62,8 +62,8 @@ CREATE TABLE VendorsIngredients(
 CREATE TABLE Inventories(
 	id int not null AUTO_INCREMENT,
 	ingredient_id int not null,
-	storage_weight int not null,
-	total_weight int not null,
+	package_type enum('sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar') not null,
+	num_packages int not null default 0,
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	PRIMARY KEY (id)

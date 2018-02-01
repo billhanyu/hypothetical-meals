@@ -1,5 +1,6 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
+import {getWeight, ignoreWeights} from './common/packageUtilies';
 import success from './common/success';
 
 export function view(req, res, next) {
@@ -18,10 +19,12 @@ export function view(req, res, next) {
  *   "1": 123,
  *   "2": 456
  * }
- * This changes ingredient 1's total_weight to 123 and 2's total_weight to 456
+ * This changes inventory 1's num_packages to 123 and 2's num_packages to 456
  */
 export function modifyQuantities(req, res, next) {
-  changeHelper(req.body.changes, false, req, res, next);
+  modifyInventoryQuantitiesPromise(req.body.changes)
+    .then(() => success(res))
+    .catch(err => handleError(err, res));
 }
 
 /* request body format:
@@ -34,98 +37,131 @@ export function modifyQuantities(req, res, next) {
  *   "1": 123,
  *   "2": 456
  * }
- * This decreases ingredient 1's total_weight by 123 and 2's total_weight by 456
+ * This decreases inventory id 1's num_packages by 123 and 2's num_packages by 456
  */
 export function commitCart(req, res, next) {
-  // TODO: log to spendinglog
-  changeHelper(req.body.cart, true, req, res, next);
+  try {
+    const cart = req.body.cart;
+    checkInputChanges(cart);
+    checkChangesProperties(cart);
+    const ids = Object.keys(cart);
+    connection.query(`SELECT id, num_packages FROM Inventories WHERE id IN (${ids.join(', ')})`)
+      .then(results => {
+        if (results.length < ids.length) {
+          throw createError('Some inventory id not in database.');
+        }
+        for (let item of results) {
+          const id = item.id;
+          const newNum = item.num_packages - cart[id];
+          if (newNum < 0) {
+            throw createError('Requesting more than what\'s in the database.');
+          }
+          cart[id] = newNum;
+        }
+        return modifyInventoryQuantitiesPromise(cart);
+      })
+      .then(() => success(res))
+      .catch(err => {
+        handleError(err, res);
+      });
+  } catch (err) {
+    handleError(err, res);
+  }
 }
 
-function changeHelper(items, isCart, req, res, next) {
-  if (!items || Object.keys(items).length < 1) {
-    return res.status(400).send('Invalid input request, see doc.');
-  }
-  const ingredientIds = [];
-  for (const idString in items) {
-    if (!checkNumber.isPositiveInteger(idString)) {
-      return res.status(400).send(`Ingredient ID ${idString} is invalid.`);
+/* changes: {
+ *   'inventory_id1': newQuantity1,
+ *   'inventory_id2': newQuantity2,
+ * }
+ */
+export function modifyInventoryQuantitiesPromise(changes) {
+  return new Promise((resolve, reject) => {
+    try {
+      checkInputChanges(changes);
+      checkChangesProperties(changes);
+    } catch (err) {
+      reject(err);
     }
-    const quantity = items[idString];
-    if (!checkNumber.isPositiveInteger(quantity) && isCart) {
-      return res.status(400).send(`Request quantity ${quantity} is invalid.`);
+    const ids = Object.keys(changes);
+    const cases = [];
+    for (let id of ids) {
+      cases.push(`when id = ${id} then ${changes[id]}`);
     }
-    if (!checkNumber.isNonNegativeInteger(quantity) && !isCart) {
-      return res.status(400).send(`New quantity ${quantity} is invalid.`);
+    let backup;
+    connection.query(`SELECT id, num_packages FROM Inventories WHERE id IN (${ids.join(', ')})`)
+      .then(results => {
+        backup = results;
+        if (results.length < ids.length) {
+          reject(createError('Some id not in database.'));
+        }
+        return connection.query(`UPDATE Inventories SET num_packages = (case ${cases.join(' ')} end)
+                    WHERE id IN (${ids.join(', ')})`);
+      })
+      .then(() => checkStorageCapacityPromise(backup))
+      .then(() => connection.query('DELETE FROM Inventories WHERE num_packages = 0'))
+      .then(() => resolve())
+      .catch(err => {
+        reject(err);
+      });
+    });
+}
+
+function checkInputChanges(changes) {
+  if (!changes || Object.keys(changes) < 1) {
+    throw createError('Invlaid input object, see doc.');
+  }
+}
+
+function checkChangesProperties(changes) {
+  for (let id in changes) {
+    if (!checkNumber.isPositiveInteger(id)) {
+      throw createError(`inventory_id ${id} invalid.`);
     }
-    ingredientIds.push(idString);
+    const value = changes[id];
+    if (!checkNumber.isNonNegativeInteger(value)) {
+      throw createError(`new inventory quantity ${value} invalid.`);
+    }
   }
-
-  connection.query(
-    `SELECT ingredient_id, storage_weight, total_weight FROM Inventories WHERE ingredient_id IN (${ingredientIds.join(', ')})`)
-    .then(results => {
-      if (results.length < ingredientIds.length) {
-        throw createError(`Changing quantity of something not in the inventory.`);
-      }
-
-      const newWeights = calcNewStorageAndTotalWeights(results, isCart, items);
-
-      return connection.query(
-        `UPDATE Inventories
-          SET total_weight = (case ${newWeights.totalCases.join(' ')} end),
-              storage_weight = (case ${newWeights.storageCases.join(' ')} end)
-          WHERE ingredient_id IN (${ingredientIds.join(', ')})`);
-    })
-    .then(() => connection.query('DELETE FROM Inventories WHERE total_weight = 0'))
-    .then(() => success(res))
-    .catch(err => handleError(err, res));
 }
 
-function calcNewStorageAndTotalWeights(oldItems, isCart, request) {
-  const totalCases = [];
-  const storageCases = [];
-  for (let i = 0; i < oldItems.length; i++) {
-    const item = oldItems[i];
-    const id = item['ingredient_id'];
-    const reqNum = parseInt(request[id]);
-    const oldTotal = item['total_weight'];
-    const oldStorage = item['storage_weight'];
-    const newWeights = isCart
-      ? calcIndStorageTotalWeightsCart(oldStorage, oldTotal, reqNum)
-      : calcIndStorageTotalWeightsAdmin(oldStorage, oldTotal, reqNum);
-    const newTotal = newWeights.newTotal;
-    const newStorage = newWeights.newStorage;
-
-    totalCases.push(`when ingredient_id = ${id} then ${newTotal}`);
-    storageCases.push(`when ingredient_id = ${id} then ${newStorage}`);
-  }
-
-  return {
-    totalCases,
-    storageCases,
-  };
-}
-
-function calcIndStorageTotalWeightsAdmin(oldStorage, oldTotal, reqNum) {
-  const newTotal = reqNum;
-  let newStorage = oldStorage;
-  const reduce = oldTotal - newTotal;
-  if (reduce > 0) {
-    newStorage = oldStorage > reduce ? oldStorage - reduce : 0;
-  }
-  return {
-    newTotal,
-    newStorage,
-  };
-}
-
-function calcIndStorageTotalWeightsCart(oldStorage, oldTotal, reqNum) {
-  const newTotal = oldTotal - reqNum;
-  if (newTotal < 0) {
-    throw createError(`Requesting more then what's in the inventory.`);
-  }
-  const newStorage = oldStorage > reqNum > 0 ? oldStorage - reqNum : 0;
-  return {
-    newTotal,
-    newStorage,
-  };
+function checkStorageCapacityPromise(backup) {
+  return new Promise((resolve, reject) => {
+    let storages;
+    const sums = {};
+    const capacities = {};
+    connection.query('SELECT * FROM Storages')
+      .then(results => {
+        storages = results;
+        for (let storage of storages) {
+          sums[storage.id] = 0;
+          capacities[storage.id] = storage.capacity;
+        }
+        return connection.query(`SELECT Inventories.package_type, Inventories.num_packages, Ingredients.storage_id
+                                  FROM Inventories
+                                  INNER JOIN Ingredients
+                                  ON Inventories.ingredient_id = Ingredients.id`);
+      })
+      .then(items => {
+        items.forEach(item => {
+          if (ignoreWeights.indexOf(item.package_type) < 0) {
+            sums[item.storage_id] += getWeight(item.package_type) * item.num_packages;
+          }
+        });
+        for (let id of Object.keys(sums)) {
+          if (sums[id] > capacities[id]) {
+            const ids = [];
+            const cases = [];
+            backup.forEach(item => {
+              ids.push(item.id);
+              cases.push(`when id = ${item.id} then ${item.num_packages}`);
+            });
+            connection.query(`UPDATE Inventories SET num_packages = (case ${cases.join(' ')} end) WHERE id IN (${ids.join(', ')})`)
+              .then(() => reject(createError('New quantities too large for current storages')))
+              .catch(err => reject(err));
+          }
+        }
+      })
+      .then(() => resolve())
+      .catch(err => reject(err));
+  });
 }
