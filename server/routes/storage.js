@@ -1,5 +1,6 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
+import { getWeight, ignoreWeights} from './common/packageUtilies';
 import success from './common/success';
 
 export function view(req, res, next) {
@@ -34,16 +35,18 @@ export function changeStorage(req, res, next) {
       throw createError('Storage ID not in Storages Table');
     }
     return connection.query(
-      `SELECT Inventories.storage_weight 
+      `SELECT Inventories.package_type, Inventories.num_packages 
       FROM Inventories
       INNER JOIN Ingredients 
       ON Ingredients.id = Inventories.ingredient_id 
       WHERE Ingredients.storage_id = ${storageId}`);
   })
-  .then(storageWeights => {
+  .then(results => {
     let sum = 0;
-    storageWeights.forEach(weight => {
-      sum += weight['storage_weight'];
+    results.forEach(item => {
+      if (ignoreWeights.indexOf(item.package_type) < 0) {
+        sum += getWeight(item.package_type) * item.num_packages;
+      }
     });
     if (newCapacity < sum) {
       throw createError(`New capacity ${newCapacity} is smaller than current total storage weight ${sum}`);
