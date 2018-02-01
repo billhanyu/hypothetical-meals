@@ -1,12 +1,22 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import {getWeight, ignoreWeights} from './common/packageUtilies';
+import { getNumPages, queryWithPagination} from './common/pagination';
 import success from './common/success';
 
 const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
 
+export function pages(req, res, next) {
+  getNumPages('Inventories')
+    .then(results => res.status(200).send(results))
+    .catch(err => {
+      console.error(err);
+      return res.status(500).send('Database error');
+    });
+}
+
 export function view(req, res, next) {
-  connection.query(basicViewQueryString)
+  queryWithPagination(req.params.page_num, 'Inventories', basicViewQueryString)
     .then(results => res.status(200).send(results))
     .catch(err => handleError(err, res));
 }

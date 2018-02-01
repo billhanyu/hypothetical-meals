@@ -2,24 +2,34 @@ import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import success from './common/success';
 import { fakeDeleteMultipleVendorIngredients } from './vendorIngredient';
+import { getNumPages, queryWithPagination} from './common/pagination';
 const fs = require('fs');
 
 const basicViewQueryString = 'SELECT Ingredients.*, Storages.name as storage_name, Storages.capacity as storage_capacity FROM Ingredients INNER JOIN Storages ON Storages.id = Ingredients.storage_id';
 
-export function view(req, res, next) {
-  connection.query(basicViewQueryString)
+export function pages(req, res, next) {
+  getNumPages('Ingredients')
     .then(results => res.status(200).send(results))
     .catch(err => {
-      console.error(error);
+      console.error(err);
+      return res.status(500).send('Database error');
+    });
+}
+
+export function view(req, res, next) {
+  queryWithPagination(req.params.page_num, 'Ingredients', basicViewQueryString)
+    .then(results => res.status(200).send(results))
+    .catch(err => {
+      console.error(err);
       return res.status(500).send('Database error');
     });
 }
 
 export function viewAvailable(req, res, next) {
-  connection.query(`${basicViewQueryString} WHERE removed = 0`)
+  queryWithPagination(req.params.page_num, 'Ingredients', `${basicViewQueryString} WHERE removed = 0`)
     .then(results => res.status(200).send(results))
     .catch(err => {
-      console.error(error);
+      console.error(err);
       return res.status(500).send('Database error');
     });
 }

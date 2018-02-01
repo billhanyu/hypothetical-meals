@@ -1,12 +1,22 @@
 import * as checkNumber from './common/checkNumber';
+import { getNumPages, queryWithPagination} from './common/pagination';
 
 const basicViewQueryString = 'SELECT SpendingLogs.*, Ingredients.name AS ingredient_name, Ingredients.storage_id AS ingredient_storage_id, Ingredients.removed AS ingredient_removed FROM SpendingLogs INNER JOIN Ingredients ON SpendingLogs.ingredient_id = Ingredients.id';
 
-export function view(req, res, next) {
-  connection.query(basicViewQueryString)
+export function pages(req, res, next) {
+  getNumPages('SpendingLogs')
     .then(results => res.status(200).send(results))
     .catch(err => {
-      console.error(error);
+      console.error(err);
+      return res.status(500).send('Database error');
+    });
+}
+
+export function view(req, res, next) {
+  queryWithPagination(req.params.page_num, 'SpendingLogs', basicViewQueryString)
+    .then(results => res.status(200).send(results))
+    .catch(err => {
+      console.error(err);
       return res.status(500).send('Database error');
     });
 }
@@ -22,7 +32,7 @@ export function logsForIngredient(req, res, next) {
   connection.query(`${basicViewQueryString} WHERE ingredient_id IN (${ingredientId})`)
   .then(results => res.status(200).send(results))
   .catch(err => {
-      console.error(error);
+      console.error(err);
       return res.status(500).send('Database error');
   });
 }

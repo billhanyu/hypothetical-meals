@@ -4,10 +4,24 @@ const testTokens = require('./testTokens');
 
 
 describe('Log', () => {
+  describe('#pages()', () => {
+    it('should return number of pages of data', (done) => {
+      chai.request(server)
+        .get('/logs/pages')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          assert.strictEqual(res.body['numPages'], 1, 'number of pages');
+          done();
+        });
+    });
+  });
+
   describe('#view()', () => {
     it('should return all logs', (done) => {
       chai.request(server)
-        .get('/logs')
+        .get('/logs/page/1')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
@@ -26,7 +40,7 @@ describe('Log', () => {
 
     it('should return all logs for a vendor ingredient', (done) => {
       chai.request(server)
-      .get('/logs/ingredients')
+      .get('/logs/ingredients/page/1')
       .set('Authorization', `Token ${testTokens.noobTestToken}`)
       .send({
         'vendor_ingredient_ids': [3],
@@ -41,7 +55,7 @@ describe('Log', () => {
 
     it('should return no logs for a vendor ingredient not in table', (done) => {
       chai.request(server)
-      .get('/logs/ingredients')
+      .get('/logs/ingredients/page/1')
       .set('Authorization', `Token ${testTokens.noobTestToken}`)
       .send({
         'vendor_ingredient_ids': [10],

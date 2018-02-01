@@ -72,21 +72,24 @@ app.post('/users/admin', user.signupAdmin);
 app.post('/users/noob', beAdmin, user.signupNoob);
 app.post('/users/login', user.login);
 
-app.get('/vendors', beNoob, vendor.view);
-app.get('/vendors-available', beNoob, vendor.viewAvailable);
+app.get('/vendors/pages', beNoob, vendor.pages);
+app.get('/vendors/page/:page_num', beNoob, vendor.view);
+app.get('/vendors-available/page/:page_num', beNoob, vendor.viewAvailable);
 app.post('/vendors', beAdmin, vendor.addVendors);
 app.put('/vendors', beAdmin, vendor.modifyVendors);
 app.delete('/vendors', beAdmin, vendor.deleteVendors);
 
-app.get('/ingredients', beNoob, ingredient.view);
-app.get('/ingredients-available', beNoob, ingredient.viewAvailable);
+app.get('/ingredients/pages', beNoob, ingredient.pages);
+app.get('/ingredients/page/:page_num', beNoob, ingredient.view);
+app.get('/ingredients-available/page/:page_num', beNoob, ingredient.viewAvailable);
 app.post('/ingredients', beAdmin, ingredient.addIngredient);
 app.put('/ingredients', beAdmin, ingredient.modifyIngredient);
 app.delete('/ingredients', beAdmin, ingredient.deleteIngredient);
 app.post('/ingredients/import', [auth.required, adminRequired, upload.single('bulk')], ingredient.bulkImport);
 
-app.get('/vendoringredients', beNoob, vendorIngredient.view);
-app.get('/vendoringredients-available', beNoob, vendorIngredient.viewAvailable);
+app.get('/vendoringredients/pages', beNoob, vendorIngredient.pages);
+app.get('/vendoringredients/page/:page_num', beNoob, vendorIngredient.view);
+app.get('/vendoringredients-available/page/:page_num', beNoob, vendorIngredient.viewAvailable);
 app.get('/vendoringredients/:ingredient_id', beNoob, vendorIngredient.getVendorsForIngredient);
 app.post('/vendoringredients', beAdmin, vendorIngredient.addVendorIngredients);
 app.put('/vendoringredients', beAdmin, vendorIngredient.modifyVendorIngredients);
@@ -95,14 +98,17 @@ app.delete('/vendoringredients', beAdmin, vendorIngredient.deleteVendorIngredien
 app.get('/storages', beNoob, storage.view);
 app.put('/storages', beAdmin, storage.changeStorage);
 
-app.get('/logs', beNoob, log.view);
-app.get('/logs/ingredients', beNoob, log.viewLogForIngredient);
+app.get('/logs/pages', beNoob, log.pages);
+app.get('/logs/page/:page_num', beNoob, log.view);
+app.get('/logs/ingredients/page/:page_num', beNoob, log.viewLogForIngredient);
 app.post('/logs', beNoob, log.addEntry);
 
-app.get('/spendinglogs', beNoob, spendinglog.view);
+app.get('/spendinglogs/pages', beNoob, spendinglog.pages);
+app.get('/spendinglogs/page/:page_num', beNoob, spendinglog.view);
 app.get('/spendinglogs/:ingredient_id', beNoob, spendinglog.logsForIngredient);
 
-app.get('/inventory', beNoob, inventory.view);
+app.get('/inventory/pages', beNoob, inventory.pages);
+app.get('/inventory/page/:page_num', beNoob, inventory.view);
 app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
 app.put('/inventory', beNoob, inventory.commitCart);
 

@@ -7,7 +7,7 @@ export function view(req, res, next) {
   connection.query('SELECT * FROM Storages')
     .then(results => res.status(200).send(results))
     .catch(err => {
-      console.error(error);
+      console.error(err);
       return res.status(500).send('Database error');
     });
 }
