@@ -82,6 +82,29 @@ describe('Inventory', () => {
         });
     });
 
+    it('should decline when exceed storage capacity', (done) => {
+      chai.request(server)
+        .put('/inventory/admin')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'changes': {
+            '1': 100000,
+            '2': 99,
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          const left = alasql('SELECT * FROM Inventories');
+          assert.strictEqual(left[0].id, 1, 'Inventory item 1 left.');
+          assert.strictEqual(left[0].num_packages, 10, 'Inventory item 1 number of packages.');
+          assert.strictEqual(left[1].id, 2, 'Inventory item 2 left.');
+          assert.strictEqual(left[1].num_packages, 20, 'Inventory item 2 number of packages.');
+          assert.strictEqual(left[2].id, 3, 'Inventory item 3 left.');
+          assert.strictEqual(left[2].num_packages, 2, 'Inventory item 3 number of packages.');
+          done();
+        });
+    });
+
     it('should decline ingredients not in inventory', (done) => {
       chai.request(server)
         .put('/inventory/admin')

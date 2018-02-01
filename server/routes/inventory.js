@@ -1,6 +1,10 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
+import weightsConfig from './common/packageWeights';
 import success from './common/success';
+
+const packageWeights = weightsConfig.packageWeights;
+const ignoreWeights = weightsConfig.ignoreWeights;
 
 export function view(req, res, next) {
   connection.query('SELECT * FROM Inventories')
@@ -86,14 +90,17 @@ export function modifyInventoryQuantitiesPromise(changes) {
     for (let id of ids) {
       cases.push(`when id = ${id} then ${changes[id]}`);
     }
-    connection.query(`SELECT id FROM Inventories WHERE id IN (${ids.join(', ')})`)
+    let backup;
+    connection.query(`SELECT id, num_packages FROM Inventories WHERE id IN (${ids.join(', ')})`)
       .then(results => {
+        backup = results;
         if (results.length < ids.length) {
           reject(createError('Some id not in database.'));
         }
         return connection.query(`UPDATE Inventories SET num_packages = (case ${cases.join(' ')} end)
                     WHERE id IN (${ids.join(', ')})`);
       })
+      .then(() => checkStorageCapacityPromise(backup))
       .then(() => connection.query('DELETE FROM Inventories WHERE num_packages = 0'))
       .then(() => resolve())
       .catch(err => {
@@ -118,4 +125,46 @@ function checkChangesProperties(changes) {
       throw createError(`new inventory quantity ${value} invalid.`);
     }
   }
+}
+
+function checkStorageCapacityPromise(backup) {
+  return new Promise((resolve, reject) => {
+    let storages;
+    const sums = {};
+    const capacities = {};
+    connection.query('SELECT * FROM Storages')
+      .then(results => {
+        storages = results;
+        for (let storage of storages) {
+          sums[storage.id] = 0;
+          capacities[storage.id] = storage.capacity;
+        }
+        return connection.query(`SELECT Inventories.package_type, Inventories.num_packages, Ingredients.storage_id
+                                  FROM Inventories
+                                  INNER JOIN Ingredients
+                                  ON Inventories.ingredient_id = Ingredients.id`);
+      })
+      .then(items => {
+        items.forEach(item => {
+          if (ignoreWeights.indexOf(item.package_type) < 0) {
+            sums[item.storage_id] += packageWeights[item.package_type] * item.num_packages;
+          }
+        });
+        for (let id of Object.keys(sums)) {
+          if (sums[id] > capacities[id]) {
+            const ids = [];
+            const cases = [];
+            backup.forEach(item => {
+              ids.push(item.id);
+              cases.push(`when id = ${item.id} then ${item.num_packages}`);
+            });
+            connection.query(`UPDATE Inventories SET num_packages = (case ${cases.join(' ')} end) WHERE id IN (${ids.join(', ')})`)
+              .then(() => reject(createError('New quantities too large for current storages')))
+              .catch(err => reject(err));
+          }
+        }
+      })
+      .then(() => resolve())
+      .catch(err => reject(err));
+  });
 }
