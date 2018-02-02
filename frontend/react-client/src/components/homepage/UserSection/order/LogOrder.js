@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import OrderItem from '../Components/OrderItem';
+import OrderItem from './OrderItem';
 
 class LogOrder extends Component {
   constructor(props) {
