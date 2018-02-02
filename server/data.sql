@@ -22,8 +22,9 @@ INSERT INTO VendorsIngredients (id, ingredient_id, package_type, price, vendor_i
 INSERT INTO VendorsIngredients (id, ingredient_id, package_type, price, vendor_id) VALUES (2, 2, 'pail', 20, 1);
 INSERT INTO VendorsIngredients (id, ingredient_id, package_type, price, vendor_id) VALUES (3, 3, 'pail', 30, 1);
 INSERT INTO VendorsIngredients (id, ingredient_id, package_type, price, vendor_id) VALUES (4, 1, 'truckload', 30, 2);
-INSERT INTO Inventories (id, ingredient_id, storage_weight, total_weight) VALUES(1, 1, 5, 10);
-INSERT INTO Inventories (id, ingredient_id, storage_weight, total_weight) VALUES (2, 2, 15, 20);
+INSERT INTO Inventories (id, ingredient_id, package_type, num_packages) VALUES(1, 1, 'pail', 10);
+INSERT INTO Inventories (id, ingredient_id, package_type, num_packages) VALUES (2, 2, 'sack', 20);
+INSERT INTO Inventories (id, ingredient_id, package_type, num_packages) VALUES (3, 2, 'truckload', 2);
 INSERT INTO Logs (id, user_id, vendor_ingredient_id, quantity) VALUES (1, 1, 1, 18);
 INSERT INTO Logs (id, user_id, vendor_ingredient_id, quantity) VALUES (2, 1, 3, 5);
 INSERT INTO SpendingLogs (id, ingredient_id, total, consumed) VALUES (1, 1, 100, 50);
