@@ -27,36 +27,49 @@ export function logsForIngredient(req, res, next) {
 
 /* Request format:
  * req = {
- *   '1': 1,
- *   '2': 20,
+ *   '1': {
+ *      'total_weight': 100,
+ *      'cost': 10,
+ *   }
+ *   '2': {
+ *      'total_weight': 50,
+ *      'cost': 30,
+ *   }
  *  ...
  * }
- * Key is ingredient, value is the cost.
+ * Key is ingredient id.
  */
 export function updateLogForIngredient(req) {
-  connection.query(`SELECT id, ingredient_id, total FROM SpendingLogs WHERE ingredient_id IN (${Object.keys(req).join(', ')})`)
+  connection.query(`SELECT id, ingredient_id, total, total_weight FROM SpendingLogs WHERE ingredient_id IN (${Object.keys(req).join(', ')})`)
     .then(results => {
       let toUpdate = {
         'ids': [],
         'ingredient_ids': new Set(),
       };
-      let updateCases = [];
+      let updateTotalCostCases = [];
+      let updateTotalWeightCases = [];
       for (let log of results) {
+        let ingredientId = log['ingredient_id'];
         toUpdate['ids'].push(log['id']);
-        toUpdate['ingredient_ids'].add(`${log['ingredient_id']}`);
-        updateCases.push(`when id = ${log['id']} then ${req[log['ingredient_id']] + log['total']}`);
+        toUpdate['ingredient_ids'].add(`${ingredientId}`);
+        updateTotalCostCases.push(`when id = ${log['id']} then ${req[ingredientId]['cost'] + log['total']}`);
+        updateTotalWeightCases.push(`when id = ${log['id']} then ${req[ingredientId]['total_weight'] + log['total_weight']}`);
       }
 
       let newIngredientIds = Object.keys(req).filter(x => !toUpdate['ingredient_ids'].has(x));
-      let newIngredientTotals = newIngredientIds.map(x => req[x]);
+      let newIngredientTotals = newIngredientIds.map(x => req[x]['cost']);
+      let newIngredientWeights = newIngredientIds.map(x => req[x]['total_weight']);
       let newConsumed = new Array(newIngredientIds.length).fill(0);
       let newUpdate = [];
       for (let i = 0; i < newConsumed.length; i++) {
-        newUpdate.push(`(${newIngredientIds[i]}, ${newIngredientTotals[i]}, ${newConsumed[i]})`);
+        newUpdate.push(`(${newIngredientIds[i]}, ${newIngredientTotals[i]}, ${newIngredientWeights[i]}, ${newConsumed[i]})`);
       }
-      connection.query(`INSERT INTO SpendingLogs (ingredient_id, total, consumed) VALUES ${newUpdate.join(', ')}`)
+      connection.query(`INSERT INTO SpendingLogs (ingredient_id, total, total_weight, consumed) VALUES ${newUpdate.join(', ')}`)
       .then(() => {
-        return connection.query(`UPDATE SpendingLogs SET total = (case ${updateCases.join(' ')} end) WHERE id IN (${toUpdate['ids'].join(', ')})`);
+        return connection.query(`UPDATE SpendingLogs 
+        SET total = (case ${updateTotalCostCases.join(' ')} end),
+            total_weight = (case ${updateTotalWeightCases.join(' ')} end)
+        WHERE id IN (${toUpdate['ids'].join(', ')})`);
       })
       .catch(err => {
         throw err;
