@@ -85,6 +85,7 @@ CREATE TABLE SpendingLogs(
 	id int not null AUTO_INCREMENT,
 	ingredient_id int not null,
 	total double not null,
+	total_weight int not null,
 	consumed double not null,
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
