@@ -45,7 +45,7 @@
 }
 
 .InventoryColumn {
-  width: 29%;
+  width: 21%;
   margin: 10px 2%;
   font-size: 14px;
   float: left;
@@ -56,4 +56,14 @@
 .InventoryHead > .InventoryColumn {
   font-size: 16px;
   font-weight: 500;
+}
+
+.FilterItem {
+  height: 35px;
+  margin: 0 20px;
+  width: 20%;
+}
+
+.FilterBar {
+  margin-bottom: 30px;
 }

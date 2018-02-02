@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import UserButton from '../CommonComponent/UserButton';
-import ViewInventory from './Functions/ViewInventory';
-import LogOrder from './Functions/LogOrder';
+import ViewInventory from './inventory/ViewInventory';
+import LogOrder from './order/LogOrder';
 
 class UserButtons extends Component {
   constructor(props) {
