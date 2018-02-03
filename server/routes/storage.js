@@ -1,13 +1,13 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
-import { getWeight, ignoreWeights} from './common/packageUtilies';
+import { getWeight, ignoreWeights } from './common/packageUtilies';
 import success from './common/success';
 
 export function view(req, res, next) {
   connection.query('SELECT * FROM Storages')
     .then(results => res.status(200).send(results))
     .catch(err => {
-      console.error(error);
+      console.error(err);
       return res.status(500).send('Database error');
     });
 }

@@ -1,6 +1,17 @@
 # Spendinglogs API
+
 {% method %}
-## GET '/spendinglogs'
+## GET '/spendinglogs/pages' {#pages}
+
+Get the number of pages in the `SpendingLogs` table, requires no parameter input. Default 50 ids per page in numerical order (page 2 = id range 51 to 100).
+
+Return parameters:
+{numPages: 5}
+
+{% endmethod %}
+
+{% method %}
+## GET '/spendinglogs/page/:page_num'
 
 Get all of the spendinglogs.
 
