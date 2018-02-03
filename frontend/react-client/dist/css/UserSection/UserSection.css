@@ -131,6 +131,30 @@
   display: inline-block;
 }
 
+.CartQuantityColumn {
+  width: 25%;
+  text-align: center;
+  display: inline-block;
+}
+
+.CartDeleteColumn {
+  width: 8%;
+}
+
 .CartItemColumnHeader {
   font-weight: 500;
+}
+
+.Overflow {
+  color: red;
+}
+
+.DeleteCartItem {
+  left: 5px;
+  top: 2px;
+  cursor: pointer;
+}
+
+.DeleteCartItem:hover {
+  color: red;
 }

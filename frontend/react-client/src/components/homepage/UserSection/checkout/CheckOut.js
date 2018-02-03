@@ -11,6 +11,8 @@ class CheckOut extends Component {
     };
     this.onClickInventoryItem = this.onClickInventoryItem.bind(this);
     this.checkout = this.checkout.bind(this);
+    this.setQuantity = this.setQuantity.bind(this);
+    this.removeInventoryItem = this.removeInventoryItem.bind(this);
   }
 
   onClickInventoryItem(item) {
@@ -24,6 +26,32 @@ class CheckOut extends Component {
       const newItem = itemInCart[0];
       newItem.quantity += 1;
     }
+    this.setState({
+      cart
+    });
+  }
+
+  removeInventoryItem(id) {
+    let index = -1;
+    for (let i = 0; i < this.state.cart.length; i++) {
+      if (this.state.cart[i].id === id) {
+        index = i;
+        break;
+      }
+    }
+    if (index > -1) {
+      const cart = this.state.cart.slice();
+      cart.splice(index, 1);
+      this.setState({
+        cart
+      });
+    }
+  }
+
+  setQuantity(item, quantity) {
+    const cart = this.state.cart.slice();
+    const itemInCart = cart.filter(s => s.id === item.id)[0];
+    itemInCart.quantity = quantity;
     this.setState({
       cart
     });
@@ -49,7 +77,7 @@ class CheckOut extends Component {
       alert('Checked Out!');
     })
     .catch(error => {
-      console.log(error);
+      alert('Error, please check that you checked out valid numbers.');
     });
   }
 
@@ -66,6 +94,8 @@ class CheckOut extends Component {
           ref={e => {this.cart = e;}}
           cart={this.state.cart}
           checkout={this.checkout}
+          setQuantity={this.setQuantity}
+          removeItem={this.removeInventoryItem}
         />
       </div>
     );
