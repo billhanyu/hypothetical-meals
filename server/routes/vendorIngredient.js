@@ -1,6 +1,6 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
-import { getNumPages, queryWithPagination} from './common/pagination';
+import { getNumPages, queryWithPagination } from './common/pagination';
 import success from './common/success';
 const ALL_PACKAGE_TYPES = ['sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar'];
 
