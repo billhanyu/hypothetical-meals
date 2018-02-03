@@ -8,7 +8,6 @@ class LogOrder extends Component {
     this.state = {
       ingredients: [],
       orders: [],
-      completed: false,
     };
     this.addOrderItem = this.addOrderItem.bind(this);
     this.onChangeIngredientName = this.onChangeIngredientName.bind(this);
@@ -81,10 +80,12 @@ class LogOrder extends Component {
       })
       .then(function (response) {
         self.setState({
-          completed: true,
+          orders: [],
         });
+        alert('Order Completed!');
       })
       .catch(error => {
+        alert('Some error occurred');
       });
   }
 
@@ -105,41 +106,32 @@ class LogOrder extends Component {
   render() {
     return (
       <div>
-        {!this.state.completed &&
-          <div>
-            <div className="orderitem">
-              <div className="DeleteOrderColumn" />
-              <span className="OrderColumn OrderColumnHeader">Ingredient</span>
-              <span className="OrderColumn OrderColumnHeader">Vendor</span>
-              <span className="OrderColumn OrderColumnHeader">Quantity</span>
-            </div>
-            {
-              this.state.orders.map((item, key) => 
-                <OrderItem
-                  key={key}
-                  idx={key}
-                  token={this.props.token}
-                  ingredients={this.state.ingredients}
-                  data={item}
-                  onChangeIngredientName={this.onChangeIngredientName}
-                  selectedVendorIngredient={this.selectedVendorIngredient}
-                  changedQuantity={this.changedQuantity}
-                  removeOrderItem={this.removeOrderItem}
-                  fillVendorIngredients={this.fillVendorIngredients}
-                />
-              )
-            }
-            <div className="OrderButtons orderitem">
-              <button className="AdminButton" onClick={this.addOrderItem}>Add Another</button>
-              <button className="btn btn-primary AdminButton" onClick={this.commitOrder}>Order</button>
-            </div>
-          </div>
+        <div className="orderitem">
+          <div className="DeleteOrderColumn" />
+          <span className="OrderColumn OrderColumnHeader">Ingredient</span>
+          <span className="OrderColumn OrderColumnHeader">Vendor</span>
+          <span className="OrderColumn OrderColumnHeader">Quantity</span>
+        </div>
+        {
+          this.state.orders.map((item, key) => 
+            <OrderItem
+              key={key}
+              idx={key}
+              token={this.props.token}
+              ingredients={this.state.ingredients}
+              data={item}
+              onChangeIngredientName={this.onChangeIngredientName}
+              selectedVendorIngredient={this.selectedVendorIngredient}
+              changedQuantity={this.changedQuantity}
+              removeOrderItem={this.removeOrderItem}
+              fillVendorIngredients={this.fillVendorIngredients}
+            />
+          )
         }
-        {this.state.completed &&
-          <div>
-            <span>Order Completed</span>
-          </div>
-        }
+        <div className="OrderButtons orderitem">
+          <button className="AdminButton" onClick={this.addOrderItem}>Add Another</button>
+          <button className="btn btn-primary AdminButton" onClick={this.commitOrder}>Order</button>
+        </div>
       </div>
     );
   }
