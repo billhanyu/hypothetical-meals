@@ -44,6 +44,14 @@
   margin: 5px 0;
 }
 
+.InventoryRowCart {
+  cursor: pointer;
+}
+
+.InventoryRowCart:hover {
+  background-color: #BCC9D0;
+}
+
 .InventoryColumn {
   width: 21%;
   margin: 10px 2%;
@@ -66,4 +74,63 @@
 
 .FilterBar {
   margin-bottom: 30px;
+}
+
+.InventoryCart {
+  position: fixed;
+  bottom: -450px;
+  right: 0px;
+  height: 500px;
+  width: 400px;
+  border: 1px solid black;
+}
+
+.CartHeader {
+  height: 50px;
+  background-color: rgb(39, 126, 255);
+  cursor: pointer;
+}
+
+.CartBody {
+  height: 400px;
+  background-color: rgba(255, 255, 255, 0.9);
+  overflow-y: scroll;
+}
+
+.CartOrder {
+  height: 50px;
+  cursor: pointer;
+}
+
+.CartOrderText {
+  text-align: center;
+  margin: 17px auto;
+  font-size: 16px;
+  font-weight: 600;
+  width: 99%;
+  display: inline-block;
+}
+
+.CartHeaderText {
+  text-align: center;
+  margin: 17px auto;
+  font-size: 16px;
+  font-weight: 600;
+  width: 99%;
+  display: inline-block;
+}
+
+.CartItem {
+  font-size: 15px;
+  padding: 15px 2%;
+}
+
+.CartItemColumn {
+  width: 33%;
+  text-align: center;
+  display: inline-block;
+}
+
+.CartItemColumnHeader {
+  font-weight: 500;
 }
