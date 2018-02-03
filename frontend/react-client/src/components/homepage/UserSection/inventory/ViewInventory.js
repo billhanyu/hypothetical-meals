@@ -15,9 +15,14 @@ class ViewInventory extends Component {
     this.filterIngredient = this.filterIngredient.bind(this);
     this.filterTemp = this.filterTemp.bind(this);
     this.filterPackage = this.filterPackage.bind(this);
+    this.selectInventoryItem = this.selectInventoryItem.bind(this);
   }
 
   componentDidMount() {
+    this.reloadData();
+  }
+
+  reloadData() {
     const self = this;
     let allInventories;
     axios.get("/inventory", {
@@ -25,7 +30,6 @@ class ViewInventory extends Component {
     })
       .then(response => {
         allInventories = response.data;
-        console.log(allInventories);
         self.setState({
           allInventories,
           inventories: response.data,
@@ -91,6 +95,12 @@ class ViewInventory extends Component {
     });
   }
 
+  selectInventoryItem(item) {
+    if (this.props.onClickInventoryItem) {
+      this.props.onClickInventoryItem(item);
+    }
+  }
+
   render() {
     return (
       <div>
@@ -107,6 +117,8 @@ class ViewInventory extends Component {
         </div>
         {this.state.inventories.map((item, key) =>
           <InventoryItem
+            mode={this.props.mode}
+            selectInventoryItem={this.selectInventoryItem}
             key={key}
             item={item}
             storages={this.state.storages}

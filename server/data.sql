@@ -12,9 +12,9 @@ INSERT INTO Users (id, username, name, hash, salt, user_group) VALUES (6, 'r', '
  '6bf38f50cab9976a94623b74860613e9', 'admin');
 INSERT INTO Vendors (id, name, contact, code) VALUES (1, 'Duke', 'contact', 'code_duke');
 INSERT INTO Vendors (id, name, contact, code) VALUES (2, 'UNC', 'contact', 'code_unc');
-INSERT INTO Storages (id, name, capacity) VALUES (1, 'freezer', 20);
-INSERT INTO Storages (id, name, capacity) VALUES (2, 'refrigerator', 20);
-INSERT INTO Storages (id, name, capacity) VALUES (3, 'warehouse', 20);
+INSERT INTO Storages (id, name, capacity) VALUES (1, 'freezer', 2000);
+INSERT INTO Storages (id, name, capacity) VALUES (2, 'refrigerator', 2000);
+INSERT INTO Storages (id, name, capacity) VALUES (3, 'warehouse', 2000);
 INSERT INTO Ingredients (id, name, storage_id) VALUES (1, 'poop', 1);
 INSERT INTO Ingredients (id, name, storage_id) VALUES (2, 'beans', 1);
 INSERT INTO Ingredients (id, name, storage_id) VALUES (3, 'boop', 1);
@@ -27,4 +27,4 @@ INSERT INTO Inventories (id, ingredient_id, package_type, num_packages) VALUES (
 INSERT INTO Inventories (id, ingredient_id, package_type, num_packages) VALUES (3, 2, 'truckload', 2);
 INSERT INTO Logs (id, user_id, vendor_ingredient_id, quantity) VALUES (1, 1, 1, 18);
 INSERT INTO Logs (id, user_id, vendor_ingredient_id, quantity) VALUES (2, 1, 3, 5);
-INSERT INTO SpendingLogs (id, ingredient_id, total, consumed) VALUES (1, 1, 100, 50);
+INSERT INTO SpendingLogs (id, ingredient_id, total_weight, total, consumed) VALUES (1, 1, 500, 5000, 50);

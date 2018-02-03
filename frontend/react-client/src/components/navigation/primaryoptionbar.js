@@ -13,7 +13,6 @@ class PrimaryOptionBar extends Component {
         icon:'fas fa-columns fa-lg'
       }
     ];
-    console.log(props);
 
     if(props.isAdmin == 'true') {
       buttons.push(
