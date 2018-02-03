@@ -52,14 +52,14 @@ export function addEntry(req, userId) {
 function addLogEntryHelper(logs, userId) {
   return new Promise((resolve, reject) => {
     if (!logs || logs.length < 1) {
-      return res.status(400).send('Invalid input request, see doc.');
+      throw createError('Invalid input request, see doc.');
     }
     const vendorIngredientMap = {};
     const packageTypes = [];
     const userLogs = [];
     for (let log of logs) {
       if (!checkNumber.isPositiveInteger(log.vendor_ingredient_id)) {
-        return res.status(400).send(`Vendor ingredient ID ${log.vendor_ingredient_id} is invalid.`);
+        throw createError(`Vendor ingredient ID ${log.vendor_ingredient_id} is invalid.`);
       }
       vendorIngredientMap[log.vendor_ingredient_id] = log.quantity;
       packageTypes.push(`'${log.package_type}'`);
@@ -86,7 +86,9 @@ function addLogEntryHelper(logs, userId) {
       connection.query(`INSERT INTO Logs (user_id, vendor_ingredient_id, quantity) VALUES ${userLogs.join(', ')}`)
       .then(() => {
         Promise.resolve(updateLogForIngredient(spendingLogReq))
-        .then(() => resolve())
+        .then(() => {
+          resolve();
+        })
         .catch(err => {
           throw err;
         });
