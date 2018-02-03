@@ -45,11 +45,11 @@ export function viewLogForIngredient(req, res, next) {
  * }, ...]
  * This adds a log to the Log Table. Checks storage capacity and updates spending logs.
  */
-export function addEntry(req) {
-  return addLogEntryHelper(req);
+export function addEntry(req, userId) {
+  return addLogEntryHelper(req, userId);
 }
 
-function addLogEntryHelper(logs) {
+function addLogEntryHelper(logs, userId) {
   return new Promise((resolve, reject) => {
     if (!logs || logs.length < 1) {
       return res.status(400).send('Invalid input request, see doc.');
@@ -78,7 +78,7 @@ function addLogEntryHelper(logs) {
             'total_weight': unitWeight * quantity,
             'cost': quantity * vendorIngredient['price'],
           };
-          userLogs.push(`(${req.payload.id}, ${vendorIngredient['id']}, ${unitWeight * quantity})`);
+          userLogs.push(`(${userId}, ${vendorIngredient['id']}, ${unitWeight * quantity})`);
         } catch (err) {
           throw err;
         }

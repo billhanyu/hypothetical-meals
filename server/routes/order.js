@@ -1,5 +1,4 @@
 import modifyInventoryQuantitiesPromise from './inventory';
-import checkStorageCapacityPromise from './inventory';
 import { createError, handleError } from './common/customError';
 import { getWeight } from './common/packageUtilies';
 
@@ -62,7 +61,7 @@ function orderHelper(orders, req, res, next) {
             })
             .then(() => {
                 let logReq = Object.values(ingredientsMap);
-                return addEntry(logReq);
+                return addEntry(logReq, req.payload.id);
             })
             .catch((err) => {
                 throw err;
