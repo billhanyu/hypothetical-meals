@@ -60,13 +60,23 @@ class Cart extends Component {
         </div>
         <div className="CartBody">
           <div className="CartItem">
+            <span 
+              className="glyphicon glyphicon-remove CartDeleteColumn DeleteCartItem"
+              aria-hidden="true"
+              style={{'color': 'rgba(0,0,0,0)', 'cursor': ''}}
+            />
             <span className="CartItemColumn CartItemColumnHeader">Ingredient</span>
             <span className="CartItemColumn CartItemColumnHeader">Package</span>
-            <span className="CartItemColumn CartItemColumnHeader">Quantity</span>
+            <span className="CartQuantityColumn CartItemColumnHeader">Quantity</span>
           </div>
           {
             this.props.cart.map((item, key) => {
-              return <CartItem item={item} key={key} />;
+              return <CartItem
+                item={item}
+                key={key}
+                setQuantity={this.props.setQuantity}
+                removeItem={this.props.removeItem}
+              />;
             })
           }
         </div>
