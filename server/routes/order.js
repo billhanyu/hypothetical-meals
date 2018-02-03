@@ -25,6 +25,7 @@ function orderHelper(orders, req, res, next) {
     connection.query(`SELECT VendorIngredients.id, VendorIngredients.ingredient_id, VendorIngredients.package_type, Ingredients.storage_type 
     FROM VendorIngredients JOIN Ingredients ON VendorIngredients.ingredient_id = Ingredients.id WHERE VendorIngredients.id IN ${Object.keys(orders).join(', ')}`)
     .then((results) => {
+        console.log('results');
         if (results.length < Objet.keys(order).length) {
             throw createError('Some id not in Vendor Ingredients');
         }
