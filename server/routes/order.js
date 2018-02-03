@@ -9,8 +9,8 @@ import { getWeight } from './common/packageUtilies';
  * }
  * example:
  * {
- *   "1": 123,
- *   "2": 456
+ *   '1': 123,
+ *   '2': 456
  * }
  * 1. check inventory capacities
  * 2. update inventory capacities/stock
@@ -21,11 +21,10 @@ export function placeOrder(req, res, next) {
 }
 
 function orderHelper(orders, req, res, next) {
-    connection.query(`SELECT VendorIngredients.id, VendorIngredients.ingredient_id, VendorIngredients.package_type, Ingredients.storage_type 
-    FROM VendorIngredients JOIN Ingredients ON VendorIngredients.ingredient_id = Ingredients.id WHERE VendorIngredients.id IN ${Object.keys(orders).join(', ')}`)
+    connection.query(`SELECT VendorsIngredients.id, VendorsIngredients.ingredient_id, VendorsIngredients.package_type, Ingredients.storage_type 
+    FROM VendorsIngredients JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id WHERE VendorsIngredients.id IN ${Object.keys(orders).join(', ')}`)
     .then((results) => {
-        console.log('results');
-        if (results.length < Objet.keys(order).length) {
+        if (results.length < Object.keys(orders).length) {
             throw createError('Some id not in Vendor Ingredients');
         }
         let ingredientIds = results.map(x => x.ingredient_id);
@@ -72,6 +71,6 @@ function orderHelper(orders, req, res, next) {
         });
     })
     .catch((err) => {
-        handleError(err);
+        handleError(err, res);
     });
 }
