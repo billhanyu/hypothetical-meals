@@ -20,6 +20,11 @@ describe('Ingredient', () => {
   });
 
   describe('#view()', () => {
+    beforeEach(() => {
+      alasql('SOURCE "./server/create_database.sql"');
+      alasql('SOURCE "./server/sample_data.sql"');
+    });
+
     it('should return all ingredients', (done) => {
       chai.request(server)
         .get('/ingredients/page/1')
@@ -28,6 +33,22 @@ describe('Ingredient', () => {
           res.should.have.status(200);
           res.body.should.be.a('array');
           res.body.length.should.be.eql(3);
+          done();
+        });
+    });
+
+    it('should only return one page of ingredients', (done) => {
+      for (let i = 0; i < 52; i++) {
+        alasql(`INSERT INTO Ingredients (name, storage_id) VALUES ('TEST', 1)`);
+      }
+
+      chai.request(server)
+        .get('/ingredients/page/1')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(50);
           done();
         });
     });

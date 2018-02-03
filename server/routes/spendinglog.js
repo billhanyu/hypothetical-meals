@@ -1,5 +1,5 @@
 import * as checkNumber from './common/checkNumber';
-import { getNumPages, queryWithPagination} from './common/pagination';
+import { getNumPages, queryWithPagination } from './common/pagination';
 
 const basicViewQueryString = 'SELECT SpendingLogs.*, Ingredients.name AS ingredient_name, Ingredients.storage_id AS ingredient_storage_id, Ingredients.removed AS ingredient_removed FROM SpendingLogs INNER JOIN Ingredients ON SpendingLogs.ingredient_id = Ingredients.id';
 

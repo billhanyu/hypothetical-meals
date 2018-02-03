@@ -2,7 +2,7 @@ import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import success from './common/success';
 import { fakeDeleteMultipleVendorIngredients } from './vendorIngredient';
-import { getNumPages, queryWithPagination} from './common/pagination';
+import { getNumPages, queryWithPagination } from './common/pagination';
 
 export function pages(req, res, next) {
   getNumPages('Vendors')

@@ -2,7 +2,7 @@ import * as checkNumber from './common/checkNumber';
 import * as packageCalc from './common/packageUtilies';
 import { updateLogForIngredient } from './spendinglog';
 import { createError } from './common/customError';
-import { getNumPages, queryWithPagination} from './common/pagination';
+import { getNumPages, queryWithPagination } from './common/pagination';
 
 const basicViewQueryString = 'SELECT Logs.*, Users.username as user_username FROM Logs INNER JOIN Users ON Logs.user_id = Users.id';
 
