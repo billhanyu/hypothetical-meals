@@ -193,6 +193,47 @@ describe('Inventory', () => {
         });
     });
 
+    it('should update spendinglog valid request', (done) => {
+      chai.request(server)
+        .put('/inventory')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .send({
+          'cart': {
+            '1': 1,
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const spending = alasql('SELECT * FROM SpendingLogs WHERE id = 1');
+          assert.strictEqual(spending[0].id, 1, 'spendinglog 1');
+          assert.strictEqual(spending[0].consumed, 550, 'spendinglog 1 consumed cost');
+          done();
+        });
+    });
+
+    it('should update spendinglog valid request multiple ingredients', (done) => {
+      alasql('INSERT INTO SpendingLogs (2, 2, 101000, 90000, 50)');
+      chai.request(server)
+        .put('/inventory')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .send({
+          'cart': {
+            '1': 1,
+            '2': 10,
+            '3': 1,
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const spending = alasql('SELECT * FROM SpendingLogs');
+          assert.strictEqual(spending[0].id, 1, 'spendinglog 1');
+          assert.strictEqual(spending[0].consumed, 550, 'spendinglog 1 consumed cost');
+          assert.strictEqual(spending[1].id, 2, 'spendinglog 2');
+          assert.strictEqual(spending[1].consumed, 45050, 'spendinglog 2 consumed cost');
+          done();
+        });
+    });
+
     it('should delete from inventory when quantity is zero', (done) => {
       chai.request(server)
         .put('/inventory')

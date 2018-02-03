@@ -3,6 +3,7 @@ import { createError, handleError } from './common/customError';
 import {getWeight, ignoreWeights} from './common/packageUtilies';
 import { getNumPages, queryWithPagination } from './common/pagination';
 import success from './common/success';
+import { updateConsumedSpendingLogForCart } from './spendinglog';
 
 const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
 
@@ -57,11 +58,16 @@ export function commitCart(req, res, next) {
     checkInputChanges(cart);
     checkChangesProperties(cart);
     const ids = Object.keys(cart);
-    connection.query(`SELECT id, num_packages FROM Inventories WHERE id IN (${ids.join(', ')})`)
+    let cartItems;
+    connection.query(`SELECT * FROM Inventories WHERE id IN (${ids.join(', ')})`)
       .then(results => {
         if (results.length < ids.length) {
           throw createError('Some inventory id not in database.');
         }
+        cartItems = results.map(a => Object.assign({}, a));
+        cartItems.forEach(item => {
+          item.num_packages = cart[item.id];
+        });
         for (let item of results) {
           const id = item.id;
           const newNum = item.num_packages - cart[id];
@@ -72,6 +78,7 @@ export function commitCart(req, res, next) {
         }
         return modifyInventoryQuantitiesPromise(cart);
       })
+      .then(() => updateConsumedSpendingLogForCart(cartItems))
       .then(() => success(res))
       .catch(err => {
         handleError(err, res);

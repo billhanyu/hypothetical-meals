@@ -84,8 +84,9 @@ CREATE TABLE Logs(
 CREATE TABLE SpendingLogs(
 	id int not null AUTO_INCREMENT,
 	ingredient_id int not null,
-	total double not null,
-	consumed double not null,
+	total_weight int not null DEFAULT 0,
+	total double not null DEFAULT 0,
+	consumed double not null DEFAULT 0,
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	PRIMARY KEY (id)
