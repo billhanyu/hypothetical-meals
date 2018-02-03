@@ -109,6 +109,17 @@ describe('Log', () => {
         assert.strictEqual(newLogs[3]['vendor_ingredient_id'], 2, 'Vendor id for log 4.');
         assert.strictEqual(newLogs[3]['quantity'], 500, 'Quantity for log 4.');
         assert.strictEqual(newLogs.length, 4, 'Length of logs.');
+
+        const newSpendingLogs = alasql('SELECT * FROM SpendingLogs');
+        assert.strictEqual(newSpendingLogs[0]['total'], 200, 'Total spent for ingredient 1.');
+        assert.strictEqual(newSpendingLogs[0]['total_weight'], 600, 'Total weight for ingredient 1.');
+        assert.strictEqual(newSpendingLogs[0]['ingredient_id'], 1, 'Ingredient id for spending log 1.');
+        assert.strictEqual(newSpendingLogs[0]['consumed'], 50, 'Quantity consumed for ingredient 1.');
+        assert.strictEqual(newSpendingLogs[1]['total'], 200, 'Total spent for ingredient 2.');
+        assert.strictEqual(newSpendingLogs[1]['total_weight'], 500, 'Total weight for ingredient 2.');
+        assert.strictEqual(newSpendingLogs[1]['ingredient_id'], 2, 'Vendor id for log 4.');
+        assert.strictEqual(newSpendingLogs[1]['consumed'], 0, 'Quantity consumed for ingredient 2.');
+        assert.strictEqual(newSpendingLogs.length, 2, 'Length of spending logs.');
       });
     });
   });
