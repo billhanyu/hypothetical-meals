@@ -65,15 +65,9 @@ export function updateLogForIngredient(req) {
         newUpdate.push(`(${newIngredientIds[i]}, ${newIngredientTotals[i]}, ${newIngredientWeights[i]}, ${newConsumed[i]})`);
       }
       connection.query(`INSERT INTO SpendingLogs (ingredient_id, total, total_weight, consumed) VALUES ${newUpdate.join(', ')}`)
-      .then(() => {
-        return connection.query(`UPDATE SpendingLogs 
-        SET total = (case ${updateTotalCostCases.join(' ')} end),
-            total_weight = (case ${updateTotalWeightCases.join(' ')} end)
-        WHERE id IN (${toUpdate['ids'].join(', ')})`);
-      })
-      .catch(err => {
-        throw err;
-      });
+      connection.query(`UPDATE SpendingLogs 
+      SET total = (case ${updateTotalCostCases.join(' ')} end), total_weight = (case ${updateTotalWeightCases.join(' ')} end)
+      WHERE id IN (${toUpdate['ids'].join(', ')})`);
     })
     .catch(err => {
       throw err;
