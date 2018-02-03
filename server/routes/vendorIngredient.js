@@ -32,7 +32,7 @@ export function getVendorsForIngredient(req, res, next) {
   if (!checkNumber.isPositiveInteger(ingredientId)) {
     res.status(400).send('Invalid Ingredient Id');
   }
-  connection.query(`${basicViewQueryString} WHERE ingredient_id = ${ingredientId} AND removed = 0`)
+  connection.query(`${basicViewQueryString} WHERE ingredient_id = ${ingredientId} AND VendorsIngredients.removed = 0`)
     .then(results => res.status(200).send(results))
     .catch(err => handleError(err, res));
 }
