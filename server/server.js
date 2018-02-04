@@ -79,6 +79,7 @@ app.post('/vendors', beAdmin, vendor.addVendors);
 app.put('/vendors', beAdmin, vendor.modifyVendors);
 app.delete('/vendors', beAdmin, vendor.deleteVendors);
 
+app.get('/ingredients-available', beNoob, ingredient.allAvailable);
 app.get('/ingredients/pages', beNoob, ingredient.pages);
 app.get('/ingredients/page/:page_num', beNoob, ingredient.view);
 app.get('/ingredients-available/page/:page_num', beNoob, ingredient.viewAvailable);
@@ -107,6 +108,7 @@ app.get('/spendinglogs/pages', beNoob, spendinglog.pages);
 app.get('/spendinglogs/page/:page_num', beNoob, spendinglog.view);
 app.get('/spendinglogs/:ingredient_id', beNoob, spendinglog.logsForIngredient);
 
+app.get('/inventory', beNoob, inventory.all);
 app.get('/inventory/pages', beNoob, inventory.pages);
 app.get('/inventory/page/:page_num', beNoob, inventory.view);
 app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);

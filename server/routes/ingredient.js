@@ -7,6 +7,12 @@ const fs = require('fs');
 
 const basicViewQueryString = 'SELECT Ingredients.*, Storages.name as storage_name, Storages.capacity as storage_capacity FROM Ingredients INNER JOIN Storages ON Storages.id = Ingredients.storage_id';
 
+export function allAvailable(req, res, next) {
+  connection.query(`${basicViewQueryString} WHERE removed = 0`)
+    .then(results => res.status(200).send(results))
+    .catch(err => handleError(err, res));
+}
+
 export function pages(req, res, next) {
   getNumPages('Ingredients')
     .then(results => res.status(200).send(results))
