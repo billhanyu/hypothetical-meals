@@ -32,7 +32,7 @@ describe('Ingredient', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(3);
+          res.body.length.should.be.eql(4);
           done();
         });
     });
@@ -63,7 +63,7 @@ describe('Ingredient', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(2);
+          res.body.length.should.be.eql(3);
           done();
         });
     });
@@ -105,10 +105,10 @@ describe('Ingredient', () => {
       .end((err, res) => {
         res.should.have.status(200);
         const changed = alasql('SELECT * FROM Ingredients');
-        assert.strictEqual(changed[3]['name'], 'flour', 'Name for ingredient 4.');
-        assert.strictEqual(changed[3]['storage_id'], 1, 'Storage id for ingredient 4.');
-        assert.strictEqual(changed[4]['name'], 'rice', 'Name for ingredient 5.');
-        assert.strictEqual(changed[4]['storage_id'], 1, 'Storage id for ingredient 5.');
+        assert.strictEqual(changed[4]['name'], 'flour', 'Name for ingredient 4.');
+        assert.strictEqual(changed[4]['storage_id'], 1, 'Storage id for ingredient 4.');
+        assert.strictEqual(changed[5]['name'], 'rice', 'Name for ingredient 5.');
+        assert.strictEqual(changed[5]['storage_id'], 1, 'Storage id for ingredient 5.');
         done();
       });
     });
@@ -285,7 +285,7 @@ describe('Ingredient', () => {
       .end((err, res) => {
         res.should.have.status(200);
         const left = alasql('SELECT * FROM Ingredients');
-        assert.strictEqual(left.length, 3, 'Rows in Ingredients table still the same.');
+        assert.strictEqual(left.length, 4, 'Rows in Ingredients table still the same.');
         assert.strictEqual(left[0]['removed'], 1, 'ingredient 1 fake deleted');
         assert.strictEqual(left[1]['removed'], 1, 'ingredient 2 fake deleted');
         assert.strictEqual(left[2]['removed'], 0, 'ingredient 3 not fake deleted');
@@ -303,7 +303,7 @@ describe('Ingredient', () => {
         .end((err, res) => {
           res.should.have.status(200);
           const left = alasql('SELECT * FROM Ingredients');
-          assert.strictEqual(left.length, 3, 'Rows in Ingredients table still the same.');
+          assert.strictEqual(left.length, 4, 'Rows in Ingredients table still the same.');
           assert.strictEqual(left[0]['removed'], 1, 'ingredient 1 fake deleted');
           assert.strictEqual(left[1]['removed'], 0, 'ingredient 2 not fake deleted');
           assert.strictEqual(left[2]['removed'], 0, 'ingredient 3 not fake deleted');
