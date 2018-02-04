@@ -27,6 +27,7 @@ function orderHelper(orders, req, res, next) {
     let ingredientIds = [];
     let requestedCapacities = {};
     let newIngredientCases = [];
+    let ingredientsMap = {};
 
     connection.query(`SELECT VendorsIngredients.id, VendorsIngredients.ingredient_id, VendorsIngredients.package_type, Ingredients.storage_id 
     FROM VendorsIngredients JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id WHERE VendorsIngredients.id IN (${Object.keys(orders).join(', ')})`)
@@ -35,7 +36,6 @@ function orderHelper(orders, req, res, next) {
             throw createError('Some id not in Vendor Ingredients');
         }
         ingredientIds = results.map(x => x.ingredient_id);
-        let ingredientsMap = {};
         for (let result of results) {
             ingredientsMap[result['ingredient_id']] = {
                 'package_type': result['package_type'],
@@ -54,22 +54,23 @@ function orderHelper(orders, req, res, next) {
         for (let ingredientId of ingredientIds) {
             if (!(ingredientId in updateIngredients)) {
                 newIngredientCases.push(`(${ingredientId}, ${ingredientsMap[ingredientId]['package_type']}, ${ingredientsMap[ingredientId]['quantity']})`);
-                requestedCapacities[ingredientsMap[ingredientId]['storage_id']] += ingredientsMap[ingredientId]['quantity'] * getWeight(ingredientsMap[ingredientId]['package_type']);
+                let itemPackage = ingredientsMap[ingredientId]['package_type'];
+                if (ignoreWeights.indexOf(itemPackage) < 0) {
+                    requestedCapacities[ingredientsMap[ingredientId]['storage_id']] += ingredientsMap[ingredientId]['quantity'] * getWeight(itemPackage);
+                }
             }
         }
         if (Object.keys(updateIngredients).length > 0) {
             return modifyInventoryQuantitiesPromise(updateIngredients);
-        } else {
-            throw createError('TODO');
         }
+        return;
     })
     .then(() => checkStoragePromise(requestedCapacities))
     .then(() => {
         if (newIngredientCases.length > 0) {
             return connection.query(`INSERT INTO Inventories (ingredient_id, package_type, quantity) VALUES ${newIngredientCases.join(' ')}`);
-        } else {
-            throw createError('TODO');
         }
+        return;
     })
     .then(() => {
         let logReq = Object.values(ingredientsMap);
