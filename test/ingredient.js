@@ -150,8 +150,12 @@ describe('Ingredient', () => {
       .set('Authorization', `Token ${testTokens.adminTestToken}`)
       .send({
         'ingredients': {
-          '1': '2',
-          '3': '2',
+          '1': {
+            'storage_id': '2',
+          },
+          '3': {
+            'storage_id': '2',
+          },
         },
       })
       .end((err, res) => {
@@ -165,14 +169,70 @@ describe('Ingredient', () => {
       });
     });
 
+    it('should modify the name or storage id of the ingredient', (done) => {
+      chai.request(server)
+      .put('/ingredients')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .send({
+        'ingredients': {
+          '1': {
+            'name': 'meow',
+          },
+          '3': {
+            'storage_id': '2',
+          },
+        },
+      })
+      .end((err, res) => {
+        res.should.have.status(200);
+        const changed = alasql('SELECT * FROM Ingredients');
+        assert.strictEqual(changed[0]['name'], 'meow', 'Name for ingredient 1.');
+        assert.strictEqual(changed[0]['storage_id'], 1, 'Storage id for ingredient 1.');
+        assert.strictEqual(changed[2]['name'], 'boop', 'Name for ingredient 3.');
+        assert.strictEqual(changed[2]['storage_id'], 2, 'Storage id for ingredient 3.');
+        done();
+      });
+    });
+
+    it('should modify the storage id and name of the ingredient', (done) => {
+      chai.request(server)
+      .put('/ingredients')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .send({
+        'ingredients': {
+          '1': {
+            'storage_id': '2',
+            'name': 'meow',
+          },
+          '3': {
+            'name': 'pleb',
+            'storage_id': '2',
+          },
+        },
+      })
+      .end((err, res) => {
+        res.should.have.status(200);
+        const changed = alasql('SELECT * FROM Ingredients');
+        assert.strictEqual(changed[0]['name'], 'meow', 'Name for ingredient 1.');
+        assert.strictEqual(changed[0]['storage_id'], 2, 'Storage id for ingredient 1.');
+        assert.strictEqual(changed[2]['name'], 'pleb', 'Name for ingredient 3.');
+        assert.strictEqual(changed[2]['storage_id'], 2, 'Storage id for ingredient 3.');
+        done();
+      });
+    });
+
     it('should decline if invalid storage id', (done) => {
       chai.request(server)
         .put('/ingredients')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'ingredients': {
-            '3': '2',
-            '1': '928',
+            '3': {
+              'storage_id': '2',
+            },
+            '1': {
+              'storage_id': '928',
+            },
           },
         })
         .end((err, res) => {
