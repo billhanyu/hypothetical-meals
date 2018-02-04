@@ -1,7 +1,7 @@
 import { modifyInventoryQuantitiesPromise } from './inventory';
 import { addEntry } from './log';
 import { createError, handleError } from './common/customError';
-import { getWeight } from './common/packageUtilies';
+import { getWeight, ignoreWeights } from './common/packageUtilies';
 import { checkStoragePromise } from './common/storageUtilities';
 import success from './common/success';
 
@@ -44,19 +44,23 @@ function orderHelper(orders, req, res, next) {
                 'vendor_ingredient_id': result['id'],
             };
         }
-        return connection.query(`SELECT id, ingredient_id FROM Inventories WHERE ingredient_id IN (${ingredientIds.join(', ')})`);
+        return connection.query(`SELECT * FROM Inventories WHERE ingredient_id IN (${ingredientIds.join(', ')})`);
     })
     .then((inventoryResults) => {
         let updateIngredients = {};
         inventoryResults.forEach(x => {
-            updateIngredients[x.id] = orders[x.ingredient_id];
+            updateIngredients[x.id] = orders[x.ingredient_id] + x.num_packages;
         });
         for (let ingredientId of ingredientIds) {
             if (!(ingredientId in updateIngredients)) {
-                newIngredientCases.push(`(${ingredientId}, ${ingredientsMap[ingredientId]['package_type']}, ${ingredientsMap[ingredientId]['quantity']})`);
+                const storageKey = ingredientsMap[ingredientId]['storage_id'];
+                newIngredientCases.push(`(${ingredientId}, '${ingredientsMap[ingredientId]['package_type']}', ${ingredientsMap[ingredientId]['quantity']})`);
                 let itemPackage = ingredientsMap[ingredientId]['package_type'];
                 if (ignoreWeights.indexOf(itemPackage) < 0) {
-                    requestedCapacities[ingredientsMap[ingredientId]['storage_id']] += ingredientsMap[ingredientId]['quantity'] * getWeight(itemPackage);
+                    if (!(storageKey in requestedCapacities)) {
+                        requestedCapacities[storageKey] = 0;
+                    }
+                    requestedCapacities[storageKey] += ingredientsMap[ingredientId]['quantity'] * getWeight(itemPackage);
                 }
             }
         }
@@ -68,7 +72,7 @@ function orderHelper(orders, req, res, next) {
     .then(() => checkStoragePromise(requestedCapacities))
     .then(() => {
         if (newIngredientCases.length > 0) {
-            return connection.query(`INSERT INTO Inventories (ingredient_id, package_type, quantity) VALUES ${newIngredientCases.join(' ')}`);
+            return connection.query(`INSERT INTO Inventories (ingredient_id, package_type, num_packages) VALUES ${newIngredientCases.join(' ')}`);
         }
         return;
     })
@@ -80,7 +84,6 @@ function orderHelper(orders, req, res, next) {
         success(res);
     })
     .catch((err) => {
-        console.log(err);
         handleError(err, res);
     });
 }

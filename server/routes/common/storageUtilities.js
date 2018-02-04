@@ -8,7 +8,7 @@ import { createError } from './customError';
 * Quantities do not include ignored storage quantities (railcar etc.). Quantities in pounds.
 */
 export function checkStoragePromise(req) {
-  console.log(req);
+  // console.log(req);
   return new Promise((resolve, reject) => {
     if (Object.keys(req) < 1) {
       resolve();
@@ -42,7 +42,6 @@ export function checkStoragePromise(req) {
                 remainingCapacity[storage] = capacities[storage];
             }
         }
-        console.log(remainingCapacity);
         return remainingCapacity;
       })
       .then((capacities) => {
