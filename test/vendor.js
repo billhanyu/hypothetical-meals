@@ -3,15 +3,45 @@ const alasql = require('alasql');
 const assert = require('chai').assert;
 
 describe('Vendor', () => {
+  describe('#pages()', () => {
+    it('should return number of pages of data', (done) => {
+      chai.request(server)
+        .get('/vendors/pages')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          assert.strictEqual(res.body['numPages'], 1, 'number of pages');
+          done();
+        });
+    });
+  });
+
   describe('#view()', () => {
     it('should return all vendors', (done) => {
       chai.request(server)
-        .get('/vendors')
+        .get('/vendors/page/1')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
           res.body.length.should.be.eql(2);
+          done();
+        });
+    });
+  });
+
+  describe('#viewAvailable()', () => {
+    it('should return all vendors available', (done) => {
+      alasql('UPDATE Vendors SET removed = 1 WHERE id = 1');
+      chai.request(server)
+        .get('/vendors-available/page/1')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(1);
+          assert.strictEqual(res.body[0].id, 2, 'returned vendor id should be 2');
           done();
         });
     });
@@ -368,8 +398,47 @@ describe('Vendor', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const left = alasql('SELECT id FROM Vendors');
-          assert.strictEqual(left.length, 0, 'no vendor left');
+          const left = alasql('SELECT removed FROM Vendors');
+          assert.strictEqual(left[0].removed, 1, 'vendor 1 deleted');
+          assert.strictEqual(left[1].removed, 1, 'vendor 2 deleted');
+          done();
+        });
+    });
+
+    it('should delete corresponding vendoringredient', (done) => {
+      chai.request(server)
+        .delete('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'ids': [
+            1,
+          ],
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const left = alasql('SELECT removed FROM VendorsIngredients');
+          assert.strictEqual(left[0].removed, 1, 'vendoringredient 1 deleted');
+          assert.strictEqual(left[1].removed, 1, 'vendoringredient 2 deleted');
+          assert.strictEqual(left[2].removed, 1, 'vendoringredient 3 deleted');
+          done();
+        });
+    });
+
+    it('should work for vendors without vendoringredients', (done) => {
+      chai.request(server)
+        .delete('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'ids': [
+            2,
+          ],
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const left = alasql('SELECT removed FROM VendorsIngredients');
+          assert.strictEqual(left[0].removed, 0, 'vendoringredient 1 still there');
+          assert.strictEqual(left[1].removed, 0, 'vendoringredient 2 still there');
+          assert.strictEqual(left[2].removed, 0, 'vendoringredient 2 still there');
           done();
         });
     });

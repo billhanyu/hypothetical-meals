@@ -23,6 +23,7 @@ CREATE TABLE Vendors(
 	name varchar(70) not null UNIQUE,
 	contact varchar(255) not null,
 	code varchar(255) not null UNIQUE,
+	removed BIT DEFAULT 0,
 
 	PRIMARY KEY (id)
 );
@@ -39,6 +40,7 @@ CREATE TABLE Ingredients(
 	id int not null AUTO_INCREMENT,
 	name varchar(70) not null,
 	storage_id int not null,
+	removed BIT DEFAULT 0,
 
 	FOREIGN KEY (storage_id) REFERENCES Storages(id),
 	PRIMARY KEY (id)
@@ -50,6 +52,7 @@ CREATE TABLE VendorsIngredients(
 	package_type enum('sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar') not null,
 	price double not null,
 	vendor_id int not null,
+	removed BIT DEFAULT 0,
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	FOREIGN KEY (vendor_id) REFERENCES Vendors(id),
@@ -59,8 +62,8 @@ CREATE TABLE VendorsIngredients(
 CREATE TABLE Inventories(
 	id int not null AUTO_INCREMENT,
 	ingredient_id int not null,
-	storage_weight int not null,
-	total_weight int not null,
+	package_type enum('sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar') not null,
+	num_packages int not null default 0,
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	PRIMARY KEY (id)
@@ -81,8 +84,9 @@ CREATE TABLE Logs(
 CREATE TABLE SpendingLogs(
 	id int not null AUTO_INCREMENT,
 	ingredient_id int not null,
-	total double not null,
-	consumed double not null,
+	total_weight int not null DEFAULT 0,
+	total double not null DEFAULT 0,
+	consumed double not null DEFAULT 0,
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	PRIMARY KEY (id)

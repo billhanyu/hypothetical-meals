@@ -4,11 +4,14 @@
   margin-top: 48px;
   margin-bottom: 40px;
   padding-bottom: 40px;
+  height: 150px;
+  min-width: 800px;
 }
 
 .AdminButton {
   width: 250px;
   min-width: 250px;
+  margin-top: 12px;
   height: 40px;
   border: 1px solid grey;
   border-radius: 6px;

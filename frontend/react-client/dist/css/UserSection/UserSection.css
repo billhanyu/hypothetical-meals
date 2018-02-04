@@ -1,11 +1,24 @@
 .orderitem {
   margin: 10px auto;
+  width: 80%;
+}
+
+.OrderColumn {
+  width: 27.6%;
+  margin: 0 2%;
+}
+
+.OrderColumnHeader {
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  display: inline-block;
 }
 
 .orderitem > .inputitem {
   height: 40px;
-  margin: 0 2%;
-  width: 29%;
+  padding: 0 10px;
 }
 
 .orderitem > input {
@@ -14,22 +27,11 @@
 }
 
 .OrderButtons {
-  width: 99%;
   margin: 20px auto;
 }
 
 .OrderButton {
   float: right;
-}
-
-.OrderColumn {
-  width: 29%;
-  margin: 0 2%;
-  margin-bottom: 15px;
-  text-align: center;
-  font-size: 16px;
-  float: left;
-  font-weight: 500;
 }
 
 .InventoryHead {
@@ -44,8 +46,16 @@
   margin: 5px 0;
 }
 
+.InventoryRowCart {
+  cursor: pointer;
+}
+
+.InventoryRowCart:hover {
+  background-color: #BCC9D0;
+}
+
 .InventoryColumn {
-  width: 29%;
+  width: 21%;
   margin: 10px 2%;
   font-size: 14px;
   float: left;
@@ -56,4 +66,136 @@
 .InventoryHead > .InventoryColumn {
   font-size: 16px;
   font-weight: 500;
+}
+
+.FilterItem {
+  height: 35px;
+  margin: 0 20px;
+  width: 20%;
+}
+
+.FilterBar {
+  margin-bottom: 30px;
+}
+
+.InventoryCart {
+  position: fixed;
+  bottom: -450px;
+  right: 0px;
+  height: 500px;
+  width: 400px;
+  border: 1px solid black;
+}
+
+.CartHeader {
+  height: 50px;
+  background-color: rgb(39, 126, 255);
+  cursor: pointer;
+}
+
+.CartBody {
+  height: 400px;
+  background-color: rgba(255, 255, 255, 0.9);
+  overflow-y: scroll;
+}
+
+.CartOrder {
+  height: 50px;
+  cursor: pointer;
+}
+
+.CartOrderText {
+  text-align: center;
+  margin: 17px auto;
+  font-size: 16px;
+  font-weight: 600;
+  width: 99%;
+  display: inline-block;
+}
+
+.CartHeaderText {
+  text-align: center;
+  margin: 17px auto;
+  font-size: 16px;
+  font-weight: 600;
+  width: 99%;
+  display: inline-block;
+}
+
+.CartItem {
+  font-size: 15px;
+  padding: 15px 2%;
+}
+
+.CartItemColumn {
+  width: 33%;
+  text-align: center;
+  display: inline-block;
+}
+
+.CartQuantityColumn {
+  width: 25%;
+  text-align: center;
+  display: inline-block;
+}
+
+.CartDeleteColumn {
+  width: 8%;
+}
+
+.CartItemColumnHeader {
+  font-weight: 500;
+}
+
+.Overflow {
+  color: red;
+}
+
+.DeleteCartItem {
+  left: 5px;
+  top: 2px;
+  cursor: pointer;
+}
+
+.DeleteCartItem:hover {
+  color: red;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #2e6da4;
+}
+
+.btn {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.DeleteOrderColumn {
+  width: 2%;
+  display: inline-block;
+}
+
+.DeleteOrderItem {
+  cursor: pointer;
+}
+
+.DeleteOrderItem:hover {
+  color: red;
 }

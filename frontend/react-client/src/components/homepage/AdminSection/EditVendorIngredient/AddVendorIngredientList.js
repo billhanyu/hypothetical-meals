@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import VendorIngredientListItem from './VendorIngredientListItem.js';
+import AddVendorListItem from './AddVendorListItem.js';
 import RegistrationHeader from './../../../Registration/RegistrationHeader.js';
 import axios from 'axios';
 import AddVendorIngredient from './AddVendorIngredient.js';
@@ -21,7 +21,7 @@ class AddVendorIngredientList extends Component {
 
   componentDidMount() {
     const self = this;
-    axios.get("/ingredients", {
+    axios.get("/ingredients/page/1", {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(function (response) {
@@ -48,7 +48,7 @@ class AddVendorIngredientList extends Component {
         <RegistrationHeader HeaderText="Add Vendor Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>
         {
           this.state.ingredients.map((element, key) => {
-            return <VendorIngredientListItem onClick={this.clickedIngredient} key={key} id={element.id} name={element.name}/>
+            return <AddVendorListItem onClick={this.clickedIngredient} key={key} id={element.id} name={element.name}/>
           })
         }
       </div>

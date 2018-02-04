@@ -1,13 +1,35 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import success from './common/success';
+import { fakeDeleteMultipleVendorIngredients } from './vendorIngredient';
+import { getNumPages, queryWithPagination } from './common/pagination';
 const fs = require('fs');
 
-export function view(req, res, next) {
-  connection.query('SELECT * FROM Ingredients')
+const basicViewQueryString = 'SELECT Ingredients.*, Storages.name as storage_name, Storages.capacity as storage_capacity FROM Ingredients INNER JOIN Storages ON Storages.id = Ingredients.storage_id';
+
+export function pages(req, res, next) {
+  getNumPages('Ingredients')
     .then(results => res.status(200).send(results))
     .catch(err => {
-      console.error(error);
+      console.error(err);
+      return res.status(500).send('Database error');
+    });
+}
+
+export function view(req, res, next) {
+  queryWithPagination(req.params.page_num, 'Ingredients', basicViewQueryString)
+    .then(results => res.status(200).send(results))
+    .catch(err => {
+      console.error(err);
+      return res.status(500).send('Database error');
+    });
+}
+
+export function viewAvailable(req, res, next) {
+  queryWithPagination(req.params.page_num, 'Ingredients', `${basicViewQueryString} WHERE removed = 0`)
+    .then(results => res.status(200).send(results))
+    .catch(err => {
+      console.error(err);
       return res.status(500).send('Database error');
     });
 }
@@ -110,7 +132,12 @@ function deleteIngredientHelper(items, req, res, next) {
       throw createError('Deleting nonexistent ingredient.');
     }
   })
-  .then(() => connection.query(`DELETE FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`))
+  .then(() => connection.query(`UPDATE Ingredients SET removed = 1 WHERE id IN (${ingredientIds.join(', ')})`))
+  .then(() => connection.query(`SELECT id FROM VendorsIngredients WHERE ingredient_id IN (${ingredientIds.join(', ')})`))
+  .then(results => {
+    const vendorsIngredientsIds = results.map(e => e.id);
+    return fakeDeleteMultipleVendorIngredients(vendorsIngredientsIds);
+  })
   .then(() => success(res))
   .catch(err => handleError(err, res));
 }
