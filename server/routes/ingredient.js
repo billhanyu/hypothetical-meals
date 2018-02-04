@@ -63,10 +63,15 @@ function addIngredientHelper(ingredients, req, res, next) {
 /* request body format:
  * request.body.ingredients =
  *   {
- *     'ingredient_id1': storage_id_change1,
- *     'ingredient_id2': storage_id_change2,
+ *     'ingredient_id1': {
+ *        'name': 'name_change1',
+ *        'storage_id': 'storage_id_change1',
+ *      },
+ *     'ingredient_id2': {
+ *        'storage_id': storage_id_change2,
+ *      },
  *   }, ...
- * This changes the storage_id of the ingredient.
+ * This can change the storage id or name of the ingredient.
  */
 export function modifyIngredient(req, res, next) {
   modifyIngredientHelper(req.body.ingredients, req, res, next);
@@ -77,25 +82,37 @@ function modifyIngredientHelper(items, req, res, next) {
     return res.status(400).send('Invalid input reqest, see doc.');
   }
   const ingredientIds = [];
-  const storageCases = [];
   for (const idString in items) {
     if (!checkNumber.isPositiveInteger(idString)) {
       return res.status(400).send(`Ingredient ID ${idString} is invalid.`);
     }
-    const storageId = items[idString];
+    const storageId = items[idString]['storage_id'] || 0;
     if (!checkNumber.isNonNegativeInteger(storageId) || storageId > 2) {
       return res.status(400).send(`New storage id ${storageId} is invalid`);
     }
     ingredientIds.push(idString);
-    storageCases.push(`when id = ${idString} then ${storageId}`);
   }
-
-  connection.query(`SELECT id, storage_id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
+  
+  const nameCases = [];
+  const storageCases = [];
+  connection.query(`SELECT id, name, storage_id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
   .then(results => {
     if (results.length < ingredientIds.length) {
-      throw createError('Changing storage id of invalid ingredient.');
+      throw createError('Changing storage id or name of invalid ingredient.');
     }
-    return connection.query(`UPDATE Ingredients SET storage_id = (case ${storageCases.join(' ')} end) WHERE id IN (${ingredientIds.join(', ')})`);
+    for (let ingredient of results) {
+      const oldName = ingredient['name'];
+      const newName = items[ingredient.id]['name'];
+      const oldStorage = ingredient['storage_id'];
+      const newStorage = items[ingredient.id]['storage_id'];
+      nameCases.push(`when id = ${ingredient.id} then '${newName || oldName}'`);
+      storageCases.push(`when id = ${ingredient.id} then ${newStorage || oldStorage}`);
+    }
+    return connection.query(
+      `UPDATE Ingredients 
+        SET storage_id = (case ${storageCases.join(' ')} end),
+            name = (case ${nameCases.join(' ')} end)
+        WHERE id IN (${ingredientIds.join(', ')})`);
   })
   .then(() => success(res))
   .catch(err => handleError(err, res));
