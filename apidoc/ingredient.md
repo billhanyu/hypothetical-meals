@@ -61,13 +61,18 @@ request.body.ingredients = [
 {% method %}
 ## PUT '/ingredients'
 
-Modify ingredients.
+Modify ingredients to change either the name or storage id.
 
 {% sample lang="js" %}
 ```js
 request.body.ingredients = {
-  'ingredient_id1': storage_id_change1,
-  'ingredient_id2': storage_id_change2,
+  'ingredient_id1': {
+    'storage_id': storage_id_change1,
+    'name': 'name_change1',
+  },
+  'ingredient_id2': {
+    'storage_id': storage_id_change2,
+  },
 }
 ```
 {% endmethod %}
