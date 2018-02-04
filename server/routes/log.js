@@ -2,12 +2,24 @@ import * as checkNumber from './common/checkNumber';
 import * as packageCalc from './common/packageUtilies';
 import { updateLogForIngredient } from './spendinglog';
 import { createError } from './common/customError';
+import { getNumPages, queryWithPagination } from './common/pagination';
 
-export function view(req, res, next) {
-  connection.query('SELECT * FROM Logs')
+const basicViewQueryString = 'SELECT Logs.*, Users.username as user_username FROM Logs INNER JOIN Users ON Logs.user_id = Users.id';
+
+export function pages(req, res, next) {
+  getNumPages('Logs')
     .then(results => res.status(200).send(results))
     .catch(err => {
-      console.error(error);
+      console.error(err);
+      return res.status(500).send('Database error');
+    });
+}
+
+export function view(req, res, next) {
+  queryWithPagination(req.params.page_num, 'Logs', basicViewQueryString)
+    .then(results => res.status(200).send(results))
+    .catch(err => {
+      console.error(err);
       return res.status(500).send('Database error');
     });
 }
@@ -30,11 +42,17 @@ export function viewLogForIngredient(req, res, next) {
     }
     vendorIngredientIds.push(idString);
   }
-  connection.query(`SELECT * FROM Logs WHERE vendor_ingredient_id IN (${vendorIngredientIds.join(', ')})`)
+  queryWithPagination(req.params.page_num, 'Logs', `${basicViewQueryString} WHERE vendor_ingredient_id IN (${vendorIngredientIds.join(', ')})`)
   .then(results => res.status(200).send(results))
   .catch(err => {
+<<<<<<< HEAD
       handleError(err, res);
   });
+=======
+      console.error(err);
+      return res.status(500).send('Database error');
+    });
+>>>>>>> master
 }
 
 /* Request body format:

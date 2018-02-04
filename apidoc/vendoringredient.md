@@ -1,12 +1,36 @@
 # VendorIngredients API
-## GET '/vendoringredients'
+
+{% method %}
+## GET '/vendoringredients/pages' {#pages}
+
+Get the number of pages in the `VendorsIngredients` table, requires no parameter input. Default 50 ids per page in numerical order (page 2 = id range 51 to 100).
+
+Return parameters:
+{numPages: 5}
+
+{% endmethod %}
+
+{% method %}
+## GET '/vendoringredients/page/:page_num'
 
 Get all vendorsingredients.
 
 No parameter required.
+
+Return parameters:
+All columns in VendorsIngredients table AND
+- Vendors.name as vendor_name
+- Vendors.contact as vendor_contact
+- Vendors.code as vendor_code
+- Vendors.removed as vendor_removed
+- Ingredients.name as ingredient_name
+- Ingredients.storage_id as ingredient_storage_id
+- Ingredients.removed as ingredient_removed
+
 {% endmethod %}
 
-## GET '/vendoringredients-available'
+{% method %}
+## GET '/vendoringredients-available/page/:page_num'
 
 Get all available vendorsingredients (removed = 0).
 

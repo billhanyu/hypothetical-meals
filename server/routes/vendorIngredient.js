@@ -1,16 +1,28 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
+import { getNumPages, queryWithPagination } from './common/pagination';
 import success from './common/success';
 const ALL_PACKAGE_TYPES = ['sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar'];
 
+const basicViewQueryString = 'SELECT VendorsIngredients.*, Vendors.name as vendor_name, Vendors.contact as vendor_contact, Vendors.code as vendor_code, Vendors.removed as vendor_removed, Ingredients.name as ingredient_name, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM ((VendorsIngredients INNER JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id) INNER JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id)';
+
+export function pages(req, res, next) {
+  getNumPages('VendorsIngredients')
+    .then(results => res.status(200).send(results))
+    .catch(err => {
+      console.error(err);
+      return res.status(500).send('Database error');
+    });
+}
+
 export function view(req, res, next) {
-  connection.query(`SELECT * from VendorsIngredients`)
+  queryWithPagination(req.params.page_num, 'VendorsIngredients', basicViewQueryString)
     .then(results => res.status(200).send(results))
     .catch(err => handleError(err, res));
 }
 
 export function viewAvailable(req, res, next) {
-  connection.query(`SELECT * from VendorsIngredients WHERE removed = 0`)
+  queryWithPagination(req.params.page_num, 'VendorsIngredients', `${basicViewQueryString} WHERE VendorsIngredients.removed = 0`)
     .then(results => res.status(200).send(results))
     .catch(err => handleError(err, res));
 }
@@ -20,7 +32,7 @@ export function getVendorsForIngredient(req, res, next) {
   if (!checkNumber.isPositiveInteger(ingredientId)) {
     res.status(400).send('Invalid Ingredient Id');
   }
-  connection.query(`SELECT * from VendorsIngredients WHERE ingredient_id = ${ingredientId} AND removed = 0`)
+  connection.query(`${basicViewQueryString} WHERE ingredient_id = ${ingredientId} AND VendorsIngredients.removed = 0`)
     .then(results => res.status(200).send(results))
     .catch(err => handleError(err, res));
 }

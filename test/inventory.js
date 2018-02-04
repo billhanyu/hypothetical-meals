@@ -3,10 +3,24 @@ const assert = require('chai').assert;
 const testTokens = require('./testTokens');
 
 describe('Inventory', () => {
+  describe('#pages()', () => {
+    it('should return number of pages of data', (done) => {
+      chai.request(server)
+        .get('/inventory/pages')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          assert.strictEqual(res.body['numPages'], 1, 'number of pages');
+          done();
+        });
+    });
+  });
+
   describe('#view()', () => {
     it('should return inventory items', (done) => {
       chai.request(server)
-        .get('/inventory')
+        .get('/inventory/page/1')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
@@ -175,6 +189,47 @@ describe('Inventory', () => {
           assert.strictEqual(changed[0].num_packages, 9, 'Inventory item 1 new number of packages.');
           assert.strictEqual(changed[1].id, 2, 'Inventory item 2 left.');
           assert.strictEqual(changed[1].num_packages, 19, 'Inventory item 2 new number of packages.');
+          done();
+        });
+    });
+
+    it('should update spendinglog valid request', (done) => {
+      chai.request(server)
+        .put('/inventory')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .send({
+          'cart': {
+            '1': 1,
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const spending = alasql('SELECT * FROM SpendingLogs WHERE id = 1');
+          assert.strictEqual(spending[0].id, 1, 'spendinglog 1');
+          assert.strictEqual(spending[0].consumed, 550, 'spendinglog 1 consumed cost');
+          done();
+        });
+    });
+
+    it('should update spendinglog valid request multiple ingredients', (done) => {
+      alasql('INSERT INTO SpendingLogs (2, 2, 101000, 90000, 50)');
+      chai.request(server)
+        .put('/inventory')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .send({
+          'cart': {
+            '1': 1,
+            '2': 10,
+            '3': 1,
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const spending = alasql('SELECT * FROM SpendingLogs');
+          assert.strictEqual(spending[0].id, 1, 'spendinglog 1');
+          assert.strictEqual(spending[0].consumed, 550, 'spendinglog 1 consumed cost');
+          assert.strictEqual(spending[1].id, 2, 'spendinglog 2');
+          assert.strictEqual(spending[1].consumed, 45050, 'spendinglog 2 consumed cost');
           done();
         });
     });
