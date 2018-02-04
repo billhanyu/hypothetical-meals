@@ -17,6 +17,20 @@ describe('Inventory', () => {
     });
   });
 
+  describe('#all()', () => {
+    it('should return inventory items', (done) => {
+      chai.request(server)
+        .get('/inventory')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(3);
+          done();
+        });
+    });
+  });
+
   describe('#view()', () => {
     it('should return inventory items', (done) => {
       chai.request(server)
