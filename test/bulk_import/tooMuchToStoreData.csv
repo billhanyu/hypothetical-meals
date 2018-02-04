@@ -1,0 +1,7 @@
+INGREDIENT,PACKAGE,AMOUNT (LBS),PRICE PER PACKAGE,VENDOR FREIGHT CODE,TEMPERATURE
+"Carrots, pail",pail,89,20.15,code_duke,room temperature
+"Carrots, pail",pail,45,16.89,code_duke,room temperature
+Carrots - railcar,railcar,24690,4000,code_duke,room temperature
+Apples - supersack,supersack,60,69.32,code_duke,frozen
+Potatoes - drum,drum,129,32.1,code_duke,refrigerated
+"Potatoes, sack",sack,55,6.01,code_duke,refrigerated
