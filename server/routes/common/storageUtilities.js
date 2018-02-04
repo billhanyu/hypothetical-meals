@@ -55,3 +55,7 @@ export function checkStoragePromise(req) {
       .catch(err => reject(err));
     });
 }
+
+const validStorageTypes = ['room temperature', 'freezer', 'refrigerator'];
+
+export { validStorageTypes };

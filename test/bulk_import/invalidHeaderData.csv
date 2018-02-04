@@ -1,0 +1,7 @@
+INGREDIENT,PACKAGE,AMOUNT (LBS),PRICE PURRRRR PACKAGE,VENDOR FREIGHT CODE,TEMPERATURE
+boop,pail,16,20.15,code_duke,room temperature
+beans,pail,8,16.89,code_unc,room temperature
+Carrots - railcar,railcar,24690,4000,code_duke,room temperature
+Apples - supersack,supersack,4,69.32,code_unc,frozen
+Potatoes - drum,drum,2,32.1,code_duke,refrigerated
+poop,sack,1,6.01,code_duke,frozen

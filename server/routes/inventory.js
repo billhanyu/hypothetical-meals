@@ -149,7 +149,7 @@ function checkChangesProperties(changes) {
   }
 }
 
-function checkStorageCapacityPromise(backup) {
+export function checkStorageCapacityPromise(backup) {
   return new Promise((resolve, reject) => {
     let storages;
     const sums = {};
