@@ -3,10 +3,24 @@ const alasql = require('alasql');
 const assert = require('chai').assert;
 
 describe('Vendor', () => {
+  describe('#pages()', () => {
+    it('should return number of pages of data', (done) => {
+      chai.request(server)
+        .get('/vendors/pages')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          assert.strictEqual(res.body['numPages'], 1, 'number of pages');
+          done();
+        });
+    });
+  });
+
   describe('#view()', () => {
     it('should return all vendors', (done) => {
       chai.request(server)
-        .get('/vendors')
+        .get('/vendors/page/1')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
@@ -21,7 +35,7 @@ describe('Vendor', () => {
     it('should return all vendors available', (done) => {
       alasql('UPDATE Vendors SET removed = 1 WHERE id = 1');
       chai.request(server)
-        .get('/vendors-available')
+        .get('/vendors-available/page/1')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);

@@ -1,10 +1,23 @@
 import * as checkNumber from './common/checkNumber';
+import { getNumPages, queryWithPagination } from './common/pagination';
+import { getWeight } from './common/packageUtilies';
 
-export function view(req, res, next) {
-  connection.query('SELECT * FROM SpendingLogs')
+const basicViewQueryString = 'SELECT SpendingLogs.*, Ingredients.name AS ingredient_name, Ingredients.storage_id AS ingredient_storage_id, Ingredients.removed AS ingredient_removed FROM SpendingLogs INNER JOIN Ingredients ON SpendingLogs.ingredient_id = Ingredients.id';
+
+export function pages(req, res, next) {
+  getNumPages('SpendingLogs')
     .then(results => res.status(200).send(results))
     .catch(err => {
-      console.error(error);
+      console.error(err);
+      return res.status(500).send('Database error');
+    });
+}
+
+export function view(req, res, next) {
+  queryWithPagination(req.params.page_num, 'SpendingLogs', basicViewQueryString)
+    .then(results => res.status(200).send(results))
+    .catch(err => {
+      console.error(err);
       return res.status(500).send('Database error');
     });
 }
@@ -17,10 +30,10 @@ export function logsForIngredient(req, res, next) {
   if (!checkNumber.isPositiveInteger(ingredientId)) {
     return res.status(400).send(`Ingredient ID ${ingredientId} is invalid.`);
   }
-  connection.query(`SELECT * FROM SpendingLogs WHERE ingredient_id IN (${ingredientId})`)
+  connection.query(`${basicViewQueryString} WHERE ingredient_id IN (${ingredientId})`)
   .then(results => res.status(200).send(results))
   .catch(err => {
-      console.error(error);
+      console.error(err);
       return res.status(500).send('Database error');
   });
 }
@@ -72,4 +85,42 @@ export function updateLogForIngredient(req) {
     .catch(err => {
       throw err;
     });
+}
+
+/* Request format:
+ * req = [
+ *   {'id(inventory)', 'ingredient_id', 'package_type', 'num_packages'},
+ *   ...
+ * ];
+ */
+export function updateConsumedSpendingLogForCart(req) {
+  return new Promise((resolve, reject) => {
+    const consumedWeights = {};
+    const ingredientIds = [];
+    for (let consumed of req) {
+      const ingredientId = consumed.ingredient_id;
+      if (!(ingredientId in consumedWeights)) {
+        consumedWeights[ingredientId] = 0;
+        ingredientIds.push(ingredientId);
+      }
+      consumedWeights[ingredientId] +=
+        getWeight(consumed.package_type) * consumed.num_packages;
+    }
+    const cases = [];
+    connection.query(`SELECT * FROM SpendingLogs
+                      WHERE ingredient_id
+                      IN (${ingredientIds.join(', ')})`)
+      .then(results => {
+        for (let entry of results) {
+          const cost =
+            consumedWeights[entry.ingredient_id] / entry.total_weight * entry.total;
+          cases.push(`when id = ${entry.id} then ${cost}`);
+        }
+      })
+      .then(() => connection.query(`UPDATE SpendingLogs 
+        SET consumed = consumed + (case ${cases.join(' ')} end)
+        WHERE ingredient_id IN (${ingredientIds.join(', ')})`))
+      .then(() => resolve())
+      .catch(err => reject(err));
+  });
 }

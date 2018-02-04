@@ -1,10 +1,23 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import {getWeight, ignoreWeights} from './common/packageUtilies';
+import { getNumPages, queryWithPagination } from './common/pagination';
 import success from './common/success';
+import { updateConsumedSpendingLogForCart } from './spendinglog';
+
+const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
+
+export function pages(req, res, next) {
+  getNumPages('Inventories')
+    .then(results => res.status(200).send(results))
+    .catch(err => {
+      console.error(err);
+      return res.status(500).send('Database error');
+    });
+}
 
 export function view(req, res, next) {
-  connection.query('SELECT * FROM Inventories')
+  queryWithPagination(req.params.page_num, 'Inventories', basicViewQueryString)
     .then(results => res.status(200).send(results))
     .catch(err => handleError(err, res));
 }
@@ -45,11 +58,16 @@ export function commitCart(req, res, next) {
     checkInputChanges(cart);
     checkChangesProperties(cart);
     const ids = Object.keys(cart);
-    connection.query(`SELECT id, num_packages FROM Inventories WHERE id IN (${ids.join(', ')})`)
+    let cartItems;
+    connection.query(`SELECT * FROM Inventories WHERE id IN (${ids.join(', ')})`)
       .then(results => {
         if (results.length < ids.length) {
           throw createError('Some inventory id not in database.');
         }
+        cartItems = results.map(a => Object.assign({}, a));
+        cartItems.forEach(item => {
+          item.num_packages = cart[item.id];
+        });
         for (let item of results) {
           const id = item.id;
           const newNum = item.num_packages - cart[id];
@@ -60,6 +78,7 @@ export function commitCart(req, res, next) {
         }
         return modifyInventoryQuantitiesPromise(cart);
       })
+      .then(() => updateConsumedSpendingLogForCart(cartItems))
       .then(() => success(res))
       .catch(err => {
         handleError(err, res);
@@ -155,13 +174,19 @@ function checkStorageCapacityPromise(backup) {
               ids.push(item.id);
               cases.push(`when id = ${item.id} then ${item.num_packages}`);
             });
-            connection.query(`UPDATE Inventories SET num_packages = (case ${cases.join(' ')} end) WHERE id IN (${ids.join(', ')})`)
-              .then(() => reject(createError('New quantities too large for current storages')))
-              .catch(err => reject(err));
+            return revertBackPromise(cases, ids);
           }
         }
       })
       .then(() => resolve())
+      .catch(err => reject(err));
+  });
+}
+
+function revertBackPromise(cases, ids) {
+  return new Promise((resolve, reject) => {
+    connection.query(`UPDATE Inventories SET num_packages = (case ${cases.join(' ')} end) WHERE id IN (${ids.join(', ')})`)
+      .then(() => reject(createError('New quantities too large for current storages')))
       .catch(err => reject(err));
   });
 }

@@ -1,18 +1,38 @@
 # Ingredients API
 
 {% method %}
-## GET '/ingredients' {#view}
+## GET '/ingredients/pages' {#pages}
 
-Get all ingredients in the `Ingredients` table, requires no parameter input.
+Get the number of pages in the `Ingredients` table, requires no parameter input. Default 50 ids per page in numerical order (page 2 = id range 51 to 100).
+
+Return parameters:
+{numPages: 5}
 
 {% endmethod %}
 
 {% method %}
-## GET '/ingredients-available' {#view}
+## GET '/ingredients/page/:page_num' {#view}
+
+Get all ingredients in the `Ingredients` table, requires no parameter input.
+
+Return parameters:
+All columns in Ingredients table AND
+- Storages.name as storage_name
+- Storages.capacity as storage_capacity
+
+{% endmethod %}
+
+{% method %}
+## GET '/ingredients-available/page/:page_num' {#view}
 
 Get all available ingredients in the `Ingredients` table for order etc (where removed == 0).
 
 Requires no parameter input.
+
+Return parameters:
+All columns in Ingredients table AND
+- Storages.name as storage_name
+- Storages.capacity as storage_capacity
 
 {% endmethod %}
 
@@ -41,13 +61,18 @@ request.body.ingredients = [
 {% method %}
 ## PUT '/ingredients'
 
-Modify ingredients.
+Modify ingredients to change either the name or storage id.
 
 {% sample lang="js" %}
 ```js
 request.body.ingredients = {
-  'ingredient_id1': storage_id_change1,
-  'ingredient_id2': storage_id_change2,
+  'ingredient_id1': {
+    'storage_id': storage_id_change1,
+    'name': 'name_change1',
+  },
+  'ingredient_id2': {
+    'storage_id': storage_id_change2,
+  },
 }
 ```
 {% endmethod %}
