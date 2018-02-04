@@ -1,9 +1,38 @@
 # Ingredients API
 
 {% method %}
-## GET '/ingredients' {#view}
+## GET '/ingredients/pages' {#pages}
+
+Get the number of pages in the `Ingredients` table, requires no parameter input. Default 50 ids per page in numerical order (page 2 = id range 51 to 100).
+
+Return parameters:
+{numPages: 5}
+
+{% endmethod %}
+
+{% method %}
+## GET '/ingredients/page/:page_num' {#view}
 
 Get all ingredients in the `Ingredients` table, requires no parameter input.
+
+Return parameters:
+All columns in Ingredients table AND
+- Storages.name as storage_name
+- Storages.capacity as storage_capacity
+
+{% endmethod %}
+
+{% method %}
+## GET '/ingredients-available/page/:page_num' {#view}
+
+Get all available ingredients in the `Ingredients` table for order etc (where removed == 0).
+
+Requires no parameter input.
+
+Return parameters:
+All columns in Ingredients table AND
+- Storages.name as storage_name
+- Storages.capacity as storage_capacity
 
 {% endmethod %}
 
@@ -47,6 +76,12 @@ request.body.ingredients = {
 ## DELETE '/ingredients's
 
 Delete ingredients.
+
+This is a "fake delete" action where the api sets the 'removed' column to 1.
+
+As a result the get '/ingredients-available' api does not return the ingredients deleted here.
+
+Also fake deletes the corresponding VendorsIngredients.
 
 {% sample lang="js" %}
 ```js

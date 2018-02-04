@@ -3,8 +3,56 @@ const assert = require('chai').assert;
 const testTokens = require('./testTokens');
 
 describe('VendorIngredient', () => {
+  describe('#pages()', () => {
+    it('should return number of pages of data', (done) => {
+      chai.request(server)
+        .get('/vendoringredients/pages')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          assert.strictEqual(res.body['numPages'], 1, 'number of pages');
+          done();
+        });
+    });
+  });
+
+  describe('#view()', () => {
+    xit('should return all vendorsingredients', (done) => {
+      chai.request(server)
+        .get('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          assert.strictEqual(res.body.length, 3, '3 vendorsingredients in total');
+          done();
+        });
+    });
+  });
+
+  describe('#viewAvailable()', () => {
+    xit('should return all available vendorsingredients', (done) => {
+      alasql('UPDATE VendorsIngredients SET removed = 1 WHERE id = 1');
+      chai.request(server)
+        .get('/vendoringredients-available')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          assert.strictEqual(res.body.length, 2, '2 vendorsingredients available in total');
+          done();
+        });
+    });
+  });
+
   describe('#getVendorsForIngredient()', () => {
-    it('should return all vendors for an ingredient', (done) => {
+    beforeEach(() => {
+      alasql('SOURCE "./server/create_database.sql"');
+      alasql('SOURCE "./server/sample_data.sql"');
+    });
+
+    xit('should return all vendors for an ingredient', (done) => {
       chai.request(server)
         .get('/vendoringredients/1')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
@@ -12,6 +60,19 @@ describe('VendorIngredient', () => {
           res.should.have.status(200);
           res.body.should.be.a('array');
           assert.strictEqual(res.body[0]['vendor_id'], 1, 'vendor_id');
+          done();
+        });
+    });
+
+    xit('should return only available vendors for an ingredient', (done) => {
+      alasql('UPDATE VendorsIngredients SET removed = 1 WHERE ingredient_id = 1');
+      chai.request(server)
+        .get('/vendoringredients/1')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          assert.strictEqual(res.body.length, 0, 'Nothing should be selected');
           done();
         });
     });
@@ -278,12 +339,15 @@ describe('VendorIngredient', () => {
         .delete('/vendoringredients')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
-          'ids': [1, 2, 3],
+          'ids': [1, 2],
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const left = alasql('SELECT id FROM VendorsIngredients');
-          assert.strictEqual(left.length, 0, 'there should be nothing left');
+          const left = alasql('SELECT removed FROM VendorsIngredients WHERE id IN (1, 2, 3)');
+          assert.strictEqual(left.length, 3, 'fake delete 3 stuff');
+          assert.strictEqual(left[0].removed, 1, 'fake delete 1');
+          assert.strictEqual(left[1].removed, 1, 'fake delete 2');
+          assert.strictEqual(left[2].removed, 0, 'not fake delete 3');
           done();
         });
     });

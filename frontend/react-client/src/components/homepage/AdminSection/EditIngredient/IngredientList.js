@@ -23,7 +23,7 @@ class IngredientList extends Component {
 
   componentDidMount() {
     const self = this;
-    axios.get("/ingredients", {
+    axios.get("/ingredients/page/1", {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(function (response) {

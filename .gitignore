@@ -1,6 +1,9 @@
 # dependencies
 node_modules/
 
+# bundle
+bundle.js
+
 # testing
 /coverage
 
@@ -13,6 +16,7 @@ node_modules/
 .env.development.local
 .env.test.local
 .env.production.local
+.vscode
 
 npm-debug.log*
 yarn-debug.log*

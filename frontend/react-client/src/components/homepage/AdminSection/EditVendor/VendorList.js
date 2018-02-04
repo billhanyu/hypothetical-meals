@@ -24,7 +24,7 @@ class VendorList extends Component {
 
   componentDidMount() {
     const self = this;
-    axios.get("/vendors", {
+    axios.get("/vendors/page/1", {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(function (response) {

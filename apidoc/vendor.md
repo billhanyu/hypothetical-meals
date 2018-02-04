@@ -1,9 +1,27 @@
 # Vendors API
 
 {% method %}
-## GET '/vendors'
+## GET '/vendors/pages' {#pages}
+
+Get the number of pages in the `Vendors` table, requires no parameter input. Default 50 ids per page in numerical order (page 2 = id range 51 to 100).
+
+Return parameters:
+{numPages: 5}
+
+{% endmethod %}
+
+{% method %}
+## GET '/vendors/page/:page_num'
 
 Get all vendors.
+
+No parameter required.
+{% endmethod %}
+
+{% method %}
+## GET '/vendors-available/page/:page_num'
+
+Get all available vendors (where removed == 0).
 
 No parameter required.
 {% endmethod %}
@@ -53,6 +71,12 @@ request.body.vendors = {
 ## DELETE '/vendors'
 
 Delete vendor(s).
+
+This is a "fake delete" action where the api sets the 'removed' column to 1.
+
+As a result the get '/vendors-available' api does not return the vendors deleted here.
+
+Also fake deletes the corresponding VendorsIngredients.
 
 Input should be an array if id(s).
 

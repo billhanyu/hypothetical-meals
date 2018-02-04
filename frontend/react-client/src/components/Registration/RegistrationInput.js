@@ -11,6 +11,7 @@ class RegistrationContainer extends Component {
     2. placeholderText (String)
     2. onChange (Func)
     4. id (String)
+    5. value (String)
 
           OPTIONAL PROPS
     1. infoText
@@ -23,7 +24,7 @@ class RegistrationContainer extends Component {
   render() {
     return (
       <div className="RegistrationInputContainer">
-        <input className={this.props.inputClass} placeholder={this.props.placeholderText} onChange={this._handleOnChange} />
+        <input className={this.props.inputClass} value={this.props.value} placeholder={this.props.placeholderText} onChange={this._handleOnChange} />
       </div>
     )
   }

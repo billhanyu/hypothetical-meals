@@ -5,15 +5,65 @@ const assert = require('chai').assert;
 const testTokens = require('./testTokens');
 
 describe('Ingredient', () => {
+  describe('#pages()', () => {
+    it('should return number of pages of data', (done) => {
+      chai.request(server)
+        .get('/ingredients/pages')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          assert.strictEqual(res.body['numPages'], 1, 'number of pages');
+          done();
+        });
+    });
+  });
+
   describe('#view()', () => {
+    beforeEach(() => {
+      alasql('SOURCE "./server/create_database.sql"');
+      alasql('SOURCE "./server/sample_data.sql"');
+    });
+
     it('should return all ingredients', (done) => {
       chai.request(server)
-        .get('/ingredients')
+        .get('/ingredients/page/1')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
           res.body.length.should.be.eql(3);
+          done();
+        });
+    });
+
+    it('should only return one page of ingredients', (done) => {
+      for (let i = 0; i < 52; i++) {
+        alasql(`INSERT INTO Ingredients (name, storage_id) VALUES ('TEST', 1)`);
+      }
+
+      chai.request(server)
+        .get('/ingredients/page/1')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(50);
+          done();
+        });
+    });
+  });
+
+  describe('#viewAvailable()', () => {
+    it('should return all ingredients available', (done) => {
+      alasql('UPDATE Ingredients SET removed = 1 WHERE id = 1');
+      chai.request(server)
+        .get('/ingredients-available/page/1')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(2);
           done();
         });
     });
@@ -165,7 +215,7 @@ describe('Ingredient', () => {
         });
     });
 
-    it('should delete the the ingredients with the ids given', (done) => {
+    it('should delete the ingredients with the ids given', (done) => {
       chai.request(server)
       .delete('/ingredients')
       .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -174,12 +224,31 @@ describe('Ingredient', () => {
       })
       .end((err, res) => {
         res.should.have.status(200);
-        const changed = alasql('SELECT * FROM Ingredients');
-        assert.strictEqual(changed.length, 1, 'Rows in Ingredients table.');
-        assert.strictEqual(changed[0]['name'], 'boop', 'Name for ingredient left in table.');
-        assert.strictEqual(changed[0]['storage_id'], 1, 'Storage id for ingredient left in table.');
+        const left = alasql('SELECT * FROM Ingredients');
+        assert.strictEqual(left.length, 3, 'Rows in Ingredients table still the same.');
+        assert.strictEqual(left[0]['removed'], 1, 'ingredient 1 fake deleted');
+        assert.strictEqual(left[1]['removed'], 1, 'ingredient 2 fake deleted');
+        assert.strictEqual(left[2]['removed'], 0, 'ingredient 3 not fake deleted');
         done();
       });
+    });
+
+    it('should delete corresponding vendorsingredients', (done) => {
+      chai.request(server)
+        .delete('/ingredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'ingredients': [1],
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const left = alasql('SELECT * FROM Ingredients');
+          assert.strictEqual(left.length, 3, 'Rows in Ingredients table still the same.');
+          assert.strictEqual(left[0]['removed'], 1, 'ingredient 1 fake deleted');
+          assert.strictEqual(left[1]['removed'], 0, 'ingredient 2 not fake deleted');
+          assert.strictEqual(left[2]['removed'], 0, 'ingredient 3 not fake deleted');
+          done();
+        });
     });
 
     it('should decline if ingredient not in table', (done) => {

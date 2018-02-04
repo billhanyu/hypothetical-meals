@@ -30,7 +30,7 @@ class AddVendorIngredient extends Component {
 
   componentDidMount() {
     const self = this;
-    axios.get("/vendors", {
+    axios.get("/vendors/page/1", {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(function (response) {
@@ -64,9 +64,9 @@ class AddVendorIngredient extends Component {
     axios.post(`/vendoringredients`, {
       vendoringredients:[{
         'ingredient_id': self.props.id,
-        'vendor_id': correspondingIdToVendorName,
+        'vendor_id': Number(correspondingIdToVendorName),
         'package_type': self.state.packaging.split("-")[0].toLowerCase(),
-        'price': self.state.price,
+        'price': Number(self.state.price),
       }]
     }, {
       headers: { Authorization: "Token " + this.props.token }
