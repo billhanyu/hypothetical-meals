@@ -184,7 +184,7 @@ describe('VendorIngredient', () => {
           res.should.have.status(200);
           const newItems = alasql('SELECT * FROM VendorsIngredients');
           newItems.should.be.a('array');
-          assert.strictEqual(newItems.length, 5, 'new number of vendoringredients');
+          assert.strictEqual(newItems.length, 6, 'new number of vendoringredients');
           done();
         });
     });
