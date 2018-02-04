@@ -3,6 +3,7 @@ import server from '../server/server';
 const alasql = require('alasql');
 const assert = require('chai').assert;
 const testTokens = require('./testTokens');
+const supertest = require('supertest');
 
 describe('Ingredient', () => {
   describe('#pages()', () => {
@@ -262,6 +263,147 @@ describe('Ingredient', () => {
           res.should.have.status(400);
           done();
         });
+    });
+  });
+
+  describe('#bulkImport()', () => {
+    beforeEach(() => {
+      alasql('SOURCE "./server/create_database.sql"');
+      alasql('SOURCE "./server/sample_data.sql"');
+    });
+
+    it('should fail bulk import as noob', (done) => {
+      chai.request(server)
+        .post('/ingredients/import')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .send({})
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
+    it('should fail data with bad amount (in lbs)', (done) => {
+      supertest(server).post('/ingredients/import')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .attach('bulk', './test/bulk_import/badAmountData.csv')
+      .end(function(err, res) {
+        res.should.have.status(400);
+        done();
+      });
+    });
+
+    it('should fail data with bad price for ingredient', (done) => {
+      supertest(server).post('/ingredients/import')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .attach('bulk', './test/bulk_import/badPriceArgumentData.csv')
+      .end(function(err, res) {
+        res.should.have.status(400);
+        done();
+      });
+    });
+
+    it('should fail class data with invalid vendor codes', (done) => {
+      supertest(server).post('/ingredients/import')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .attach('bulk', './test/bulk_import/classData.csv')
+      .end(function(err, res) {
+        res.should.have.status(400);
+        done();
+      });
+    });
+
+    it('should fail data with extra argument for ingredient', (done) => {
+      supertest(server).post('/ingredients/import')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .attach('bulk', './test/bulk_import/extraArgumentData.csv')
+      .end(function(err, res) {
+        res.should.have.status(400);
+        done();
+      });
+    });
+
+    it('should fail data with incorrect package type for ingredient', (done) => {
+      supertest(server).post('/ingredients/import')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .attach('bulk', './test/bulk_import/incorrectPackageTypeData.csv')
+      .end(function(err, res) {
+        res.should.have.status(400);
+        done();
+      });
+    });
+
+    it('should fail data with incorrect storage type for ingredient', (done) => {
+      supertest(server).post('/ingredients/import')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .attach('bulk', './test/bulk_import/incorrectStorageTypeData.csv')
+      .end(function(err, res) {
+        res.should.have.status(400);
+        done();
+      });
+    });
+
+    it('should fail data with invalid header data', (done) => {
+      supertest(server).post('/ingredients/import')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .attach('bulk', './test/bulk_import/invalidHeaderData.csv')
+      .end(function(err, res) {
+        res.should.have.status(400);
+        done();
+      });
+    });
+
+    it('should fail data with missing argument for ingredient', (done) => {
+      supertest(server).post('/ingredients/import')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .attach('bulk', './test/bulk_import/missingArgumentData.csv')
+      .end(function(err, res) {
+        res.should.have.status(400);
+        done();
+      });
+    });
+
+    it('should fail class data with too much ingredients for storage', (done) => {
+      supertest(server).post('/ingredients/import')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .attach('bulk', './test/bulk_import/tooMuchToStoreData.csv')
+      .end(function(err, res) {
+        res.should.have.status(400);
+        done();
+      });
+    });
+
+    it('should pass valid data', (done) => {
+      supertest(server).post('/ingredients/import')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .attach('bulk', './test/bulk_import/validData.csv')
+      .end(function(err, res) {
+        const ingredients = alasql(`SELECT * FROM Ingredients`);
+        assert.strictEqual(ingredients.length, 3 + 5, 'Five of six ingredients added to ingredients table.');
+
+        const newIngredient = ingredients.find(ingredient => ingredient.name == 'boop' && ingredient.storage_id == 3);
+        assert.notEqual(newIngredient, null, 'New ingredient added exactly once');
+        newIngredient.should.not.be.a('array');
+
+        const oldIngredient = ingredients.find(ingredient => ingredient.name == 'poop' && ingredient.storage_id == 1);
+        assert.notEqual(oldIngredient, null, 'Old ingredient not added again');
+        oldIngredient.should.not.be.a('array');
+
+        const vendorsIngredients = alasql(`SELECT * FROM VendorsIngredients`);
+        console.log(vendorsIngredients);
+        assert.strictEqual(vendorsIngredients.length, 3 + 5, 'Five of six vendor ingredients added to vendor ingredients table.');
+
+        const newVendorIngredient = vendorsIngredients.find(vendorsIngredient => vendorsIngredient.ingredient_id == 8 && vendorsIngredient.price == 32.1 && vendorsIngredient.vendor_id == 1 && vendorsIngredient.package_type == 'drum');
+        assert.notEqual(newVendorIngredient, null, 'Potatoes-drum ingredient added exactly once with correct price, vendor, and package type');
+        newVendorIngredient.should.not.be.a('array');
+
+        // const inventories = alasql(`SELECT * FROM Inventories`);
+        // const spendingLogs = alasql(`SELECT * FROM SpendingLogs`);
+        // const storages = alasql(`SELECT * FROM Storages`);
+        
+        res.should.have.status(200);
+        done();
+      });
     });
   });
 });
