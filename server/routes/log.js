@@ -45,14 +45,9 @@ export function viewLogForIngredient(req, res, next) {
   queryWithPagination(req.params.page_num, 'Logs', `${basicViewQueryString} WHERE vendor_ingredient_id IN (${vendorIngredientIds.join(', ')})`)
   .then(results => res.status(200).send(results))
   .catch(err => {
-<<<<<<< HEAD
-      handleError(err, res);
-  });
-=======
       console.error(err);
       return res.status(500).send('Database error');
     });
->>>>>>> master
 }
 
 /* Request body format:

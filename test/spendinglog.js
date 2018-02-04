@@ -65,8 +65,8 @@ describe('SpendingLog', () => {
       .then(() => {
         const spendingLogs = alasql('SELECT * FROM SpendingLogs');
         assert.strictEqual(spendingLogs.length, 2, 'New length of spending logs');
-        assert.strictEqual(spendingLogs[0]['total'], 110, 'Total spent on ingredient with id 1.');
-        assert.strictEqual(spendingLogs[0]['total_weight'], 200, 'Total weight for ingredient 1.');
+        assert.strictEqual(spendingLogs[0]['total'], 5010, 'Total spent on ingredient with id 1.');
+        assert.strictEqual(spendingLogs[0]['total_weight'], 600, 'Total weight for ingredient 1.');
         assert.strictEqual(spendingLogs[1]['total'], 30, 'Total spent on ingredient with id 2.');
         assert.strictEqual(spendingLogs[1]['total_weight'], 50, 'Total weight for ingredient 2.');
       })
