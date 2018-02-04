@@ -100,10 +100,10 @@ app.get('/storages', beNoob, storage.view);
 app.put('/storages', beAdmin, storage.changeStorage);
 
 app.post('/order', beNoob, order.placeOrder);
+
 app.get('/logs/pages', beNoob, log.pages);
 app.get('/logs/page/:page_num', beNoob, log.view);
 app.get('/logs/ingredients/page/:page_num', beNoob, log.viewLogForIngredient);
-app.post('/logs', beNoob, log.addEntry);
 
 app.get('/spendinglogs/pages', beNoob, spendinglog.pages);
 app.get('/spendinglogs/page/:page_num', beNoob, spendinglog.view);
