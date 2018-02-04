@@ -199,3 +199,12 @@
 .DeleteOrderItem:hover {
   color: red;
 }
+
+.PageBar {
+  margin-top: 50px;
+}
+
+.PageLink {
+  padding: 10px 20px;
+  font-size: 16px;
+}
