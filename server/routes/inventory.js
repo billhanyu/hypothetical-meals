@@ -164,13 +164,19 @@ function checkStorageCapacityPromise(backup) {
               ids.push(item.id);
               cases.push(`when id = ${item.id} then ${item.num_packages}`);
             });
-            connection.query(`UPDATE Inventories SET num_packages = (case ${cases.join(' ')} end) WHERE id IN (${ids.join(', ')})`)
-              .then(() => reject(createError('New quantities too large for current storages')))
-              .catch(err => reject(err));
+            return revertBackPromise(cases, ids);
           }
         }
       })
       .then(() => resolve())
+      .catch(err => reject(err));
+  });
+}
+
+function revertBackPromise(cases, ids) {
+  return new Promise((resolve, reject) => {
+    connection.query(`UPDATE Inventories SET num_packages = (case ${cases.join(' ')} end) WHERE id IN (${ids.join(', ')})`)
+      .then(() => reject(createError('New quantities too large for current storages')))
       .catch(err => reject(err));
   });
 }
