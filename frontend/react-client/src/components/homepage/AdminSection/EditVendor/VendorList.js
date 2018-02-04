@@ -19,15 +19,12 @@ class VendorList extends Component {
   }
 
   /*** REQUIRED PROPS
-    1. id (Number)
-    2. name (String)
-    3. contact (String)
-    4. code (String)
+    1. token (String)
   */
 
   componentDidMount() {
     const self = this;
-    axios.get("/vendors", {
+    axios.get("/vendors/page/1", {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(function (response) {
@@ -53,7 +50,7 @@ class VendorList extends Component {
 
   render() {
     return (
-      this.state.hasPickedVendor ? <EditVendor id={this.state.activeId} name={this.state.activeName} contact={this.state.activeContact} code={this.state.activeCode}/> :
+      this.state.hasPickedVendor ? <EditVendor token={this.props.token} id={this.state.activeId} name={this.state.activeName} contact={this.state.activeContact} code={this.state.activeCode}/> :
       <div className="VendorList borderAll">
         <RegistrationHeader HeaderText="Edit Vendor" HeaderIcon="fas fa-pencil-alt fa-2x"/>
         {

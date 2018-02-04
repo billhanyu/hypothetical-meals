@@ -13,18 +13,15 @@ class EditVendor extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmitButtonClick = this.handleSubmitButtonClick.bind(this);
     this.state = {
-      name: props.name,
-      storage_id: props.storage_id,
+      num_packages: props.num_packages,
       id: props.id,
       hasUpdated: false,
-      storage: "Frozen",
     };
   }
 
   /*** REQUIRED PROPS
-    1. name (String)
-    2. storage_id (String)
-    3. id (number)
+    1. num_packages (Number)
+    2. id (number)
     3. token (String)
   */
 
@@ -36,27 +33,16 @@ class EditVendor extends Component {
 
   handleSubmitButtonClick() {
     const self = this;
-    let storage_id;
-    if(this.state.storage == "Frozen") {
-      storage_id = 1;
-    }
-    else if (this.state.storage == 'Refrigerated') {
-      storage_id = 2;
-    }
-    else if (this.state.storage == 'Room Temperature') {
-      storage_id = 3;
-    }
 
     const newVendorObject = {};
-    newVendorObject[this.state.id] = storage_id;
+    newVendorObject[this.state.id] = Number(this.state.num_packages);
 
-    axios.put("/ingredients", {
-      ingredients: newVendorObject,
+    axios.put("/inventory/admin", {
+      changes: newVendorObject,
     }, {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(function (response) {
-      console.log(response);
       self.setState({
         hasUpdated: true,
       });
@@ -69,14 +55,12 @@ class EditVendor extends Component {
   render() {
     return (
       <div className="EditContainer borderAll">
-          <RegistrationHeader HeaderText="Edit Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>
+          <RegistrationHeader HeaderText="Edit Inventory Size" HeaderIcon="fas fa-pencil-alt fa-2x"/>
 
-          <RegistrationInput inputClass="RegistrationInput" placeholderText="Name" onChange={this.handleInputChange} id="name" value={this.state.name}/>
-          <div className="RegistrationInfoText">* Ingredient Name</div>
-          <VendorComboBox id="storage" Options={["Frozen","Refrigerated","Room Temperature"]} onChange={this.handleInputChange}/>
-          <div className="RegistrationInfoText">* Temperature </div>
+          <RegistrationInput inputClass="RegistrationInput" placeholderText="Inventory Size" onChange={this.handleInputChange} id="num_packages" value={this.state.num_packages}/>
+          <div className="RegistrationInfoText">* New Inventory Size</div>
 
-          <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT VENDOR</div>
+          <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT INVENTORY SIZE</div>
           <div className="RegistrationInfoText">{this.state.hasUpdated ? "Updated" : null}</div>
       </div>
     );

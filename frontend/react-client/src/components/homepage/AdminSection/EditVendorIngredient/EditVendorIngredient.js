@@ -13,19 +13,19 @@ class EditVendor extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmitButtonClick = this.handleSubmitButtonClick.bind(this);
     this.state = {
-      name: props.name,
-      storage_id: props.storage_id,
-      id: props.id,
+      Price: props.price,
+      vendor_ingredient_id: props.vendor_ingredient_id,
       hasUpdated: false,
-      storage: "Frozen",
+      packaging: 'Sack-(50lbs)',
     };
   }
 
   /*** REQUIRED PROPS
     1. name (String)
-    2. storage_id (String)
-    3. id (number)
-    3. token (String)
+    2. price (Number)
+    3. storage_id (String)
+    4. vendor_ingredient_id (number)
+    5. token (String)
   */
 
   handleInputChange(fieldName, event) {
@@ -36,27 +36,19 @@ class EditVendor extends Component {
 
   handleSubmitButtonClick() {
     const self = this;
-    let storage_id;
-    if(this.state.storage == "Frozen") {
-      storage_id = 1;
-    }
-    else if (this.state.storage == 'Refrigerated') {
-      storage_id = 2;
-    }
-    else if (this.state.storage == 'Room Temperature') {
-      storage_id = 3;
-    }
 
     const newVendorObject = {};
-    newVendorObject[this.state.id] = storage_id;
+    newVendorObject[this.props.vendor_ingredient_id] = {
+      'package_type': this.state.packaging.split('-')[0].toLowerCase(),
+      'price': Number(this.state.Price),
+    };
 
-    axios.put("/ingredients", {
-      ingredients: newVendorObject,
+    axios.put("/vendoringredients", {
+      vendoringredients: newVendorObject,
     }, {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(function (response) {
-      console.log(response);
       self.setState({
         hasUpdated: true,
       });
@@ -71,12 +63,16 @@ class EditVendor extends Component {
       <div className="EditContainer borderAll">
           <RegistrationHeader HeaderText="Edit Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>
 
-          <RegistrationInput inputClass="RegistrationInput" placeholderText="Name" onChange={this.handleInputChange} id="name" value={this.state.name}/>
-          <div className="RegistrationInfoText">* Ingredient Name</div>
-          <VendorComboBox id="storage" Options={["Frozen","Refrigerated","Room Temperature"]} onChange={this.handleInputChange}/>
-          <div className="RegistrationInfoText">* Temperature </div>
+          <RegistrationInput inputClass="RegistrationInput" placeholderText="Price" onChange={this.handleInputChange} id="Price" value={this.state.name}/>
+          <div className="RegistrationInfoText">* Ingredient Price</div>
+          <VendorComboBox id="packaging" onChange={this.handleInputChange} Options={["Sack-(50lbs)", 'Pail-(50 lbs)',
+          'Drum-(500 lb)',
+          'Supersack-(2000 lbs)',
+          'Truckload-(50000 lbs)',
+          'Railcar-(280000 lbs)',]}/>
+          <div className="RegistrationInfoText">* Packaging Size </div>
 
-          <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT VENDOR</div>
+          <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT VENDOR INGREDIENT</div>
           <div className="RegistrationInfoText">{this.state.hasUpdated ? "Updated" : null}</div>
       </div>
     );
