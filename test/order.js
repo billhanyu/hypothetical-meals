@@ -10,8 +10,8 @@ describe('Order', () => {
             .set('Authorization', `Token ${testTokens.noobTestToken}`)
             .send({
                 'orders': {
-                    '1': 100,
-                    '2': 300,
+                    '1': 2,
+                    '2': 1,
                 },
             })
             .end((err, res) => {
