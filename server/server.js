@@ -62,11 +62,13 @@ app.use(cookieParser());
 const beAdmin = [auth.required, adminRequired];
 const beNoob = [auth.required, noobRequired];
 
-
-app.use(express.static(`${__dirname}/../frontend/react-client/dist`));
-app.get('/', (req, res) => {
-  res.sendFile(path.resolve(`${__dirname}/../frontend/react-client/dist/index.html`));
-});
+if (process.env.NODE_ENV !== 'production') {
+  const distDir = `${__dirname}/../frontend/react-client/dist`;
+  app.use(express.static(distDir));
+  app.get('/', (req, res) => {
+    res.sendFile(path.resolve(`${distDir}/index.html`));
+  });
+}
 
 app.post('/users/admin', user.signupAdmin);
 app.post('/users/noob', beAdmin, user.signupNoob);
@@ -112,8 +114,9 @@ app.get('/inventory/page/:page_num', beNoob, inventory.view);
 app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
 app.put('/inventory', beNoob, inventory.commitCart);
 
-app.listen(1717, () => {
-  console.log('Node app start at port 1717');
+const port = process.env.NODE_ENV === 'production' ? 80 : 1717;
+app.listen(port, () => {
+  console.log(`Node app start at port ${port}`);
 });
 
 export default app; // for testing
