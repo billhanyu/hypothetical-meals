@@ -6,7 +6,7 @@ import RegistrationInput from './../../../Registration/RegistrationInput.js';
 import RegistrationAgreement from './../../../Registration/RegistrationAgreement.js';
 import RegistrationSubmitButton from './../../../Registration/RegistrationSubmitButton.js';
 
-class AddVendor extends Component {
+class EditVendor extends Component {
   constructor(props){
     super(props);
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -14,9 +14,10 @@ class AddVendor extends Component {
     this.state = {
       name: props.name,
       contact: props.contact,
-      carriercode: props.code,
+      code: props.code,
       id: props.id,
       hasUpdated: false,
+      errorMessage: null,
     };
   }
 
@@ -40,19 +41,22 @@ class AddVendor extends Component {
       name: this.state.name,
       contact: this.state.contact,
       code: this.state.code,
-    }
+    };
+
     axios.put("/vendors", {
-      changes: newVendorObject,
+      vendors: newVendorObject,
     }, {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(function (response) {
-      console.log(response);
       self.setState({
         hasUpdated: true,
       });
     })
     .catch(error => {
+      self.setState({
+        errorMessage: error.data
+      });
       console.log(error.response);
     });
   }
@@ -60,19 +64,20 @@ class AddVendor extends Component {
   render() {
     return (
       <div className="EditContainer borderAll">
-          <RegistrationHeader HeaderText="New Vendor" HeaderIcon="fas fa-user fa-2x"/>
+          <RegistrationHeader HeaderText="Edit Vendor" HeaderIcon="fas fa-user fa-2x"/>
 
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Name" onChange={this.handleInputChange} id="name" value={this.state.name}/>
           <div className="RegistrationInfoText">* (Optional) How your name will appear after you have logged in</div>
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Contact" onChange={this.handleInputChange} id="contact" value={this.state.contact}/>
           <div className="RegistrationInfoText">* Used to login after registration</div>
-          <RegistrationInput inputClass="RegistrationInput" placeholderText="Carrier Code" onChange={this.handleInputChange} id="carriercode" value={this.state.code}/>
+          <RegistrationInput inputClass="RegistrationInput" placeholderText="Carrier Code" onChange={this.handleInputChange} id="code" value={this.state.code}/>
 
-          <RegistrationSubmitButton handleClick={this.handleSubmitButtonClick} />
-            <div className="RegistrationInfoText">{this.state.hasUpdated ? "Updated" : null}</div>
+          <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT VENDOR</div>
+          <div className="RegistrationInfoText">{this.state.hasUpdated ? "Updated" : null}</div>
+          <div className="RegistrationInfoText">{this.state.errorMessage != null ? this.state.errorMessage : null}</div>
       </div>
     );
   }
 }
 
-export default AddVendor;
+export default EditVendor;

@@ -15,7 +15,9 @@ class AddIngredientWindow extends Component {
     this.handleSubmitButtonClick = this.handleSubmitButtonClick.bind(this);
     this.state = {
       name: '',
-      price: '',
+      finishedSubmitting: false,
+      storage: 'Frozen',
+      errorMessage: null,
     };
   }
 
@@ -26,8 +28,37 @@ class AddIngredientWindow extends Component {
   }
 
   handleSubmitButtonClick() {
-    axios.get(`asdf`)
-    .then(response => this.setState(response.data));
+    const self = this;
+    let storage_id;
+    if(this.state.storage == "Frozen") {
+      storage_id = 1;
+    }
+    else if (this.state.storage == 'Refrigerated') {
+      storage_id = 2;
+    }
+    else if (this.state.storage == 'Room Temperature') {
+      storage_id = 3;
+    }
+
+    axios.post(`/ingredients`, {
+      ingredients:[{
+        name: self.state.name,
+        storage_id,
+      }]
+    }, {
+      headers: { Authorization: "Token " + this.props.token }
+    })
+    .then(response => {
+      console.log(response);
+      self.setState({
+        finishedSubmitting: true,
+      });
+    })
+    .catch(error => {
+      self.setState({
+        errorMessage: error.data
+      });
+    });
   }
 
   render() {
@@ -36,19 +67,13 @@ class AddIngredientWindow extends Component {
           <RegistrationHeader HeaderText="New Ingredient" HeaderIcon="fas fa-utensils fa-2x"/>
 
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Name" onChange={this.handleInputChange} id="name" />
-          <VendorComboBox Options={["Sack (50lbs)", 'Pail (50 lbs)',
-          'Drum (500 lb)',
-          'Supersack (2000 lbs)',
-          'Truckload (50000 lbs)',
-          'Railcar (280000 lbs)',]}/>
           <div className="RegistrationInfoText">* Package Type</div>
-          <VendorComboBox Options={["Frozen","Refrigerated","Room Temperature"]}/>
+          <VendorComboBox id="storage" Options={["Frozen","Refrigerated","Room Temperature"]} onChange={this.handleInputChange}/>
           <div className="RegistrationInfoText">* Temperature </div>
-          <VendorComboBox Options={["Global Mart"]}/>
-          <div className="RegistrationInfoText">* Provided Vendors </div>
-          <RegistrationInput inputClass="RegistrationInput" placeholderText="Price" onChange={this.handleInputChange} id="price" />
 
           <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>ADD INGREDIENT</div>
+          <div className="RegistrationInfoText">{this.state.finishedSubmitting ? "Finished Adding Ingredient" : null}</div>
+          <div className="RegistrationInfoText">{this.state.errorMessage != null ? this.state.errorMessage : null}</div>
       </div>
     );
   }
