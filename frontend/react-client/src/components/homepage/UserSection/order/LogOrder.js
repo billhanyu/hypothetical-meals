@@ -129,8 +129,8 @@ class LogOrder extends Component {
           )
         }
         <div className="OrderButtons orderitem">
-          <button className="AdminButton" onClick={this.addOrderItem}>Add Another</button>
-          <button className="btn btn-primary AdminButton" onClick={this.commitOrder}>Order</button>
+          <button className="UserButton" onClick={this.addOrderItem}>Add Another</button>
+          <button className="btn btn-primary UserButton" onClick={this.commitOrder}>Order</button>
         </div>
       </div>
     );

@@ -17,7 +17,7 @@ class UserButton extends Component {
 
   render() {
     return (
-      <div className="AdminButton" onClick={this._handleClick}>
+      <div className="UserButton" onClick={this._handleClick}>
         {this.props.name}
       </div>
     );
