@@ -40,7 +40,6 @@ export function login(req, res, next) {
   if (error) return res.status(422).send(error);
   passport.authenticate('local', {session: false}, function(err, user, info) {
     if (err) return next(err);
-
     if (user) return res.json({user: user.getBasicInfo()});
     else return res.status(422).send('E-mail or password is incorrect');
   })(req, res, next);

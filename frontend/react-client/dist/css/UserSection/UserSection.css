@@ -161,6 +161,25 @@
   color: red;
 }
 
+.UserButton {
+  width: 250px;
+  min-width: 250px;
+  height: 40px;
+  border: 1px solid grey;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 16px;
+  line-height: 40px;
+  float: left;
+  margin-right: 40px;
+  background-color: #FFF;
+  cursor: pointer;
+}
+
+.UserButton:hover {
+  background-color: #BCC9D0;
+}
+
 .btn-primary {
     color: #fff;
     background-color: #337ab7;
@@ -213,24 +232,6 @@
   width: 90%;
   margin: 0 auto;
   margin-top: 48px;
-  display: inline-block;
-}
-
-.UserButton {
-  width: 250px;
-  min-width: 250px;
-  height: 40px;
-  border: 1px solid grey;
-  border-radius: 6px;
-  text-align: center;
-  font-size: 16px;
-  line-height: 40px;
-  float: left;
-  margin-right: 40px;
-  background-color: #FFF;
-  cursor: pointer;
-}
-
-.UserButton:hover {
-  background-color: #BCC9D0;
+  margin-bottom: 40px;
+  padding-bottom: 100px;
 }
