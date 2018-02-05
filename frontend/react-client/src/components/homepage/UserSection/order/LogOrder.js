@@ -73,8 +73,12 @@ class LogOrder extends Component {
 
   commitOrder() {
     const self = this;
-    axios.post("/logs", {
-      logs: this.state.orders,
+    const orders = {};
+    for (let order of this.state.orders) {
+      orders[order.vendor_ingredient_id] = order.quantity;
+    }
+    axios.post("/order", {
+      orders
     }, {
         headers: { Authorization: "Token " + this.props.token }
       })
