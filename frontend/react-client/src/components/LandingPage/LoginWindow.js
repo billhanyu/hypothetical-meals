@@ -22,7 +22,9 @@ class LoginWindow extends Component {
 
   handleInputChange(fieldName, event) {
     const newState = this.state;
-    this.state[fieldName] = event.target.value;
+    this.setState({
+      fieldName: event.target.value
+    });
     this.setState(newState);
   }
 
@@ -59,7 +61,7 @@ class LoginWindow extends Component {
             <div className="LoginWindow borderAll">
               <RegistrationHeader HeaderText='Sign In' HeaderIcon='fas fa-user fa-2x'/>
               <RegistrationInput inputClass="RegistrationInput" placeholderText="Email" value={this.state.email} onChange={this.handleInputChange} id="email" />
-              <RegistrationInput inputClass="RegistrationInput" placeholderText="Password" value={this.state.password} onChange={this.handleInputChange} id="password" />
+              <RegistrationInput inputType="password" inputClass="RegistrationInput" placeholderText="Password" value={this.state.password} onChange={this.handleInputChange} id="password" />
               <div style={{marginTop: '12px', marginLeft:'24px'}}><input type="checkbox" checked={this.state.isAdmin == 'true'} onClick={this._handleCheckboxClick}/> Admin?</div>
               <div className="RegistrationSubmitButton" onClick={this._handleClick}>SIGN IN</div>
             </div>

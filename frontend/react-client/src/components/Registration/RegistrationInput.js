@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 
 class RegistrationContainer extends Component {
   constructor(props){
@@ -24,9 +23,9 @@ class RegistrationContainer extends Component {
   render() {
     return (
       <div className="RegistrationInputContainer">
-        <input className={this.props.inputClass} value={this.props.value} placeholder={this.props.placeholderText} onChange={this._handleOnChange} />
+        <input type={this.props.inputType} className={this.props.inputClass} value={this.props.value} placeholder={this.props.placeholderText} onChange={this._handleOnChange} />
       </div>
-    )
+    );
   }
 }
 
