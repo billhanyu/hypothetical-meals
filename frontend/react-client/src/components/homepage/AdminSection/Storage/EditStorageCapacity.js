@@ -15,6 +15,7 @@ class EditVendor extends Component {
     this.state = {
       size: 0,
       storage: 'Frozen',
+      errorMessage: null,
     };
   }
 
@@ -53,6 +54,9 @@ class EditVendor extends Component {
       });
     })
     .catch(error => {
+      self.setState({
+        errorMessage: error.data
+      });
       console.log(error.response);
     });
   }
@@ -69,6 +73,7 @@ class EditVendor extends Component {
 
           <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT STORAGE SIZE</div>
           <div className="RegistrationInfoText">{this.state.hasUpdated ? "Updated" : null}</div>
+          <div className="RegistrationInfoText">{this.state.errorMessage != null ? this.state.errorMessage : null}</div>
       </div>
     );
   }

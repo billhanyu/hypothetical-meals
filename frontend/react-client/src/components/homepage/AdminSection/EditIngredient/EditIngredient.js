@@ -17,6 +17,7 @@ class EditVendor extends Component {
       storage_id: props.storage_id,
       id: props.id,
       hasUpdated: false,
+      errorMessage: null,
       storage: "Frozen",
     };
   }
@@ -62,6 +63,9 @@ class EditVendor extends Component {
       });
     })
     .catch(error => {
+      self.setState({
+        errorMessage: error.data
+      });
       console.log(error.response);
     });
   }
@@ -78,6 +82,7 @@ class EditVendor extends Component {
 
           <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT VENDOR</div>
           <div className="RegistrationInfoText">{this.state.hasUpdated ? "Updated" : null}</div>
+          <div className="RegistrationInfoText">{this.state.errorMessage != null ? this.state.errorMessage : null}</div>
       </div>
     );
   }

@@ -16,6 +16,7 @@ class EditVendor extends Component {
       num_packages: props.num_packages,
       id: props.id,
       hasUpdated: false,
+      errorMessage: null,
     };
   }
 
@@ -48,6 +49,9 @@ class EditVendor extends Component {
       });
     })
     .catch(error => {
+      self.setState({
+        errorMessage: error.data
+      });
       console.log(error.response);
     });
   }
@@ -62,6 +66,7 @@ class EditVendor extends Component {
 
           <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT INVENTORY SIZE</div>
           <div className="RegistrationInfoText">{this.state.hasUpdated ? "Updated" : null}</div>
+          <div className="RegistrationInfoText">{this.state.errorMessage != null ? this.state.errorMessage : null}</div>
       </div>
     );
   }
