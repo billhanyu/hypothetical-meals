@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {getWeight, ignoreWeights} from './packageUtilies';
 import { createError } from './customError';
 
@@ -59,3 +60,8 @@ export function checkStoragePromise(req) {
 const validStorageTypes = ['room temperature', 'freezer', 'refrigerator'];
 
 export { validStorageTypes };
+=======
+const validStorageTypes = ['room temperature', 'freezer', 'refrigerator'];
+
+export { validStorageTypes };
+>>>>>>> 0a7a0bbdc11acb06ed29a0d9945d4c5598e37381
