@@ -80,7 +80,7 @@ class EditVendor extends Component {
           <VendorComboBox id="storage" Options={["Frozen","Refrigerated","Room Temperature"]} onChange={this.handleInputChange}/>
           <div className="RegistrationInfoText">* Temperature </div>
 
-          <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT VENDOR</div>
+          <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT INGREDIENT</div>
           <div className="RegistrationInfoText">{this.state.hasUpdated ? "Updated" : null}</div>
           <div className="RegistrationInfoText">{this.state.errorMessage != null ? this.state.errorMessage : null}</div>
       </div>
