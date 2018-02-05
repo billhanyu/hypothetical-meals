@@ -20,7 +20,7 @@ Running the website locally
  - MySQL Database
 
 ## Overview
-Kung Foods' application uses React & React Router 4 and Node.js & Express for the web application. The `server.js` file includes all the routes for `GET, PUT, POST, and DELETE` requests. The API details are documented in the API Documents. Queries to the MySQL database and return an array of objects. 
+Kung Foods' application uses React & React Router 4 and Node.js & Express for the web application. The `server.js` file includes all the routes for `GET, PUT, POST, and DELETE` requests. The API details are documented in the API Documents. To view the API docs, `gitbook install`, and `gitbook serve`.
 
 ## Database
 
@@ -91,6 +91,6 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
 **Foreign key in italics
 	 
 ## Testing
-Testing is done using [Chai](http://chaijs.com/api/) and [Mocha](https://mochajs.org/#getting-started) and cover all endpoints in the backend. [AlaSQL](https://github.com/agershun/alasql/wiki), a javascript SQL library is also used in testing.
+Testing is done using [Chai](http://chaijs.com/api/) and [Mocha](https://mochajs.org/#getting-started) and cover all endpoints in the backend. [AlaSQL](https://github.com/agershun/alasql/wiki), a javascript SQL library is also used in testing. Bulk import testing was done using [SuperTest](https://github.com/visionmedia/supertest). 
 ### Running Tests
 Tests are under the `/tests` folder. Use `npm test` from the root folder in the command line to run all tests. 
