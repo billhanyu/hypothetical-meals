@@ -14,7 +14,7 @@ class PrimaryOptionBar extends Component {
       }
     ];
 
-    if(props.isAdmin == 'true') {
+    if(props.isAdmin) {
       buttons.push(
       {
         name:'Admin',
@@ -51,12 +51,12 @@ class PrimaryOptionBar extends Component {
                     buttonName={element.name}
                     isSelectedButton={element.name == this.state.selectedButton}
                     buttonIcon={element.icon}
-                    handleClick={this.handleClick} />
+                    handleClick={this.handleClick} />;
             })
           }
         </div>
       </div>
-    )
+    );
   }
 }
 

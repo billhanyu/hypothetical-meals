@@ -4,6 +4,7 @@ import AddIngredientWindow from './AddIngredientWindow.js';
 import IngredientList from './EditIngredient/IngredientList.js';
 import AddVendor from './AddVendor.js';
 import VendorList from './EditVendor/VendorList.js';
+import BulkImport from './BulkImport';
 import VendorIngredientList from './EditVendorIngredient/VendorIngredientList.js';
 import AddVendorIngredientList from './EditVendorIngredient/AddVendorIngredientList.js';
 import EditStorageCapacity from './Storage/EditStorageCapacity.js';
@@ -32,28 +33,31 @@ class AdminButtons extends Component {
   _renderSelectedButton() {
     const selectedButton = this.state.renderedButton;
     if (selectedButton == "editVendor") {
-        return <VendorList token={this.props.token}/>
+        return <VendorList token={this.props.token}/>;
     }
     else if (selectedButton == "addVendor") {
-        return <AddVendor token={this.props.token}/>
+        return <AddVendor token={this.props.token}/>;
     }
     else if (selectedButton == "editIngredient") {
-        return <IngredientList token={this.props.token}/>
+        return <IngredientList token={this.props.token}/>;
     }
     else if (selectedButton == "addIngredient") {
-        return <AddIngredientWindow token={this.props.token}/>
+        return <AddIngredientWindow token={this.props.token}/>;
     }
     else if (selectedButton == "editVendorIngredient") {
-        return <VendorIngredientList token={this.props.token}/>
+        return <VendorIngredientList token={this.props.token}/>;
     }
     else if (selectedButton == "addVendorIngredient") {
-        return <AddVendorIngredientList token={this.props.token}/>
+        return <AddVendorIngredientList token={this.props.token}/>;
     }
     else if (selectedButton == "editStorage") {
-        return <EditStorageCapacity token={this.props.token} />
+        return <EditStorageCapacity token={this.props.token} />;
     }
     else if (selectedButton == 'inventoryQuantity') {
-      return <InventoryList token={this.props.token} />
+      return <InventoryList token={this.props.token} />;
+    }
+    else if (selectedButton == "bulkImport") {
+      return <BulkImport token={this.props.token} />;
     }
   }
 
@@ -75,6 +79,7 @@ class AdminButtons extends Component {
           <AdminButton name="Edit Storage" id="editStorage" handleClick={this.handleClick}/>
           <AdminButton name="Edit Inventory Size" id="inventoryQuantity" handleClick={this.handleClick} />
           <AdminButton name="New User" id="inventoryQuantity" handleClick={this._redirectSignup} />
+          <AdminButton name="Bulk Import" id="bulkImport" handleClick={this.handleClick} />
         </div>
         {
           this._renderSelectedButton()

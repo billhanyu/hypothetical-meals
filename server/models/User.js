@@ -36,7 +36,7 @@ class User {
     return jwt.sign({
       id: this.id,
       name: this.name,
-      user_group: this.user_group,
+      user_group: this.userGroup,
       exp: parseInt(exp.getTime() / 1000),
     }, config.secret);
   }
@@ -45,7 +45,7 @@ class User {
     return {
       name: this.name,
       username: this.username,
-      user_group: this.user_group,
+      user_group: this.userGroup,
       token: this.generateJWT(),
     };
   }

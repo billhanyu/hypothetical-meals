@@ -10,19 +10,24 @@ class LoginWindow extends Component {
   constructor(props){
     super(props);
     this._handleClick = this._handleClick.bind(this);
-    this._handleCheckboxClick = this._handleCheckboxClick.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.cookies = new Cookies();
     this.state = {
-      email: this.cookies.get('username') != null ? this.cookies.get('username') : '',
-      password: this.cookies.get('password') != null ? this.cookies.get('password') : '',
-      isAdmin: this.cookies.get('admin') != null ? this.cookies.get('admin') : false,
+      email: '',
+      password: '',
     };
   }
 
+  componentDidMount() {
+    this.setState({
+      email: this.cookies.get('email') || '',
+      password: this.cookies.get('password') || ''
+    });
+  }
+
   handleInputChange(fieldName, event) {
-    const newState = this.state;
-    this.state[fieldName] = event.target.value;
+    const newState = Object.assign({}, this.state);
+    newState[fieldName] = event.target.value;
     this.setState(newState);
   }
 
@@ -38,29 +43,24 @@ class LoginWindow extends Component {
     })
     .then(response => {
       if(response.status == 200) {
-        this.props.history.push(`/dashboard/${response.data.user.token}/${this.state.isAdmin}`);
+        this.cookies.set('user_group', response.data.user.user_group, { path: '/' });
+        this.cookies.set('token', response.data.user.token, { path: '/' });
+        global.token = response.data.user.token;
+        global.user_group = response.data.user.user_group;
+        this.props.history.push(`/dashboard`);
       }
     })
     .catch(error => {
-      console.log(error);
+      alert('Wrong username or password!');
     });
-  }
-
-  _handleCheckboxClick() {
-    const newIsAdmin = this.state.isAdmin == 'true' ? 'false' : 'true';
-    this.cookies.set('admin', newIsAdmin, { path: '/' });
-    this.setState({
-      isAdmin: newIsAdmin
-    })
   }
 
     render() {
         return (
             <div className="LoginWindow borderAll">
               <RegistrationHeader HeaderText='Sign In' HeaderIcon='fas fa-user fa-2x'/>
-              <RegistrationInput inputClass="RegistrationInput" placeholderText="Email" value={this.state.email} onChange={this.handleInputChange} id="email" />
-              <RegistrationInput inputClass="RegistrationInput" placeholderText="Password" value={this.state.password} onChange={this.handleInputChange} id="password" />
-              <div style={{marginTop: '12px', marginLeft:'24px'}}><input type="checkbox" checked={this.state.isAdmin == 'true'} onClick={this._handleCheckboxClick}/> Admin?</div>
+              <RegistrationInput inputClass="RegistrationInput" placeholderText="Username" value={this.state.email} onChange={this.handleInputChange} id="email" />
+              <RegistrationInput inputType="password" inputClass="RegistrationInput" placeholderText="Password" value={this.state.password} onChange={this.handleInputChange} id="password" />
               <div className="RegistrationSubmitButton" onClick={this._handleClick}>SIGN IN</div>
             </div>
         );
