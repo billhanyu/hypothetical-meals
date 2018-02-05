@@ -38,6 +38,52 @@
   padding: 12px 0 40px;
 }
 
+/*** ARROWS SHIT ****/
+.PageArrows {
+    width: 100%;
+}
+
+.PageNumber {
+  font-size: 18px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.LeftPageArrow {
+  float: left;
+  height: 40px;
+  width: 40px;
+  border-radius: 40px;
+  background-color: #75ABCC;
+  margin-left: 12px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.RightPageArrow {
+  float: right;
+  cursor: pointer;
+  height: 40px;
+  width: 40px;
+  border-radius: 40px;
+  margin-right: 12px;
+  background-color: #75ABCC;
+  text-align: center;
+}
+
+.RightPageArrow:hover {
+  background-color: #C9D9E8;
+}
+
+.LeftPageArrow:hover {
+  background-color: #C9D9E8;
+}
+
+.PageArrow {
+  margin-top: 12px;
+  color: #FFF;
+}
+
 
 /** EDIT VENDOR WINDOW ***/
 .AdminDropdown {

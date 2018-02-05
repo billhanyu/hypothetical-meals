@@ -17,6 +17,7 @@ class AddIngredientWindow extends Component {
       name: '',
       finishedSubmitting: false,
       storage: 'Frozen',
+      errorMessage: null,
     };
   }
 
@@ -54,8 +55,9 @@ class AddIngredientWindow extends Component {
       });
     })
     .catch(error => {
-      console.log(error);
-      console.log(error.response);
+      self.setState({
+        errorMessage: error.data
+      });
     });
   }
 
@@ -71,6 +73,7 @@ class AddIngredientWindow extends Component {
 
           <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>ADD INGREDIENT</div>
           <div className="RegistrationInfoText">{this.state.finishedSubmitting ? "Finished Adding Ingredient" : null}</div>
+          <div className="RegistrationInfoText">{this.state.errorMessage != null ? this.state.errorMessage : null}</div>
       </div>
     );
   }

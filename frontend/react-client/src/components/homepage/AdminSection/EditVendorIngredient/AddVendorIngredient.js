@@ -20,6 +20,7 @@ class AddVendorIngredient extends Component {
       packaging: 'Sack-(50lbs)',
       vendor: '',
       hasUpdated: false,
+      errorMessage: null,
     };
   }
 
@@ -77,6 +78,9 @@ class AddVendorIngredient extends Component {
       });
     })
     .catch(error => {
+      self.setState({
+        errorMessage: error.data
+      });
       console.log(error.response);
     });
   }
@@ -84,7 +88,7 @@ class AddVendorIngredient extends Component {
   render() {
     return (
       <div className="EditContainer borderAll">
-          <RegistrationHeader HeaderText="New Ingredient" HeaderIcon="fas fa-utensils fa-2x"/>
+          <RegistrationHeader HeaderText="New Vendor Ingredient" HeaderIcon="fas fa-utensils fa-2x"/>
 
           <VendorComboBox id="packaging" onChange={this.handleInputChange} Options={["Sack-(50lbs)", 'Pail-(50 lbs)',
           'Drum-(500 lb)',
@@ -98,6 +102,7 @@ class AddVendorIngredient extends Component {
 
           <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>ADD VENDOR INGREDIENT</div>
           <div className="RegistrationInfoText">{this.state.hasUpdated ? "Updated" : null}</div>
+          <div className="RegistrationInfoText">{this.state.errorMessage != null ? this.state.errorMessage : null}</div>
       </div>
     );
   }

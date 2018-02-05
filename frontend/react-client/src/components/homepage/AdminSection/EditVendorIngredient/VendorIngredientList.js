@@ -3,6 +3,7 @@ import VendorIngredientListItem from './VendorIngredientListItem.js';
 import RegistrationHeader from './../../../Registration/RegistrationHeader.js';
 import axios from 'axios';
 import EditVendorIngredient from './EditVendorIngredient.js';
+import PageArrows from './../PageArrows.js';
 
 class IngredientList extends Component {
   constructor(props){
@@ -14,7 +15,44 @@ class IngredientList extends Component {
       activeStorageID: -1,
       activeId: -1,
       name: '',
+      currentPage: 1,
     };
+    this.onLeftArrowClick = this.onLeftArrowClick.bind(this);
+    this.onRightArrowClick = this.onRightArrowClick.bind(this);
+  }
+
+  onLeftArrowClick() {
+    const newPageNumber = this.state.currentPage <= 1 ? this.state.currentPage : this.state.currentPage - 1;
+    const self = this;
+    axios.get(`/vendoringredients-available/page/${newPageNumber}`, {
+      headers: { Authorization: "Token " + this.props.token }
+    })
+    .then(function (response) {
+      self.setState({
+        vendoringredients: response.data,
+        currentPage: newPageNumber,
+      });
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  }
+
+  onRightArrowClick() {
+    const newPageNumber = this.state.currentPage + 1;
+    const self = this;
+    axios.get(`/vendoringredients-available/page/${newPageNumber}`, {
+      headers: { Authorization: "Token " + this.props.token }
+    })
+    .then(function (response) {
+      self.setState({
+        vendoringredients: response.data,
+        currentPage: newPageNumber,
+      });
+    })
+    .catch(error => {
+      console.log(error);
+    });
   }
 
   /*** REQUIRED PROPS
@@ -52,6 +90,7 @@ class IngredientList extends Component {
     return (
       this.state.hasPickedIngredient ? <EditVendorIngredient token={this.props.token} vendor_ingredient_id={this.state.vendor_ingredient_id} price={this.state.ingredient_price} storage_id={this.state.storage_id} name={this.state.ingredient_name}/> :
       <div className="VendorList borderAll">
+        <PageArrows onClickLeft={this.onLeftArrowClick} pageNumber={this.state.currentPage} onClickRight={this.onRightArrowClick}/>
         <RegistrationHeader HeaderText="Edit Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>
         {
           this.state.vendoringredients.map((element, key) => {

@@ -17,6 +17,7 @@ class EditVendor extends Component {
       code: props.code,
       id: props.id,
       hasUpdated: false,
+      errorMessage: null,
     };
   }
 
@@ -48,12 +49,14 @@ class EditVendor extends Component {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(function (response) {
-      console.log(response);
       self.setState({
         hasUpdated: true,
       });
     })
     .catch(error => {
+      self.setState({
+        errorMessage: error.data
+      });
       console.log(error.response);
     });
   }
@@ -71,6 +74,7 @@ class EditVendor extends Component {
 
           <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT VENDOR</div>
           <div className="RegistrationInfoText">{this.state.hasUpdated ? "Updated" : null}</div>
+          <div className="RegistrationInfoText">{this.state.errorMessage != null ? this.state.errorMessage : null}</div>
       </div>
     );
   }

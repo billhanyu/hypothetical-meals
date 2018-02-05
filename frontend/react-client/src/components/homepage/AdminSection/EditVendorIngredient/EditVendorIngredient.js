@@ -17,6 +17,7 @@ class EditVendor extends Component {
       vendor_ingredient_id: props.vendor_ingredient_id,
       hasUpdated: false,
       packaging: 'Sack-(50lbs)',
+      errorMessage: null,
     };
   }
 
@@ -54,6 +55,9 @@ class EditVendor extends Component {
       });
     })
     .catch(error => {
+      self.setState({
+        errorMessage: error.data
+      });
       console.log(error.response);
     });
   }
@@ -61,7 +65,7 @@ class EditVendor extends Component {
   render() {
     return (
       <div className="EditContainer borderAll">
-          <RegistrationHeader HeaderText="Edit Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>
+          <RegistrationHeader HeaderText="Edit Vendor Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>
 
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Price" onChange={this.handleInputChange} id="Price" value={this.state.name}/>
           <div className="RegistrationInfoText">* Ingredient Price</div>
@@ -74,6 +78,7 @@ class EditVendor extends Component {
 
           <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT VENDOR INGREDIENT</div>
           <div className="RegistrationInfoText">{this.state.hasUpdated ? "Updated" : null}</div>
+          <div className="RegistrationInfoText">{this.state.errorMessage != null ? this.state.errorMessage : null}</div>
       </div>
     );
   }
