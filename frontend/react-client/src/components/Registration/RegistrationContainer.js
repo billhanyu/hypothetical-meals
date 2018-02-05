@@ -63,7 +63,7 @@ class RegistrationContainer extends Component {
             <div className="RegistrationInfoText">* (Optional) How your name will appear after you have logged in</div>
             <RegistrationInput inputClass="RegistrationInput" placeholderText="Email" onChange={this.handleInputChange} id="email" />
             <div className="RegistrationInfoText">* Used to login after registration</div>
-            <RegistrationInput inputClass="RegistrationInput" placeholderText="Password" onChange={this.handleInputChange} id="password" />
+            <RegistrationInput inputType="password" inputClass="RegistrationInput" placeholderText="Password" onChange={this.handleInputChange} id="password" />
 
             <PasswordStrengthContainer passwordText={this.state.password} />
             <div style={{marginTop: '12px', marginLeft:'24px', float:'left', marginBottom:'20px'}}><input type="checkbox" onClick={this._handleCheckboxClick}/> Admin?</div>

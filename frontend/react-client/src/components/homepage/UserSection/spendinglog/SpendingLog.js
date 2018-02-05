@@ -33,7 +33,6 @@ class SpendingLog extends Component {
       this.setState({
         entries: response.data
       });
-      console.log(response.data);
     });
   }
 
@@ -56,7 +55,7 @@ class SpendingLog extends Component {
         }
         <PageBar
           pages={this.state.pages}
-          onClickLink={this.selectPage}
+          selectPage={this.selectPage}
         />
       </div>
     );

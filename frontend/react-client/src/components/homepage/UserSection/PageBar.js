@@ -13,7 +13,7 @@ class PageBar extends Component {
   render() {
     const links = [];
     for (let i = 0; i < this.props.pages; i++) {
-      links.push(<a key={i} className="PageLink" onClick={e => this.onClickLink(i+1)} href="#">{i+1}</a>);
+      links.push(<a key={i} className="PageLink" onClick={e => this.onClickLink(i + 1)} href="javascript:void(0)">{i+1}</a>);
     }
     return(
       <div className="PageBar">
