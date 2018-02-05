@@ -5,6 +5,7 @@
 Requirements:  Node.js, MySQL
 
  1. Install packages using `npm install` in the root directory
+ 2. Install the frontend packages using `npm install` after `cd frontend`
 
 ### Website
 Running the website locally
