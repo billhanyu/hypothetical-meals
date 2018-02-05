@@ -45,7 +45,7 @@ class User {
     return {
       name: this.name,
       username: this.username,
-      user_group: this.user_group,
+      userGroup: this.userGroup,
       token: this.generateJWT(),
     };
   }
