@@ -36,7 +36,7 @@ class UserButtons extends Component {
   render() {
     return (
       <div>
-        <div className="AdminButtonContainer">
+        <div className="UserButtonContainer">
           <UserButton name="View Inventory" id="viewInventory" handleClick={this.handleClick} />
           <UserButton name="Log Orders" id="logOrder" handleClick={this.handleClick} />
           <UserButton name="Check Out" id="checkOut" handleClick={this.handleClick} />
