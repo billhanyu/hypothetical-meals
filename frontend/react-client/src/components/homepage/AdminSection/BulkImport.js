@@ -34,7 +34,7 @@ class BulkImport extends Component {
       <div className="BulkImport">
         <input className="BulkImportFile" type="file" name="bulk" onChange={this.changeFile}/>
         <div className="BulkImportButton">
-          <button className="UserButton btn btn-primary BulkImportSubmit" onClick={this.submit}>Import</button>
+          <button className="AdminButton btn btn-primary BulkImportSubmit" onClick={this.submit}>Import</button>
         </div>
       </div>
     );

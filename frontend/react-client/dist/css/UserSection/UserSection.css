@@ -233,23 +233,5 @@
   margin: 0 auto;
   margin-top: 48px;
   margin-bottom: 40px;
-  padding-bottom: 40px;
-}
-
-.BulkImport {
-  width: 50%;
-  margin: 0 auto;
-}
-
-.BulkImportFile {
-  margin: 0 auto;
-}
-
-.BulkImportButton {
-  margin: 30px auto;
-  text-align: center;
-}
-
-.BulkImportSubmit {
-  float: none;
+  padding-bottom: 100px;
 }
