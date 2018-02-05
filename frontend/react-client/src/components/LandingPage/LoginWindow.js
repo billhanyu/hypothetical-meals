@@ -43,7 +43,6 @@ class LoginWindow extends Component {
     })
     .then(response => {
       if(response.status == 200) {
-        console.log(response.data.user.user_group);
         this.cookies.set('user_group', response.data.user.user_group, { path: '/' });
         this.cookies.set('token', response.data.user.token, { path: '/' });
         global.token = response.data.user.token;
