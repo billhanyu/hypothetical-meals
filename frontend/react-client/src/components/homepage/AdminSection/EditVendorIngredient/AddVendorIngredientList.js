@@ -1,20 +1,18 @@
 import React, { Component } from 'react';
-import IngredientListItem from './IngredientListItem.js';
+import AddVendorListItem from './AddVendorListItem.js';
 import RegistrationHeader from './../../../Registration/RegistrationHeader.js';
 import axios from 'axios';
-import EditIngredient from './EditIngredient.js';
+import AddVendorIngredient from './AddVendorIngredient.js';
 import PageArrows from './../PageArrows.js';
 
-class IngredientList extends Component {
+class AddVendorIngredientList extends Component {
   constructor(props){
     super(props);
     this.clickedIngredient = this.clickedIngredient.bind(this);
     this.state = {
       ingredients: [],
       hasPickedIngredient: false,
-      activeStorageID: -1,
       activeId: -1,
-      name: '',
       currentPage: 1,
     };
     this.onLeftArrowClick = this.onLeftArrowClick.bind(this);
@@ -76,21 +74,19 @@ class IngredientList extends Component {
   clickedIngredient(dataObject) {
     this.setState({
       hasPickedIngredient: true,
-      activeStorageID: dataObject.storage_id,
-      activeName: dataObject.name,
       activeId: dataObject.id,
     });
   }
 
   render() {
     return (
-      this.state.hasPickedIngredient ? <EditIngredient token={this.props.token} id={this.state.activeId} storage_id={this.state.activeStorageID} name={this.state.activeName}/> :
+      this.state.hasPickedIngredient ? <AddVendorIngredient token={this.props.token} id={this.state.activeId}/> :
       <div className="VendorList borderAll">
         <PageArrows onClickLeft={this.onLeftArrowClick} pageNumber={this.state.currentPage} onClickRight={this.onRightArrowClick}/>
-        <RegistrationHeader HeaderText="Edit Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>
+        <RegistrationHeader HeaderText="Add Vendor Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>
         {
           this.state.ingredients.map((element, key) => {
-            return <IngredientListItem onClick={this.clickedIngredient} key={key} id={element.id} name={element.name} storage_id={element.storage_id}/>
+            return <AddVendorListItem onClick={this.clickedIngredient} key={key} id={element.id} name={element.name}/>
           })
         }
       </div>
@@ -98,4 +94,4 @@ class IngredientList extends Component {
   }
 }
 
-export default IngredientList;
+export default AddVendorIngredientList;

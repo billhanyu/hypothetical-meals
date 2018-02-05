@@ -5,6 +5,10 @@ import IngredientList from './EditIngredient/IngredientList.js';
 import AddVendor from './AddVendor.js';
 import VendorList from './EditVendor/VendorList.js';
 import BulkImport from './BulkImport';
+import VendorIngredientList from './EditVendorIngredient/VendorIngredientList.js';
+import AddVendorIngredientList from './EditVendorIngredient/AddVendorIngredientList.js';
+import EditStorageCapacity from './Storage/EditStorageCapacity.js';
+import InventoryList from './InventoryQuantity/InventoryList.js';
 
 class AdminButtons extends Component {
   constructor(props) {
@@ -32,8 +36,8 @@ class AdminButtons extends Component {
     else if (selectedButton == "addVendor") {
         return <AddVendor token={this.props.token}/>;
     }
-    if (selectedButton == "editIngredient") {
-        return <IngredientList token={this.props.token}/>;
+    else if (selectedButton == "editIngredient") {
+        return <IngredientList token={this.props.token}/>
     }
     else if (selectedButton == "addIngredient") {
         return <AddIngredientWindow token={this.props.token}/>;
@@ -41,6 +45,19 @@ class AdminButtons extends Component {
     else if (selectedButton == "bulkImport") {
       return <BulkImport token={this.props.token} />;
     }
+    else if (selectedButton == "editVendorIngredient") {
+        return <VendorIngredientList token={this.props.token}/>
+    }
+    else if (selectedButton == "addVendorIngredient") {
+        return <AddVendorIngredientList token={this.props.token}/>
+    }
+    else if (selectedButton == "editStorage") {
+        return <EditStorageCapacity token={this.props.token} />
+    }
+    else if (selectedButton == 'inventoryQuantity') {
+      return <InventoryList token={this.props.token} />
+    }
+
   }
 
   render() {
@@ -52,6 +69,10 @@ class AdminButtons extends Component {
           <AdminButton name="Edit Ingredient" id="editIngredient" handleClick={this.handleClick}/>
           <AdminButton name="Add Ingredient" id="addIngredient" handleClick={this.handleClick}/>
           <AdminButton name="Bulk Import" id="bulkImport" handleClick={this.handleClick} />
+          <AdminButton name="Edit VendorIngedient" id="editVendorIngredient" handleClick={this.handleClick}/>
+          <AdminButton name="Add VendorIngredient" id="addVendorIngredient" handleClick={this.handleClick}/>
+          <AdminButton name="Edit Storage" id="editStorage" handleClick={this.handleClick}/>
+          <AdminButton name="Edit Inventory Size" id="inventoryQuantity" handleClick={this.handleClick} />
         </div>
         {
           this._renderSelectedButton()

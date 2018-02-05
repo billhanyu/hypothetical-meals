@@ -1,24 +1,19 @@
 import React, { Component } from 'react';
 
-class VendorListItem extends Component {
+class AddVendorListItem extends Component {
   constructor(props){
     super(props);
     this._handleClick = this._handleClick.bind(this);
   }
 
   /*** REQUIRED PROPS
-    1. id (Number)
-    2. name (String)
-    3. contact (String)
-    4. code (String)
-    5. clickedVendor (Func)
+    1. name (String)
+    2. onClick (Func)
+    3. id (Number)
   */
   _handleClick() {
     this.props.onClick({
-      code: this.props.code,
-      name: this.props.name,
       id: this.props.id,
-      contact: this.props.contact,
     });
   }
 
@@ -31,4 +26,4 @@ class VendorListItem extends Component {
   }
 }
 
-export default VendorListItem;
+export default AddVendorListItem;
