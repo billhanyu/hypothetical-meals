@@ -21,10 +21,8 @@ class LoginWindow extends Component {
   }
 
   handleInputChange(fieldName, event) {
-    const newState = this.state;
-    this.setState({
-      fieldName: event.target.value
-    });
+    const newState = Object.assign({}, this.state);
+    newState[fieldName] = event.target.value;
     this.setState(newState);
   }
 
@@ -44,7 +42,7 @@ class LoginWindow extends Component {
       }
     })
     .catch(error => {
-      console.log(error);
+      alert('Wrong username or password!');
     });
   }
 
@@ -53,7 +51,7 @@ class LoginWindow extends Component {
     this.cookies.set('admin', newIsAdmin, { path: '/' });
     this.setState({
       isAdmin: newIsAdmin
-    })
+    });
   }
 
     render() {
