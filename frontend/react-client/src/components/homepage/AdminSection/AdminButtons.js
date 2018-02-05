@@ -8,6 +8,7 @@ import VendorIngredientList from './EditVendorIngredient/VendorIngredientList.js
 import AddVendorIngredientList from './EditVendorIngredient/AddVendorIngredientList.js';
 import EditStorageCapacity from './Storage/EditStorageCapacity.js';
 import InventoryList from './InventoryQuantity/InventoryList.js';
+import { withRouter } from 'react-router';
 
 class AdminButtons extends Component {
   constructor(props) {
@@ -15,6 +16,7 @@ class AdminButtons extends Component {
     this.state = {
       renderedButton:"",
     };
+    this._redirectSignup = this._redirectSignup.bind(this);
     this.handleClick = this.handleClick.bind(this);
   }
   /** REQUIRED PROPS
@@ -53,7 +55,11 @@ class AdminButtons extends Component {
     else if (selectedButton == 'inventoryQuantity') {
       return <InventoryList token={this.props.token} />
     }
+  }
 
+  _redirectSignup() {
+    this.props.history.push(`/register`);
+    return;
   }
 
   render() {
@@ -68,6 +74,7 @@ class AdminButtons extends Component {
           <AdminButton name="Add VendorIngredient" id="addVendorIngredient" handleClick={this.handleClick}/>
           <AdminButton name="Edit Storage" id="editStorage" handleClick={this.handleClick}/>
           <AdminButton name="Edit Inventory Size" id="inventoryQuantity" handleClick={this.handleClick} />
+          <AdminButton name="New User" id="inventoryQuantity" handleClick={this._redirectSignup} />
         </div>
         {
           this._renderSelectedButton()
@@ -77,4 +84,4 @@ class AdminButtons extends Component {
   }
 }
 
-export default AdminButtons;
+export default withRouter(AdminButtons);
