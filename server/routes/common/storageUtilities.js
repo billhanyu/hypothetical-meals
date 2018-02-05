@@ -56,6 +56,6 @@ export function checkStoragePromise(req) {
     });
 }
 
-const validStorageTypes = ['room temperature', 'freezer', 'refrigerator'];
+const validStorageTypes = ['room temperature', 'freezer', 'room temperature'];
 
 export { validStorageTypes };
