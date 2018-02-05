@@ -213,8 +213,7 @@
   width: 90%;
   margin: 0 auto;
   margin-top: 48px;
-  margin-bottom: 40px;
-  padding-bottom: 40px;
+  display: inline-block;
 }
 
 .UserButton {

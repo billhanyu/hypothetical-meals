@@ -3,6 +3,7 @@ import UserButton from '../CommonComponent/UserButton';
 import ViewInventory from './inventory/ViewInventory';
 import LogOrder from './order/LogOrder';
 import CheckOut from './checkout/CheckOut';
+import SpendingLog from './spendinglog/SpendingLog';
 
 class UserButtons extends Component {
   constructor(props) {
@@ -30,6 +31,8 @@ class UserButtons extends Component {
       return <LogOrder token={this.props.token} />;
     } else if (selectedButton == "checkOut") {
       return <CheckOut token={this.props.token} />;
+    } else if (selectedButton == "spendingLog") {
+      return <SpendingLog token={this.props.token} />;
     }
   }
 
@@ -40,6 +43,7 @@ class UserButtons extends Component {
           <UserButton name="View Inventory" id="viewInventory" handleClick={this.handleClick} />
           <UserButton name="Log Orders" id="logOrder" handleClick={this.handleClick} />
           <UserButton name="Check Out" id="checkOut" handleClick={this.handleClick} />
+          <UserButton name="Spending Report" id="spendingLog" handleClick={this.handleClick} />
         </div>
         {
           this._renderSelectedButton()
