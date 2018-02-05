@@ -24,27 +24,26 @@
   width: 90%;
   margin: 0 auto;
   min-width: 1000px;
-  margin-top: 20px;
+  margin-top: 40px;
 }
 
 .FeatureLine {
-  height: 1px;
   background-color: #F9F9F9;
   float: left;
-  width: 32.5%;
+  width: 29.5%;
 }
 
 .FeatureTitleText {
   float: left;
   text-align: center;
-  width: 35%;
+  width: 40%;
   margin: 0 auto;
   font-size: 20px;
   color: #5B5B5B;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-family: "Lato", sans-serif;
-  margin-top: 6px;
+  margin-top: -4px;
 }
 
 /** BEGIN GENERAL FEATURE CONTENT CONTAINER */

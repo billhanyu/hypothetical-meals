@@ -3,6 +3,7 @@ import VendorListItem from './VendorListItem.js';
 import RegistrationHeader from './../../../Registration/RegistrationHeader.js';
 import axios from 'axios';
 import EditVendor from './EditVendor.js';
+import PageArrows from './../PageArrows.js';
 
 class VendorList extends Component {
   constructor(props){
@@ -15,23 +16,56 @@ class VendorList extends Component {
       activeId: -1,
       activeName: '',
       activeContact: '',
+      currentPage: 1,
     };
+    this.onLeftArrowClick = this.onLeftArrowClick.bind(this);
+    this.onRightArrowClick = this.onRightArrowClick.bind(this);
+  }
+
+  onLeftArrowClick() {
+    const newPageNumber = this.state.currentPage <= 1 ? this.state.currentPage : this.state.currentPage - 1;
+    const self = this;
+    axios.get(`/vendors/page/${newPageNumber}`, {
+      headers: { Authorization: "Token " + this.props.token }
+    })
+    .then(function (response) {
+      self.setState({
+        vendors: response.data,
+        currentPage: newPageNumber,
+      });
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  }
+
+  onRightArrowClick() {
+    const newPageNumber = this.state.currentPage + 1;
+    const self = this;
+    axios.get(`/vendors/page/${newPageNumber}`, {
+      headers: { Authorization: "Token " + this.props.token }
+    })
+    .then(function (response) {
+      self.setState({
+        vendors: response.data,
+        currentPage: newPageNumber,
+      });
+    })
+    .catch(error => {
+      console.log(error);
+    });
   }
 
   /*** REQUIRED PROPS
-    1. id (Number)
-    2. name (String)
-    3. contact (String)
-    4. code (String)
+    1. token (String)
   */
 
   componentDidMount() {
     const self = this;
-    axios.get("/vendors", {
+    axios.get("/vendors/page/1", {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(function (response) {
-      console.log(response);
       self.setState({
         vendors: response.data
       });
@@ -53,8 +87,9 @@ class VendorList extends Component {
 
   render() {
     return (
-      this.state.hasPickedVendor ? <EditVendor id={this.state.activeId} name={this.state.activeName} contact={this.state.activeContact} code={this.state.activeCode}/> :
+      this.state.hasPickedVendor ? <EditVendor token={this.props.token} id={this.state.activeId} name={this.state.activeName} contact={this.state.activeContact} code={this.state.activeCode}/> :
       <div className="VendorList borderAll">
+        <PageArrows onClickLeft={this.onLeftArrowClick} pageNumber={this.state.currentPage} onClickRight={this.onRightArrowClick}/>
         <RegistrationHeader HeaderText="Edit Vendor" HeaderIcon="fas fa-pencil-alt fa-2x"/>
         {
           this.state.vendors.map((element, key) => {

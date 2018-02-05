@@ -4,11 +4,14 @@
   margin-top: 48px;
   margin-bottom: 40px;
   padding-bottom: 40px;
+  height: 150px;
+  min-width: 800px;
 }
 
 .AdminButton {
   width: 250px;
   min-width: 250px;
+  margin-top: 12px;
   height: 40px;
   border: 1px solid grey;
   border-radius: 6px;
@@ -33,6 +36,52 @@
   border-radius: 8px;
   clear: both;
   padding: 12px 0 40px;
+}
+
+/*** ARROWS SHIT ****/
+.PageArrows {
+    width: 100%;
+}
+
+.PageNumber {
+  font-size: 18px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.LeftPageArrow {
+  float: left;
+  height: 40px;
+  width: 40px;
+  border-radius: 40px;
+  background-color: #75ABCC;
+  margin-left: 12px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.RightPageArrow {
+  float: right;
+  cursor: pointer;
+  height: 40px;
+  width: 40px;
+  border-radius: 40px;
+  margin-right: 12px;
+  background-color: #75ABCC;
+  text-align: center;
+}
+
+.RightPageArrow:hover {
+  background-color: #C9D9E8;
+}
+
+.LeftPageArrow:hover {
+  background-color: #C9D9E8;
+}
+
+.PageArrow {
+  margin-top: 12px;
+  color: #FFF;
 }
 
 
