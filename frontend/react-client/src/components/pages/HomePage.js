@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import PrimaryOptionBar from './../navigation/primaryoptionbar.js';
 import ContentMain from './../homepage/ContentMain.js';
 import Enums from './../Constants/Enums.js';
-import NavBar from './../navigation/navBar.js';
 import RegistrationNavBar from './../Registration/RegistrationNavBar.js';
+import LogOutButton from '../homepage/LogOutButton';
 
 class HomePage extends Component {
   constructor(props){
@@ -24,8 +24,9 @@ class HomePage extends Component {
     return (
       <div>
         <RegistrationNavBar />
-        <PrimaryOptionBar changeTab={this.changeTab} isAdmin={this.props.match.params.isAdmin}/>
-        <ContentMain selectedTab={this.state.selectedTab} token={this.props.match.params.token}/>
+        <PrimaryOptionBar changeTab={this.changeTab} isAdmin={global.user_group == 'admin'}/>
+        <ContentMain selectedTab={this.state.selectedTab} token={global.token}/>
+        <LogOutButton />
       </div>
     );
   }
