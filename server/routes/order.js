@@ -49,7 +49,9 @@ function orderHelper(orders, req, res, next) {
     .then((inventoryResults) => {
         let updateIngredients = {};
         inventoryResults.forEach(x => {
-            updateIngredients[x.id] = orders[x.ingredient_id] + x.num_packages;
+            const myIngredientId = x.ingredient_id;
+            const myVendorIngredientId = ingredientsMap[myIngredientId]['vendor_ingredient_id'];
+            updateIngredients[x.id] = orders[myVendorIngredientId] + x.num_packages;
         });
         for (let ingredientId of ingredientIds) {
             if (!(ingredientId in updateIngredients)) {

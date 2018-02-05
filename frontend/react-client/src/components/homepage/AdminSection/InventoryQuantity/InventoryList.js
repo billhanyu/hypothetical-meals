@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import IngredientListItem from './IngredientListItem.js';
 import RegistrationHeader from './../../../Registration/RegistrationHeader.js';
 import axios from 'axios';
-import EditIngredient from './EditIngredient.js';
+
+import InventoryListItem from './InventoryListItem.js';
+import EditInventory from './EditInventory.js';
 import PageArrows from './../PageArrows.js';
 
 class IngredientList extends Component {
@@ -10,11 +11,8 @@ class IngredientList extends Component {
     super(props);
     this.clickedIngredient = this.clickedIngredient.bind(this);
     this.state = {
-      ingredients: [],
+      inventory: [],
       hasPickedIngredient: false,
-      activeStorageID: -1,
-      activeId: -1,
-      name: '',
       currentPage: 1,
     };
     this.onLeftArrowClick = this.onLeftArrowClick.bind(this);
@@ -24,12 +22,12 @@ class IngredientList extends Component {
   onLeftArrowClick() {
     const newPageNumber = this.state.currentPage <= 1 ? this.state.currentPage : this.state.currentPage - 1;
     const self = this;
-    axios.get(`/ingredients/page/${newPageNumber}`, {
+    axios.get(`/inventory/page/${newPageNumber}`, {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(function (response) {
       self.setState({
-        ingredients: response.data,
+        inventory: response.data,
         currentPage: newPageNumber,
       });
     })
@@ -41,12 +39,12 @@ class IngredientList extends Component {
   onRightArrowClick() {
     const newPageNumber = this.state.currentPage + 1;
     const self = this;
-    axios.get(`/ingredients/page/${newPageNumber}`, {
+    axios.get(`/inventory/page/${newPageNumber}`, {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(function (response) {
       self.setState({
-        ingredients: response.data,
+        inventory: response.data,
         currentPage: newPageNumber,
       });
     })
@@ -56,17 +54,18 @@ class IngredientList extends Component {
   }
   /*** REQUIRED PROPS
     1. token (String)
+
   */
 
   componentDidMount() {
     const self = this;
-    axios.get("/ingredients/page/1", {
+    axios.get("/inventory/page/1", {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(function (response) {
       self.setState({
-        ingredients: response.data
-      });
+        inventory: response.data,
+      })
     })
     .catch(error => {
       console.log(error);
@@ -76,21 +75,20 @@ class IngredientList extends Component {
   clickedIngredient(dataObject) {
     this.setState({
       hasPickedIngredient: true,
-      activeStorageID: dataObject.storage_id,
-      activeName: dataObject.name,
-      activeId: dataObject.id,
+      id: dataObject.id,
+      num_packages: dataObject.num_packages,
     });
   }
 
   render() {
     return (
-      this.state.hasPickedIngredient ? <EditIngredient token={this.props.token} id={this.state.activeId} storage_id={this.state.activeStorageID} name={this.state.activeName}/> :
+      this.state.hasPickedIngredient ? <EditInventory token={this.props.token} id={this.state.id} num_packages={this.state.num_packages}/> :
       <div className="VendorList borderAll">
         <PageArrows onClickLeft={this.onLeftArrowClick} pageNumber={this.state.currentPage} onClickRight={this.onRightArrowClick}/>
         <RegistrationHeader HeaderText="Edit Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>
         {
-          this.state.ingredients.map((element, key) => {
-            return <IngredientListItem onClick={this.clickedIngredient} key={key} id={element.id} name={element.name} storage_id={element.storage_id}/>
+          this.state.inventory.map((element, key) => {
+            return <InventoryListItem onClick={this.clickedIngredient} key={key} id={element.id} ingredient_name={element.ingredient_name} package_type={element.package_type} num_packages={element.num_packages}/>
           })
         }
       </div>

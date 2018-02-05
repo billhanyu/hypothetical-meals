@@ -93,12 +93,12 @@ function modifyIngredientHelper(items, req, res, next) {
       return res.status(400).send(`Ingredient ID ${idString} is invalid.`);
     }
     const storageId = items[idString]['storage_id'] || 0;
-    if (!checkNumber.isNonNegativeInteger(storageId) || storageId > 2) {
+    if (!checkNumber.isNonNegativeInteger(storageId) || storageId > 3) {
       return res.status(400).send(`New storage id ${storageId} is invalid`);
     }
     ingredientIds.push(idString);
   }
-  
+
   const nameCases = [];
   const storageCases = [];
   connection.query(`SELECT id, name, storage_id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
@@ -115,7 +115,7 @@ function modifyIngredientHelper(items, req, res, next) {
       storageCases.push(`when id = ${ingredient.id} then ${newStorage || oldStorage}`);
     }
     return connection.query(
-      `UPDATE Ingredients 
+      `UPDATE Ingredients
         SET storage_id = (case ${storageCases.join(' ')} end),
             name = (case ${nameCases.join(' ')} end)
         WHERE id IN (${ingredientIds.join(', ')})`);
