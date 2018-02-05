@@ -5,6 +5,7 @@ import RegistrationHeader from './../../Registration/RegistrationHeader.js';
 import RegistrationInput from './../../Registration/RegistrationInput.js';
 import RegistrationAgreement from './../../Registration/RegistrationAgreement.js';
 import RegistrationSubmitButton from './../../Registration/RegistrationSubmitButton.js';
+import PageArrows from './PageArrows.js';
 
 class AddVendor extends Component {
   constructor(props){
@@ -16,6 +17,7 @@ class AddVendor extends Component {
       contact: '',
       carriercode: '',
       finishedSubmitting: false,
+      errorMessage: null,
     };
   }
 
@@ -36,12 +38,14 @@ class AddVendor extends Component {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(response => {
-      console.log(response);
       this.setState({
         finishedSubmitting: true
       });
     })
     .catch(error => {
+      self.setState({
+        errorMessage: error.data
+      });
       console.log(error.response);
     });
   }
@@ -59,6 +63,7 @@ class AddVendor extends Component {
 
           <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>ADD INGREDIENT</div>
           <div className="RegistrationInfoText">{this.state.finishedSubmitting ? "Finished Adding Vendor" : null}</div>
+          <div className="RegistrationInfoText">{this.state.errorMessage != null ? this.state.errorMessage : null}</div>
       </div>
     );
   }

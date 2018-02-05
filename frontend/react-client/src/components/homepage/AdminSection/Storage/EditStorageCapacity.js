@@ -13,20 +13,14 @@ class EditVendor extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmitButtonClick = this.handleSubmitButtonClick.bind(this);
     this.state = {
-      name: props.name,
-      storage_id: props.storage_id,
-      id: props.id,
-      hasUpdated: false,
+      size: 0,
+      storage: 'Frozen',
       errorMessage: null,
-      storage: "Frozen",
     };
   }
 
   /*** REQUIRED PROPS
-    1. name (String)
-    2. storage_id (String)
-    3. id (number)
-    3. token (String)
+    1. Token (String)
   */
 
   handleInputChange(fieldName, event) {
@@ -48,16 +42,13 @@ class EditVendor extends Component {
       storage_id = 3;
     }
 
-    const newVendorObject = {};
-    newVendorObject[this.state.id] = storage_id;
+    const paramObject = {};
+    paramObject[storage_id] = this.state.size;
 
-    axios.put("/ingredients", {
-      ingredients: newVendorObject,
-    }, {
+    axios.put("/storages", paramObject, {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(function (response) {
-      console.log(response);
       self.setState({
         hasUpdated: true,
       });
@@ -73,14 +64,14 @@ class EditVendor extends Component {
   render() {
     return (
       <div className="EditContainer borderAll">
-          <RegistrationHeader HeaderText="Edit Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>
+          <RegistrationHeader HeaderText="Storage Size" HeaderIcon="fas fa-pencil-alt fa-2x"/>
 
-          <RegistrationInput inputClass="RegistrationInput" placeholderText="Name" onChange={this.handleInputChange} id="name" value={this.state.name}/>
-          <div className="RegistrationInfoText">* Ingredient Name</div>
+          <RegistrationInput inputClass="RegistrationInput" placeholderText="Size" onChange={this.handleInputChange} id="size" value={this.state.size}/>
+          <div className="RegistrationInfoText">* Max Capacity</div>
           <VendorComboBox id="storage" Options={["Frozen","Refrigerated","Room Temperature"]} onChange={this.handleInputChange}/>
-          <div className="RegistrationInfoText">* Temperature </div>
+          <div className="RegistrationInfoText">* Storage Type </div>
 
-          <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT VENDOR</div>
+          <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT STORAGE SIZE</div>
           <div className="RegistrationInfoText">{this.state.hasUpdated ? "Updated" : null}</div>
           <div className="RegistrationInfoText">{this.state.errorMessage != null ? this.state.errorMessage : null}</div>
       </div>
