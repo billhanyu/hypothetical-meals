@@ -9,6 +9,7 @@ INSERT INTO Vendors (id, name, contact, code) VALUES (1, 'Duke', 'contact', 'cod
 INSERT INTO Vendors (id, name, contact, code) VALUES (2, 'UNC', 'contact', 'code_unc');
 INSERT INTO Storages (id, name, capacity) VALUES (1, 'freezer', 2000);
 INSERT INTO Storages (id, name, capacity) VALUES (2, 'refrigerator', 20);
+INSERT INTO Storages (id, name, capacity) VALUES (3, 'room temperature', 500);
 INSERT INTO Ingredients (id, name, storage_id) VALUES (1, 'poop', 1);
 INSERT INTO Ingredients (id, name, storage_id) VALUES (2, 'beans', 1);
 INSERT INTO Ingredients (id, name, storage_id) VALUES (3, 'boop', 1);

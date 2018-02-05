@@ -4,8 +4,9 @@
   "description": "ECE-458 Project",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec babel-node server/server.js",
-    "test": "cross-env NODE_ENV=test mocha --require babel-polyfill --require babel-register --exit"
+    "start": "cross-env NODE_ENV=dev nodemon --exec babel-node server/server.js",
+    "test": "cross-env NODE_ENV=test mocha --require babel-polyfill --require babel-register --exit",
+    "start-production": "./deploy.sh"
   },
   "author": "Eric Song, Bill Yu, Brian Zhou, Christine Zhou",
   "license": "ISC",
@@ -41,6 +42,8 @@
     "gitbook-cli": "^2.3.2",
     "gitbook-plugin-theme-api": "^1.1.2",
     "mocha": "^4.1.0",
-    "nodemon": "^1.14.11"
+    "nodemon": "^1.14.11",
+    "papaparse": "^4.3.7",
+    "supertest": "^3.0.0"
   }
 }
