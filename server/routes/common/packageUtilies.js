@@ -25,7 +25,7 @@ function getWeight(type) {
 
     if (unitWeight < 0) {
         const err = {
-            custom: 'Invalid type of ingredient.',
+            custom: 'Invalid package type.',
         };
         throw err;
     } else {
