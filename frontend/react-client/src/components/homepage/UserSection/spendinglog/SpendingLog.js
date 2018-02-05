@@ -33,7 +33,6 @@ class SpendingLog extends Component {
       this.setState({
         entries: response.data
       });
-      console.log(response.data);
     });
   }
 
