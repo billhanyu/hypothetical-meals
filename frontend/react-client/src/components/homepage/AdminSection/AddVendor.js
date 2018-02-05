@@ -61,7 +61,7 @@ class AddVendor extends Component {
           <div className="RegistrationInfoText">* Used to login after registration</div>
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Carrier Code" onChange={this.handleInputChange} id="carriercode" />
 
-          <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>ADD INGREDIENT</div>
+          <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>ADD VENDOR</div>
           <div className="RegistrationInfoText">{this.state.finishedSubmitting ? "Finished Adding Vendor" : null}</div>
           <div className="RegistrationInfoText">{this.state.errorMessage != null ? this.state.errorMessage : null}</div>
       </div>
