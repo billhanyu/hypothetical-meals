@@ -10,6 +10,17 @@ export function signupNoob(req, res, next) {
   signupUser(req, res, next, false);
 }
 
+
+export function getInfo(req, res, next) {
+  connection.query(`SELECT * from Users where id=${req.payload.id}`)
+  .then((results) => {
+    if (results.length != 1) return res.status(500).send('Database error');
+    let user = new User(results[0]);
+    return res.status(200).send(user.getBasicInfo());
+  })
+  .catch(err => handleError(err, res));
+}
+
 function signupUser(req, res, next, isAdmin) {
   const error = checkParams.checkBlankParams(req.body.user, ['name', 'username', 'password']);
   if (error) return res.status(422).send(error);

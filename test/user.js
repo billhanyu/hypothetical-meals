@@ -3,6 +3,35 @@ const assert = require('chai').assert;
 const testTokens = require('./testTokens');
 
 describe('User', () => {
+
+  describe('#getInfo()', () => {
+    it('should get info for admin user', (done) => {
+      chai.request(server)
+        .get('/users/info')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          assert.strictEqual(res.body.name, 'mike wazowski', 'Name of user');
+          assert.strictEqual(res.body.username, 'noob', 'Username of user');
+          assert.strictEqual(res.body.userGroup, 'noob', 'User priviledge group');
+          done();
+        });
+    });
+
+    it('should get info for admin user', (done) => {
+      chai.request(server)
+        .get('/users/info')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          assert.strictEqual(res.body.name, 'mike krzyzewski', 'Name of user');
+          assert.strictEqual(res.body.username, 'admin', 'Username of user');
+          assert.strictEqual(res.body.userGroup, 'admin', 'User priviledge group');
+          done();
+        });
+    });
+  });
+
   describe('#modifyUsers()', () => {
     beforeEach(() => {
       alasql('SOURCE "./server/create_database.sql"');
