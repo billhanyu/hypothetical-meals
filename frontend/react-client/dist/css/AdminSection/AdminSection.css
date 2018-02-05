@@ -144,3 +144,9 @@
 .BulkImportSubmit {
   float: none;
 }
+
+.LogOutLink {
+  position: absolute;
+  top: 20px;
+  right: 50px;
+}
