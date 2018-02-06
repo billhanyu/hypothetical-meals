@@ -98,68 +98,6 @@ describe('Vendor', () => {
         });
     });
 
-    it('should reject duplicate name', (done) => {
-      chai.request(server)
-        .post('/vendors')
-        .set('Authorization', `Token ${testTokens.adminTestToken}`)
-        .send({
-          'vendors': [
-            {
-              'name': 'Duke',
-              'contact': 'mcd@mcd.com',
-              'code': 'mcd',
-            },
-          ],
-        })
-        .end((err, res) => {
-          res.should.have.status(400);
-          done();
-        });
-    });
-
-    it('should reject duplicate name within request', (done) => {
-      chai.request(server)
-        .post('/vendors')
-        .set('Authorization', `Token ${testTokens.adminTestToken}`)
-        .send({
-          'vendors': [
-            {
-              'name': 'mcd',
-              'contact': 'mcd@mcd.com',
-              'code': 'mcd',
-            },
-            {
-              'name': 'mcd',
-              'contact': 'mcd',
-              'code': 'mcd1',
-            },
-          ],
-        })
-        .end((err, res) => {
-          res.should.have.status(400);
-          done();
-        });
-    });
-
-    it('should reject duplicate code', (done) => {
-      chai.request(server)
-        .post('/vendors')
-        .set('Authorization', `Token ${testTokens.adminTestToken}`)
-        .send({
-          'vendors': [
-            {
-              'name': 'mcd',
-              'contact': 'mcd@mcd.com',
-              'code': 'code_duke',
-            },
-          ],
-        })
-        .end((err, res) => {
-          res.should.have.status(400);
-          done();
-        });
-    });
-
     it('should add vendors for valid requests', (done) => {
       chai.request(server)
         .post('/vendors')
@@ -241,60 +179,6 @@ describe('Vendor', () => {
         .put('/vendors')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({})
-        .end((err, res) => {
-          res.should.have.status(400);
-          done();
-        });
-    });
-
-    it('should reject duplicate name', (done) => {
-      chai.request(server)
-        .put('/vendors')
-        .set('Authorization', `Token ${testTokens.adminTestToken}`)
-        .send({
-          'vendors': {
-            '2': {
-              'name': 'Duke',
-            },
-          },
-        })
-        .end((err, res) => {
-          res.should.have.status(400);
-          done();
-        });
-    });
-
-    it('should reject duplicate name within request', (done) => {
-      chai.request(server)
-        .put('/vendors')
-        .set('Authorization', `Token ${testTokens.adminTestToken}`)
-        .send({
-          'vendors': {
-            '1': {
-              'name': 'bill',
-            },
-            '2': {
-              'name': 'bill',
-            },
-          },
-        })
-        .end((err, res) => {
-          res.should.have.status(400);
-          done();
-        });
-    });
-
-    it('should reject duplicate code', (done) => {
-      chai.request(server)
-        .put('/vendors')
-        .set('Authorization', `Token ${testTokens.adminTestToken}`)
-        .send({
-          'vendors': {
-            '2': {
-              'code': 'code_duke',
-            },
-          },
-        })
         .end((err, res) => {
           res.should.have.status(400);
           done();

@@ -1,5 +1,5 @@
 import * as checkNumber from './common/checkNumber';
-import { createError, handleError } from './common/customError';
+import { handleError } from './common/customError';
 import success from './common/success';
 import { fakeDeleteMultipleVendorIngredients } from './vendorIngredient';
 import { getNumPages, queryWithPagination } from './common/pagination';
@@ -61,8 +61,11 @@ export function addVendors(req, res, next) {
     values.push(`('${name}', '${contact}', '${code}')`);
   }
 
-  const changeQuery = () => connection.query(`INSERT INTO Vendors (name, contact, code) VALUES ${values.join(', ')}`);
-  duplicationCheckHelper(names, codes, changeQuery, res);
+  connection.query(`INSERT INTO Vendors (name, contact, code) VALUES ${values.join(', ')}`)
+    .then(() => success(res))
+    .catch(err => {
+      handleError(err, res);
+    });
 }
 
 /* req.body.vendors = {
@@ -91,67 +94,35 @@ export function modifyVendors(req, res, next) {
     if (code) codes.push(code);
   }
 
-  const changeQuery = () =>
-    connection.query(`SELECT * FROM Vendors WHERE id IN (${Object.keys(vendors).join(', ')})`)
-      .then(olds => {
-        const nameCases = [];
-        const contactCases = [];
-        const codeCases = [];
-        for (let old of olds) {
-          const id = old['id'];
-          const oldName = old['name'];
-          const oldContact = old['contact'];
-          const oldCode = old['code'];
-          const change = vendors[id];
-          const newName = change['name'];
-          const newContact = change['contact'];
-          const newCode = change['code'];
-          nameCases.push(`when id = ${id} then '${newName || oldName}'`);
-          contactCases.push(`when id = ${id} then '${newContact || oldContact}'`);
-          codeCases.push(`when id = ${id} then '${newCode || oldCode}'`);
-        }
-        return connection.query(`
-          UPDATE Vendors
-            SET name = (case ${nameCases.join(' ')} end),
-              contact = (case ${contactCases.join(' ')} end),
-              code = (case ${codeCases.join(' ')} end)
-            WHERE id IN (${Object.keys(vendors).join(', ')})`);
+  connection.query(`SELECT * FROM Vendors WHERE id IN (${Object.keys(vendors).join(', ')})`)
+    .then(olds => {
+      const nameCases = [];
+      const contactCases = [];
+      const codeCases = [];
+      for (let old of olds) {
+        const id = old['id'];
+        const oldName = old['name'];
+        const oldContact = old['contact'];
+        const oldCode = old['code'];
+        const change = vendors[id];
+        const newName = change['name'];
+        const newContact = change['contact'];
+        const newCode = change['code'];
+        nameCases.push(`when id = ${id} then '${newName || oldName}'`);
+        contactCases.push(`when id = ${id} then '${newContact || oldContact}'`);
+        codeCases.push(`when id = ${id} then '${newCode || oldCode}'`);
+      }
+      return connection.query(`
+        UPDATE Vendors
+          SET name = (case ${nameCases.join(' ')} end),
+            contact = (case ${contactCases.join(' ')} end),
+            code = (case ${codeCases.join(' ')} end)
+          WHERE id IN (${Object.keys(vendors).join(', ')})`);
+      })
+      .then(() => success(res))
+      .catch(err => {
+        handleError(err, res);
       });
-  duplicationCheckHelper(names, codes, changeQuery, res);
-}
-
-function duplicationCheckHelper(names, codes, nextQuery, res) {
-  names = names.sort();
-  codes = codes.sort();
-  for (let i = 0; i < names.length - 1; i++) {
-    if (names[i] === names[i + 1]) {
-      return res.status(400).send('You have duplicated names in your request.');
-    }
-  }
-  for (let i = 0; i < codes.length - 1; i++) {
-    if (codes[i] === codes[i + 1]) {
-      return res.status(400).send('You have duplicated codes in your request.');
-    }
-  }
-
-  connection.query('SELECT name, code FROM Vendors')
-    .then(results => {
-      const oldNames = results.map(vendor => vendor['name']);
-      const oldCodes = results.map(vendor => vendor['code']);
-      for (let name of names) {
-        if (oldNames.indexOf(name) > -1) {
-          throw createError('One or more of your names has duplications with the database.');
-        }
-      }
-      for (let code of codes) {
-        if (oldCodes.indexOf(code) > -1) {
-          throw createError('One of more of your codes has duplications with the database.');
-        }
-      }
-      return nextQuery();
-    })
-    .then(() => success(res))
-    .catch(err => handleError(err, res));
 }
 
 /* req.body.ids = [

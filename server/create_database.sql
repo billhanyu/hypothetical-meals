@@ -38,7 +38,7 @@ CREATE TABLE Storages(
 
 CREATE TABLE Ingredients(
 	id int not null AUTO_INCREMENT,
-	name varchar(70) not null,
+	name varchar(70) not null UNIQUE,
 	storage_id int not null,
 	removed BIT DEFAULT 0,
 
