@@ -3,9 +3,6 @@ import axios from 'axios';
 
 import RegistrationHeader from './../../Registration/RegistrationHeader.js';
 import RegistrationInput from './../../Registration/RegistrationInput.js';
-import RegistrationAgreement from './../../Registration/RegistrationAgreement.js';
-import RegistrationSubmitButton from './../../Registration/RegistrationSubmitButton.js';
-import PageArrows from './PageArrows.js';
 
 class AddVendor extends Component {
   constructor(props){
@@ -22,8 +19,8 @@ class AddVendor extends Component {
   }
 
   handleInputChange(fieldName, event) {
-    const newState = this.state;
-    this.state[fieldName] = event.target.value;
+    const newState = Object.assign({}, this.state);
+    newState[fieldName] = event.target.value;
     this.setState(newState);
   }
 
@@ -43,10 +40,9 @@ class AddVendor extends Component {
       });
     })
     .catch(error => {
-      self.setState({
+      this.setState({
         errorMessage: error.data
       });
-      console.log(error.response);
     });
   }
 

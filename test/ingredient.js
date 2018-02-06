@@ -40,7 +40,7 @@ describe('Ingredient', () => {
 
     it('should only return one page of ingredients', (done) => {
       for (let i = 0; i < 52; i++) {
-        alasql(`INSERT INTO Ingredients (name, storage_id) VALUES ('TEST', 1)`);
+        alasql(`INSERT INTO Ingredients (name, storage_id) VALUES ('${i}', 1)`);
       }
 
       chai.request(server)
@@ -439,18 +439,10 @@ describe('Ingredient', () => {
       .attach('bulk', './test/bulk_import/validData.csv')
       .end(function(err, res) {
         const ingredients = alasql(`SELECT * FROM Ingredients`);
-        assert.strictEqual(ingredients.length, 4 + 5, 'Five of six ingredients added to ingredients table.');
-
-        const newIngredient = ingredients.find(ingredient => ingredient.name == 'boop' && ingredient.storage_id == 3);
-        assert.notEqual(newIngredient, null, 'New ingredient added exactly once');
-        newIngredient.should.not.be.a('array');
-
-        const oldIngredient = ingredients.find(ingredient => ingredient.name == 'poop' && ingredient.storage_id == 1);
-        assert.notEqual(oldIngredient, null, 'Old ingredient not added again');
-        oldIngredient.should.not.be.a('array');
+        assert.strictEqual(ingredients.length, 4 + 6, 'Five of six ingredients added to ingredients table.');
 
         const vendorsIngredients = alasql(`SELECT * FROM VendorsIngredients`);
-        assert.strictEqual(vendorsIngredients.length, 4 + 5, 'Five of six vendor ingredients added to vendor ingredients table.');
+        assert.strictEqual(vendorsIngredients.length, 4 + 6, 'Five of six vendor ingredients added to vendor ingredients table.');
 
         const newVendorIngredient = vendorsIngredients.find(vendorsIngredient => vendorsIngredient.ingredient_id == 9 && vendorsIngredient.price == 32.1 && vendorsIngredient.vendor_id == 1 && vendorsIngredient.package_type == 'drum');
         assert.notEqual(newVendorIngredient, null, 'Potatoes-drum ingredient added exactly once with correct price, vendor, and package type');
@@ -459,7 +451,7 @@ describe('Ingredient', () => {
         // const inventories = alasql(`SELECT * FROM Inventories`);
         // const spendingLogs = alasql(`SELECT * FROM SpendingLogs`);
         // const storages = alasql(`SELECT * FROM Storages`);
-        
+
         res.should.have.status(200);
         done();
       });
