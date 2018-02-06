@@ -11,7 +11,7 @@ describe('Storage', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(2);
+          res.body.length.should.be.eql(3);
           done();
         });
     });
@@ -102,7 +102,7 @@ describe('Storage', () => {
         .put('/storages')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
-          '3': 100000,
+          '4': 100000,
         })
         .end((err, res) => {
           res.should.have.status(400);
