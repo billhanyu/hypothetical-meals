@@ -44,4 +44,7 @@ Kung Foods is a web application that is deployed on a Linux cloud server. We use
  - Run `cd frontend` and then `npm install` to install the Node packages for frontend
 
 1. Run source code
- - Run `cd ..` then `npm start` to start the backend server
+ - Run `npm run build` to build the frontend files
+ - Run `cd ..` then `babel -d ./build ./server -s` to build the backend server (you might need to install babel-cli)
+ - Run `npm i -g pm2` to install pm2
+ - Run `pm2 start ./build/server.js` to start the server
