@@ -51,13 +51,13 @@ class EditVendor extends Component {
     .then(function (response) {
       self.setState({
         hasUpdated: true,
+        errorMessage: null,
       });
     })
     .catch(error => {
       self.setState({
-        errorMessage: error.data
+        errorMessage: error.response.data
       });
-      console.log(error.response);
     });
   }
 
@@ -67,9 +67,9 @@ class EditVendor extends Component {
           <RegistrationHeader HeaderText="Edit Vendor" HeaderIcon="fas fa-user fa-2x"/>
 
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Name" onChange={this.handleInputChange} id="name" value={this.state.name}/>
-          <div className="RegistrationInfoText">* (Optional) How your name will appear after you have logged in</div>
+          <div className="RegistrationInfoText">* Vendor Name</div>
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Contact" onChange={this.handleInputChange} id="contact" value={this.state.contact}/>
-          <div className="RegistrationInfoText">* Used to login after registration</div>
+          <div className="RegistrationInfoText">* Contact Info </div>
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Carrier Code" onChange={this.handleInputChange} id="code" value={this.state.code}/>
 
           <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT VENDOR</div>

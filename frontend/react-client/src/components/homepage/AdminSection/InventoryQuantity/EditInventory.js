@@ -46,13 +46,13 @@ class EditVendor extends Component {
     .then(function (response) {
       self.setState({
         hasUpdated: true,
+        errorMessage: null,
       });
     })
     .catch(error => {
       self.setState({
-        errorMessage: error.data
+        errorMessage: error.response.data
       });
-      console.log(error.response);
     });
   }
 
