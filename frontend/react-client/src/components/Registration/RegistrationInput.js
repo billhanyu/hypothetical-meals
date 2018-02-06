@@ -23,7 +23,7 @@ class RegistrationContainer extends Component {
   render() {
     return (
       <div className="RegistrationInputContainer">
-        <input type={this.props.inputType} className={this.props.inputClass} value={this.props.value} placeholder={this.props.placeholderText} onChange={this._handleOnChange} />
+        <input type={this.props.inputType} className={this.props.inputClass} value={this.props.value} placeholder={this.props.placeholderText} onKeyPress={this.props.onKeyPress} onChange={this._handleOnChange} />
       </div>
     );
   }

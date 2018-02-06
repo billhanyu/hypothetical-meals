@@ -14,6 +14,7 @@ class RegistrationContainer extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmitButtonClick = this.handleSubmitButtonClick.bind(this);
     this._handleCheckboxClick = this._handleCheckboxClick.bind(this);
+    this.keyPress = this.keyPress.bind(this);
     this.state = {
       name: '',
       email: '',
@@ -53,17 +54,23 @@ class RegistrationContainer extends Component {
     });
   }
 
+  keyPress(e) {
+    if (e.key == 'Enter') {
+      this.handleSubmitButtonClick();
+    }
+  }
+
   render() {
     return (
       <div className="RegistrationBG">
         <div className="RegistrationContainer">
             <RegistrationHeader HeaderText='Account Creation' HeaderIcon='fas fa-user fa-2x'/>
 
-            <RegistrationInput inputClass="RegistrationInput" placeholderText="Full Name" onChange={this.handleInputChange} id="name" />
+            <RegistrationInput inputClass="RegistrationInput" placeholderText="Full Name" onKeyPress={this.keyPress} onChange={this.handleInputChange} id="name" />
             <div className="RegistrationInfoText">* (Optional) How your name will appear after you have logged in</div>
-            <RegistrationInput inputClass="RegistrationInput" placeholderText="Username" onChange={this.handleInputChange} id="email" />
+            <RegistrationInput inputClass="RegistrationInput" placeholderText="Username" onKeyPress={this.keyPress} onChange={this.handleInputChange} id="email" />
             <div className="RegistrationInfoText">* Used to login after registration</div>
-            <RegistrationInput inputType="password" inputClass="RegistrationInput" placeholderText="Password" onChange={this.handleInputChange} id="password" />
+            <RegistrationInput inputType="password" inputClass="RegistrationInput" placeholderText="Password" onChange={this.handleInputChange} onKeyPress={this.keyPress} id="password" />
 
             <PasswordStrengthContainer passwordText={this.state.password} />
             <div style={{marginTop: '12px', marginLeft:'24px', float:'left', marginBottom:'20px'}}><input type="checkbox" onClick={this._handleCheckboxClick}/> Admin?</div>

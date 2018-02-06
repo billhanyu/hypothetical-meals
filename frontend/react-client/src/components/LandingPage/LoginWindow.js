@@ -11,6 +11,7 @@ class LoginWindow extends Component {
     super(props);
     this._handleClick = this._handleClick.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.keyPress = this.keyPress.bind(this);
     this.cookies = new Cookies();
     this.state = {
       email: '',
@@ -29,6 +30,13 @@ class LoginWindow extends Component {
     const newState = Object.assign({}, this.state);
     newState[fieldName] = event.target.value;
     this.setState(newState);
+  }
+
+  keyPress(e) {
+    console.log(e.key);
+    if (e.key == 'Enter') {
+      this._handleClick();
+    }
   }
 
   _handleClick(){
@@ -55,16 +63,16 @@ class LoginWindow extends Component {
     });
   }
 
-    render() {
-        return (
-            <div className="LoginWindow borderAll">
-              <RegistrationHeader HeaderText='Sign In' HeaderIcon='fas fa-user fa-2x'/>
-              <RegistrationInput inputClass="RegistrationInput" placeholderText="Username" value={this.state.email} onChange={this.handleInputChange} id="email" />
-              <RegistrationInput inputType="password" inputClass="RegistrationInput" placeholderText="Password" value={this.state.password} onChange={this.handleInputChange} id="password" />
-              <div className="RegistrationSubmitButton" onClick={this._handleClick}>SIGN IN</div>
-            </div>
-        );
-    }
+  render() {
+    return (
+      <div className="LoginWindow borderAll">
+        <RegistrationHeader HeaderText='Sign In' HeaderIcon='fas fa-user fa-2x'/>
+        <RegistrationInput inputClass="RegistrationInput" placeholderText="Username" value={this.state.email} onChange={this.handleInputChange} onKeyPress={this.keyPress} id="email" />
+        <RegistrationInput inputType="password" inputClass="RegistrationInput" placeholderText="Password" value={this.state.password} onChange={this.handleInputChange} onKeyPress={this.keyPress} id="password" />
+        <div className="RegistrationSubmitButton" onClick={this._handleClick}>SIGN IN</div>
+      </div>
+    );
+  }
 }
 
 export default withRouter(LoginWindow);
