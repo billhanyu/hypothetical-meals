@@ -39,7 +39,7 @@ describe('Ingredient', () => {
 
     it('should only return one page of ingredients', (done) => {
       for (let i = 0; i < 52; i++) {
-        alasql(`INSERT INTO Ingredients (name, storage_id) VALUES ('TEST', 1)`);
+        alasql(`INSERT INTO Ingredients (name, storage_id) VALUES ('${i}', 1)`);
       }
 
       chai.request(server)

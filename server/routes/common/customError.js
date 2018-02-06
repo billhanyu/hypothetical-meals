@@ -7,6 +7,9 @@ export function createError(msg, ...args) {
 };
 
 export function handleError(err, res) {
+  if (err.code == 'ER_DUP_ENTRY') {
+    return res.status(400).send(err.code);
+  }
   if (err.custom) {
     const code = err.code || 400;
     return res.status(code).send(err.custom);
