@@ -49,14 +49,14 @@ class AddIngredientWindow extends Component {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(response => {
-      console.log(response);
       self.setState({
+        errorMessage: null,
         finishedSubmitting: true,
       });
     })
     .catch(error => {
       self.setState({
-        errorMessage: error.data
+        errorMessage: error.response.data
       });
     });
   }
@@ -67,7 +67,7 @@ class AddIngredientWindow extends Component {
           <RegistrationHeader HeaderText="New Ingredient" HeaderIcon="fas fa-utensils fa-2x"/>
 
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Name" onChange={this.handleInputChange} id="name" />
-          <div className="RegistrationInfoText">* Package Type</div>
+          <div className="RegistrationInfoText">* Ingredient Name</div>
           <VendorComboBox id="storage" Options={["Frozen","Refrigerated","Room Temperature"]} onChange={this.handleInputChange}/>
           <div className="RegistrationInfoText">* Temperature </div>
 
