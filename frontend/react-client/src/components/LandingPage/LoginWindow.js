@@ -33,7 +33,6 @@ class LoginWindow extends Component {
   }
 
   keyPress(e) {
-    console.log(e.key);
     if (e.key == 'Enter') {
       this._handleClick();
     }
