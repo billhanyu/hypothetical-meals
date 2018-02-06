@@ -13,7 +13,7 @@ class EditVendor extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmitButtonClick = this.handleSubmitButtonClick.bind(this);
     this.state = {
-      Price: props.price,
+      Price: props.ingredient_price,
       vendor_ingredient_id: props.vendor_ingredient_id,
       hasUpdated: false,
       packaging: 'Sack-(50lbs)',
@@ -23,7 +23,7 @@ class EditVendor extends Component {
 
   /*** REQUIRED PROPS
     1. name (String)
-    2. price (Number)
+    2. ingredient_price (Number)
     3. storage_id (String)
     4. vendor_ingredient_id (number)
     5. token (String)
@@ -52,13 +52,13 @@ class EditVendor extends Component {
     .then(function (response) {
       self.setState({
         hasUpdated: true,
+        errorMessage: null,
       });
     })
     .catch(error => {
       self.setState({
-        errorMessage: error.data
+        errorMessage: error.response.data
       });
-      console.log(error.response);
     });
   }
 
@@ -67,7 +67,7 @@ class EditVendor extends Component {
       <div className="EditContainer borderAll">
           <RegistrationHeader HeaderText="Edit Vendor Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>
 
-          <RegistrationInput inputClass="RegistrationInput" placeholderText="Price" onChange={this.handleInputChange} id="Price" value={this.state.name}/>
+          <RegistrationInput inputClass="RegistrationInput" placeholderText="Price" onChange={this.handleInputChange} id="Price" value={this.state.Price}/>
           <div className="RegistrationInfoText">* Ingredient Price</div>
           <VendorComboBox id="packaging" onChange={this.handleInputChange} Options={["Sack-(50lbs)", 'Pail-(50 lbs)',
           'Drum-(500 lb)',

@@ -28,6 +28,7 @@ class AddVendor extends Component {
   }
 
   handleSubmitButtonClick() {
+    const self = this;
     axios.post("/vendors", {
       vendors: [{
         name: this.state.name,
@@ -39,14 +40,14 @@ class AddVendor extends Component {
     })
     .then(response => {
       this.setState({
-        finishedSubmitting: true
+        finishedSubmitting: true,
+        errorMessage: null,
       });
     })
     .catch(error => {
       self.setState({
-        errorMessage: error.data
+        errorMessage: error.response.data
       });
-      console.log(error.response);
     });
   }
 
@@ -56,9 +57,9 @@ class AddVendor extends Component {
           <RegistrationHeader HeaderText="New Vendor" HeaderIcon="fas fa-user fa-2x"/>
 
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Name" onChange={this.handleInputChange} id="name" />
-          <div className="RegistrationInfoText">* (Optional) How your name will appear after you have logged in</div>
+          <div className="RegistrationInfoText">* Vendor Name </div>
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Contact" onChange={this.handleInputChange} id="contact" />
-          <div className="RegistrationInfoText">* Used to login after registration</div>
+          <div className="RegistrationInfoText">* Contact Info </div>
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Carrier Code" onChange={this.handleInputChange} id="carriercode" />
 
           <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>ADD VENDOR</div>

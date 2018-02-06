@@ -49,7 +49,10 @@ class EditVendor extends Component {
     }
 
     const newVendorObject = {};
-    newVendorObject[this.state.id] = storage_id;
+    newVendorObject[this.state.id] = {
+      storage_id,
+      name: this.state.name,
+    };
 
     axios.put("/ingredients", {
       ingredients: newVendorObject,
@@ -57,16 +60,15 @@ class EditVendor extends Component {
       headers: { Authorization: "Token " + this.props.token }
     })
     .then(function (response) {
-      console.log(response);
       self.setState({
+        errorMessage: null,
         hasUpdated: true,
       });
     })
     .catch(error => {
       self.setState({
-        errorMessage: error.data
+        errorMessage: error.response.data
       });
-      console.log(error.response);
     });
   }
 

@@ -16,6 +16,7 @@ class IngredientList extends Component {
       activeId: -1,
       name: '',
       currentPage: 1,
+      ingredient_price: 0
     };
     this.onLeftArrowClick = this.onLeftArrowClick.bind(this);
     this.onRightArrowClick = this.onRightArrowClick.bind(this);
@@ -88,7 +89,7 @@ class IngredientList extends Component {
 
   render() {
     return (
-      this.state.hasPickedIngredient ? <EditVendorIngredient token={this.props.token} vendor_ingredient_id={this.state.vendor_ingredient_id} price={this.state.ingredient_price} storage_id={this.state.storage_id} name={this.state.ingredient_name}/> :
+      this.state.hasPickedIngredient ? <EditVendorIngredient token={this.props.token} vendor_ingredient_id={this.state.vendor_ingredient_id} ingredient_price={this.state.ingredient_price} storage_id={this.state.storage_id} name={this.state.ingredient_name}/> :
       <div className="VendorList borderAll">
         <PageArrows onClickLeft={this.onLeftArrowClick} pageNumber={this.state.currentPage} onClickRight={this.onRightArrowClick}/>
         <RegistrationHeader HeaderText="Edit Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>

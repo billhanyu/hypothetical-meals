@@ -11,7 +11,7 @@ class VendorListItem extends Component {
     2. ingredient_name (String)
     3. ingredient_storage_id (Number)
     4. ingredient_package_type (String)
-    5. price (Number)
+    5. ingredient_price (Number)
     6. vendor_ingredient_id (Number)
   */
   _handleClick() {
