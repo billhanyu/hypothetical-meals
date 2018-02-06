@@ -74,8 +74,8 @@ class AdminButtons extends Component {
           <AdminButton name="Add Vendor" id="addVendor" handleClick={this.handleClick}/>
           <AdminButton name="Edit Ingredient" id="editIngredient" handleClick={this.handleClick}/>
           <AdminButton name="Add Ingredient" id="addIngredient" handleClick={this.handleClick}/>
-          <AdminButton name="Edit VendorIngedient" id="editVendorIngredient" handleClick={this.handleClick}/>
-          <AdminButton name="Add VendorIngredient" id="addVendorIngredient" handleClick={this.handleClick}/>
+          <AdminButton name="Edit Vendor for Ingredient" id="editVendorIngredient" handleClick={this.handleClick}/>
+          <AdminButton name="Add Vendor for Ingredient" id="addVendorIngredient" handleClick={this.handleClick}/>
           <AdminButton name="Edit Storage" id="editStorage" handleClick={this.handleClick}/>
           <AdminButton name="Edit Inventory Size" id="inventoryQuantity" handleClick={this.handleClick} />
           <AdminButton name="New User" id="inventoryQuantity" handleClick={this._redirectSignup} />
