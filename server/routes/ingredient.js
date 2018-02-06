@@ -336,6 +336,7 @@ function checkForBulkImportFormattingErrors(data) {
     // Edit #6 changed it to frozen and refrigerated, changing back to freezer and refrigerator for ease of integration
     if (data[i][5] == 'frozen') data[i][5] = 'freezer';
     else if (data[i][5] == 'refrigerated') data[i][5] = 'refrigerator';
+    else if (data[i][5] == 'room temperature') data[i][5] = 'warehouse';
     if (validStorageTypes.indexOf(data[i][5].toLowerCase()) < 0) return `Invalid package type: ${data[i][5]}`;
   }
 }
