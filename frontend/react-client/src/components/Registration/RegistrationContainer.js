@@ -5,7 +5,6 @@ import RegistrationHeader from './RegistrationHeader.js';
 import RegistrationInput from './RegistrationInput.js';
 import PasswordStrengthContainer from './PasswordStrengthContainer.js';
 import RegistrationAgreement from './RegistrationAgreement.js';
-import RegistrationSubmitButton from './RegistrationSubmitButton.js';
 
 import axios from 'axios';
 
@@ -30,8 +29,8 @@ class RegistrationContainer extends Component {
   }
 
   handleInputChange(fieldName, event) {
-    const newState = this.state;
-    this.state[fieldName] = event.target.value;
+    const newState = Object.assign({}, this.state);
+    newState[fieldName] = event.target.value;
     this.setState(newState);
   }
 
@@ -41,15 +40,16 @@ class RegistrationContainer extends Component {
         username: this.state.email,
         name: this.state.name,
         password: this.state.password,
-      }
-    })
+      }}, {
+        headers: { Authorization: "Token " + global.token }
+      })
     .then(response => {
       if(response.status == 200) {
         this.props.history.push('/');
       }
     })
     .catch(error => {
-      console.log(error.response);
+      alert('Check if username already exists');
     });
   }
 
@@ -61,7 +61,7 @@ class RegistrationContainer extends Component {
 
             <RegistrationInput inputClass="RegistrationInput" placeholderText="Full Name" onChange={this.handleInputChange} id="name" />
             <div className="RegistrationInfoText">* (Optional) How your name will appear after you have logged in</div>
-            <RegistrationInput inputClass="RegistrationInput" placeholderText="Email" onChange={this.handleInputChange} id="email" />
+            <RegistrationInput inputClass="RegistrationInput" placeholderText="Username" onChange={this.handleInputChange} id="email" />
             <div className="RegistrationInfoText">* Used to login after registration</div>
             <RegistrationInput inputType="password" inputClass="RegistrationInput" placeholderText="Password" onChange={this.handleInputChange} id="password" />
 
