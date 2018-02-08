@@ -10,10 +10,10 @@ class LogOutButton extends Component {
   }
 
   logout() {
-    this.cookies.set('user_group', null, { path: '/' });
-    this.cookies.set('token', null, { path: '/' });
-    global.user_group = null;
-    global.token = null;
+    this.cookies.set('user_group', '', { path: '/' });
+    this.cookies.set('token', '', { path: '/' });
+    global.user_group = '';
+    global.token = '';
     this.props.history.push('/');
   }
 
