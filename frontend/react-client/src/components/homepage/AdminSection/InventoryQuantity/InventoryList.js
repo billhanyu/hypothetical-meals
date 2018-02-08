@@ -65,7 +65,7 @@ class IngredientList extends Component {
     .then(function (response) {
       self.setState({
         inventory: response.data,
-      })
+      });
     })
     .catch(error => {
       console.log(error);
@@ -88,7 +88,7 @@ class IngredientList extends Component {
         <RegistrationHeader HeaderText="Edit Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>
         {
           this.state.inventory.map((element, key) => {
-            return <InventoryListItem onClick={this.clickedIngredient} key={key} id={element.id} ingredient_name={element.ingredient_name} package_type={element.package_type} num_packages={element.num_packages}/>
+            return <InventoryListItem onClick={this.clickedIngredient} key={key} id={element.id} ingredient_name={element.ingredient_name} package_type={element.package_type} num_packages={element.num_packages}/>;
           })
         }
       </div>

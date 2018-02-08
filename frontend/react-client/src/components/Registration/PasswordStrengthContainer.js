@@ -48,7 +48,7 @@ class PasswordStrengthContainer extends Component {
           this._renderBars(this.props.passwordText)
         }
       </div>
-    )
+    );
   }
 }
 
