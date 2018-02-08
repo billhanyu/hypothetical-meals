@@ -234,7 +234,7 @@ class MainTable extends Component {
             </tr>
           </tbody>
       </table>
-    )
+    );
   }
 }
 

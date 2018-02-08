@@ -39,7 +39,7 @@ class PrimaryOption extends Component {
               {this.props.buttonName}
             </span>
       </div>
-    )
+    );
   }
 }
 

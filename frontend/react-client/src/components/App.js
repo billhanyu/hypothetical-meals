@@ -20,20 +20,20 @@ class App extends Component {
           <Route
             name="home"
             exact path="/"
-            render={() => global.token ? <Redirect to="/dashboard"/> : <IndexPage/>}
+            render={() => global.token ? <Redirect to="/dashboard" /> : <IndexPage />}
           />
           <Route
             name="registration"
             exact path="/register"
             render={() => (global.user_group == 'admin'
-              ? <RegistrationPage/>
-              : <Redirect to="/"/>
+              ? <RegistrationPage />
+              : <Redirect to="/" />
             )}
           />
           <Route
             name="dashboard"
             exact path="/dashboard"
-            render={() => global.token ? <HomePage/> : <Redirect to="/"/>}
+            render={() => global.token ? <HomePage /> : <Redirect to="/" />}
           />
         </div>
       </Router>
