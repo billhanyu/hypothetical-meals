@@ -66,7 +66,7 @@ const beNoob = [auth.required, noobRequired];
 
 const distDir = `${__dirname}/../frontend/react-client/dist`;
 app.use(express.static(distDir));
-app.get('/*', (req, res) => {
+app.get('/', (req, res) => {
   res.sendFile(path.resolve(`${distDir}/index.html`));
 });
 
