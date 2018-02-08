@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 const auth = require('./auth');
+const path = require('path');
 import * as user from './routes/user';
 import * as ingredient from './routes/ingredient';
 import * as storage from './routes/storage';
@@ -63,13 +64,11 @@ app.use(cookieParser());
 const beAdmin = [auth.required, adminRequired];
 const beNoob = [auth.required, noobRequired];
 
-if (process.env.NODE_ENV !== 'production') {
-  const distDir = `${__dirname}/../frontend/react-client/dist`;
-  app.use(express.static(distDir));
-  app.get('/', (req, res) => {
-    res.sendFile(path.resolve(`${distDir}/index.html`));
-  });
-}
+const distDir = `${__dirname}/../frontend/react-client/dist`;
+app.use(express.static(distDir));
+app.get('/*', (req, res) => {
+  res.sendFile(path.resolve(`${distDir}/index.html`));
+});
 
 app.post('/users/admin', user.signupAdmin);
 app.post('/users/noob', beAdmin, user.signupNoob);
@@ -118,7 +117,7 @@ app.get('/inventory/page/:page_num', beNoob, inventory.view);
 app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
 app.put('/inventory', beNoob, inventory.commitCart);
 
-const port = process.env.NODE_ENV === 'production' ? 80 : 1717;
+const port = 1717;
 app.listen(port, () => {
   console.log(`Node app start at port ${port}`);
 });

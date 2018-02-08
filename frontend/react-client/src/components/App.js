@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { HashRouter as Router, Route, Redirect } from 'react-router-dom';
-import { hashHistory } from 'react-router';
+import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 import HomePage from './pages/HomePage.js';
 import RegistrationPage from './pages/RegistrationPage.js';
 import IndexPage from './pages/IndexPage.js';
@@ -16,7 +15,7 @@ class App extends Component {
 
   render() {
     return (
-      <Router history={hashHistory}>
+      <Router>
         <div>
           <Route
             name="home"
@@ -33,7 +32,6 @@ class App extends Component {
           <Route
             name="dashboard"
             exact path="/dashboard"
-            component={HomePage}
             render={() => (
               global.token ? (
                 <HomePage/>
