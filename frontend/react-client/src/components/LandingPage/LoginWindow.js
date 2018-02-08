@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import axios from 'axios';
 import Cookies from 'universal-cookie';
-
 import RegistrationHeader from './../Registration/RegistrationHeader.js';
 import RegistrationInput from './../Registration/RegistrationInput.js';
 
