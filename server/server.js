@@ -64,12 +64,6 @@ app.use(cookieParser());
 const beAdmin = [auth.required, adminRequired];
 const beNoob = [auth.required, noobRequired];
 
-const distDir = `${__dirname}/../frontend/react-client/dist`;
-app.use(express.static(distDir));
-app.get('/', (req, res) => {
-  res.sendFile(path.resolve(`${distDir}/index.html`));
-});
-
 app.post('/users/admin', user.signupAdmin);
 app.post('/users/noob', beAdmin, user.signupNoob);
 app.post('/users/login', user.login);
@@ -116,6 +110,12 @@ app.get('/inventory/pages', beNoob, inventory.pages);
 app.get('/inventory/page/:page_num', beNoob, inventory.view);
 app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
 app.put('/inventory', beNoob, inventory.commitCart);
+
+const distDir = `${__dirname}/../frontend/react-client/dist`;
+app.use(express.static(distDir));
+app.get('/*', (req, res) => {
+  res.sendFile(path.resolve(`${distDir}/index.html`));
+});
 
 const port = 1717;
 app.listen(port, () => {
