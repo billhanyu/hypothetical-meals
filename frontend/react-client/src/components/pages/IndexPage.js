@@ -1,11 +1,22 @@
 import React, { Component } from 'react';
-
+import { withRouter } from 'react-router';
 import TopContentContainer from './../LandingPage/TopContent/TopContentContainer.js';
 import FeaturesOverviewContainer from './../LandingPage/FeatureOverview/FeaturesOverviewContainer.js';
 import LandingPageFooter from './../LandingPage/LandingPageFooter.js';
 import LoginWindow from './../LandingPage/LoginWindow.js';
 
 class IndexPage extends Component {
+  constructor(props) {
+    super(props);
+    this.checkOauth();
+  }
+
+  checkOauth() {
+    if (window.location.hash.indexOf('access_token') > -1) {
+      this.props.history.push(`/oauth${window.location.hash}`);
+    }
+  }
+
   componentDidMount() {
     // Get the DOM node and store the jQuery element reference
     //'#06F, #25BFF7, #0656F1'
@@ -52,4 +63,4 @@ class IndexPage extends Component {
   }
 }
 
-export default IndexPage;
+export default withRouter(IndexPage);

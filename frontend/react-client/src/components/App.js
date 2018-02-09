@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage.js';
 import RegistrationPage from './pages/RegistrationPage.js';
 import IndexPage from './pages/IndexPage.js';
 import Cookies from 'universal-cookie';
+import OAuthComponent from '../oauth/OAuthComponent';
 
 class App extends Component {
   constructor(props) {
@@ -21,6 +22,11 @@ class App extends Component {
             name="home"
             exact path="/"
             render={() => global.token ? <Redirect to="/dashboard" /> : <IndexPage />}
+          />
+          <Route
+            name="oauth"
+            exact path="/oauth"
+            render={() => <OAuthComponent />}
           />
           <Route
             name="registration"
