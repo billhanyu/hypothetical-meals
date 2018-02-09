@@ -4,6 +4,7 @@ import axios from 'axios';
 import Cookies from 'universal-cookie';
 import RegistrationHeader from './../Registration/RegistrationHeader.js';
 import RegistrationInput from './../Registration/RegistrationInput.js';
+import { getAuthorizeLink } from '../../oauth/OAuth';
 
 class LoginWindow extends Component {
   constructor(props){
@@ -33,6 +34,8 @@ class LoginWindow extends Component {
 
   keyPress(e) {
     if (e.key == 'Enter') {
+      //console.log(getAuthorizeLink());
+      //window.location = getAuthorizeLink();
       this._handleClick();
     }
   }
