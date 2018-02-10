@@ -167,15 +167,17 @@ describe('VendorIngredient', () => {
         .send({
           'vendoringredients': [
             {
-              'ingredient_id': 1,
+              'ingredient_id': 4,
               'vendor_id': 2,
-              'package_type': 'sack',
+              'package_type': 'truckload',
+              'num_native_units': 10.8,
               'price': 100,
             },
             {
-              'ingredient_id': 2,
+              'ingredient_id': 3,
               'vendor_id': 1,
               'package_type': 'sack',
+              'num_native_units': 40,
               'price': 100,
             },
           ],
@@ -278,14 +280,18 @@ describe('VendorIngredient', () => {
             '2': {
               'price': 99,
             },
+            '3': {
+              'num_native_units': 1129,
+            },
           },
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const changed = alasql('SELECT * FROM VendorsIngredients WHERE id IN (1, 2)');
+          const changed = alasql('SELECT * FROM VendorsIngredients WHERE id IN (1, 2, 3)');
           assert.equal(changed[0]['price'], 999, 'price for id 1');
           assert.strictEqual(changed[0]['package_type'], 'truckload', 'package_type for id 1');
           assert.equal(changed[1]['price'], 99, 'price for id 2');
+          assert.equal(changed[2]['num_native_units'], 1129, 'num_native_units for id 3');
           done();
         });
     });
