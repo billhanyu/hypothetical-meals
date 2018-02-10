@@ -4,6 +4,7 @@ import TopContentContainer from './../LandingPage/TopContent/TopContentContainer
 import FeaturesOverviewContainer from './../LandingPage/FeatureOverview/FeaturesOverviewContainer.js';
 import LandingPageFooter from './../LandingPage/LandingPageFooter.js';
 import LoginWindow from './../LandingPage/LoginWindow.js';
+import { logInWithRedirectedHash } from '../../oauth/OAuth';
 
 class IndexPage extends Component {
   constructor(props) {
@@ -13,7 +14,7 @@ class IndexPage extends Component {
 
   checkOauth() {
     if (window.location.hash.indexOf('access_token') > -1) {
-      this.props.history.push(`/oauth${window.location.hash}`);
+      logInWithRedirectedHash(window.location.hash, this.props.history);
     }
   }
 
