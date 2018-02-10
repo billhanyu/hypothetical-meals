@@ -1,3 +1,6 @@
+DROP TABLE IF EXISTS SystemLogs;
+DROP TABLE IF EXISTS FormulaEntries;
+DROP TABLE IF EXISTS Formulas;
 DROP TABLE IF EXISTS SpendingLogs;
 DROP TABLE IF EXISTS Logs;
 DROP TABLE IF EXISTS Inventories;
@@ -60,7 +63,7 @@ CREATE TABLE VendorsIngredients(
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	FOREIGN KEY (vendor_id) REFERENCES Vendors(id),
-	UNIQUE (ingredient_id, package_type),
+	UNIQUE (ingredient_id, package_type, vendor_id),
 	PRIMARY KEY (id)
 );
 
