@@ -17,15 +17,11 @@ import * as vendorIngredient from './routes/vendorIngredient';
 import * as spendinglog from './routes/spendinglog';
 import * as order from './routes/order';
 import { adminRequired, noobRequired } from './authMiddleware';
+import getConfig from './getConfig';
 
 require('./routes/common/passport');
 
-let config;
-try {
-  config = require('./config');
-} catch (e) {
-  config = require('./config.example');
-}
+const config = getConfig();
 
 if (process.env.NODE_ENV === 'test') {
   global.connection = {
