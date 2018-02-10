@@ -205,7 +205,6 @@ export function bulkImport(req, res, next) {
   const getVendors = connection.query(`SELECT * FROM Vendors`);
   const getVendorsIngredients = connection.query('SELECT VendorsIngredients.*,Ingredients.name as ingredient_name, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM (VendorsIngredients INNER JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id)');
   const getInventories = connection.query(`SELECT * FROM Inventories`);
-  const getSpendingLogs = connection.query(`SELECT * FROM SpendingLogs`);
   const getStorages = connection.query(`SELECT * FROM Storages`);
 
   let ingredients;
@@ -214,10 +213,9 @@ export function bulkImport(req, res, next) {
   let inventories;
   let storages;
 
-
-  Promise.all([getIngredients, getVendors, getVendorsIngredients, getInventories, getSpendingLogs, getStorages])
+  Promise.all([getIngredients, getVendors, getVendorsIngredients, getInventories, getStorages])
   .then((response) => {
-    [ingredients, vendors, vendorsIngredients, inventories, spendingLogs, storages] = response;
+    [ingredients, vendors, vendorsIngredients, inventories, storages] = response;
 
     // Ensure all vendors exist, and add vendor id and storage id parameter
     for (let entry of entries) {
