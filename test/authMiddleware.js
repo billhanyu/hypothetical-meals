@@ -84,7 +84,7 @@ describe('authMiddleware', () => {
       req = fakeReq(2); // Eric - noob
       noobRequired(req, res, () => {
         assert.strictEqual(req.user.name, 'Eric', 'User 2 name');
-        assert.strictEqual(req.user.username, 'eric', 'User 2 username');
+        assert.strictEqual(req.user.username, 'eri101', 'User 2 username');
         assert.strictEqual(req.user.user_group, 'noob', 'User 2 user group');
         assert.strictEqual(res.code, 0, 'Response status code');
         done();

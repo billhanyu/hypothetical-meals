@@ -67,6 +67,7 @@ const beNoob = [auth.required, noobRequired];
 app.post('/users/admin', user.signupAdmin);
 app.post('/users/noob', beAdmin, user.signupNoob);
 app.post('/users/login', user.login);
+app.post('/users/login/oauth', user.loginOauth);
 
 app.get('/vendors/pages', beNoob, vendor.pages);
 app.get('/vendors/page/:page_num', beNoob, vendor.view);
