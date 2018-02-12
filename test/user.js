@@ -52,7 +52,7 @@ describe('User', () => {
           res.should.have.status(200);
           const newLength = alasql('SELECT id FROM Users').length;
           assert.strictEqual(oldLength + 1, newLength, 'Add new user to table');
-          const addedUser = alasql('SELECT name, oauth FROM Users WHERE netid = \'hy103\'');
+          const addedUser = alasql('SELECT * FROM Users WHERE username = "hy103"');
           assert.strictEqual(addedUser[0].name, 'Bill Yu', 'Bill Yu registered to database');
           assert.strictEqual(addedUser[0].oauth, 1, 'User is oauth');
           assert.strictEqual(addedUser[0].user_group, 'noob', 'Default to noob user');
@@ -142,7 +142,7 @@ describe('User', () => {
           const users = alasql(`SELECT * FROM Users WHERE username = 'admin1'`);
           assert.strictEqual(users.length, 1, 'Number of rows with username.');
           const newAdmin = users[0];
-          assert.strictEqual(newAdmin.id, 5, 'New admin ID.');
+          assert.strictEqual(newAdmin.id, 6, 'New admin ID.');
           assert.strictEqual(newAdmin.username, 'admin1', 'New admin username.');
           assert.strictEqual(newAdmin.oauth, 0, 'Not OAuth user');
           assert.strictEqual(newAdmin.name, 'mike wazowski', 'New admin name.');
@@ -184,7 +184,7 @@ describe('User', () => {
           const users = alasql(`SELECT * FROM Users WHERE username = 'noob1'`);
           assert.strictEqual(users.length, 1, 'Number of rows with username.');
           const newNoob = users[0];
-          assert.strictEqual(newNoob.id, 5, 'New noob ID.');
+          assert.strictEqual(newNoob.id, 6, 'New noob ID.');
           assert.strictEqual(newNoob.username, 'noob1', 'New noob username.');
           assert.strictEqual(newNoob.oauth, 0, 'Not OAuth user');
           assert.strictEqual(newNoob.name, 'mike wazowski', 'New noob name.');
