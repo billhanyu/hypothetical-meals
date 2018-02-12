@@ -3,8 +3,6 @@ import axios from 'axios';
 
 import RegistrationHeader from './../../../Registration/RegistrationHeader.js';
 import RegistrationInput from './../../../Registration/RegistrationInput.js';
-import RegistrationAgreement from './../../../Registration/RegistrationAgreement.js';
-import RegistrationSubmitButton from './../../../Registration/RegistrationSubmitButton.js';
 import VendorComboBox from './../VendorComboBox.js';
 
 class EditVendor extends Component {
@@ -20,7 +18,6 @@ class EditVendor extends Component {
       frozen_storage: 0,
       refrigerated_storage: 0,
       room_temp_storage: 0,
-      errorMessage: null,
     };
   }
 

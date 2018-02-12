@@ -11,7 +11,7 @@ class PortfolioSection extends Component {
       <div className="FeatureContainer borderAll">
         <MainTable />
       </div>
-    )
+    );
   }
 }
 

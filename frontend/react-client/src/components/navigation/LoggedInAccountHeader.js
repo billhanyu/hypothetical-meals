@@ -8,7 +8,7 @@ class LoggedInAccountHeader extends Component {
         <i className="fas fa-angle-down fa-sm navButtonAccountDropdownArrow"></i>
         <span className="navButtonAccountName">Brian Zhou</span>
       </div>
-    )
+    );
   }
 }
 
