@@ -93,7 +93,7 @@ class VendorList extends Component {
         <RegistrationHeader HeaderText="Edit Vendor" HeaderIcon="fas fa-pencil-alt fa-2x"/>
         {
           this.state.vendors.map((element, key) => {
-            return <VendorListItem onClick={this.clickedVendor} key={key} name={element.name} contact={element.contact} id={element.id} code={element.code}/>
+            return <VendorListItem onClick={this.clickedVendor} key={key} name={element.name} contact={element.contact} id={element.id} code={element.code}/>;
           })
         }
       </div>

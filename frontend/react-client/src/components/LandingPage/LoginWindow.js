@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import axios from 'axios';
 import Cookies from 'universal-cookie';
-
 import RegistrationHeader from './../Registration/RegistrationHeader.js';
 import RegistrationInput from './../Registration/RegistrationInput.js';
+import { getAuthorizeLink } from '../../oauth/OAuth';
 
 class LoginWindow extends Component {
   constructor(props){
@@ -12,6 +12,7 @@ class LoginWindow extends Component {
     this._handleClick = this._handleClick.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.keyPress = this.keyPress.bind(this);
+    this.login_oauth = this.login_oauth.bind(this);
     this.cookies = new Cookies();
     this.state = {
       email: '',
@@ -62,6 +63,10 @@ class LoginWindow extends Component {
     });
   }
 
+  login_oauth() {
+    window.location = getAuthorizeLink();
+  }
+
   render() {
     return (
       <div className="LoginWindow borderAll">
@@ -69,6 +74,8 @@ class LoginWindow extends Component {
         <RegistrationInput inputClass="RegistrationInput" placeholderText="Username" value={this.state.email} onChange={this.handleInputChange} onKeyPress={this.keyPress} id="email" />
         <RegistrationInput inputType="password" inputClass="RegistrationInput" placeholderText="Password" value={this.state.password} onChange={this.handleInputChange} onKeyPress={this.keyPress} id="password" />
         <div className="RegistrationSubmitButton" onClick={this._handleClick}>SIGN IN</div>
+        <hr/>
+        <div className="RegistrationSubmitButton OAuthButton" onClick={this.login_oauth}/>
       </div>
     );
   }

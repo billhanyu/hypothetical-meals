@@ -22,7 +22,7 @@ class FeatureOverviewContentEntry extends Component {
             <div className="FeatureContentBulletsContainer">
             {
               this.props.BulletTexts.map((element, key) => {
-                return <FeatureContentBullet contentText={element.contentText} titleText={element.titleText} key={key} />
+                return <FeatureContentBullet contentText={element.contentText} titleText={element.titleText} key={key} />;
               })
             }
             </div>

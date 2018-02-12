@@ -8,7 +8,7 @@ class FeaturesOverviewContainer extends Component {
     this.state = {
       portFolioSelected: true,
       knowledgeSelected: false,
-    }
+    };
   }
 
   // THIS COMPONENT IS JUST THE TABS LOGIC, Renders the correct feature overview container

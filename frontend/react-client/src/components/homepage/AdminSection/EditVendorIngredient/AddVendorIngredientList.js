@@ -86,7 +86,7 @@ class AddVendorIngredientList extends Component {
         <RegistrationHeader HeaderText="Add Vendor Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>
         {
           this.state.ingredients.map((element, key) => {
-            return <AddVendorListItem onClick={this.clickedIngredient} key={key} id={element.id} name={element.name}/>
+            return <AddVendorListItem onClick={this.clickedIngredient} key={key} id={element.id} name={element.name}/>;
           })
         }
       </div>
