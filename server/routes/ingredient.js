@@ -49,6 +49,7 @@ export function viewAvailable(req, res, next) {
  * request.body.ingredients = [
  *   {
  *     'name': 'p',
+ *     'native_unit': 'kg',
  *     'storage_id': 1,
  *   }, ...
  * ]
@@ -64,9 +65,9 @@ function addIngredientHelper(ingredients, req, res, next) {
   }
   const ingredientsToAdd = [];
   for (let ingredient of ingredients) {
-    ingredientsToAdd.push(`('${ingredient.name}', ${ingredient.storage_id})`);
+    ingredientsToAdd.push(`('${ingredient.name}', '${ingredient.native_unit}', ${ingredient.storage_id})`);
   }
-  connection.query(`INSERT INTO Ingredients (name, storage_id) VALUES ${ingredientsToAdd.join(', ')}`)
+  connection.query(`INSERT INTO Ingredients (name, native_unit, storage_id) VALUES ${ingredientsToAdd.join(', ')}`)
   .then(() => success(res))
   .catch(err => handleError(err, res));
 }
@@ -80,6 +81,9 @@ function addIngredientHelper(ingredients, req, res, next) {
  *      },
  *     'ingredient_id2': {
  *        'storage_id': storage_id_change2,
+ *      },
+ *     'ingredient_id3': {
+ *        'native_unit': native_unit_change3,
  *      },
  *   }, ...
  * This can change the storage id or name of the ingredient.
@@ -106,7 +110,8 @@ function modifyIngredientHelper(items, req, res, next) {
 
   const nameCases = [];
   const storageCases = [];
-  connection.query(`SELECT id, name, storage_id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
+  const nativeUnitCases = [];
+  connection.query(`SELECT id, name, storage_id, native_unit FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
   .then(results => {
     if (results.length < ingredientIds.length) {
       throw createError('Changing storage id or name of invalid ingredient.');
@@ -116,13 +121,17 @@ function modifyIngredientHelper(items, req, res, next) {
       const newName = items[ingredient.id]['name'];
       const oldStorage = ingredient['storage_id'];
       const newStorage = items[ingredient.id]['storage_id'];
+      const oldNativeUnit = ingredient['native_unit'];
+      const newNativeUnit = items[ingredient.id]['native_unit'];
       nameCases.push(`when id = ${ingredient.id} then '${newName || oldName}'`);
       storageCases.push(`when id = ${ingredient.id} then ${newStorage || oldStorage}`);
+      nativeUnitCases.push(`when id = ${ingredient.id} then '${newNativeUnit || oldNativeUnit}'`);
     }
     return connection.query(
       `UPDATE Ingredients
         SET storage_id = (case ${storageCases.join(' ')} end),
-            name = (case ${nameCases.join(' ')} end)
+            name = (case ${nameCases.join(' ')} end),
+            native_unit = (case ${nativeUnitCases.join(' ')} end)
         WHERE id IN (${ingredientIds.join(', ')})`);
   })
   .then(() => success(res))
@@ -174,13 +183,12 @@ export function bulkImport(req, res, next) {
   const csv = fs.readFileSync(req.file.path);
   const papaResponse = Papa.parse(csv.toString());
   const data = papaResponse.data;
-  
-  
+
   const formattingError = checkForBulkImportFormattingErrors(data);
   if (formattingError) {
     return handleError(createError(formattingError), res);
   }
-  
+
   const slicedData = data.slice(1);
   const entries = slicedData.map(a => {
     return {
@@ -197,20 +205,17 @@ export function bulkImport(req, res, next) {
   const getVendors = connection.query(`SELECT * FROM Vendors`);
   const getVendorsIngredients = connection.query('SELECT VendorsIngredients.*,Ingredients.name as ingredient_name, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM (VendorsIngredients INNER JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id)');
   const getInventories = connection.query(`SELECT * FROM Inventories`);
-  const getSpendingLogs = connection.query(`SELECT * FROM SpendingLogs`);
   const getStorages = connection.query(`SELECT * FROM Storages`);
 
   let ingredients;
   let vendors;
   let vendorsIngredients;
   let inventories;
-  let spendingLogs;
   let storages;
 
-
-  Promise.all([getIngredients, getVendors, getVendorsIngredients, getInventories, getSpendingLogs, getStorages])
+  Promise.all([getIngredients, getVendors, getVendorsIngredients, getInventories, getStorages])
   .then((response) => {
-    [ingredients, vendors, vendorsIngredients, inventories, spendingLogs, storages] = response;
+    [ingredients, vendors, vendorsIngredients, inventories, storages] = response;
 
     // Ensure all vendors exist, and add vendor id and storage id parameter
     for (let entry of entries) {
