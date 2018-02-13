@@ -1,10 +1,6 @@
 const jwt = require('express-jwt');
-let config;
-try {
-  config = require('./config');
-} catch (e) {
-  config = require('./config.example');
-}
+import getConfig from './getConfig';
+const config = getConfig();
 
 function getTokenFromHeader(req) {
   if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Token') {

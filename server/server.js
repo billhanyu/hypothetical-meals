@@ -17,15 +17,11 @@ import * as vendorIngredient from './routes/vendorIngredient';
 import * as spendinglog from './routes/spendinglog';
 import * as order from './routes/order';
 import { adminRequired, noobRequired } from './authMiddleware';
+import getConfig from './getConfig';
 
 require('./routes/common/passport');
 
-let config;
-try {
-  config = require('./config');
-} catch (e) {
-  config = require('./config.example');
-}
+const config = getConfig();
 
 if (process.env.NODE_ENV === 'test') {
   global.connection = {
@@ -67,6 +63,7 @@ const beNoob = [auth.required, noobRequired];
 app.post('/users/admin', user.signupAdmin);
 app.post('/users/noob', beAdmin, user.signupNoob);
 app.post('/users/login', user.login);
+app.post('/users/login/oauth', user.loginOauth);
 
 app.get('/vendors/pages', beNoob, vendor.pages);
 app.get('/vendors/page/:page_num', beNoob, vendor.view);

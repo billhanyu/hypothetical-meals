@@ -1,5 +1,6 @@
 import * as checkParams from './common/checkParams';
 import User from '../models/User';
+import { handleError } from './common/customError';
 const passport = require('passport');
 
 export function signupAdmin(req, res, next) {
@@ -43,4 +44,39 @@ export function login(req, res, next) {
     if (user) return res.json({user: user.getBasicInfo()});
     else return res.status(422).send('E-mail or password is incorrect');
   })(req, res, next);
+}
+
+export function loginOauth(req, res, next) {
+  const error = checkParams.checkBlankParams(req.body.info, ['netid', 'name']);
+  if (error) return res.status(400).send(error);
+  const netid = req.body.info.netid;
+  const name = req.body.info.name;
+  connection.query(`SELECT * FROM Users WHERE username = '${netid}' AND oauth = 1`)
+    .then(result => {
+      if (result.length == 0) {
+        connection.query(`INSERT INTO Users
+          (username, name, oauth, user_group) VALUES
+          ('${netid}', '${name}', 1, 'noob')`)
+          .then(result => {
+            const userInfo = {
+              username: netid,
+              name: name,
+              oauth: 1,
+              user_group: 'noob',
+            };
+            return tokenForOauth(userInfo, res);
+          })
+          .catch(err => {
+            throw err;
+          });
+      } else {
+        return tokenForOauth(result[0], res);
+      }
+    })
+    .catch(err => handleError(err, res));
+}
+
+function tokenForOauth(userData, res) {
+  const user = new User(userData);
+  return res.json({user: user.getBasicInfo()});
 }

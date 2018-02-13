@@ -7,7 +7,7 @@ passport.use(new LocalStrategy({
   usernameField: 'user[username]',
   passwordField: 'user[password]',
 }, function(username, password, done) {
-  connection.query(`SELECT * FROM Users WHERE username = '${username}'`)
+  connection.query(`SELECT * FROM Users WHERE username = '${username}' AND oauth = 0`)
   .then(results => {
     if (results.length==0) {
       return done(null, false, `Username or password is invalid`);

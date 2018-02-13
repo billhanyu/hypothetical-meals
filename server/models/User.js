@@ -13,6 +13,7 @@ class User {
     this.id = mysqlData.id;
     this.username = mysqlData.username;
     this.name = mysqlData.name;
+    this.oauth = mysqlData.oauth;
     this.hash = mysqlData.hash;
     this.salt = mysqlData.salt;
     this.userGroup = mysqlData.user_group;
@@ -45,6 +46,7 @@ class User {
     return {
       name: this.name,
       username: this.username,
+      oauth: this.oauth,
       user_group: this.userGroup,
       token: this.generateJWT(),
     };
