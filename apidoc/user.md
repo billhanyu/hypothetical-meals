@@ -57,3 +57,32 @@ request.body.user = 'user': {
 ```
 
 {% endmethod %}
+
+{% method %}
+## POST '/users/login/oauth' {#login}
+
+Logs the user in with OAuth method, returns the User info with .getBasicInfo().
+
+New users are saved to the Users table with default user_group as noob. All users are returned their info as well as a token.
+
+{% sample lang="js" %}
+```js
+# Request body format:
+request.body.user = 'user': {
+  'netid': 'hy103',
+  'name': 'Bill Yu',
+};
+```
+
+```js
+# Response body format:
+request.body.user = 'user': {
+  'username': 'hy103',
+  'oauth': 1,
+  'name': 'Bill Yu',
+  'user_group': 'noob',
+  'token': {token},
+};
+```
+
+{% endmethod %}
