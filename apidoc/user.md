@@ -8,6 +8,8 @@ Upon successful authentication, a JSON Web Token (JWT) will be returned. We expe
 
 You must replace myJSONWebToken with the JSON Web Token you received from authenticating with either the "Log In" or "Sign Up" endpoints.
 
+OAuth Users have the 'oauth' column as 1; Normal users have 0. The usernames for users are unique as long as they have the same 'oauth' value. This means you can have a normal user with username 'hy103' as well as an oauth user with username 'hy103'.
+
 {% method %}
 ## POST '/users/admin' {#modifyUsers}
 

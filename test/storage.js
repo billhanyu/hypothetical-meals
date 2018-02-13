@@ -61,7 +61,6 @@ describe('Storage', () => {
           '1': 1800,
         })
         .end((err, res) => {
-          console.log(res.message);
           res.should.have.status(200);
           const newCapacity = alasql('SELECT capacity FROM Storages WHERE id = 1')[0].capacity;
           assert.strictEqual(newCapacity, 1800, 'New storage capacity');

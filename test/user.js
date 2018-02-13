@@ -142,7 +142,7 @@ describe('User', () => {
           const users = alasql(`SELECT * FROM Users WHERE username = 'admin1'`);
           assert.strictEqual(users.length, 1, 'Number of rows with username.');
           const newAdmin = users[0];
-          assert.strictEqual(newAdmin.id, 6, 'New admin ID.');
+          assert.strictEqual(newAdmin.id, 7, 'New admin ID.');
           assert.strictEqual(newAdmin.username, 'admin1', 'New admin username.');
           assert.strictEqual(newAdmin.oauth, 0, 'Not OAuth user');
           assert.strictEqual(newAdmin.name, 'mike wazowski', 'New admin name.');
@@ -184,7 +184,7 @@ describe('User', () => {
           const users = alasql(`SELECT * FROM Users WHERE username = 'noob1'`);
           assert.strictEqual(users.length, 1, 'Number of rows with username.');
           const newNoob = users[0];
-          assert.strictEqual(newNoob.id, 6, 'New noob ID.');
+          assert.strictEqual(newNoob.id, 7, 'New noob ID.');
           assert.strictEqual(newNoob.username, 'noob1', 'New noob username.');
           assert.strictEqual(newNoob.oauth, 0, 'Not OAuth user');
           assert.strictEqual(newNoob.name, 'mike wazowski', 'New noob name.');
@@ -201,7 +201,7 @@ describe('User', () => {
         .send({
           'user': {
             'username': 'admin',
-            'password': 'mike mike mike',
+            'password': 'a',
           },
         })
         .end((err, res) => {
@@ -219,7 +219,7 @@ describe('User', () => {
         .send({
           'user': {
             'username': 'noob',
-            'password': 'mike mike mike',
+            'password': 'a',
           },
         })
         .end((err, res) => {
@@ -262,6 +262,8 @@ describe('User', () => {
         })
         .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .end((err, res) => {
+          console.log(res.body);
+          console.log(res.message);
           res.should.have.status(401);
           done();
         });
@@ -284,13 +286,64 @@ describe('User', () => {
         });
     });
 
-    it('should reject incomplete reject properties', (done) => {
+    it('should reject incomplete properties', (done) => {
       chai.request(server)
         .post('/users/permission')
         .send({
           'user': {
             'username': 'eri101',
             'permission': 'manager',
+          },
+        })
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should reject nonexisting user', (done) => {
+      chai.request(server)
+        .post('/users/permission')
+        .send({
+          'user': {
+            'username': 'clz4',
+            'oauth': 0,
+            'permission': 'manager',
+          },
+        })
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should reject invalid oauth value', (done) => {
+      chai.request(server)
+        .post('/users/permission')
+        .send({
+          'user': {
+            'username': 'eri101',
+            'oauth': 'true',
+            'permission': 'manager',
+          },
+        })
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should reject invalid new permission', (done) => {
+      chai.request(server)
+        .post('/users/permission')
+        .send({
+          'user': {
+            'username': 'eri101',
+            'oauth': 1,
+            'permission': 'fuck',
           },
         })
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -314,7 +367,7 @@ describe('User', () => {
         .end((err, res) => {
           res.should.have.status(200);
           const eric = alasql('SELECT * FROM Users WHERE username = "eri101" and oauth = 1')[0];
-          assert.strictEqual(eric.permission, 'manager', 'Eric should become a manager now.');
+          assert.strictEqual(eric.user_group, 'manager', 'Eric should become a manager now.');
           done();
         });
     });
