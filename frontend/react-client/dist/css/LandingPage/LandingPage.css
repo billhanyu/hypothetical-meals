@@ -27,6 +27,16 @@
   background-color: #FFF;
 }
 
+@media (max-width: 1300px) {
+  .LoginWindow {
+    right: 10%;
+    z-index: 3;
+    top: 40px;
+    width: 20%;
+    min-width: 430px;
+  }
+}
+
 /*** BEGIN HEADER STUFF ****/
 .LandingPageLogo {
   font-size: 22px;

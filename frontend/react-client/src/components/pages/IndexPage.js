@@ -5,16 +5,18 @@ import FeaturesOverviewContainer from './../LandingPage/FeatureOverview/Features
 import LandingPageFooter from './../LandingPage/LandingPageFooter.js';
 import LoginWindow from './../LandingPage/LoginWindow.js';
 import { logInWithRedirectedHash } from '../../oauth/OAuth';
+import Cookies from 'universal-cookie';
 
 class IndexPage extends Component {
   constructor(props) {
     super(props);
+    this.cookies = new Cookies();
     this.checkOauth();
   }
 
   checkOauth() {
     if (window.location.hash.indexOf('access_token') > -1) {
-      logInWithRedirectedHash(window.location.hash, this.props.history);
+      logInWithRedirectedHash(window.location.hash, this.props.history, this.cookies);
     }
   }
 
