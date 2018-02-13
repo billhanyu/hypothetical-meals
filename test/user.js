@@ -111,4 +111,92 @@ describe('User', () => {
         });
     });
   });
+
+  describe('#changePermission()', () => {
+    it('should reject noob requests', (done) => {
+      chai.request(server)
+        .post('/users/permission')
+        .send({
+          'user': {
+            'username': 'eri101',
+            'oauth': 1,
+            'permission': 'manager',
+          },
+        })
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
+    it('should reject manager requests', (done) => {
+      chai.request(server)
+        .post('/users/permission')
+        .send({
+          'user': {
+            'username': 'eri101',
+            'oauth': 1,
+            'permission': 'manager',
+          },
+        })
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
+    it('should reject invalid request object', (done) => {
+      chai.request(server)
+        .post('/users/permission')
+        .send({
+          'info': {
+            'username': 'eri101',
+            'oauth': 1,
+            'permission': 'manager',
+          },
+        })
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should reject incomplete reject properties', (done) => {
+      chai.request(server)
+        .post('/users/permission')
+        .send({
+          'user': {
+            'username': 'eri101',
+            'permission': 'manager',
+          },
+        })
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should change permission for the user described', (done) => {
+      chai.request(server)
+        .post('/users/permission')
+        .send({
+          'user': {
+            'username': 'eri101',
+            'oauth': 1,
+            'permission': 'manager',
+          },
+        })
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          const eric = alasql('SELECT * FROM Users WHERE username = "eri101" and oauth = 1')[0];
+          assert.strictEqual(eric.permission, 'manager', 'Eric should become a manager now.');
+          done();
+        });
+    });
+  });
 });
