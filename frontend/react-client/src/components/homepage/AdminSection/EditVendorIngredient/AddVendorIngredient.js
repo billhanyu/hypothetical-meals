@@ -3,9 +3,6 @@ import axios from 'axios';
 
 import RegistrationHeader from './../../../Registration/RegistrationHeader.js';
 import RegistrationInput from './../../../Registration/RegistrationInput.js';
-import RegistrationAgreement from './../../../Registration/RegistrationAgreement.js';
-import RegistrationSubmitButton from './../../../Registration/RegistrationSubmitButton.js';
-
 import VendorComboBox from './../VendorComboBox.js';
 
 class AddVendorIngredient extends Component {
@@ -51,8 +48,8 @@ class AddVendorIngredient extends Component {
   }
 
   handleInputChange(fieldName, event) {
-    const newState = this.state;
-    this.state[fieldName] = event.target.value;
+    const newState = Object.assign({}, this.state);
+    newState[fieldName] = event.target.value;
     this.setState(newState);
   }
 

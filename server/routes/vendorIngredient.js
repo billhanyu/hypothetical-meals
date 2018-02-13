@@ -63,15 +63,17 @@ export function addVendorIngredients(req, res, next) {
     const ingredientId = item['ingredient_id'];
     const vendorId = item['vendor_id'];
     const packageType = item['package_type'];
+    const numNativeUnits = item['num_native_units'];
     const price = item['price'];
 
     if (!checkNumber.isPositiveInteger(ingredientId)
       || !checkNumber.isPositiveInteger(vendorId)
       || !checkNumber.isPositiveInteger(price)
+      || isNaN(numNativeUnits)
       || ALL_PACKAGE_TYPES.indexOf(packageType) < 0) {
       return res.status(400).send('Invalid input, check your property names and values.');
     }
-    values.push(`(${ingredientId}, ${vendorId}, '${packageType}', ${price})`);
+    values.push(`(${ingredientId}, ${vendorId}, '${packageType}', ${numNativeUnits}, ${price})`);
     dup.push(`(ingredient_id = ${ingredientId} AND vendor_id = ${vendorId} AND package_type = '${packageType}')`);
   }
   connection.query(`SELECT id FROM VendorsIngredients WHERE ${dup.join(' OR ')}`)
@@ -79,7 +81,7 @@ export function addVendorIngredients(req, res, next) {
       if (results.length > 0) {
         throw createError('There exists duplicate(s) in your input: same ingredient_id, vendor_id and package_type');
       }
-      return connection.query(`INSERT INTO VendorsIngredients (ingredient_id, vendor_id, package_type, price) VALUES ${values.join(', ')}`);
+      return connection.query(`INSERT INTO VendorsIngredients (ingredient_id, vendor_id, package_type, num_native_units, price) VALUES ${values.join(', ')}`);
     })
     .then(() => success(res))
     .catch(err => handleError(err, res));
@@ -119,6 +121,7 @@ export function modifyVendorIngredients(req, res, next) {
       return connection.query(
         `UPDATE VendorsIngredients
           SET price = (case ${cases.prices.join(' ')} end),
+              num_native_units = (case ${cases.numNativeUnits.join(' ')} end),
               package_type = (case ${cases.packageTypes.join(' ')} end)
           WHERE id IN (${ids.join(', ')})`);
     })
@@ -155,17 +158,21 @@ export function fakeDeleteMultipleVendorIngredients(ids) {
 function getCases(olds, items) {
   const prices = [];
   const packageTypes = [];
+  const numNativeUnitsArr = [];
   for (let i = 0; i < olds.length; i++) {
     const old = olds[i];
     const id = old['ingredient_id'];
     const change = items[id];
     const price = 'price' in change ? change['price'] : old['price'];
     const packageType = 'package_type' in change ? change['package_type'] : old['package_type'];
+    const numNativeUnits = 'num_native_units' in change ? change['num_native_units'] : old['num_native_units'];
     prices.push(`when id = ${id} then ${price}`);
     packageTypes.push(`when id = ${id} then '${packageType}'`);
+    numNativeUnitsArr.push(`when id = ${id} then ${numNativeUnits}`);
   }
   return {
     prices,
     packageTypes,
+    numNativeUnits: numNativeUnitsArr,
   };
 }
