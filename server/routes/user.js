@@ -1,6 +1,7 @@
 import * as checkParams from './common/checkParams';
 import User from '../models/User';
 import { handleError } from './common/customError';
+import success from './common/success';
 const passport = require('passport');
 
 export function signupAdmin(req, res, next) {
@@ -79,4 +80,28 @@ export function loginOauth(req, res, next) {
 function tokenForOauth(userData, res) {
   const user = new User(userData);
   return res.json({user: user.getBasicInfo()});
+}
+
+export function changePermission(req, res, next) {
+  const user = req.body.user;
+  const error = checkParams.checkBlankParams(user, ['username', 'oauth', 'permission']);
+  if (error) {
+    return res.status(400).send(error);
+  }
+  if (user.oauth != 0 && user.oauth != 1) {
+    return res.status(400).send('User 0 and 1 for oauth value.');
+  }
+  const validPermissions = ['noob', 'manager', 'admin'];
+  if (validPermissions.indexOf(user.permission) < 0) {
+    return res.status(400).send('Invalid New Permission.');
+  }
+  connection.query(`SELECT * FROM Users WHERE username = '${user.username}' AND oauth = ${user.oauth}`)
+    .then(result => {
+      if (result.length == 0) {
+        return res.status(400).send('User does not exist');
+      }
+      return connection.query(`UPDATE Users SET user_group = '${user.permission}' WHERE id = ${result[0].id}`);
+    })
+    .then(result => success(res))
+    .catch(err => handleError(err, res));
 }

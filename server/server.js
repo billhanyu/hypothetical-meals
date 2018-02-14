@@ -16,7 +16,7 @@ import * as vendor from './routes/vendor';
 import * as vendorIngredient from './routes/vendorIngredient';
 import * as spendinglog from './routes/spendinglog';
 import * as order from './routes/order';
-import { adminRequired, noobRequired } from './authMiddleware';
+import { adminRequired, noobRequired, managerRequired } from './authMiddleware';
 import getConfig from './getConfig';
 
 require('./routes/common/passport');
@@ -59,11 +59,13 @@ app.use(cookieParser());
 
 const beAdmin = [auth.required, adminRequired];
 const beNoob = [auth.required, noobRequired];
+const beManager = [auth.required, managerRequired];
 
 app.post('/users/admin', user.signupAdmin);
 app.post('/users/noob', beAdmin, user.signupNoob);
 app.post('/users/login', user.login);
 app.post('/users/login/oauth', user.loginOauth);
+app.post('/users/permission', beAdmin, user.changePermission);
 
 app.get('/vendors/pages', beNoob, vendor.pages);
 app.get('/vendors/page/:page_num', beNoob, vendor.view);
