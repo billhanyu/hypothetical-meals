@@ -42,7 +42,7 @@ class OrderItem extends Component {
     return (
       <div className="orderitem">
         <div
-          className="glyphicon glyphicon-remove DeleteOrderColumn DeleteOrderItem"
+          className="fa fa-remove DeleteOrderColumn DeleteOrderItem"
           aria-hidden="true"
           onClick={this.remove}
         />
