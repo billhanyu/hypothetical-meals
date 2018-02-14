@@ -4,17 +4,22 @@ export function adminRequired(req, res, next) {
   userQuery(req, res, next, ['admin']);
 }
 
+export function managerRequired(req, res, next) {
+  userQuery(req, res, next, ['manager', 'admin']);
+}
+
 export function noobRequired(req, res, next) {
-  userQuery(req, res, next, ['admin', 'noob']);
+  userQuery(req, res, next, ['noob', 'manager', 'admin']);
 }
 
 function userQuery(req, res, next, groups) {
-  connection.query(`SELECT username, name, user_group FROM Users WHERE id = ${req.payload.id}`)
+  connection.query(`SELECT username, oauth, name, user_group FROM Users WHERE id = ${req.payload.id}`)
     .then(results => {
       if (results.length == 0) throw createError('Database error');
       const user = results[0];
       req.user = {
         username: user['username'],
+        oauth: user['oauth'],
         name: user['name'],
         user_group: user['user_group'],
       };
