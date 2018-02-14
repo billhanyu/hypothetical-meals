@@ -22,7 +22,7 @@ class LoginWindow extends Component {
 
   componentDidMount() {
     this.setState({
-      email: this.cookies.get('email') || '',
+      email: this.cookies.get('username') || '',
       password: this.cookies.get('password') || ''
     });
   }
