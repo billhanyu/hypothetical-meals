@@ -35,7 +35,7 @@ class CartItem extends Component {
     return (
       <div className="CartItem">
         <div
-          className="glyphicon glyphicon-remove CartDeleteColumn DeleteCartItem"
+          className="fa fa-remove CartDeleteColumn DeleteCartItem"
           aria-hidden="true"
           onClick={this.remove}
         />
