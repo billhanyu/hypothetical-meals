@@ -74,7 +74,7 @@ function orderHelper(orders, req, res, next) {
     .then(() => checkStoragePromise(requestedCapacities))
     .then(() => {
         if (newIngredientCases.length > 0) {
-            return connection.query(`INSERT INTO Inventories (ingredient_id, package_type, num_packages) VALUES ${newIngredientCases.join(' ')}`);
+            return connection.query(`INSERT INTO Inventories (ingredient_id, package_type, num_packages) VALUES ${newIngredientCases.join(', ')}`);
         }
         return;
     })

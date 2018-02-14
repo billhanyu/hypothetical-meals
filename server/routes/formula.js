@@ -8,19 +8,22 @@ const formulaEntryQuery = 'SELECT FormulaEntries.*';
 /**
  *
  * @param {*} req
- * req.body.formulas: [{
+ * @param {*} res
+ * res.body: [{
  *      id: 'myId',
  *      name: 'myName',
  *      description: 'myDescription',
+ *      num_product: 1
  *      ingredients: {
- *          'ingredient1': 'ingredient1_quantity',
- *          'ingredient2': 'ingredient2_quantity',
+ *          'ingredient1': {
+ *              'ingredient_id': 1,
+ *              'num_native_units': 1,
+ *              'native_unit': kg,
+ *          }
  *          ...
  *      },
  *      ...
- *      ]
- * }
- * @param {*} res
+ * ]
  * @param {*} next
  */
 export function view(req, res, next) {
@@ -43,7 +46,7 @@ export function view(req, res, next) {
     .then((formulaEntries) => {
         formulaEntries.forEach(x => {
             let ingredientTuple = {
-                'quantity': x.quantity,
+                'ingredient_id': x.ingredient_id,
                 'num_native_units': x.num_native_units,
                 'native_unit': x.native_unit,
             };
@@ -56,6 +59,62 @@ export function view(req, res, next) {
             }
         });
         res.status(200).send(Object.values(myFormulas));
+    })
+    .catch((err) => {
+        handleError(err, res);
+    });
+}
+
+/**
+ *
+ * @param {*} req
+ * req.body.formulas: [{
+ *      name: 'myName',
+ *      description: 'myDescription',
+ *      num_product: 1
+ *      ingredients: [{
+ *          'ingredient_id': 1
+ *          'num_native_units': 1,
+ *          }],
+ *      }]
+ * }
+ * @param {*} res
+ * @param {*} next
+ */
+export function add(req, res, next) {
+    const formulas = req.body.formulas;
+    let names = [];
+    let formulaCases = [];
+    let formulaEntryCases = [];
+    formulas.forEach(x => {
+        names.push(`'${x.name}'`);
+        formulaCases.push(`('${x.name}', '${x.description}', ${x.num_product})`);
+    });
+    connection.query(`${formulaQueryString} WHERE name IN (${names.join(', ')})`)
+    .then((results) => {
+        if (results.length > 0) {
+            throw createError('Trying to add a formula that already exists in database');
+        }
+        return connection.query(`INSERT INTO Formulas (name, description, num_product) VALUES ${formulaCases.join(', ')}`);
+    })
+    .then(() => {
+        return connection.query(`${formulaQueryString} WHERE name IN (${names.join(', ')})`);
+    })
+    .then((dataFormulas) => {
+        let nameIdTuple = {};
+        dataFormulas.forEach(x => {
+            nameIdTuple[`${x.name}`] = x.id;
+        });
+        formulas.forEach(x => {
+            let ingredients = x.ingredients;
+            ingredients.forEach(i => {
+                formulaEntryCases.push(`(${i.ingredient_id}, ${i.num_native_units}, ${nameIdTuple[x.name]})`);
+            });
+        });
+        return connection.query(`INSERT INTO FormulaEntries (ingredient_id, num_native_units, formula_id) VALUES ${formulaEntryCases.join(', ')}`);
+    })
+    .then(() => {
+        success(res);
     })
     .catch((err) => {
         handleError(err, res);
