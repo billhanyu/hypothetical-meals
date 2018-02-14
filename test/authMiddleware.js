@@ -1,6 +1,6 @@
 const assert = require('chai').assert;
 const testTokens = require('./testTokens');
-import { adminRequired, noobRequired } from '../server/authMiddleware';
+import { adminRequired, managerRequired, noobRequired } from '../server/authMiddleware';
 import server from '../server/server';
 
 class FakeRes {
@@ -44,6 +44,21 @@ describe('authMiddleware', () => {
         assert.strictEqual(res.code, 0, 'Response status code');
         done();
       });
+    });
+
+    it('should reject managers', (done) => {
+      chai.request(server)
+        .post('/users/noob')
+        .send({
+          name: 'shit',
+          username: 'shit',
+          password: 'shit',
+        })
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
     });
 
     it('should reject noobs', (done) => {
