@@ -4,6 +4,7 @@
 ## GET '/formulas'
 
 Gets formula information including formula entries for each formula.
+Everyone can view.
 
 Returns
 
@@ -30,7 +31,7 @@ res.body: [{
 {% method %}
 ## POST '/formulas'
 
-This adds formulas to the database.
+This adds formulas to the database. Only admins can add.
 
 {% sample lang="js" %}
 ```js
