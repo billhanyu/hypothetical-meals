@@ -9,7 +9,7 @@ describe('Formulas', () => {
         it('should return all formulas', (done) => {
             chai.request(server)
                 .get('/formulas')
-                .set('Authorization', `Token ${testTokens.adminTestToken}`)
+                .set('Authorization', `Token ${testTokens.managerTestToken}`)
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a('array');
@@ -28,12 +28,12 @@ describe('Formulas', () => {
                 });
         });
 
-        it('should reject noobs to view', (done) => {
+        it('should let noobs view', (done) => {
             chai.request(server)
                 .get('/formulas')
                 .set('Authorization', `Token ${testTokens.noobTestToken}`)
                 .end((err, res) => {
-                    res.should.have.status(401);
+                    res.should.have.status(200);
                     done();
                 });
         });
@@ -97,7 +97,32 @@ describe('Formulas', () => {
         it('should reject an add request from a noob', (done) => {
             chai.request(server)
                 .post('/formulas')
-                .set('Authorization', `Token ${testTokens.TestToken}`)
+                .set('Authorization', `Token ${testTokens.noobTestToken}`)
+                .send({
+                    'formulas': [
+                        {
+                            'name': 'blob',
+                            'description': 'A blob',
+                            'num_product': 1,
+                            'ingredients': [
+                                {
+                                    'ingredient_id': 1,
+                                    'num_native_units': 2,
+                                },
+                            ],
+                        },
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    done();
+                });
+        });
+
+        it('should reject an add request from a manager', (done) => {
+            chai.request(server)
+                .post('/formulas')
+                .set('Authorization', `Token ${testTokens.managerTestToken}`)
                 .send({
                     'formulas': [
                         {
