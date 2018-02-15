@@ -80,17 +80,21 @@ request.body.vendoringredients = [
 {% method %}
 ## PUT '/vendoringredients'
 
-Modify the price or package type of multiple vendoringredients.
+Modify the price or native_units of multiple vendoringredients.
 
-you can modify the price or num_native_units, but make sure every object in the array modifies at least one of them.
+you can modify the price or num_native_units.
+
+**Send in the whole objects with fields modified. Ingredient_id or vendor_id changes will be ignored.**
 
 {% sample lang="js" %}
 ```js
 request.body.vendoringredients = {
   '1': {
     'price': 100,
+    'num_native_units': 150.2
   },
   '2': {
+    'price': 500,
     'num_native_units': 200.1
   },
 };
