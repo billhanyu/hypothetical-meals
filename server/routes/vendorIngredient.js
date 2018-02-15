@@ -2,7 +2,7 @@ import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import { getNumPages, queryWithPagination } from './common/pagination';
 import success from './common/success';
-const basicViewQueryString = 'SELECT VendorsIngredients.*, Vendors.name as vendor_name, Vendors.contact as vendor_contact, Vendors.code as vendor_code, Vendors.removed as vendor_removed, Ingredients.name as ingredient_name, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM ((VendorsIngredients INNER JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id) INNER JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id)';
+const basicViewQueryString = 'SELECT VendorsIngredients.*, Vendors.name as vendor_name, Vendors.contact as vendor_contact, Vendors.code as vendor_code, Vendors.removed as vendor_removed, Ingredients.name as ingredient_name, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed, Ingredients.package_type as ingredient_package_type, Ingredients.native_unit as ingredient_native_unit FROM ((VendorsIngredients INNER JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id) INNER JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id)';
 
 export function pages(req, res, next) {
   getNumPages('VendorsIngredients')
@@ -79,9 +79,6 @@ export function addVendorIngredients(req, res, next) {
  *   '1': {
  *     'price': 100,
  *   },
- *   '2': {
- *     'package_type': 'sack',
- *   }
  * }
  */
 export function modifyVendorIngredients(req, res, next) {
@@ -108,8 +105,7 @@ export function modifyVendorIngredients(req, res, next) {
       return connection.query(
         `UPDATE VendorsIngredients
           SET price = (case ${cases.prices.join(' ')} end),
-              num_native_units = (case ${cases.numNativeUnits.join(' ')} end),
-              package_type = (case ${cases.packageTypes.join(' ')} end)
+              num_native_units = (case ${cases.numNativeUnits.join(' ')} end)
           WHERE id IN (${ids.join(', ')})`);
     })
     .then(() => success(res))
@@ -144,22 +140,18 @@ export function fakeDeleteMultipleVendorIngredients(ids) {
 
 function getCases(olds, items) {
   const prices = [];
-  const packageTypes = [];
   const numNativeUnitsArr = [];
   for (let i = 0; i < olds.length; i++) {
     const old = olds[i];
     const id = old['ingredient_id'];
     const change = items[id];
     const price = 'price' in change ? change['price'] : old['price'];
-    const packageType = 'package_type' in change ? change['package_type'] : old['package_type'];
     const numNativeUnits = 'num_native_units' in change ? change['num_native_units'] : old['num_native_units'];
     prices.push(`when id = ${id} then ${price}`);
-    packageTypes.push(`when id = ${id} then '${packageType}'`);
     numNativeUnitsArr.push(`when id = ${id} then ${numNativeUnits}`);
   }
   return {
     prices,
-    packageTypes,
     numNativeUnits: numNativeUnitsArr,
   };
 }
