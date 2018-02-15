@@ -15,7 +15,7 @@ class BulkImport extends Component {
     const data = new FormData();
     data.set('bulk', this.file);
     axios.post('/ingredients/import', data, {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
       alert('Successfully Imported!');

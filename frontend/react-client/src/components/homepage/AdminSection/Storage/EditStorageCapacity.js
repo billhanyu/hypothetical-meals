@@ -28,7 +28,7 @@ class EditVendor extends Component {
   componentDidMount(){
     const self = this;
     axios.get("/storages", {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(function (response) {
       self.setState({
@@ -86,7 +86,7 @@ class EditVendor extends Component {
     paramObject[storage_id] = this.state.size;
 
     axios.put("/storages", paramObject, {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(function (response) {
       self.setState({

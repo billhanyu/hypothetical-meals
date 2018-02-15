@@ -31,7 +31,6 @@ export function logInWithRedirectedHash(hash, history, cookies) {
     }
   })
     .then(response => {
-      console.log(response.data);
       const dukeInfo = response.data;
       axios.post('/users/login/oauth', {
         info: {

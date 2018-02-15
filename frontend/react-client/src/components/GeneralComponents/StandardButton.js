@@ -15,7 +15,7 @@ class StandardButton extends Component {
       <div className={`${this.props.buttonClass}`} onClick={this.props.onClick}>
         <i className={`${this.props.ButtonIcon} SearchButtonIconImage`}></i>
       </div>
-    )
+    );
   }
 }
 

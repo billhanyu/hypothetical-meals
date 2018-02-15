@@ -61,7 +61,7 @@ class Cart extends Component {
         <div className="CartBody">
           <div className="CartItem">
             <span 
-              className="glyphicon glyphicon-remove CartDeleteColumn DeleteCartItem"
+              className="fa fa-remove CartDeleteColumn DeleteCartItem"
               aria-hidden="true"
               style={{'color': 'rgba(0,0,0,0)', 'cursor': ''}}
             />

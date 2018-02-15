@@ -15,7 +15,7 @@ class SpendingLog extends Component {
 
   componentDidMount() {
     axios.get('/spendinglogs/pages', {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
       this.setState({
@@ -27,7 +27,7 @@ class SpendingLog extends Component {
 
   selectPage(idx) {
     axios.get(`/spendinglogs/page/${idx}`, {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
       this.setState({

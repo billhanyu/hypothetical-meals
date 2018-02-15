@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 import HomePage from './pages/HomePage.js';
-import RegistrationPage from './pages/RegistrationPage.js';
 import IndexPage from './pages/IndexPage.js';
 import Cookies from 'universal-cookie';
 
@@ -21,14 +20,6 @@ class App extends Component {
             name="home"
             exact path="/"
             render={() => global.token ? <Redirect to="/dashboard" /> : <IndexPage />}
-          />
-          <Route
-            name="registration"
-            exact path="/register"
-            render={() => (global.user_group == 'admin'
-              ? <RegistrationPage />
-              : <Redirect to="/" />
-            )}
           />
           <Route
             name="dashboard"

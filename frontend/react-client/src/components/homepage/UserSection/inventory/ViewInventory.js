@@ -27,7 +27,7 @@ class ViewInventory extends Component {
 
   reloadData() {
     axios.get('/inventory/pages', {
-        headers: { Authorization: "Token " + this.props.token }
+        headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
       this.setState({
@@ -85,7 +85,7 @@ class ViewInventory extends Component {
     const self = this;
     let allInventories;
     axios.get(`/inventory/page/${idx}`, {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
       .then(response => {
         allInventories = response.data;
@@ -94,7 +94,7 @@ class ViewInventory extends Component {
           inventories: response.data,
         });
         return axios.get('/storages', {
-          headers: { Authorization: "Token " + this.props.token }
+          headers: { Authorization: "Token " + global.token }
         });
       })
       .then(response => {
@@ -140,7 +140,6 @@ class ViewInventory extends Component {
             key={key}
             item={item}
             storages={this.state.storages}
-            token={this.props.token}
           />
         )}
         <PageBar
