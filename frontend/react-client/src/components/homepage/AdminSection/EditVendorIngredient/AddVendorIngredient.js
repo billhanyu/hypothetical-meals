@@ -29,7 +29,7 @@ class AddVendorIngredient extends Component {
   componentDidMount() {
     const self = this;
     axios.get("/vendors/page/1", {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(function (response) {
       const vendorNameArray = [];
@@ -67,7 +67,7 @@ class AddVendorIngredient extends Component {
         'price': Number(self.state.price),
       }]
     }, {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
       self.setState({

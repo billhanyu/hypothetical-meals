@@ -80,7 +80,7 @@ class LogOrder extends Component {
     axios.post("/order", {
       orders
     }, {
-        headers: { Authorization: "Token " + this.props.token }
+        headers: { Authorization: "Token " + global.token }
       })
       .then(function (response) {
         self.setState({
@@ -96,7 +96,7 @@ class LogOrder extends Component {
   componentDidMount() {
     const self = this;
     axios.get("/ingredients-available", {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
       .then(function (response) {
         self.setState({
@@ -121,7 +121,6 @@ class LogOrder extends Component {
             <OrderItem
               key={key}
               idx={key}
-              token={this.props.token}
               ingredients={this.state.ingredients}
               data={item}
               onChangeIngredientName={this.onChangeIngredientName}
