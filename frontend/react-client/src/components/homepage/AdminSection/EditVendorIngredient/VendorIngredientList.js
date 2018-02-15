@@ -95,7 +95,7 @@ class IngredientList extends Component {
         <RegistrationHeader HeaderText="Edit Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>
         {
           this.state.vendoringredients.map((element, key) => {
-            return <VendorIngredientListItem onClick={this.clickedIngredient} key={key} vendor_ingredient_id={element.id} ingredient_id={element.ingredient_id} ingredient_name={element.ingredient_name} ingredient_storage_id={element.ingredient_storage_id} ingredient_package_type={element.package_type} ingredient_price={element.price}/>
+            return <VendorIngredientListItem onClick={this.clickedIngredient} key={key} vendor_ingredient_id={element.id} ingredient_id={element.ingredient_id} ingredient_name={element.ingredient_name} ingredient_storage_id={element.ingredient_storage_id} ingredient_package_type={element.package_type} ingredient_price={element.price}/>;
           })
         }
       </div>
