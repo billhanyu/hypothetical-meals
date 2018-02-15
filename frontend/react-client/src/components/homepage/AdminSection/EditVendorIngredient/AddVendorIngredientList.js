@@ -23,7 +23,7 @@ class AddVendorIngredientList extends Component {
     const newPageNumber = this.state.currentPage <= 1 ? this.state.currentPage : this.state.currentPage - 1;
     const self = this;
     axios.get(`/ingredients/page/${newPageNumber}`, {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(function (response) {
       self.setState({
@@ -40,7 +40,7 @@ class AddVendorIngredientList extends Component {
     const newPageNumber = this.state.currentPage + 1;
     const self = this;
     axios.get(`/ingredients/page/${newPageNumber}`, {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(function (response) {
       self.setState({
@@ -59,7 +59,7 @@ class AddVendorIngredientList extends Component {
   componentDidMount() {
     const self = this;
     axios.get("/ingredients/page/1", {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(function (response) {
       self.setState({
@@ -80,7 +80,7 @@ class AddVendorIngredientList extends Component {
 
   render() {
     return (
-      this.state.hasPickedIngredient ? <AddVendorIngredient token={this.props.token} id={this.state.activeId}/> :
+      this.state.hasPickedIngredient ? <AddVendorIngredient id={this.state.activeId}/> :
       <div className="VendorList borderAll">
         <PageArrows onClickLeft={this.onLeftArrowClick} pageNumber={this.state.currentPage} onClickRight={this.onRightArrowClick}/>
         <RegistrationHeader HeaderText="Add Vendor Ingredient" HeaderIcon="fas fa-pencil-alt fa-2x"/>

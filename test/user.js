@@ -262,8 +262,6 @@ describe('User', () => {
         })
         .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .end((err, res) => {
-          console.log(res.body);
-          console.log(res.message);
           res.should.have.status(401);
           done();
         });

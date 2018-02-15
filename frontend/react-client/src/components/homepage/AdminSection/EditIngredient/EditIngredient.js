@@ -55,7 +55,7 @@ class EditVendor extends Component {
     axios.put("/ingredients", {
       ingredients: newVendorObject,
     }, {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(function (response) {
       self.setState({

@@ -26,7 +26,7 @@ class VendorList extends Component {
     const newPageNumber = this.state.currentPage <= 1 ? this.state.currentPage : this.state.currentPage - 1;
     const self = this;
     axios.get(`/vendors/page/${newPageNumber}`, {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(function (response) {
       self.setState({
@@ -43,7 +43,7 @@ class VendorList extends Component {
     const newPageNumber = this.state.currentPage + 1;
     const self = this;
     axios.get(`/vendors/page/${newPageNumber}`, {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(function (response) {
       self.setState({
@@ -63,7 +63,7 @@ class VendorList extends Component {
   componentDidMount() {
     const self = this;
     axios.get("/vendors/page/1", {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(function (response) {
       self.setState({
@@ -87,7 +87,7 @@ class VendorList extends Component {
 
   render() {
     return (
-      this.state.hasPickedVendor ? <EditVendor token={this.props.token} id={this.state.activeId} name={this.state.activeName} contact={this.state.activeContact} code={this.state.activeCode}/> :
+      this.state.hasPickedVendor ? <EditVendor id={this.state.activeId} name={this.state.activeName} contact={this.state.activeContact} code={this.state.activeCode}/> :
       <div className="VendorList borderAll">
         <PageArrows onClickLeft={this.onLeftArrowClick} pageNumber={this.state.currentPage} onClickRight={this.onRightArrowClick}/>
         <RegistrationHeader HeaderText="Edit Vendor" HeaderIcon="fas fa-pencil-alt fa-2x"/>

@@ -39,7 +39,8 @@ body {
   background-color: #ecf0f5;
   padding: 0 15px;
   width: 100%;
-  height: 100%;
+  top: 60px;
+  bottom: 0px;
   position: absolute;
   min-width: 1000px;
 }
@@ -76,4 +77,54 @@ select:focus,
 textarea:focus,
 button:focus {
     outline: none;
+}
+
+.appcontainer {
+  padding: 0px;
+}
+
+.row-nomargin {
+  margin: 0px;
+}
+
+.PermissionLink {
+  color: rgba(0,0,0,.65);
+  font-size: 90%;
+}
+
+.PermissionLink:hover {
+  color: rgba(0,0,0,.75);
+}
+
+.PermissionLink-active {
+  font-weight: 500;
+  color: rgba(0,0,0,.9);
+}
+
+.PermissionCategory {
+  color: rgba(0,0,0,.85);
+}
+
+.PermissionCategory:hover {
+  color: rgba(0,0,0,.95);
+}
+
+.PermissionCategory-active {
+  font-weight: 600;
+  color: rgba(0,0,0,1);
+}
+
+.SideBar {
+  padding-left: 15px;
+  padding-top: 15px;
+  position: sticky;
+  height: calc(100vh - 60px);
+  background-color: white;
+  border-right: 1px solid rgba(0,0,0,.1);
+  overflow-y: auto;
+}
+
+.ContentMain {
+  height: calc(100vh - 60px);
+  overflow-y: auto;
 }

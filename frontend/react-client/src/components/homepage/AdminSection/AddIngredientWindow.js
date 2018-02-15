@@ -43,7 +43,7 @@ class AddIngredientWindow extends Component {
         storage_id,
       }]
     }, {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
       self.setState({

@@ -61,7 +61,7 @@ request.body.user = 'user': {
 {% endmethod %}
 
 {% method %}
-## POST '/users/login/oauth' {#login}
+## POST '/users/login/oauth' {#loginOauth}
 
 Logs the user in with OAuth method, returns the User info with .getBasicInfo().
 
@@ -84,6 +84,25 @@ request.body.user = 'user': {
   'name': 'Bill Yu',
   'user_group': 'noob',
   'token': {token},
+};
+```
+
+{% endmethod %}
+
+{% method %}
+## POST '/users/permission' {#changePermission}
+
+Changes a user's permission level, **requires admin permission level**.
+
+Note that for the input object, 'oauth' field needs to be 0 or 1.
+
+{% sample lang="js" %}
+```js
+# Request body format:
+request.body.user = 'user': {
+  'username': 'hy103',
+  'oauth': 1,
+  'permissoin': 'admin',
 };
 ```
 

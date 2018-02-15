@@ -33,7 +33,7 @@ class AddVendor extends Component {
         code: this.state.carriercode,
       }]
     }, {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
       this.setState({

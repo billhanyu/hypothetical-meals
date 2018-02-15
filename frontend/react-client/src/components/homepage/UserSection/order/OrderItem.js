@@ -11,7 +11,7 @@ class OrderItem extends Component {
   selectedIngredient(event) {
     const ingredientName = event.target.value;
     axios.get('/ingredients-available', {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
       let ingredientId;
@@ -23,7 +23,7 @@ class OrderItem extends Component {
       }
       if (ingredientId) {
         return axios.get(`/vendoringredients/${ingredientId}`, {
-          headers: { Authorization: "Token " + this.props.token }
+          headers: { Authorization: "Token " + global.token }
         });
       }
     })
@@ -42,7 +42,7 @@ class OrderItem extends Component {
     return (
       <div className="orderitem">
         <div
-          className="glyphicon glyphicon-remove DeleteOrderColumn DeleteOrderItem"
+          className="fa fa-remove DeleteOrderColumn DeleteOrderItem"
           aria-hidden="true"
           onClick={this.remove}
         />
