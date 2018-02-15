@@ -48,10 +48,14 @@ request.body.ingredients = [
   {
     'name': 'ingredient1_name',
     'storage_id': 1,
+    'native_unit': 'lbs',
+    'package_type': 'pail',
   },
   {
     'name': 'other_name',
     'storage_id': 2,
+    'native_unit': 'lbs',
+    'package_type': 'pail',
   },
 ];
 ```
@@ -61,17 +65,24 @@ request.body.ingredients = [
 {% method %}
 ## PUT '/ingredients'
 
-Modify ingredients to change either the name or storage id.
+Modify ingredients to change the name, storage id, package_type or native_unit.
+
+**Need to send the full objects with changed fields.**
 
 {% sample lang="js" %}
 ```js
 request.body.ingredients = {
-  'ingredient_id1': {
-    'storage_id': storage_id_change1,
-    'name': 'name_change1',
+  'id1': {
+    'name': 'ingredient1_name',
+    'storage_id': 1,
+    'native_unit': 'lbs',
+    'package_type': 'pail',
   },
-  'ingredient_id2': {
-    'storage_id': storage_id_change2,
+  'id2': {
+    'name': 'other_name',
+    'storage_id': 2,
+    'native_unit': 'lbs',
+    'package_type': 'pail',
   },
 }
 ```
