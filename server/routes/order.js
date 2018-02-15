@@ -29,7 +29,7 @@ function orderHelper(orders, req, res, next) {
     let newIngredientCases = [];
     let ingredientsMap = {};
 
-    connection.query(`SELECT VendorsIngredients.id, VendorsIngredients.ingredient_id, VendorsIngredients.package_type, Ingredients.storage_id 
+    connection.query(`SELECT VendorsIngredients.id, VendorsIngredients.ingredient_id, Ingredients.package_type, Ingredients.storage_id 
     FROM VendorsIngredients JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id WHERE VendorsIngredients.id IN (${Object.keys(orders).join(', ')})`)
     .then((results) => {
         if (results.length < Object.keys(orders).length) {
@@ -56,7 +56,7 @@ function orderHelper(orders, req, res, next) {
         for (let ingredientId of ingredientIds) {
             if (!(ingredientId in updateIngredients)) {
                 const storageKey = ingredientsMap[ingredientId]['storage_id'];
-                newIngredientCases.push(`(${ingredientId}, '${ingredientsMap[ingredientId]['package_type']}', ${ingredientsMap[ingredientId]['quantity']})`);
+                newIngredientCases.push(`(${ingredientId}, ${ingredientsMap[ingredientId]['quantity']})`);
                 let itemPackage = ingredientsMap[ingredientId]['package_type'];
                 if (ignoreWeights.indexOf(itemPackage) < 0) {
                     if (!(storageKey in requestedCapacities)) {
@@ -74,7 +74,7 @@ function orderHelper(orders, req, res, next) {
     .then(() => checkStoragePromise(requestedCapacities))
     .then(() => {
         if (newIngredientCases.length > 0) {
-            return connection.query(`INSERT INTO Inventories (ingredient_id, package_type, num_packages) VALUES ${newIngredientCases.join(', ')}`);
+            return connection.query(`INSERT INTO Inventories (ingredient_id, num_packages) VALUES ${newIngredientCases.join(', ')}`);
         }
         return;
     })

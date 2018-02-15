@@ -105,7 +105,7 @@ describe('Inventory', () => {
           assert.strictEqual(changed[0].id, 2, 'Inventory item 2 left.');
           assert.strictEqual(changed[0].num_packages, 20, 'Inventory item 2 new number of packages.');
           assert.strictEqual(changed[1].id, 3, 'Inventory item 3 left.');
-          assert.strictEqual(changed[1].num_packages, 2, 'Inventory item 3 new number of packages.');
+          assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 3 new number of packages.');
           done();
         });
     });
@@ -128,7 +128,7 @@ describe('Inventory', () => {
           assert.strictEqual(left[1].id, 2, 'Inventory item 2 left.');
           assert.strictEqual(left[1].num_packages, 20, 'Inventory item 2 number of packages.');
           assert.strictEqual(left[2].id, 3, 'Inventory item 3 left.');
-          assert.strictEqual(left[2].num_packages, 2, 'Inventory item 3 number of packages.');
+          assert.strictEqual(left[2].num_packages, 20, 'Inventory item 3 number of packages.');
           done();
         });
     });
@@ -226,15 +226,14 @@ describe('Inventory', () => {
     });
 
     it('should update spendinglog valid request multiple ingredients', (done) => {
-      alasql('INSERT INTO SpendingLogs (2, 2, 101000, 90000, 50)');
+      alasql('INSERT INTO SpendingLogs (2, 2, 100000, 90000, 50)');
       chai.request(server)
         .put('/inventory')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'cart': {
             '1': 1,
-            '2': 10,
-            '3': 1,
+            '2': 1,
           },
         })
         .end((err, res) => {
@@ -265,7 +264,7 @@ describe('Inventory', () => {
           assert.strictEqual(changed[0].id, 2, 'Inventory item 2 left.');
           assert.strictEqual(changed[0].num_packages, 18, 'Inventory item 2 number packages left.');
           assert.strictEqual(changed[1].id, 3, 'Inventory item 3 left.');
-          assert.strictEqual(changed[1].num_packages, 2, 'Inventory item 3 number packages left.');
+          assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 3 number packages left.');
           done();
         });
     });

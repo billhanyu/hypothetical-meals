@@ -123,7 +123,6 @@ describe('VendorIngredient', () => {
             {
               'ingredient_id': 1,
               'vendor_id': 1,
-              'package_type': 'sack',
               'price': 100,
             },
           ],
@@ -143,13 +142,11 @@ describe('VendorIngredient', () => {
             {
               'ingredient_id': 1,
               'vendor_id': 2,
-              'package_type': 'sack',
               'price': 100,
             },
             {
               'ingredient_id': 2,
               'vendor_id': 1,
-              'package_type': 'sack',
               'price': 100,
             },
           ],
@@ -168,15 +165,13 @@ describe('VendorIngredient', () => {
           'vendoringredients': [
             {
               'ingredient_id': 4,
-              'vendor_id': 2,
-              'package_type': 'truckload',
+              'vendor_id': 1,
               'num_native_units': 10.8,
-              'price': 100,
+              'price': 100.1,
             },
             {
               'ingredient_id': 3,
-              'vendor_id': 1,
-              'package_type': 'sack',
+              'vendor_id': 2,
               'num_native_units': 40,
               'price': 100,
             },
@@ -254,7 +249,6 @@ describe('VendorIngredient', () => {
           'vendoringredients': {
             '1': {
               'price': 999,
-              'package_type': 'truckload',
             },
             '2': {
               'price': 99,
@@ -275,7 +269,6 @@ describe('VendorIngredient', () => {
           'vendoringredients': {
             '1': {
               'price': 999,
-              'package_type': 'truckload',
             },
             '2': {
               'price': 99,
@@ -289,7 +282,6 @@ describe('VendorIngredient', () => {
           res.should.have.status(200);
           const changed = alasql('SELECT * FROM VendorsIngredients WHERE id IN (1, 2, 3)');
           assert.equal(changed[0]['price'], 999, 'price for id 1');
-          assert.strictEqual(changed[0]['package_type'], 'truckload', 'package_type for id 1');
           assert.equal(changed[1]['price'], 99, 'price for id 2');
           assert.equal(changed[2]['num_native_units'], 1129, 'num_native_units for id 3');
           done();

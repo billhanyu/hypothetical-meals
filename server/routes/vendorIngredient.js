@@ -42,7 +42,6 @@ export function getVendorsForIngredient(req, res, next) {
  *   {
  *     'ingredient_id': 1,
  *     'vendor_id': 1,
- *     'package_type': 'sack',
  *     'price': 100
  *   },
  *   {
@@ -57,34 +56,25 @@ export function addVendorIngredients(req, res, next) {
   if (!items || items.length < 1) {
     return res.status(400).send('Invalid input request, see doc.');
   }
-  const dup = [];
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     const ingredientId = item['ingredient_id'];
     const vendorId = item['vendor_id'];
-    const packageType = item['package_type'];
     const numNativeUnits = item['num_native_units'];
     const price = item['price'];
 
     if (!checkNumber.isPositiveInteger(ingredientId)
       || !checkNumber.isPositiveInteger(vendorId)
-      || !checkNumber.isPositiveInteger(price)
-      || isNaN(numNativeUnits)
-      || ALL_PACKAGE_TYPES.indexOf(packageType) < 0) {
+      || isNaN(price)
+      || isNaN(numNativeUnits)) {
       return res.status(400).send('Invalid input, check your property names and values.');
     }
-    values.push(`(${ingredientId}, ${vendorId}, '${packageType}', ${numNativeUnits}, ${price})`);
-    dup.push(`(ingredient_id = ${ingredientId} AND vendor_id = ${vendorId} AND package_type = '${packageType}')`);
+    values.push(`(${ingredientId}, ${vendorId}, ${numNativeUnits}, ${price})`);
   }
-  connection.query(`SELECT id FROM VendorsIngredients WHERE ${dup.join(' OR ')}`)
-    .then(results => {
-      if (results.length > 0) {
-        throw createError('There exists duplicate(s) in your input: same ingredient_id, vendor_id and package_type');
-      }
-      return connection.query(`INSERT INTO VendorsIngredients (ingredient_id, vendor_id, package_type, num_native_units, price) VALUES ${values.join(', ')}`);
-    })
-    .then(() => success(res))
-    .catch(err => handleError(err, res));
+  connection.query('SELECT * FROM VendorsIngredients')
+  connection.query(`INSERT INTO VendorsIngredients (ingredient_id, vendor_id, num_native_units, price) VALUES ${values.join(', ')}`)
+  .then(() => success(res))
+  .catch(err => handleError(err, res));
 }
 
 /* Request body format

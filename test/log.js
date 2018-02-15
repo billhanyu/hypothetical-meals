@@ -76,11 +76,10 @@ describe('Log', () => {
       alasql('SOURCE "./server/create_database.sql"');
       alasql('SOURCE "./server/sample_data.sql"');
     });
-    
+
     const req = [
       {
         'vendor_ingredient_id': 1,
-        'package_type': 'blob',
         'quantity': 10,
       },
     ];
@@ -102,12 +101,10 @@ describe('Log', () => {
     const validReq = [
       {
         'vendor_ingredient_id': 2,
-        'package_type': 'pail',
         'quantity': 10,
       },
       {
         'vendor_ingredient_id': 1,
-        'package_type': 'sack',
         'quantity': 10,
       },
     ];
