@@ -27,3 +27,9 @@ INSERT INTO Inventories (id, ingredient_id, package_type, num_packages) VALUES (
 INSERT INTO Logs (id, user_id, vendor_ingredient_id, quantity) VALUES (1, 1, 1, 18);
 INSERT INTO Logs (id, user_id, vendor_ingredient_id, quantity) VALUES (2, 1, 3, 5);
 INSERT INTO SpendingLogs (id, ingredient_id, total_weight, total, consumed) VALUES (1, 1, 500, 5000, 50);
+INSERT INTO Formulas (id, name, description, num_product) VALUES (1, 'cake', 'A simple cake', 1);
+INSERT INTO Formulas (id, name, description, num_product) VALUES (2, 'shit', 'just shit', 10);
+INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (1, 3, 1, 1);
+INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (2, 4, 2, 1);
+INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (3, 1, 3, 2);
+INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (4, 2, 4, 2);
