@@ -65,9 +65,9 @@ function addIngredientHelper(ingredients, req, res, next) {
   }
   const ingredientsToAdd = [];
   for (let ingredient of ingredients) {
-    ingredientsToAdd.push(`('${ingredient.name}', '${ingredient.native_unit}', ${ingredient.storage_id})`);
+    ingredientsToAdd.push(`('${ingredient.name}', '${ingredient.package_type}', '${ingredient.native_unit}', ${ingredient.storage_id})`);
   }
-  connection.query(`INSERT INTO Ingredients (name, native_unit, storage_id) VALUES ${ingredientsToAdd.join(', ')}`)
+  connection.query(`INSERT INTO Ingredients (name, package_type, native_unit, storage_id) VALUES ${ingredientsToAdd.join(', ')}`)
   .then(() => success(res))
   .catch(err => handleError(err, res));
 }
@@ -78,6 +78,7 @@ function addIngredientHelper(ingredients, req, res, next) {
  *     'ingredient_id1': {
  *        'name': 'name_change1',
  *        'storage_id': 'storage_id_change1',
+ *        'package_type': 'package_type_change1',
  *      },
  *     'ingredient_id2': {
  *        'storage_id': storage_id_change2,
@@ -111,25 +112,26 @@ function modifyIngredientHelper(items, req, res, next) {
   const nameCases = [];
   const storageCases = [];
   const nativeUnitCases = [];
-  connection.query(`SELECT id, name, storage_id, native_unit FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
+  const packageTypeCases = [];
+  connection.query(`SELECT id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
   .then(results => {
     if (results.length < ingredientIds.length) {
       throw createError('Changing storage id or name of invalid ingredient.');
     }
     for (let ingredient of results) {
-      const oldName = ingredient['name'];
       const newName = items[ingredient.id]['name'];
-      const oldStorage = ingredient['storage_id'];
       const newStorage = items[ingredient.id]['storage_id'];
-      const oldNativeUnit = ingredient['native_unit'];
       const newNativeUnit = items[ingredient.id]['native_unit'];
-      nameCases.push(`when id = ${ingredient.id} then '${newName || oldName}'`);
-      storageCases.push(`when id = ${ingredient.id} then ${newStorage || oldStorage}`);
-      nativeUnitCases.push(`when id = ${ingredient.id} then '${newNativeUnit || oldNativeUnit}'`);
+      const newPackageType = items[ingredient.id]['package_type'];
+      nameCases.push(`when id = ${ingredient.id} then '${newName}'`);
+      storageCases.push(`when id = ${ingredient.id} then ${newStorage}`);
+      nativeUnitCases.push(`when id = ${ingredient.id} then '${newNativeUnit}'`);
+      packageTypeCases.push(`when id = ${ingredient.id} then '${newPackageType}'`);
     }
     return connection.query(
       `UPDATE Ingredients
         SET storage_id = (case ${storageCases.join(' ')} end),
+            package_type = (case ${packageTypeCases.join(' ')} end),
             name = (case ${nameCases.join(' ')} end),
             native_unit = (case ${nativeUnitCases.join(' ')} end)
         WHERE id IN (${ingredientIds.join(', ')})`);
@@ -290,7 +292,7 @@ function checkSufficientStorage(storages, entries, backup) {
     }
 
     // Add already existing inventory to sums
-    connection.query(`SELECT Inventories.package_type, Inventories.num_packages, Ingredients.storage_id
+    connection.query(`SELECT Ingredients.package_type, Inventories.num_packages, Ingredients.storage_id
                                   FROM Inventories
                                   INNER JOIN Ingredients
                                   ON Inventories.ingredient_id = Ingredients.id`)

@@ -65,7 +65,11 @@ export function commitCart(req, res, next) {
     checkChangesProperties(cart);
     const ids = Object.keys(cart);
     let cartItems;
-    connection.query(`SELECT * FROM Inventories WHERE id IN (${ids.join(', ')})`)
+    connection.query(`SELECT Inventories.*, Ingredients.package_type
+      FROM Inventories
+      INNER JOIN Ingredients
+      ON Inventories.ingredient_id = Ingredients.id
+      WHERE Inventories.id IN (${ids.join(', ')})`)
       .then(results => {
         if (results.length < ids.length) {
           throw createError('Some inventory id not in database.');
@@ -161,7 +165,7 @@ export function checkStorageCapacityPromise(backup) {
           sums[storage.id] = 0;
           capacities[storage.id] = storage.capacity;
         }
-        return connection.query(`SELECT Inventories.package_type, Inventories.num_packages, Ingredients.storage_id
+        return connection.query(`SELECT Inventories.num_packages, Ingredients.storage_id, Ingredients.package_type
                                   FROM Inventories
                                   INNER JOIN Ingredients
                                   ON Inventories.ingredient_id = Ingredients.id`);

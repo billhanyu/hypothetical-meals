@@ -35,7 +35,7 @@ export function changeStorage(req, res, next) {
       throw createError('Storage ID not in Storages Table');
     }
     return connection.query(
-      `SELECT Inventories.package_type, Inventories.num_packages 
+      `SELECT Ingredients.package_type, Inventories.num_packages 
       FROM Inventories
       INNER JOIN Ingredients 
       ON Ingredients.id = Inventories.ingredient_id 
