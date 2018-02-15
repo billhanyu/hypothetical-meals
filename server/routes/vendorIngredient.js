@@ -2,8 +2,6 @@ import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import { getNumPages, queryWithPagination } from './common/pagination';
 import success from './common/success';
-const ALL_PACKAGE_TYPES = ['sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar'];
-
 const basicViewQueryString = 'SELECT VendorsIngredients.*, Vendors.name as vendor_name, Vendors.contact as vendor_contact, Vendors.code as vendor_code, Vendors.removed as vendor_removed, Ingredients.name as ingredient_name, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM ((VendorsIngredients INNER JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id) INNER JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id)';
 
 export function pages(req, res, next) {
@@ -71,7 +69,6 @@ export function addVendorIngredients(req, res, next) {
     }
     values.push(`(${ingredientId}, ${vendorId}, ${numNativeUnits}, ${price})`);
   }
-  connection.query('SELECT * FROM VendorsIngredients')
   connection.query(`INSERT INTO VendorsIngredients (ingredient_id, vendor_id, num_native_units, price) VALUES ${values.join(', ')}`)
   .then(() => success(res))
   .catch(err => handleError(err, res));
