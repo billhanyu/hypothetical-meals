@@ -145,8 +145,8 @@ function getCases(olds, items) {
     const old = olds[i];
     const id = old['ingredient_id'];
     const change = items[id];
-    const price = 'price' in change ? change['price'] : old['price'];
-    const numNativeUnits = 'num_native_units' in change ? change['num_native_units'] : old['num_native_units'];
+    const price = change['price'];
+    const numNativeUnits = change['num_native_units'];
     prices.push(`when id = ${id} then ${price}`);
     numNativeUnitsArr.push(`when id = ${id} then ${numNativeUnits}`);
   }

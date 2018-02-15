@@ -212,6 +212,7 @@ describe('VendorIngredient', () => {
           'vendoringredients': {
             '1a': {
               'price': 100,
+              'num_native_units': 90,
             },
           },
         })
@@ -228,10 +229,12 @@ describe('VendorIngredient', () => {
         .send({
           'vendoringredients': {
             '1': {
-              'price': 100,
+              'price': 999,
+              'num_native_units': 10,
             },
             '100': {
-              'price': 100,
+              'price': 99,
+              'num_native_units': 15,
             },
           },
         })
@@ -249,9 +252,11 @@ describe('VendorIngredient', () => {
           'vendoringredients': {
             '1': {
               'price': 999,
+              'num_native_units': 10,
             },
             '2': {
               'price': 99,
+              'num_native_units': 15,
             },
           },
         })
@@ -269,11 +274,14 @@ describe('VendorIngredient', () => {
           'vendoringredients': {
             '1': {
               'price': 999,
+              'num_native_units': 10,
             },
             '2': {
               'price': 99,
+              'num_native_units': 15,
             },
             '3': {
+              'price': 30,
               'num_native_units': 1129,
             },
           },
