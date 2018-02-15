@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import InventoryItem from './InventoryItem';
 import FilterBar from './FilterBar';
-import storage2State from '../../../Constants/Storage2State';
 
 class ViewInventory extends Component {
   constructor(props) {
@@ -26,7 +25,7 @@ class ViewInventory extends Component {
     const self = this;
     let allSpendingLogs;
     axios.get("/spendinglogs", {
-      headers: { Authorization: "Token " + this.props.token }
+      headers: { Authorization: "Token " + global.token }
     })
       .then(response => {
         allSpendingLogs = response.data;
@@ -35,7 +34,7 @@ class ViewInventory extends Component {
           spendingLogs: response.data,
         });
         return axios.get('/ingredients', {
-          headers: { Authorization: "Token " + this.props.token }
+          headers: { Authorization: "Token " + global.token }
         });
       })
       .then(response => {
@@ -120,7 +119,6 @@ class ViewInventory extends Component {
             key={key}
             item={item}
             storages={this.state.storages}
-            token={this.props.token}
           />
         )}
       </div>

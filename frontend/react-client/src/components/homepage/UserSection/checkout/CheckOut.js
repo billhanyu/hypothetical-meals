@@ -66,7 +66,7 @@ class CheckOut extends Component {
     axios.put('/inventory', {
       cart: req
     }, {
-        headers: { Authorization: "Token " + this.props.token }
+        headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
       self.setState({
@@ -86,7 +86,6 @@ class CheckOut extends Component {
       <div>
         <ViewInventory
           ref={e => {this.viewInventory = e;}}
-          token={this.props.token}
           mode="cart"
           onClickInventoryItem={this.onClickInventoryItem}
         />
