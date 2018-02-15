@@ -16,7 +16,9 @@ import * as vendor from './routes/vendor';
 import * as vendorIngredient from './routes/vendorIngredient';
 import * as spendinglog from './routes/spendinglog';
 import * as order from './routes/order';
+import * as formulas from './routes/formula';
 import { adminRequired, noobRequired, managerRequired } from './authMiddleware';
+
 import getConfig from './getConfig';
 
 require('./routes/common/passport');
@@ -109,6 +111,9 @@ app.get('/inventory/pages', beNoob, inventory.pages);
 app.get('/inventory/page/:page_num', beNoob, inventory.view);
 app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
 app.put('/inventory', beNoob, inventory.commitCart);
+
+app.get('/formulas', beNoob, formulas.view);
+app.post('/formulas', beAdmin, formulas.add);
 
 const distDir = `${__dirname}/../frontend/react-client/dist`;
 app.use(express.static(distDir));
