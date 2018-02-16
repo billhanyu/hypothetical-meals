@@ -2,6 +2,20 @@ import React, { Component } from 'react';
 import PermissionLink from './PermissionLink';
 
 class SideBar extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      activeLinkKey: '',
+    };
+    this.setActive = this.setActive.bind(this);
+  }
+
+  setActive(key) {
+    this.setState({
+      activeLinkKey: key,
+    });
+  }
+
   render() {
     return (
       <div className="SideBar col-sm-4 col-md-3 col-lg-2 col-xl-2" id="SideBar">
@@ -10,7 +24,7 @@ class SideBar extends Component {
             <a
               href="#nav-ingredient"
               role="button"
-              className="nav-link"
+              className="nav-link PermissionCategory"
               data-toggle="collapse"
               aria-expanded="false"
               aria-controls="nav-ingredient"
@@ -21,11 +35,11 @@ class SideBar extends Component {
             </a>
             <div className="collapse" id="nav-ingredient">
               <ul className="nav flex-column">
-                <PermissionLink action={e => this.props.link('addIngredient')} text="Add Ingredient" permission="admin" />
-                <PermissionLink action={e => this.props.link('editIngredient')} text="Edit Ingredient" permission="admin" />
-                <PermissionLink action={e => this.props.link('addVendorIngredient')} text="Add Vendor for Ingredient" permission="admin" />
-                <PermissionLink action={e => this.props.link('editVendorIngredient')} text="Edit Vendor for Ingredient" permission="admin" />
-                <PermissionLink action={e => this.props.link('bulkImport')} text="Bulk Import" permission="admin" />
+                <PermissionLink linkKey={0} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('addIngredient')} text="Add Ingredient" permission="admin" />
+                <PermissionLink linkKey={1} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('editIngredient')} text="Edit Ingredient" permission="admin" />
+                <PermissionLink linkKey={2} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('addVendorIngredient')} text="Add Vendor for Ingredient" permission="admin" />
+                <PermissionLink linkKey={3} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('editVendorIngredient')} text="Edit Vendor for Ingredient" permission="admin" />
+                <PermissionLink linkKey={4} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('bulkImport')} text="Bulk Import" permission="admin" />
               </ul>
             </div>
           </li>
@@ -33,7 +47,7 @@ class SideBar extends Component {
             <a
               href="#nav-vendor"
               role="button"
-              className="nav-link"
+              className="nav-link PermissionCategory"
               data-toggle="collapse"
               aria-expanded="false"
               aria-controls="nav-vendor"
@@ -44,8 +58,8 @@ class SideBar extends Component {
             </a>
             <div className="collapse" id="nav-vendor">
               <ul className="nav flex-column">
-                <PermissionLink action={e => this.props.link('addVendor')} text="Add Vendor" permission="admin" />
-                <PermissionLink action={e => this.props.link('editVendor')} text="Edit Vendor" permission="admin" />
+                <PermissionLink linkKey={5} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('addVendor')} text="Add Vendor" permission="admin" />
+                <PermissionLink linkKey={6} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('editVendor')} text="Edit Vendor" permission="admin" />
               </ul>
             </div>
           </li>
@@ -53,7 +67,7 @@ class SideBar extends Component {
             <a
               href="#nav-storage"
               role="button"
-              className="nav-link"
+              className="nav-link PermissionCategory"
               data-toggle="collapse"
               aria-expanded="false"
               aria-controls="nav-storage"
@@ -64,7 +78,7 @@ class SideBar extends Component {
             </a>
             <div className="collapse" id="nav-storage">
               <ul className="nav flex-column">
-                <PermissionLink action={e => this.props.link('editStorage')} text="Edit Storage" permission="admin" />
+                <PermissionLink linkKey={7} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('editStorage')} text="Edit Storage" permission="admin" />
               </ul>
             </div>
           </li>
@@ -72,7 +86,7 @@ class SideBar extends Component {
             <a
               href="#nav-inventory"
               role="button"
-              className="nav-link"
+              className="nav-link PermissionCategory"
               data-toggle="collapse"
               aria-expanded="false"
               aria-controls="nav-inventory"
@@ -83,9 +97,9 @@ class SideBar extends Component {
             </a>
             <div className="collapse" id="nav-inventory">
               <ul className="nav flex-column">
-                <PermissionLink action={e => this.props.link('inventoryQuantity')} text="Change Inventory Quantity" permission="admin" />
-                <PermissionLink action={e => this.props.link('logOrder')} text="Order" permission="manager" />
-                <PermissionLink action={e => this.props.link('checkOut')} text="Check Out" permission="manager" />
+                <PermissionLink linkKey={8} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('inventoryQuantity')} text="Change Inventory Quantity" permission="admin" />
+                <PermissionLink linkKey={9} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('logOrder')} text="Order" permission="manager" />
+                <PermissionLink linkKey={10} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('checkOut')} text="Check Out" permission="manager" />
               </ul>
             </div>
           </li>
@@ -93,7 +107,7 @@ class SideBar extends Component {
             <a
               href="#nav-log"
               role="button"
-              className="nav-link"
+              className="nav-link PermissionCategory"
               data-toggle="collapse"
               aria-expanded="false"
               aria-controls="nav-log"
@@ -104,11 +118,17 @@ class SideBar extends Component {
             </a>
             <div className="collapse" id="nav-log">
               <ul className="nav flex-column">
-                <PermissionLink action={e => this.props.link('spendingLog')} text="Spending Log" permission="noob" />
+                <PermissionLink linkKey={11} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('spendingLog')} text="Spending Log" permission="noob" />
               </ul>
             </div>
           </li>
-          <PermissionLink action={this.props.logout} text="Log Out" permission="noob" />
+          <a
+            className="nav-link active PermissionCategory"
+            href="javascript:void(0)"
+            onClick={this.props.logout}
+            Active>
+            Log Out
+          </a>
         </ul>
       </div>
     );
