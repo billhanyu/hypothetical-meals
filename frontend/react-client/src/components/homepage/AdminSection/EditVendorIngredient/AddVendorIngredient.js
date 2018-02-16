@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import RegistrationHeader from './../../../Registration/RegistrationHeader.js';
 import RegistrationInput from './../../../Registration/RegistrationInput.js';
-import VendorComboBox from './../VendorComboBox.js';
+import ComboBox from './../VendorComboBox.js';
 
 class AddVendorIngredient extends Component {
   constructor(props){
@@ -87,13 +87,13 @@ class AddVendorIngredient extends Component {
       <div className="EditContainer borderAll">
           <RegistrationHeader HeaderText="New Vendor Ingredient" HeaderIcon="fas fa-utensils fa-2x"/>
 
-          <VendorComboBox id="packaging" onChange={this.handleInputChange} Options={["Sack-(50lbs)", 'Pail-(50 lbs)',
+          <ComboBox id="packaging" onChange={this.handleInputChange} Options={["Sack-(50lbs)", 'Pail-(50 lbs)',
           'Drum-(500 lb)',
           'Supersack-(2000 lbs)',
           'Truckload-(50000 lbs)',
           'Railcar-(280000 lbs)',]}/>
           <div className="RegistrationInfoText">* Package Type</div>
-          <VendorComboBox id="vendor" Options={this.state.vendorNames} onChange={this.handleInputChange} />
+          <ComboBox id="vendor" Options={this.state.vendorNames} onChange={this.handleInputChange} />
           <div className="RegistrationInfoText">* Provided Vendors </div>
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Price" onChange={this.handleInputChange} id="price" />
 

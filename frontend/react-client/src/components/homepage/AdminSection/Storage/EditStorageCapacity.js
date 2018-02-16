@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import RegistrationHeader from './../../../Registration/RegistrationHeader.js';
 import RegistrationInput from './../../../Registration/RegistrationInput.js';
-import VendorComboBox from './../VendorComboBox.js';
+import ComboBox from './../VendorComboBox.js';
 
 class EditVendor extends Component {
   constructor(props){
@@ -108,7 +108,7 @@ class EditVendor extends Component {
 
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Size" onChange={this.handleInputChange} id="size" value={this.state.size}/>
           <div className="RegistrationInfoText">* Max Capacity</div>
-          <VendorComboBox id="storage" Options={["Frozen","Refrigerated","Room Temperature"]} onChange={this.handleComboBoxChange}/>
+          <ComboBox id="storage" Options={["Frozen","Refrigerated","Room Temperature"]} onChange={this.handleComboBoxChange}/>
           <div className="RegistrationInfoText">* Storage Type </div>
 
           <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT STORAGE SIZE</div>

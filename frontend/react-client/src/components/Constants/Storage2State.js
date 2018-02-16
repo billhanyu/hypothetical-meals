@@ -1,7 +1,7 @@
 const Storage2State = {
-  freezer: 'frozen',
-  refrigerator: 'refrigerated',
-  warehouse: 'room temperature',
+  freezer: 'Frozen',
+  refrigerator: 'Refrigerated',
+  warehouse: 'Room Temperature',
 };
 
 export default Storage2State;
