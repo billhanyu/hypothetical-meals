@@ -36,7 +36,6 @@ class SideBar extends Component {
             <div className="collapse" id="nav-ingredient">
               <ul className="nav flex-column">
                 <PermissionLink linkKey={0} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('addIngredient')} text="Add Ingredient" permission="admin" />
-                <PermissionLink linkKey={1} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('editIngredient')} text="Edit Ingredient" permission="admin" />
                 <PermissionLink linkKey={2} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('addVendorIngredient')} text="Add Vendor for Ingredient" permission="admin" />
                 <PermissionLink linkKey={3} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('editVendorIngredient')} text="Edit Vendor for Ingredient" permission="admin" />
                 <PermissionLink linkKey={4} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('bulkImport')} text="Bulk Import" permission="admin" />
