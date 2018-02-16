@@ -7,6 +7,7 @@ import logoutFunc from '../homepage/LogOut';
 
 import AddIngredientWindow from '../homepage/AdminSection/AddIngredientWindow';
 import IngredientList from '../homepage/AdminSection/EditIngredient/IngredientList';
+import NewIngredientList from '../homepage/ingredient/IngredientList';
 import AddVendor from '../homepage/AdminSection/AddVendor';
 import VendorList from '../homepage/AdminSection/EditVendor/VendorList';
 import BulkImport from '../homepage/AdminSection/BulkImport';
@@ -23,7 +24,7 @@ class HomePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      funcName: 'bulkImport',
+      funcName: 'viewIngredients',
     };
     this.cookies = new Cookies();
     this.logout = this.logout.bind(this);
@@ -81,6 +82,9 @@ class HomePage extends Component {
     }
     else if (funcName == "spendingLog") {
       return <SpendingLog />;
+    }
+    else if (funcName == "viewIngredients") {
+      return <NewIngredientList />;
     }
   }
 
