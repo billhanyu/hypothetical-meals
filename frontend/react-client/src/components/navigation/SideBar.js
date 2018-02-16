@@ -29,7 +29,7 @@ class SideBar extends Component {
               aria-expanded="false"
               aria-controls="nav-ingredient"
               data-parent="#SideBar"
-              onClick={this.props.viewIngredients}>
+              onClick={e => this.props.link('viewIngredients')}>
               Ingredient
             <i className="fa fa-caret-down"></i>
             </a>

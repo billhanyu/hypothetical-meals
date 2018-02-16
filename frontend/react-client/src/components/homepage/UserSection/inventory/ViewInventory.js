@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import InventoryItem from './InventoryItem';
 import FilterBar from './FilterBar';
-import PageBar from '../PageBar';
+import PageBar from '../../../GeneralComponents/PageBar';
 import storage2State from '../../../Constants/Storage2State';
 
 class ViewInventory extends Component {
