@@ -21,7 +21,8 @@ class ComboBox extends Component {
       <select className="AdminDropdown" onChange={this.handleChange}>
         {
           this.props.Options.map((element, key) => {
-            return <option value={element} key={key}>{element}</option>;
+            const selected = element == this.props.selected ? "selected" : "";
+            return <option selected={selected} value={element} key={key}>{element}</option>;
           })
         }
       </select>

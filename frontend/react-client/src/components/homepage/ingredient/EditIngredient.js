@@ -5,6 +5,9 @@ import RegistrationHeader from './../../Registration/RegistrationHeader';
 import RegistrationInput from './../../Registration/RegistrationInput';
 import ComboBox from '../AdminSection/VendorComboBox';
 import Storage2State from '../../Constants/Storage2State';
+import packageTypes from '../../Constants/PackageTypes';
+
+const STORAGES = ["Frozen", "Refrigerated", "Room Temperature"];
 
 class EditIngredient extends Component {
   constructor(props){
@@ -52,6 +55,8 @@ class EditIngredient extends Component {
     newIngredientObject[this.state.id] = {
       storage_id,
       name: this.state.name,
+      native_unit: this.state.native_unit,
+      package_type: this.state.package_type,
     };
 
     axios.put("/ingredients", {
@@ -80,13 +85,13 @@ class EditIngredient extends Component {
         <RegistrationInput inputClass="RegistrationInput" placeholderText="Name" onChange={this.handleInputChange} id="name" value={this.state.name}/>
         <div className="RegistrationInfoText">* Name</div>
 
-        <RegistrationInput inputClass="RegistrationInput" placeholderText="Name" onChange={this.handleInputChange} id="name" value={this.state.name} />
-        <div className="RegistrationInfoText">* Name</div>
+        <ComboBox id="package_type" Options={packageTypes} onChange={this.handleInputChange} selected={this.state.package_type} />
+        <div className="RegistrationInfoText">* Package Type</div>
 
-        <ComboBox id="storage" Options={["Frozen", "Refrigerated", "Room Temperature"]} onChange={this.handleInputChange} />
+        <ComboBox id="storage" Options={["Frozen", "Refrigerated", "Room Temperature"]} onChange={this.handleInputChange} selected={STORAGES[this.state.storage_id-1]} />
         <div className="RegistrationInfoText">* Temperature State</div>
 
-        <RegistrationInput inputClass="RegistrationInput" placeholderText="Name" onChange={this.handleInputChange} id="name" value={this.state.name} />
+        <RegistrationInput inputClass="RegistrationInput" placeholderText="Pounds" onChange={this.handleInputChange} id="native_unit" value={this.state.native_unit} />
         <div className="RegistrationInfoText">* Unit</div>
 
         <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>EDIT INGREDIENT</div>
