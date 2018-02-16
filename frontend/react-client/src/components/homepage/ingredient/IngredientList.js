@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import PageBar from '../../GeneralComponents/PageBar';
 import IngredientListItem from './IngredientListItem';
+import EditIngredient from './EditIngredient';
 
 class IngredientList extends Component {
   constructor(props) {
@@ -9,9 +10,14 @@ class IngredientList extends Component {
     this.state = {
       ingredients: [],
       pages: 1,
+      page: 1,
       toDelete: 0,
+      storages: [],
+      editing: false,
+      editingIdx: 0,
     };
     this.selectPage = this.selectPage.bind(this);
+    this.edit = this.edit.bind(this);
     this.delete = this.delete.bind(this);
     this.confirmDelete = this.confirmDelete.bind(this);
   }
@@ -34,6 +40,10 @@ class IngredientList extends Component {
   }
 
   selectPage(page) {
+    this.setState({
+      editing: false,
+      page,
+    });
     axios.get(`/ingredients/page/${page}`, {
       headers: { Authorization: "Token " + global.token }
     })
@@ -41,11 +51,19 @@ class IngredientList extends Component {
       const ingredients = response.data.filter(ingredient => {
         return ingredient.removed.data[0] == 0;
       });
+      ingredients.sort((a, b) => a.id - b.id);
       this.setState({
         ingredients,
       });
     })
     .catch(err => console.error(err));
+  }
+
+  edit(idx) {
+    this.setState({
+      editing: true,
+      editingIdx: idx,
+    });
   }
 
   delete(idx) {
@@ -73,6 +91,15 @@ class IngredientList extends Component {
 
   render() {
     return (
+      this.state.editing
+      ?
+
+      <EditIngredient
+        ingredient={this.state.ingredients[this.state.editingIdx]}
+      />
+
+      :
+
       <div>
         <h2>Ingredients</h2>
         <table className="table">
@@ -93,7 +120,13 @@ class IngredientList extends Component {
             {
               this.state.ingredients.map((ingredient, idx) => {
                 return (
-                  <IngredientListItem key={idx} idx={idx} delete={this.delete} ingredient={ingredient} />
+                  <IngredientListItem
+                    key={idx}
+                    idx={idx}
+                    edit={this.edit}
+                    delete={this.delete}
+                    ingredient={ingredient}
+                  />
                 );
               })
             }

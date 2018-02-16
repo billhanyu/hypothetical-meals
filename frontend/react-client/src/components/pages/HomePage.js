@@ -6,7 +6,6 @@ import Cookies from 'universal-cookie';
 import logoutFunc from '../homepage/LogOut';
 
 import AddIngredientWindow from '../homepage/AdminSection/AddIngredientWindow';
-import IngredientList from '../homepage/AdminSection/EditIngredient/IngredientList';
 import NewIngredientList from '../homepage/ingredient/IngredientList';
 import AddVendor from '../homepage/AdminSection/AddVendor';
 import VendorList from '../homepage/AdminSection/EditVendor/VendorList';
@@ -52,9 +51,6 @@ class HomePage extends Component {
     }
     else if (funcName == "addVendor") {
       return <AddVendor />;
-    }
-    else if (funcName == "editIngredient") {
-      return <IngredientList />;
     }
     else if (funcName == "addIngredient") {
       return <AddIngredientWindow />;

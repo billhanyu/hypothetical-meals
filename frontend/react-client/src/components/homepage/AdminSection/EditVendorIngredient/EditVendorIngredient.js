@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import RegistrationHeader from './../../../Registration/RegistrationHeader.js';
 import RegistrationInput from './../../../Registration/RegistrationInput.js';
-import VendorComboBox from './../VendorComboBox.js';
+import ComboBox from './../VendorComboBox.js';
 
 class EditVendor extends Component {
   constructor(props){
@@ -67,7 +67,7 @@ class EditVendor extends Component {
 
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Price" onChange={this.handleInputChange} id="Price" value={this.state.Price}/>
           <div className="RegistrationInfoText">* Ingredient Price</div>
-          <VendorComboBox id="packaging" onChange={this.handleInputChange} Options={["Sack-(50lbs)", 'Pail-(50 lbs)',
+          <ComboBox id="packaging" onChange={this.handleInputChange} Options={["Sack-(50lbs)", 'Pail-(50 lbs)',
           'Drum-(500 lb)',
           'Supersack-(2000 lbs)',
           'Truckload-(50000 lbs)',

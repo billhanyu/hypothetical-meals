@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import RegistrationHeader from './../../Registration/RegistrationHeader.js';
 import RegistrationInput from './../../Registration/RegistrationInput.js';
-import VendorComboBox from './VendorComboBox.js';
+import ComboBox from './VendorComboBox.js';
 
 class AddIngredientWindow extends Component {
   constructor(props){
@@ -65,7 +65,7 @@ class AddIngredientWindow extends Component {
 
           <RegistrationInput inputClass="RegistrationInput" placeholderText="Name" onChange={this.handleInputChange} id="name" />
           <div className="RegistrationInfoText">* Ingredient Name</div>
-          <VendorComboBox id="storage" Options={["Frozen","Refrigerated","Room Temperature"]} onChange={this.handleInputChange}/>
+          <ComboBox id="storage" Options={["Frozen","Refrigerated","Room Temperature"]} onChange={this.handleInputChange}/>
           <div className="RegistrationInfoText">* Temperature </div>
 
           <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>ADD INGREDIENT</div>

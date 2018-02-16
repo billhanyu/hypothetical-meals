@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-class VendorComboBox extends Component {
+class ComboBox extends Component {
   constructor(props){
     super(props);
     this.handleChange = this.handleChange.bind(this);
@@ -29,4 +29,4 @@ class VendorComboBox extends Component {
   }
 }
 
-export default VendorComboBox;
+export default ComboBox;
