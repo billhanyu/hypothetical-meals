@@ -5,7 +5,7 @@ import { getNumPages, queryWithPagination } from './common/pagination';
 import success from './common/success';
 import { updateConsumedSpendingLogForCart } from './spendinglog';
 
-const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
+const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.package_type as ingredient_package_type, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
 
 export function all(req, res, next) {
   connection.query(basicViewQueryString)

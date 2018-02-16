@@ -30,7 +30,7 @@ class SideBar extends Component {
               aria-controls="nav-ingredient"
               data-parent="#SideBar"
               onClick={e => this.props.link('viewIngredients')}>
-              Ingredient
+              Ingredient&nbsp;&nbsp;
             <i className="fa fa-caret-down"></i>
             </a>
             <div className="collapse" id="nav-ingredient">
@@ -52,8 +52,8 @@ class SideBar extends Component {
               aria-expanded="false"
               aria-controls="nav-vendor"
               data-parent="#SideBar"
-              onClick={this.props.viewVendors}>
-              Vendor
+              onClick={e => this.props.link('viewVendors')}>
+              Vendor&nbsp;&nbsp;
             <i className="fa fa-caret-down"></i>
             </a>
             <div className="collapse" id="nav-vendor">
@@ -73,7 +73,7 @@ class SideBar extends Component {
               aria-controls="nav-storage"
               data-parent="#SideBar"
               onClick={this.props.viewStorages}>
-              Storage
+              Storage&nbsp;&nbsp;
             <i className="fa fa-caret-down"></i>
             </a>
             <div className="collapse" id="nav-storage">
@@ -92,7 +92,7 @@ class SideBar extends Component {
               aria-controls="nav-inventory"
               data-parent="#SideBar"
               onClick={e => this.props.link('viewInventory')}>
-              Inventory
+              Inventory&nbsp;&nbsp;
             <i className="fa fa-caret-down"></i>
             </a>
             <div className="collapse" id="nav-inventory">
@@ -113,7 +113,7 @@ class SideBar extends Component {
               aria-controls="nav-log"
               data-parent="#SideBar"
             >
-              Log
+              Log&nbsp;&nbsp;
             <i className="fa fa-caret-down"></i>
             </a>
             <div className="collapse" id="nav-log">

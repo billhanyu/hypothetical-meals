@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import PageBar from '../../GeneralComponents/PageBar';
 
-class IngredientList extends Component {
+class VendorList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ingredients: [],
+      vendors: [],
       pages: 1,
     };
     this.selectPage = this.selectPage.bind(this);
@@ -18,7 +18,7 @@ class IngredientList extends Component {
   }
 
   getPageNum() {
-    axios.get('/ingredients/pages', {
+    axios.get('/vendors/pages', {
       headers: { Authorization: "Token " + global.token }
     })
       .then(response => {
@@ -30,41 +30,39 @@ class IngredientList extends Component {
   }
 
   selectPage(page) {
-    axios.get(`/ingredients/page/${page}`, {
+    axios.get(`/vendors/page/${page}`, {
       headers: { Authorization: "Token " + global.token }
     })
-    .then(response => {
-      this.setState({
-        ingredients: response.data,
-      });
-    })
-    .catch(err => console.error(err));
+      .then(response => {
+        this.setState({
+          vendors: response.data,
+        });
+      })
+      .catch(err => console.error(err));
   }
 
   render() {
     return (
       <div>
-        <h2>Ingredients</h2>
+        <h2>Vendors</h2>
         <table className="table">
           <thead>
             <tr>
               <th>id</th>
               <th>Name</th>
-              <th>Package Type</th>
-              <th>Storage</th>
-              <th>Unit</th>
+              <th>Code</th>
+              <th>Contact</th>
             </tr>
           </thead>
           <tbody>
             {
-              this.state.ingredients.map((ingredient, idx) => {
+              this.state.vendors.map((vendor, idx) => {
                 return (
                   <tr key={idx}>
-                    <td>{ingredient.id}</td>
-                    <td>{ingredient.name}</td>
-                    <td>{ingredient.package_type}</td>
-                    <td>{ingredient.storage_name}</td>
-                    <td>{ingredient.native_unit}</td>
+                    <td>{vendor.id}</td>
+                    <td>{vendor.name}</td>
+                    <td>{vendor.code}</td>
+                    <td>{vendor.contact}</td>
                   </tr>
                 );
               })
@@ -77,4 +75,4 @@ class IngredientList extends Component {
   }
 }
 
-export default IngredientList;
+export default VendorList;

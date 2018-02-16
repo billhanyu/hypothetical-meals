@@ -7,12 +7,12 @@ class SpendingLogEntry extends Component {
 
   render() {
     return(
-      <div className="InventoryRow">
-        <span className="InventoryColumn">{this.props.item.ingredient_name}</span>
-        <span className="InventoryColumn">{this.props.item.total_weight} lbs</span>
-        <span className="InventoryColumn">${this.props.item.total}</span>
-        <span className="InventoryColumn">${this.props.item.consumed}</span>
-      </div>
+      <tr>
+        <td>{this.props.item.ingredient_name}</td>
+        <td>{this.props.item.total_weight} lbs</td>
+        <td>${this.props.item.total}</td>
+        <td>${this.props.item.consumed}</td>
+      </tr>
     );
   }
 }

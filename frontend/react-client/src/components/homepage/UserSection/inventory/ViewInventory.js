@@ -89,6 +89,7 @@ class ViewInventory extends Component {
     })
       .then(response => {
         allInventories = response.data;
+        console.log(allInventories);
         self.setState({
           allInventories,
           inventories: response.data,
@@ -122,26 +123,33 @@ class ViewInventory extends Component {
   render() {
     return (
       <div>
+        <h2>Inventory</h2>
         <FilterBar
           filterIngredient={this.filterIngredient}
           filterTemp={this.filterTemp}
           filterPackage={this.filterPackage}
         />
-        <div className="InventoryHead">
-          <span className="InventoryColumn">Ingredient Name</span>
-          <span className="InventoryColumn">Temperature State</span>
-          <span className="InventoryColumn">Package Type</span>
-          <span className="InventoryColumn">Number of Packages</span>
-        </div>
-        {this.state.inventories.map((item, key) =>
-          <InventoryItem
-            mode={this.props.mode}
-            selectInventoryItem={this.selectInventoryItem}
-            key={key}
-            item={item}
-            storages={this.state.storages}
-          />
-        )}
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Ingredient Name</th>
+              <th>Temperature State</th>
+              <th>Package Type</th>
+              <th>Number of Packages</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.inventories.map((item, key) =>
+              <InventoryItem
+                mode={this.props.mode}
+                selectInventoryItem={this.selectInventoryItem}
+                key={key}
+                item={item}
+                storages={this.state.storages}
+              />
+            )}
+          </tbody>
+        </table>
         <PageBar
           pages={this.state.pages}
           selectPage={this.selectPage}
