@@ -20,6 +20,7 @@ import ViewInventory from '../homepage/UserSection/inventory/ViewInventory';
 import LogOrder from '../homepage/UserSection/order/LogOrder';
 import CheckOut from '../homepage/UserSection/checkout/CheckOut';
 import SpendingLog from '../homepage/UserSection/spendinglog/SpendingLog';
+import StorageList from '../homepage/storage/StorageList';
 
 class HomePage extends Component {
   constructor(props) {
@@ -41,6 +42,7 @@ class HomePage extends Component {
     this.setState({
       funcName
     });
+    this.forceUpdate();
   }
 
   renderComponent() {
@@ -89,6 +91,9 @@ class HomePage extends Component {
     }
     else if (funcName == "viewVendors") {
       return <NewVendorList />;
+    }
+    else if (funcName == "viewStorages") {
+      return <StorageList />;
     }
   }
 

@@ -13,7 +13,14 @@ class IngredientListItem extends Component {
         {
           global.user_group == 'admin' &&
           <td>
-            <button type="button" className="btn btn-danger" onClick={this.props.delete}>Delete</button>
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={e => this.props.delete(this.props.idx)}
+              data-toggle="modal"
+              data-target="#deleteIngredientModal">
+              Delete
+            </button>
           </td>
         }
       </tr>

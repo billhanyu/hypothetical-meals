@@ -31,7 +31,7 @@ class SideBar extends Component {
               data-parent="#SideBar"
               onClick={e => this.props.link('viewIngredients')}>
               Ingredient&nbsp;&nbsp;
-            <i className="fa fa-caret-down"></i>
+              {global.user_group !== 'noob' && <i className="fa fa-caret-down"></i>}
             </a>
             <div className="collapse" id="nav-ingredient">
               <ul className="nav flex-column">
@@ -54,7 +54,7 @@ class SideBar extends Component {
               data-parent="#SideBar"
               onClick={e => this.props.link('viewVendors')}>
               Vendor&nbsp;&nbsp;
-            <i className="fa fa-caret-down"></i>
+              {global.user_group !== 'noob' && <i className="fa fa-caret-down"></i>}
             </a>
             <div className="collapse" id="nav-vendor">
               <ul className="nav flex-column">
@@ -72,9 +72,9 @@ class SideBar extends Component {
               aria-expanded="false"
               aria-controls="nav-storage"
               data-parent="#SideBar"
-              onClick={this.props.viewStorages}>
+              onClick={e => this.props.link('viewStorages')}>
               Storage&nbsp;&nbsp;
-            <i className="fa fa-caret-down"></i>
+              {global.user_group !== 'noob' && <i className="fa fa-caret-down"></i>}
             </a>
             <div className="collapse" id="nav-storage">
               <ul className="nav flex-column">
@@ -93,7 +93,7 @@ class SideBar extends Component {
               data-parent="#SideBar"
               onClick={e => this.props.link('viewInventory')}>
               Inventory&nbsp;&nbsp;
-            <i className="fa fa-caret-down"></i>
+              {global.user_group !== 'noob' && <i className="fa fa-caret-down"></i>}
             </a>
             <div className="collapse" id="nav-inventory">
               <ul className="nav flex-column">
