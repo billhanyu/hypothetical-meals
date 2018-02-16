@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import PageBar from '../../GeneralComponents/PageBar';
+import IngredientListItem from './IngredientListItem';
 
 class IngredientList extends Component {
   constructor(props) {
@@ -34,8 +35,11 @@ class IngredientList extends Component {
       headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
+      const ingredients = response.data.filter(ingredient => {
+        return ingredient.removed.data[0] == 0;
+      });
       this.setState({
-        ingredients: response.data,
+        ingredients,
       });
     })
     .catch(err => console.error(err));
@@ -53,19 +57,17 @@ class IngredientList extends Component {
               <th>Package Type</th>
               <th>Storage</th>
               <th>Unit</th>
+              {
+                global.user_group == 'admin' &&
+                <th>Options</th>
+              }
             </tr>
           </thead>
           <tbody>
             {
               this.state.ingredients.map((ingredient, idx) => {
                 return (
-                  <tr key={idx}>
-                    <td>{ingredient.id}</td>
-                    <td>{ingredient.name}</td>
-                    <td>{ingredient.package_type}</td>
-                    <td>{ingredient.storage_name}</td>
-                    <td>{ingredient.native_unit}</td>
-                  </tr>
+                  <IngredientListItem key={idx} ingredient={ingredient} />
                 );
               })
             }
