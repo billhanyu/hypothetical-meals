@@ -67,3 +67,43 @@ This adds formulas to the database. Only admins can add.
 
 
 {% endmethod %}
+
+{% method %}
+## PUT '/formulas'
+
+Modifies formulas. Request must contain for each formula every formula entry (every single ingredient id and number of native unit pairing). Ids are required, all other formula parameters such as name, description, and num_product are optional.
+
+```js
+'formulas': [
+                {
+                    'id': 1,
+                    'name': 'blob',
+                    'description': 'A blob',
+                    'num_product': 1,
+                    'ingredients': [
+                        {
+                            'ingredient_id': 1,
+                            'num_native_units': 2,
+                        },
+                    ],
+                },
+                {
+                    'id': 3,
+                    'name': 'foo',
+                    'description': 'bar',
+                    'num_product': 1,
+                    'ingredients': [
+                        {
+                            'ingredient_id': 1,
+                            'num_native_units': 10,
+                        },
+                        {
+                            'ingredient_id': 2,
+                            'num_native_units': 2,
+                        },
+                    ],
+                },
+            ]
+```
+
+{% endmethod %}

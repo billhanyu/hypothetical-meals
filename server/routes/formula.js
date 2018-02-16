@@ -171,7 +171,7 @@ function addFormulaEntries(formulas) {
  */
 export function modify(req, res, next) {
     // check names all exist in database
-    const formulas = req.body.formulas;
+    let formulas = req.body.formulas;
     let formulaIds = [];
     let hasAllIds = true;
     formulas.forEach(x => {
@@ -201,16 +201,22 @@ export function modify(req, res, next) {
         return;
     }
 
+    let toUpdate = [];
     connection.query(`${formulaQueryString} WHERE id IN (${formulaIds.join(', ')})`)
         .then((formulaResults) => {
             if (formulaResults.length != formulas.length) {
                 throw createError('Trying to modify formula not in database');
             }
+            let oldIdNameTuple = {};
+            formulaResults.forEach(x => {
+                oldIdNameTuple[x.id] = x.name;
+            });
             // update formula values
-            let toUpdate = [];
             formulas.forEach(x => {
                 let newUpdate = Object.assign({}, x);
                 delete newUpdate.ingredients;
+                newUpdate['name'] = x.name || oldIdNameTuple[x.id];
+                x['name'] = x.name || oldIdNameTuple[x.id];
                 toUpdate.push(newUpdate);
             });
             return updateDatabaseHelper('Formulas', toUpdate);
