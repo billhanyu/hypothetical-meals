@@ -11,15 +11,14 @@ class InventoryItem extends Component {
   }
 
   render() {
-    const cssClassName =
-      `InventoryRow${this.props.mode == "view" ? "" : " InventoryRowCart"}`;
+    const cssClassName = this.props.mode == "view" ? "" : "InventoryRowCart";
     return (
-      <div className={cssClassName} onClick={this.selectSelf}>
-        <span className="InventoryColumn">{this.props.item.ingredient_name}</span>
-        <span className="InventoryColumn">{this.props.item.ingredient_temperature_state}</span>
-        <span className="InventoryColumn">{this.props.item.package_type}</span>
-        <span className="InventoryColumn">{this.props.item.num_packages}</span>
-      </div>
+      <tr className={cssClassName} onClick={this.selectSelf}>
+        <td>{this.props.item.ingredient_name}</td>
+        <td>{this.props.item.ingredient_temperature_state}</td>
+        <td>{this.props.item.ingredient_package_type}</td>
+        <td>{this.props.item.num_packages}</td>
+      </tr>
     );
   }
 }

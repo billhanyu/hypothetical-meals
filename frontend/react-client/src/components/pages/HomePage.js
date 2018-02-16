@@ -10,6 +10,7 @@ import IngredientList from '../homepage/AdminSection/EditIngredient/IngredientLi
 import NewIngredientList from '../homepage/ingredient/IngredientList';
 import AddVendor from '../homepage/AdminSection/AddVendor';
 import VendorList from '../homepage/AdminSection/EditVendor/VendorList';
+import NewVendorList from '../homepage/vendor/VendorList';
 import BulkImport from '../homepage/AdminSection/BulkImport';
 import VendorIngredientList from '../homepage/AdminSection/EditVendorIngredient/VendorIngredientList';
 import AddVendorIngredientList from '../homepage/AdminSection/EditVendorIngredient/AddVendorIngredientList';
@@ -85,6 +86,9 @@ class HomePage extends Component {
     }
     else if (funcName == "viewIngredients") {
       return <NewIngredientList />;
+    }
+    else if (funcName == "viewVendors") {
+      return <NewVendorList />;
     }
   }
 
