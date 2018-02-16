@@ -2,12 +2,18 @@ import React, { Component } from 'react';
 
 class PermissionLink extends Component {
   render() {
+    const linkClass = this.props.linkKey == this.props.activeKey
+      ? 'PermissionLink-Active'
+      : 'PermissionLink';
     const link = 
       <li className="nav-item">
         <a
-          className="nav-link active"
+          className={'nav-link active ' + linkClass}
           href="javascript:void(0)"
-          onClick={this.props.action}
+          onClick={e => {
+            this.props.action();
+            this.props.setActive(this.props.linkKey);
+          }}
           Active>
           {this.props.text}
         </a>

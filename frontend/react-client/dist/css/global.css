@@ -96,9 +96,15 @@ button:focus {
   color: rgba(0,0,0,.75);
 }
 
-.PermissionLink-active {
+.PermissionLink-Active {
+  font-size: 95%;
   font-weight: 500;
   color: rgba(0,0,0,.9);
+}
+
+.PermissionLink-Active:hover {
+  font-weight: 500;
+  color: rgba(0,0,0,1);
 }
 
 .PermissionCategory {
@@ -109,7 +115,7 @@ button:focus {
   color: rgba(0,0,0,.95);
 }
 
-.PermissionCategory-active {
+.PermissionCategory-Active {
   font-weight: 600;
   color: rgba(0,0,0,1);
 }
