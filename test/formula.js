@@ -144,4 +144,198 @@ describe('Formulas', () => {
                 });
         });
     });
+
+    describe('#modify()', () => {
+        beforeEach(() => {
+            alasql('SOURCE "./server/create_database.sql"');
+            alasql('SOURCE "./server/sample_data.sql"');
+        });
+
+        it('should modify two of the formulas in the database', (done) => {
+            chai.request(server)
+                .put('/formulas')
+                .set('Authorization', `Token ${testTokens.adminTestToken}`)
+                .send({
+                    'formulas': [
+                        {
+                            'id': 1,
+                            'name': 'cake',
+                            'description': 'A blob',
+                            'num_product': 1,
+                            'ingredients': [
+                                {
+                                    'ingredient_id': 1,
+                                    'num_native_units': 2,
+                                },
+                            ],
+                        },
+                        {
+                            'id': 2,
+                            'name': 'Bill',
+                            'description': 'Chinaman',
+                            'num_product': 1,
+                            'ingredients': [
+                                {
+                                    'ingredient_id': 1,
+                                    'num_native_units': 10,
+                                },
+                                {
+                                    'ingredient_id': 2,
+                                    'num_native_units': 2,
+                                },
+                            ],
+                        },
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    const formulas = alasql(`SELECT * FROM Formulas`);
+                    assert.strictEqual(formulas.length, 2, 'Number of formulas in database');
+                    assert.strictEqual(formulas[0].name, 'cake', 'Name for formula 1');
+                    assert.strictEqual(formulas[0].description, 'A blob', 'Description for formula 3');
+                    assert.strictEqual(formulas[0].num_product, 1, 'Number of products for formula 3');
+                    assert.strictEqual(formulas[1].name, 'Bill', 'Name for formula 1');
+                    assert.strictEqual(formulas[1].description, 'Chinaman', 'Description for formula 3');
+                    assert.strictEqual(formulas[1].num_product, 1, 'Number of products for formula 3');
+                    const formulaIngredients1 = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[0].id}`);
+                    assert.strictEqual(formulaIngredients1.length, 1, 'Number of ingredients in formula 3');
+                    assert.strictEqual(formulaIngredients1[0].ingredient_id, 1, 'Ingredient id in formula 1');
+                    assert.strictEqual(formulaIngredients1[0].num_native_units, 2, 'Ingredient native units formula 1');
+                    const formulaIngredients2 = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[1].id}`);
+                    assert.strictEqual(formulaIngredients2.length, 2, 'Number of ingredients in formula 2');
+                    assert.strictEqual(formulaIngredients2[0].ingredient_id, 1, 'Ingredient id in formula 2');
+                    assert.strictEqual(formulaIngredients2[0].num_native_units, 10, 'Ingredient native units formula 2');
+                    assert.strictEqual(formulaIngredients2[1].ingredient_id, 2, 'Ingredient id in formula 2');
+                    assert.strictEqual(formulaIngredients2[1].num_native_units, 2, 'Ingredient native units formula 2');
+                    done();
+                });
+        });
+
+        it('should reject modify if trying to modify nonexistent formula', (done) => {
+            chai.request(server)
+                .put('/formulas')
+                .set('Authorization', `Token ${testTokens.adminTestToken}`)
+                .send({
+                    'formulas': [
+                        {
+                            'id': 123,
+                            'name': 'cake',
+                            'description': 'A blob',
+                            'num_product': 1,
+                            'ingredients': [
+                                {
+                                    'ingredient_id': 1,
+                                    'num_native_units': 2,
+                                },
+                            ],
+                        },
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    done();
+                });
+        });
+
+        it('should reject modify if ids for formula not specified', (done) => {
+            chai.request(server)
+                .put('/formulas')
+                .set('Authorization', `Token ${testTokens.adminTestToken}`)
+                .send({
+                    'formulas': [
+                        {
+                            'name': 'cake',
+                            'description': 'A blob',
+                            'num_product': 1,
+                            'ingredients': [
+                                {
+                                    'ingredient_id': 1,
+                                    'num_native_units': 2,
+                                },
+                            ],
+                        },
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    done();
+                });
+        });
+
+        it('should reject modify if not all ingredient parameters present', (done) => {
+            chai.request(server)
+                .put('/formulas')
+                .set('Authorization', `Token ${testTokens.adminTestToken}`)
+                .send({
+                    'formulas': [
+                        {
+                            'name': 'cake',
+                            'description': 'A blob',
+                            'num_product': 1,
+                            'ingredients': [
+                                {
+                                    'num_native_units': 2,
+                                },
+                            ],
+                        },
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    done();
+                });
+        });
+
+        it('should reject modify if noob request', (done) => {
+            chai.request(server)
+                .put('/formulas')
+                .set('Authorization', `Token ${testTokens.noobTestToken}`)
+                .send({
+                    'formulas': [
+                        {
+                            'id': 1,
+                            'name': 'cake',
+                            'description': 'A blob',
+                            'num_product': 1,
+                            'ingredients': [
+                                {
+                                    'ingredient_id': 1,
+                                    'num_native_units': 2,
+                                },
+                            ],
+                        },
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    done();
+                });
+        });
+
+        it('should reject modify if manager request', (done) => {
+            chai.request(server)
+                .put('/formulas')
+                .set('Authorization', `Token ${testTokens.managerTestToken}`)
+                .send({
+                    'formulas': [
+                        {
+                            'id': 1,
+                            'name': 'cake',
+                            'description': 'A blob',
+                            'num_product': 1,
+                            'ingredients': [
+                                {
+                                    'ingredient_id': 1,
+                                    'num_native_units': 2,
+                                },
+                            ],
+                        },
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    done();
+                });
+        });
+    });
 });
