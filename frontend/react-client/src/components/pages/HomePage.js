@@ -10,8 +10,7 @@ import NewVendorList from '../homepage/vendor/VendorList';
 import BulkImport from '../homepage/AdminSection/BulkImport';
 import VendorIngredientList from '../homepage/AdminSection/EditVendorIngredient/VendorIngredientList';
 import AddVendorIngredientList from '../homepage/AdminSection/EditVendorIngredient/AddVendorIngredientList';
-import InventoryList from '../homepage/AdminSection/InventoryQuantity/InventoryList';
-import ViewInventory from '../homepage/UserSection/inventory/ViewInventory';
+import ViewInventory from '../homepage/inventory/ViewInventory';
 import LogOrder from '../homepage/UserSection/order/LogOrder';
 import CheckOut from '../homepage/UserSection/checkout/CheckOut';
 import SpendingLog from '../homepage/UserSection/spendinglog/SpendingLog';
@@ -47,9 +46,6 @@ class HomePage extends Component {
     }
     else if (funcName == "addVendorIngredient") {
       return <AddVendorIngredientList />;
-    }
-    else if (funcName == 'inventoryQuantity') {
-      return <InventoryList />;
     }
     else if (funcName == "bulkImport") {
       return <BulkImport />;
