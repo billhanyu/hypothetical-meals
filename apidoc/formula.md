@@ -16,15 +16,21 @@ res.body: [{
   'description': 'myDescription',
   'num_product': 1
   'ingredients': {
-    'ingredient1': {
-      'ingredient_id': 1,
-      'num_native_units': 1,
-      'native_unit': kg,
+    'ingredient1_name': {
+        'id': 3,
+        'num_native_units': 1,
+        'formula_id': 1,
+        'name': 'boop',
+        'storage_id': 1,
+        'native_unit': 'kg',
+        'removed': 0,
     }
     ...
   },
   ...
 ]
+
+Note the id within the ingredient name refers to the id in formulaEntries table.
 ```
 {% endmethod %}
 
