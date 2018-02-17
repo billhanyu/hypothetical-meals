@@ -113,6 +113,7 @@ app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
 app.put('/inventory', beNoob, inventory.commitCart);
 
 app.get('/formulas', beNoob, formulas.view);
+app.put('/formulas', beAdmin, formulas.modify);
 app.post('/formulas', beAdmin, formulas.add);
 
 const distDir = `${__dirname}/../frontend/react-client/dist`;
