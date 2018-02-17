@@ -266,6 +266,42 @@ describe('VendorIngredient', () => {
         });
     });
 
+    it('should fail negative price', (done) => {
+      chai.request(server)
+        .put('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'vendoringredients': {
+            '1': {
+              'price': -1,
+              'num_native_units': 10,
+            },
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should fail negative num_native_units', (done) => {
+      chai.request(server)
+        .put('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'vendoringredients': {
+            '1': {
+              'price': 1,
+              'num_native_units': -10,
+            },
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
     it('should modify vendoringredients with valid requests', (done) => {
       chai.request(server)
         .put('/vendoringredients')
