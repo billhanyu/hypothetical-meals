@@ -5,15 +5,11 @@ import { withRouter } from 'react-router';
 import Cookies from 'universal-cookie';
 import logoutFunc from '../homepage/LogOut';
 
-import AddIngredientWindow from '../homepage/AdminSection/AddIngredientWindow';
 import NewIngredientList from '../homepage/ingredient/IngredientList';
-import AddVendor from '../homepage/AdminSection/AddVendor';
-import VendorList from '../homepage/AdminSection/EditVendor/VendorList';
 import NewVendorList from '../homepage/vendor/VendorList';
 import BulkImport from '../homepage/AdminSection/BulkImport';
 import VendorIngredientList from '../homepage/AdminSection/EditVendorIngredient/VendorIngredientList';
 import AddVendorIngredientList from '../homepage/AdminSection/EditVendorIngredient/AddVendorIngredientList';
-import EditStorageCapacity from '../homepage/AdminSection/Storage/EditStorageCapacity';
 import InventoryList from '../homepage/AdminSection/InventoryQuantity/InventoryList';
 import ViewInventory from '../homepage/UserSection/inventory/ViewInventory';
 import LogOrder from '../homepage/UserSection/order/LogOrder';
@@ -46,23 +42,11 @@ class HomePage extends Component {
 
   renderComponent() {
     const funcName = this.state.funcName;
-    if (funcName == "editVendor") {
-      return <VendorList />;
-    }
-    else if (funcName == "addVendor") {
-      return <AddVendor />;
-    }
-    else if (funcName == "addIngredient") {
-      return <AddIngredientWindow />;
-    }
-    else if (funcName == "editVendorIngredient") {
+    if (funcName == "editVendorIngredient") {
       return <VendorIngredientList />;
     }
     else if (funcName == "addVendorIngredient") {
       return <AddVendorIngredientList />;
-    }
-    else if (funcName == "editStorage") {
-      return <EditStorageCapacity />;
     }
     else if (funcName == 'inventoryQuantity') {
       return <InventoryList />;

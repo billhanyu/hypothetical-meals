@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import RegistrationHeader from './../../../Registration/RegistrationHeader.js';
 import RegistrationInput from './../../../Registration/RegistrationInput.js';
-import ComboBox from './../VendorComboBox.js';
+import ComboBox from './../ComboBox.js';
 
 class AddVendorIngredient extends Component {
   constructor(props){

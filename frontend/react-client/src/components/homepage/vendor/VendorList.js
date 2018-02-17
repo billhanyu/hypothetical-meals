@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import PageBar from '../../GeneralComponents/PageBar';
 import VendorListItem from './VendorListItem';
+import AddVendor from './AddVendor';
+import EditVendor from './EditVendor';
 
 class VendorList extends Component {
   constructor(props) {
@@ -9,16 +11,51 @@ class VendorList extends Component {
     this.state = {
       vendors: [],
       pages: 1,
+      page: 1,
       toDelete: 0,
+      adding: false,
+      editing: false,
+      editingIdx: -1,
     };
     this.selectPage = this.selectPage.bind(this);
     this.delete = this.delete.bind(this);
     this.confirmDelete = this.confirmDelete.bind(this);
+    this.add = this.add.bind(this);
+    this.finishAdd = this.finishAdd.bind(this);
+    this.edit = this.edit.bind(this);
+    this.finishEdit = this.finishEdit.bind(this);
   }
 
   componentDidMount() {
     this.getPageNum();
     this.selectPage(1);
+  }
+  
+  add() {
+    this.setState({
+      adding: true,
+    });
+  }
+
+  finishAdd() {
+    this.setState({
+      adding: false,
+    });
+    this.selectPage(this.state.page);
+  }
+
+  edit(idx) {
+    this.setState({
+      editing: true,
+      editingIdx: idx,
+    });
+  }
+
+  finishEdit() {
+    this.setState({
+      editing: false,
+    });
+    this.selectPage(this.state.page);
   }
 
   getPageNum() {
@@ -34,6 +71,9 @@ class VendorList extends Component {
   }
 
   selectPage(page) {
+    this.setState({
+      page,
+    });
     axios.get(`/vendors/page/${page}`, {
       headers: { Authorization: "Token " + global.token }
     })
@@ -68,9 +108,10 @@ class VendorList extends Component {
   }
 
   render() {
-    return (
+    const main =
       <div>
         <h2>Vendors</h2>
+        {global.user_group == "admin" && <button type="button" className="btn btn-primary" onClick={this.add}>Add Vendor</button>}
         <table className="table">
           <thead>
             <tr>
@@ -90,7 +131,7 @@ class VendorList extends Component {
             {
               this.state.vendors.map((vendor, idx) => {
                 return (
-                  <VendorListItem key={idx} idx={idx} delete={this.delete} vendor={vendor} />
+                  <VendorListItem key={idx} idx={idx} edit={this.edit} delete={this.delete} vendor={vendor} />
                 );
               })
             }
@@ -116,8 +157,21 @@ class VendorList extends Component {
           </div>
         </div>
         <PageBar pages={this.state.pages} selectPage={this.selectPage} />
-      </div>
-    );
+      </div>;
+    
+    const edit =
+    <EditVendor vendor={this.state.vendors[this.state.editingIdx]} finishEdit={this.finishEdit} />;
+
+    const add =
+    <AddVendor finishAdd={this.finishAdd} />;
+
+    if (this.state.editing) {
+      return edit;
+    } else if (this.state.adding) {
+      return add;
+    } else {
+      return main;
+    }
   }
 }
 

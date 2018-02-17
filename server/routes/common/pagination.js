@@ -1,4 +1,4 @@
-const idsPerPage = 50;
+const idsPerPage = 1;
 
 export function getNumPages(tableName) {
   return connection.query(`SELECT COUNT(id) FROM ${tableName}`)
