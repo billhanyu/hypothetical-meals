@@ -7,7 +7,6 @@ import logoutFunc from '../homepage/LogOut';
 
 import NewIngredientList from '../homepage/ingredient/IngredientList';
 import NewVendorList from '../homepage/vendor/VendorList';
-import BulkImport from '../homepage/AdminSection/BulkImport';
 import VendorIngredientList from '../homepage/AdminSection/EditVendorIngredient/VendorIngredientList';
 import AddVendorIngredientList from '../homepage/AdminSection/EditVendorIngredient/AddVendorIngredientList';
 import ViewInventory from '../homepage/inventory/ViewInventory';
@@ -47,9 +46,6 @@ class HomePage extends Component {
     else if (funcName == "addVendorIngredient") {
       return <AddVendorIngredientList />;
     }
-    else if (funcName == "bulkImport") {
-      return <BulkImport />;
-    }
     else if (funcName == "viewInventory") {
       return <ViewInventory mode="view" />;
     }
@@ -79,11 +75,29 @@ class HomePage extends Component {
         <NavBar />
         <div className="row row-nomargin">
           <SideBar
-            logout={this.logout}
             link={this.link}
           />
           <div className="ContentMain col-sm-8 col-md-9 col-lg-10 col-xl-10">
             {this.renderComponent()}
+          </div>
+        </div>
+        <div className="modal fade" id="logOutModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">Confirm Log Out</h5>
+                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Are you sure you want to log out?
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" data-dismiss="modal">Back</button>
+                <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={this.logout}>Yes</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

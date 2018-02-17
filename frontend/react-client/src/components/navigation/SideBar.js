@@ -37,7 +37,6 @@ class SideBar extends Component {
               <ul className="nav flex-column">
                 <PermissionLink linkKey={2} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('addVendorIngredient')} text="Add Vendor for Ingredient" permission="admin" />
                 <PermissionLink linkKey={3} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('editVendorIngredient')} text="Edit Vendor for Ingredient" permission="admin" />
-                <PermissionLink linkKey={4} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('bulkImport')} text="Bulk Import" permission="admin" />
               </ul>
             </div>
           </li>
@@ -104,7 +103,8 @@ class SideBar extends Component {
             <a
               className="nav-link active PermissionCategory"
               href="javascript:void(0)"
-              onClick={this.props.logout}
+              data-toggle="modal"
+              data-target="#logOutModal"
               Active>
               Log Out
             </a>
