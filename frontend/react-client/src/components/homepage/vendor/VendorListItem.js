@@ -12,15 +12,24 @@ class VendorListItem extends Component {
         {
           global.user_group == 'admin' &&
           <td>
-            <button
-              type="button"
-              className="btn btn-danger"
-              onClick={e=>this.props.delete(this.props.idx)}
-              data-toggle="modal"
-              data-target="#deleteVendorModal"
-            >
-            Delete
-            </button>
+            <div className="btn-group" role="group" aria-label="Basic example">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={e => this.props.edit(this.props.idx)}
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={e=>this.props.delete(this.props.idx)}
+                data-toggle="modal"
+                data-target="#deleteVendorModal"
+              >
+              Delete
+              </button>
+            </div>
           </td>
         }
       </tr>

@@ -35,7 +35,6 @@ class SideBar extends Component {
             </a>
             <div className="collapse" id="nav-ingredient">
               <ul className="nav flex-column">
-                <PermissionLink linkKey={0} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('addIngredient')} text="Add Ingredient" permission="admin" />
                 <PermissionLink linkKey={2} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('addVendorIngredient')} text="Add Vendor for Ingredient" permission="admin" />
                 <PermissionLink linkKey={3} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('editVendorIngredient')} text="Edit Vendor for Ingredient" permission="admin" />
                 <PermissionLink linkKey={4} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('bulkImport')} text="Bulk Import" permission="admin" />
@@ -44,42 +43,23 @@ class SideBar extends Component {
           </li>
           <li className="nav-item">
             <a
-              href="#nav-vendor"
+              href="javascript:void(0)"
               role="button"
               className="nav-link PermissionCategory"
-              data-toggle="collapse"
-              aria-expanded="false"
-              aria-controls="nav-vendor"
               data-parent="#SideBar"
               onClick={e => this.props.link('viewVendors')}>
-              Vendor&nbsp;&nbsp;
-              {global.user_group !== 'noob' && <i className="fa fa-caret-down"></i>}
+              Vendor
             </a>
-            <div className="collapse" id="nav-vendor">
-              <ul className="nav flex-column">
-                <PermissionLink linkKey={5} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('addVendor')} text="Add Vendor" permission="admin" />
-                <PermissionLink linkKey={6} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('editVendor')} text="Edit Vendor" permission="admin" />
-              </ul>
-            </div>
           </li>
           <li className="nav-item">
             <a
-              href="#nav-storage"
+              href="javascript:void(0)"
               role="button"
               className="nav-link PermissionCategory"
-              data-toggle="collapse"
-              aria-expanded="false"
-              aria-controls="nav-storage"
               data-parent="#SideBar"
               onClick={e => this.props.link('viewStorages')}>
-              Storage&nbsp;&nbsp;
-              {global.user_group !== 'noob' && <i className="fa fa-caret-down"></i>}
+              Storage
             </a>
-            <div className="collapse" id="nav-storage">
-              <ul className="nav flex-column">
-                <PermissionLink linkKey={7} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('editStorage')} text="Edit Storage" permission="admin" />
-              </ul>
-            </div>
           </li>
           <li className="nav-item">
             <a
@@ -121,13 +101,15 @@ class SideBar extends Component {
               </ul>
             </div>
           </li>
-          <a
-            className="nav-link active PermissionCategory"
-            href="javascript:void(0)"
-            onClick={this.props.logout}
-            Active>
-            Log Out
-          </a>
+          <li className="nav-item">
+            <a
+              className="nav-link active PermissionCategory"
+              href="javascript:void(0)"
+              onClick={this.props.logout}
+              Active>
+              Log Out
+            </a>
+          </li>
         </ul>
       </div>
     );

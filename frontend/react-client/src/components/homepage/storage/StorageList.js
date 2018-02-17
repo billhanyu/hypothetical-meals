@@ -6,7 +6,13 @@ class StorageList extends Component {
     super(props);
     this.state = {
       storages: [],
+      editIdx: -1,
+      editCapacity: 0,
     };
+    this.edit = this.edit.bind(this);
+    this.changeCapacity = this.changeCapacity.bind(this);
+    this.cancelEdit = this.cancelEdit.bind(this);
+    this.finishEdit = this.finishEdit.bind(this);
   }
 
   componentDidMount() {
@@ -23,6 +29,45 @@ class StorageList extends Component {
         });
       })
       .catch(err => alert('error getting storages'));
+  }
+
+  edit(idx) {
+    this.setState({
+      editIdx: idx,
+      editCapacity: this.state.storages[idx].capacity,
+    });
+  }
+
+  changeCapacity(event) {
+    this.setState({
+      editCapacity: event.target.value,
+    });
+  }
+
+  cancelEdit() {
+    this.setState({
+      editIdx: -1,
+    });
+  }
+
+  finishEdit() {
+    const putObj = {};
+    const id = this.state.storages[this.state.editIdx].id;
+    putObj[id] = this.state.editCapacity;
+    axios.put('/storages', putObj, {
+      headers: { Authorization: "Token " + global.token }
+    })
+    .then(response => {
+      this.setState({
+        editIdx: -1,
+      });
+    })
+    .catch(err => {
+      const message = err.response.data;
+      if (message.indexOf('smaller than')) {
+        alert(message);
+      }
+    });
   }
 
   render() {
@@ -48,10 +93,44 @@ class StorageList extends Component {
                   <tr key={idx}>
                     <td>{storage.id}</td>
                     <td>{storage.name}</td>
-                    <td>{storage.capacity}</td>
+                    <td>
+                      {
+                        this.state.editIdx == idx
+                          ?
+                          <input type="number" onChange={this.changeCapacity} value={this.state.editCapacity} />
+                          :
+                          storage.capacity
+                      }
+                    </td>
                     {
-                      global.user_group == 'admin' &&
-                      <td>Edit</td>
+                      global.user_group == 'admin' && this.state.editIdx !== idx &&
+                      <td>
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          onClick={e => this.edit(idx)}>
+                          Edit
+                        </button>
+                      </td>
+                    }
+                    {
+                      global.user_group == 'admin' && this.state.editIdx == idx &&
+                      <td>
+                      <div className="btn-group" role="group" aria-label="Basic example">
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          onClick={this.cancelEdit}>
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={this.finishEdit}>
+                          Confirm
+                        </button>
+                      </div>
+                    </td>
                     }
                   </tr>
                 );
