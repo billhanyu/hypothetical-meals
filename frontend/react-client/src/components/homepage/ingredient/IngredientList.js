@@ -3,6 +3,7 @@ import axios from 'axios';
 import PageBar from '../../GeneralComponents/PageBar';
 import IngredientListItem from './IngredientListItem';
 import AddEditIngredient from './AddEditIngredient';
+import BulkImport from './BulkImport';
 
 class IngredientList extends Component {
   constructor(props) {
@@ -14,6 +15,8 @@ class IngredientList extends Component {
       toDelete: 0,
       storages: [],
       editing: false,
+      adding: false,
+      bulkImport: false,
       editingIdx: 0,
     };
     this.selectPage = this.selectPage.bind(this);
@@ -23,6 +26,8 @@ class IngredientList extends Component {
     this.finishEdit = this.finishEdit.bind(this);
     this.add = this.add.bind(this);
     this.finishAdd = this.finishAdd.bind(this);
+    this.bulkImport = this.bulkImport.bind(this);
+    this.backToList = this.backToList.bind(this);
   }
 
   componentDidMount() {
@@ -60,6 +65,20 @@ class IngredientList extends Component {
       });
     })
     .catch(err => console.error(err));
+  }
+
+  bulkImport() {
+    this.setState({
+      bulkImport: true,
+    });
+  }
+
+  backToList() {
+    this.setState({
+      bulkImport: false,
+      adding: false,
+      editing: false,
+    });
   }
   
   add() {
@@ -120,10 +139,14 @@ class IngredientList extends Component {
       finishEdit={this.finishEdit}
     />;
 
+    const bulkImport =
+    <BulkImport backToList={this.backToList} />;
+
     const main = 
     <div>
       <h2>Ingredients</h2>
-      {global.user_group == 'admin' && <button type="button" className="btn btn-primary" onClick={this.add}>Add Ingredient</button>}
+        {global.user_group == 'admin' && <button type="button" className="btn btn-primary" onClick={this.add}>Add Ingredient</button>}
+        {global.user_group == 'admin' && <button type="button" className="btn btn-primary" onClick={this.bulkImport}>Bulk Import</button>}
       <table className="table">
         <thead>
           <tr>
@@ -184,6 +207,8 @@ class IngredientList extends Component {
 
     if (this.state.editing) {
       return edit;
+    } else if (this.state.bulkImport) {
+      return bulkImport;
     } else if (this.state.adding) {
       return add;
     } else {

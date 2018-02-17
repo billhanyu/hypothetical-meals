@@ -31,10 +31,15 @@ class BulkImport extends Component {
 
   render() {
     return (
-      <div className="BulkImport">
-        <input className="BulkImportFile" type="file" name="bulk" onChange={this.changeFile}/>
-        <div className="BulkImportButton">
-          <button className="AdminButton btn btn-primary BulkImportSubmit" onClick={this.submit}>Import</button>
+      <div>
+        <div className="row justify-content-md-center" style={{'margin-top': '20px'}}>
+          <input className="col-*-auto BulkImportFile" type="file" name="bulk" onChange={this.changeFile} />
+        </div>
+        <div className="row justify-content-md-center">
+          <div className="btn-group col-*-auto" role="group" aria-label="Basic example">
+            <button className="btn btn-secondary" onClick={this.props.backToList}>Cancel</button>
+            <button className="btn btn-primary" onClick={this.submit}>Import</button>
+          </div>
         </div>
       </div>
     );
