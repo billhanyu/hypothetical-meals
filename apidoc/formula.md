@@ -16,15 +16,21 @@ res.body: [{
   'description': 'myDescription',
   'num_product': 1
   'ingredients': {
-    'ingredient1': {
-      'ingredient_id': 1,
-      'num_native_units': 1,
-      'native_unit': kg,
+    'ingredient1_name': {
+        'id': 3,
+        'num_native_units': 1,
+        'formula_id': 1,
+        'name': 'boop',
+        'storage_id': 1,
+        'native_unit': 'kg',
+        'removed': 0,
     }
     ...
   },
   ...
 ]
+
+Note the id within the ingredient name refers to the id in formulaEntries table.
 ```
 {% endmethod %}
 
@@ -65,5 +71,45 @@ This adds formulas to the database. Only admins can add.
             ]
 ```
 
+
+{% endmethod %}
+
+{% method %}
+## PUT '/formulas'
+
+Modifies formulas. Request must contain for each formula every formula entry (every single ingredient id and number of native unit pairing). Ids are required, all other formula parameters such as name, description, and num_product are optional.
+
+```js
+'formulas': [
+                {
+                    'id': 1,
+                    'name': 'blob',
+                    'description': 'A blob',
+                    'num_product': 1,
+                    'ingredients': [
+                        {
+                            'ingredient_id': 1,
+                            'num_native_units': 2,
+                        },
+                    ],
+                },
+                {
+                    'id': 3,
+                    'name': 'foo',
+                    'description': 'bar',
+                    'num_product': 1,
+                    'ingredients': [
+                        {
+                            'ingredient_id': 1,
+                            'num_native_units': 10,
+                        },
+                        {
+                            'ingredient_id': 2,
+                            'num_native_units': 2,
+                        },
+                    ],
+                },
+            ]
+```
 
 {% endmethod %}
