@@ -60,13 +60,11 @@ export function addVendorIngredients(req, res, next) {
     const vendorId = item['vendor_id'];
     const numNativeUnits = item['num_native_units'];
     const price = item['price'];
-
-    if (!checkNumber.isPositiveInteger(ingredientId)
-      || !checkNumber.isPositiveInteger(vendorId)
-      || isNaN(price)
-      || isNaN(numNativeUnits)) {
-      return res.status(400).send('Invalid input, check your property names and values.');
+    const err = checkInputErrorAdd(item);
+    if (err) {
+      return res.status(400).send(err);
     }
+
     values.push(`(${ingredientId}, ${vendorId}, ${numNativeUnits}, ${price})`);
   }
   connection.query(`INSERT INTO VendorsIngredients (ingredient_id, vendor_id, num_native_units, price) VALUES ${values.join(', ')}`)
@@ -92,6 +90,11 @@ export function modifyVendorIngredients(req, res, next) {
     const id = keys[i];
     if (!checkNumber.isPositiveInteger(id)) {
       return res.status(400).send(`Invalid id ${id}`);
+    }
+    const item = items[id];
+    const err = checkInputErrorEdit(item);
+    if (err) {
+      return res.status(400).send(err);
     }
     ids.push(id);
   }
@@ -154,4 +157,28 @@ function getCases(olds, items) {
     prices,
     numNativeUnits: numNativeUnitsArr,
   };
+}
+
+function checkInputErrorAdd(item) {
+  const ingredientId = item['ingredient_id'];
+  const vendorId = item['vendor_id'];
+  const numNativeUnits = item['num_native_units'];
+  const price = item['price'];
+  if (!checkNumber.isPositiveInteger(ingredientId)
+    || !checkNumber.isPositiveInteger(vendorId)
+    || isNaN(price) || parseFloat(price) < 0
+    || isNaN(numNativeUnits) || parseFloat(numNativeUnits) < 0) {
+    return 'Invalid input, check your property names and values.';
+  }
+  return null;
+}
+
+function checkInputErrorEdit(item) {
+  const numNativeUnits = item['num_native_units'];
+  const price = item['price'];
+  if (isNaN(price) || parseFloat(price) < 0
+    || isNaN(numNativeUnits) || parseFloat(numNativeUnits) < 0) {
+    return 'Invalid input, check your property names and values.';
+  }
+  return null;
 }
