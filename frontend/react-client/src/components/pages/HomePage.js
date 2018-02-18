@@ -35,7 +35,6 @@ class HomePage extends Component {
     this.setState({
       funcName
     });
-    this.forceUpdate();
   }
 
   renderComponent() {
