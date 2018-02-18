@@ -144,6 +144,12 @@ class AddEditIngredient extends Component {
 
   handleSubmitButtonClick(event) {
     event.preventDefault();
+
+    if (!this.state.name || !this.state.native_unit) {
+      alert('Please fill out the name and native unit');
+      return;
+    }
+
     let storage_id;
     if (this.state.storage == "Frozen") {
       storage_id = 1;
@@ -248,7 +254,7 @@ class AddEditIngredient extends Component {
           <form className="col-xl-6 col-lg-6 col-sm-8">
             <div className="form-group">
               <label htmlFor="name">Ingredient Name</label>
-              <input type="text" className="form-control" id="name" aria-describedby="name" placeholder="Name" onChange={e => this.handleInputChange('name', e)} value={this.state.name} />
+              <input type="text" className="form-control" id="name" aria-describedby="name" placeholder="Name" onChange={e => this.handleInputChange('name', e)} value={this.state.name} required />
             </div>
             <div className="form-group">
               <label htmlFor="package_type">Package Type</label>
@@ -259,8 +265,8 @@ class AddEditIngredient extends Component {
               <ComboBox className="form-control" id="storage" Options={["Frozen", "Refrigerated", "Room Temperature"]} onChange={this.handleInputChange} selected={this.state.storage} />
             </div>
             <div className="form-group">
-              <label htmlFor="native_unit">Ingredient Name</label>
-              <input type="text" className="form-control" id="native_unit" aria-describedby="unit" placeholder="Pounds" onChange={e => this.handleInputChange('native_unit', e)} value={this.state.native_unit} />
+              <label htmlFor="native_unit">Unit</label>
+              <input type="text" className="form-control" id="native_unit" aria-describedby="unit" placeholder="Pounds" onChange={e => this.handleInputChange('native_unit', e)} value={this.state.native_unit} required />
             </div>
             <button type="submit" className="btn btn-primary" onClick={this.handleSubmitButtonClick}>Submit</button>
           </form>
