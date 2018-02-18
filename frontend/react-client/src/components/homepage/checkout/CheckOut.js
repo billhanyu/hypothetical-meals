@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ViewInventory from '../../inventory/ViewInventory';
+import ViewInventory from '../inventory/ViewInventory';
 import Cart from './Cart';
 import axios from 'axios';
 

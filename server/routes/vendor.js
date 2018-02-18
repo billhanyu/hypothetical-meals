@@ -82,6 +82,9 @@ export function addVendors(req, res, next) {
   connection.query(`INSERT INTO Vendors (name, contact, code) VALUES ${values.join(', ')}`)
     .then(() => success(res))
     .catch(err => {
+      if (err.code == 'ER_DUP_ENTRY') {
+        return res.status(400).send('Duplicate code with other vendor');
+      }
       handleError(err, res);
     });
 }
@@ -139,6 +142,9 @@ export function modifyVendors(req, res, next) {
       })
       .then(() => success(res))
       .catch(err => {
+        if (err.code == 'ER_DUP_ENTRY') {
+          return res.status(400).send('Duplicate code with other vendor');
+        }
         handleError(err, res);
       });
 }

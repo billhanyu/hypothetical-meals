@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-import ComboBox from '../AdminSection/ComboBox';
+import ComboBox from '../../GeneralComponents/ComboBox';
 import Storage2State from '../../Constants/Storage2State';
 import packageTypes from '../../Constants/PackageTypes';
 
