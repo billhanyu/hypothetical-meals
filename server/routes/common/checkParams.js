@@ -7,3 +7,16 @@ export function checkBlankParams(obj, params) {
   }
   return blankParams.length > 0 ? (blankParams.join(', ') + ' cannot be blank.') : null;
 }
+
+/**
+ * Should return true when every element in subset is in set
+ * @param {Array} set
+ * @param {Array} subset
+ * @return {Boolean}
+ */
+export function checkSuperset(set, subset) {
+  let superSet = subset.every(x => {
+    return set.indexOf(x) >= 0;
+  });
+  return superSet;
+}
