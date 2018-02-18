@@ -23,7 +23,7 @@ export function checkStoragePromise(req) {
           sums[storage.id] = 0;
           capacities[storage.id] = storage.capacity;
         }
-        return connection.query(`SELECT Inventories.package_type, Inventories.num_packages, Ingredients.storage_id
+        return connection.query(`SELECT Inventories.num_packages, Ingredients.storage_id, Ingredients.package_type
                                   FROM Inventories
                                   INNER JOIN Ingredients
                                   ON Inventories.ingredient_id = Ingredients.id`);

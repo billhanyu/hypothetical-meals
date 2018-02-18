@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-class VendorComboBox extends Component {
+class ComboBox extends Component {
   constructor(props){
     super(props);
     this.handleChange = this.handleChange.bind(this);
@@ -18,10 +18,11 @@ class VendorComboBox extends Component {
 
   render() {
     return (
-      <select className="AdminDropdown" onChange={this.handleChange}>
+      <select className={this.props.className} onChange={this.handleChange}>
         {
           this.props.Options.map((element, key) => {
-            return <option value={element} key={key}>{element}</option>;
+            const selected = element == this.props.selected ? "selected" : "";
+            return <option selected={selected} value={element} key={key}>{element}</option>;
           })
         }
       </select>
@@ -29,4 +30,4 @@ class VendorComboBox extends Component {
   }
 }
 
-export default VendorComboBox;
+export default ComboBox;

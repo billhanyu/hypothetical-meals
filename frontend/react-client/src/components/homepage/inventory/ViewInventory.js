@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import InventoryItem from './InventoryItem';
 import FilterBar from './FilterBar';
-import PageBar from '../PageBar';
-import storage2State from '../../../Constants/Storage2State';
+import PageBar from '../../GeneralComponents/PageBar';
+import storage2State from '../../Constants/Storage2State';
 
 class ViewInventory extends Component {
   constructor(props) {
@@ -12,6 +12,8 @@ class ViewInventory extends Component {
       allInventories: [],
       inventories: [],
       storages: [],
+      editQuantity: 0,
+      editIdx: -1,
       pages: 0,
     };
     this.filterIngredient = this.filterIngredient.bind(this);
@@ -19,6 +21,10 @@ class ViewInventory extends Component {
     this.filterPackage = this.filterPackage.bind(this);
     this.selectInventoryItem = this.selectInventoryItem.bind(this);
     this.selectPage = this.selectPage.bind(this);
+    this.edit = this.edit.bind(this);
+    this.cancelEdit = this.cancelEdit.bind(this);
+    this.changeQuantity = this.changeQuantity.bind(this);
+    this.finishEdit = this.finishEdit.bind(this);
   }
 
   componentDidMount() {
@@ -36,7 +42,7 @@ class ViewInventory extends Component {
       this.selectPage(1);
     })
     .catch(error => {
-      console.error(error);
+      alert('Data loading error');
     });
   }
 
@@ -68,7 +74,7 @@ class ViewInventory extends Component {
       });
     }
     if (this.packageSearch && this.packageSearch !== 'All') {
-      filtered = filtered.filter(item => item.package_type == this.packageSearch);
+      filtered = filtered.filter(item => item.ingredient_package_type == this.packageSearch);
     }
     this.setState({
       inventories: filtered,
@@ -79,6 +85,47 @@ class ViewInventory extends Component {
     if (this.props.onClickInventoryItem) {
       this.props.onClickInventoryItem(item);
     }
+  }
+
+  edit(idx) {
+    this.setState({
+      editIdx: idx,
+      editQuantity: this.state.inventories[idx].num_packages,
+    });
+  }
+
+  changeQuantity(event) {
+    this.setState({
+      editQuantity: event.target.value,
+    });
+  }
+
+  cancelEdit() {
+    this.setState({
+      editIdx: -1,
+    });
+  }
+
+  finishEdit() {
+    const putObj = {};
+    const id = this.state.inventories[this.state.editIdx].id;
+    putObj[id] = this.state.editQuantity;
+    axios.put('/inventory/admin', {
+      changes: putObj
+    }, {
+      headers: { Authorization: "Token " + global.token }
+    })
+      .then(response => {
+        this.setState({
+          editIdx: -1,
+        });
+        alert('Updated!');
+        this.reloadData();
+      })
+      .catch(err => {
+        const message = err.response.data;
+        alert(message);
+      });
   }
 
   selectPage(idx) {
@@ -115,33 +162,51 @@ class ViewInventory extends Component {
         });
       })
       .catch(err => {
-        console.error(err);
+        alert('Data retrieval error');
       });
   }
 
   render() {
     return (
       <div>
+        <h2>Inventory</h2>
         <FilterBar
           filterIngredient={this.filterIngredient}
           filterTemp={this.filterTemp}
           filterPackage={this.filterPackage}
         />
-        <div className="InventoryHead">
-          <span className="InventoryColumn">Ingredient Name</span>
-          <span className="InventoryColumn">Temperature State</span>
-          <span className="InventoryColumn">Package Type</span>
-          <span className="InventoryColumn">Number of Packages</span>
-        </div>
-        {this.state.inventories.map((item, key) =>
-          <InventoryItem
-            mode={this.props.mode}
-            selectInventoryItem={this.selectInventoryItem}
-            key={key}
-            item={item}
-            storages={this.state.storages}
-          />
-        )}
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Ingredient Name</th>
+              <th>Temperature State</th>
+              <th>Package Type</th>
+              <th>Number of Packages</th>
+              {
+                global.user_group == "admin" &&
+                <th>Options</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.inventories.map((item, key) =>
+              <InventoryItem
+                mode={this.props.mode}
+                idx={key}
+                edit={this.edit}
+                editQuantity={this.state.editQuantity}
+                changeQuantity={this.changeQuantity}
+                cancelEdit={this.cancelEdit}
+                finishEdit={this.finishEdit}
+                editIdx={this.state.editIdx}
+                selectInventoryItem={this.selectInventoryItem}
+                key={key}
+                item={item}
+                storages={this.state.storages}
+              />
+            )}
+          </tbody>
+        </table>
         <PageBar
           pages={this.state.pages}
           selectPage={this.selectPage}

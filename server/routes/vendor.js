@@ -31,6 +31,24 @@ export function viewAvailable(req, res, next) {
     });
 }
 
+// req.query.code
+export function getVendorWithCode(req, res, next) {
+  if (!req.query.code) {
+    return res.status(400).send('No code provided');
+  }
+  connection.query(`SELECT * FROM Vendors WHERE code = '${req.query.code}'`)
+  .then(results => {
+    if (results.length > 0) {
+      return res.status(200).send(results[0]);
+    }
+    return res.status(404).send('Vendor Not Found');
+  })
+  .catch(err => {
+    console.error(err);
+    return res.status(500).send('Database error');
+  });
+}
+
 /* req.body.vendors = [
  *   {
  *     'name': 'duke',

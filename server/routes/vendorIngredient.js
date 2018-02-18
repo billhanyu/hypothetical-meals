@@ -2,9 +2,7 @@ import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import { getNumPages, queryWithPagination } from './common/pagination';
 import success from './common/success';
-const ALL_PACKAGE_TYPES = ['sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar'];
-
-const basicViewQueryString = 'SELECT VendorsIngredients.*, Vendors.name as vendor_name, Vendors.contact as vendor_contact, Vendors.code as vendor_code, Vendors.removed as vendor_removed, Ingredients.name as ingredient_name, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM ((VendorsIngredients INNER JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id) INNER JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id)';
+const basicViewQueryString = 'SELECT VendorsIngredients.*, Vendors.name as vendor_name, Vendors.contact as vendor_contact, Vendors.code as vendor_code, Vendors.removed as vendor_removed, Ingredients.name as ingredient_name, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed, Ingredients.package_type as ingredient_package_type, Ingredients.native_unit as ingredient_native_unit FROM ((VendorsIngredients INNER JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id) INNER JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id)';
 
 export function pages(req, res, next) {
   getNumPages('VendorsIngredients')
@@ -42,7 +40,6 @@ export function getVendorsForIngredient(req, res, next) {
  *   {
  *     'ingredient_id': 1,
  *     'vendor_id': 1,
- *     'package_type': 'sack',
  *     'price': 100
  *   },
  *   {
@@ -57,34 +54,22 @@ export function addVendorIngredients(req, res, next) {
   if (!items || items.length < 1) {
     return res.status(400).send('Invalid input request, see doc.');
   }
-  const dup = [];
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     const ingredientId = item['ingredient_id'];
     const vendorId = item['vendor_id'];
-    const packageType = item['package_type'];
     const numNativeUnits = item['num_native_units'];
     const price = item['price'];
-
-    if (!checkNumber.isPositiveInteger(ingredientId)
-      || !checkNumber.isPositiveInteger(vendorId)
-      || !checkNumber.isPositiveInteger(price)
-      || isNaN(numNativeUnits)
-      || ALL_PACKAGE_TYPES.indexOf(packageType) < 0) {
-      return res.status(400).send('Invalid input, check your property names and values.');
+    const err = checkInputErrorAdd(item);
+    if (err) {
+      return res.status(400).send(err);
     }
-    values.push(`(${ingredientId}, ${vendorId}, '${packageType}', ${numNativeUnits}, ${price})`);
-    dup.push(`(ingredient_id = ${ingredientId} AND vendor_id = ${vendorId} AND package_type = '${packageType}')`);
+
+    values.push(`(${ingredientId}, ${vendorId}, ${numNativeUnits}, ${price})`);
   }
-  connection.query(`SELECT id FROM VendorsIngredients WHERE ${dup.join(' OR ')}`)
-    .then(results => {
-      if (results.length > 0) {
-        throw createError('There exists duplicate(s) in your input: same ingredient_id, vendor_id and package_type');
-      }
-      return connection.query(`INSERT INTO VendorsIngredients (ingredient_id, vendor_id, package_type, num_native_units, price) VALUES ${values.join(', ')}`);
-    })
-    .then(() => success(res))
-    .catch(err => handleError(err, res));
+  connection.query(`INSERT INTO VendorsIngredients (ingredient_id, vendor_id, num_native_units, price) VALUES ${values.join(', ')}`)
+  .then(() => success(res))
+  .catch(err => handleError(err, res));
 }
 
 /* Request body format
@@ -92,9 +77,6 @@ export function addVendorIngredients(req, res, next) {
  *   '1': {
  *     'price': 100,
  *   },
- *   '2': {
- *     'package_type': 'sack',
- *   }
  * }
  */
 export function modifyVendorIngredients(req, res, next) {
@@ -109,6 +91,11 @@ export function modifyVendorIngredients(req, res, next) {
     if (!checkNumber.isPositiveInteger(id)) {
       return res.status(400).send(`Invalid id ${id}`);
     }
+    const item = items[id];
+    const err = checkInputErrorEdit(item);
+    if (err) {
+      return res.status(400).send(err);
+    }
     ids.push(id);
   }
 
@@ -121,8 +108,7 @@ export function modifyVendorIngredients(req, res, next) {
       return connection.query(
         `UPDATE VendorsIngredients
           SET price = (case ${cases.prices.join(' ')} end),
-              num_native_units = (case ${cases.numNativeUnits.join(' ')} end),
-              package_type = (case ${cases.packageTypes.join(' ')} end)
+              num_native_units = (case ${cases.numNativeUnits.join(' ')} end)
           WHERE id IN (${ids.join(', ')})`);
     })
     .then(() => success(res))
@@ -157,22 +143,42 @@ export function fakeDeleteMultipleVendorIngredients(ids) {
 
 function getCases(olds, items) {
   const prices = [];
-  const packageTypes = [];
   const numNativeUnitsArr = [];
   for (let i = 0; i < olds.length; i++) {
     const old = olds[i];
     const id = old['ingredient_id'];
     const change = items[id];
-    const price = 'price' in change ? change['price'] : old['price'];
-    const packageType = 'package_type' in change ? change['package_type'] : old['package_type'];
-    const numNativeUnits = 'num_native_units' in change ? change['num_native_units'] : old['num_native_units'];
+    const price = change['price'];
+    const numNativeUnits = change['num_native_units'];
     prices.push(`when id = ${id} then ${price}`);
-    packageTypes.push(`when id = ${id} then '${packageType}'`);
     numNativeUnitsArr.push(`when id = ${id} then ${numNativeUnits}`);
   }
   return {
     prices,
-    packageTypes,
     numNativeUnits: numNativeUnitsArr,
   };
+}
+
+function checkInputErrorAdd(item) {
+  const ingredientId = item['ingredient_id'];
+  const vendorId = item['vendor_id'];
+  const numNativeUnits = item['num_native_units'];
+  const price = item['price'];
+  if (!checkNumber.isPositiveInteger(ingredientId)
+    || !checkNumber.isPositiveInteger(vendorId)
+    || isNaN(price) || parseFloat(price) < 0
+    || isNaN(numNativeUnits) || parseFloat(numNativeUnits) < 0) {
+    return 'Invalid input, check your property names and values.';
+  }
+  return null;
+}
+
+function checkInputErrorEdit(item) {
+  const numNativeUnits = item['num_native_units'];
+  const price = item['price'];
+  if (isNaN(price) || parseFloat(price) < 0
+    || isNaN(numNativeUnits) || parseFloat(numNativeUnits) < 0) {
+    return 'Invalid input, check your property names and values.';
+  }
+  return null;
 }

@@ -31,6 +31,31 @@ describe('Vendor', () => {
     });
   });
 
+  describe('#getVendorWithCode()', () => {
+    it('should return vendor with code', (done) => {
+      chai.request(server)
+        .get('/vendors/code')
+        .query({ code: 'code_duke' })
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          assert.strictEqual(res.body.name, 'Duke', 'name of vendor should be Duke');
+          done();
+        });
+    });
+
+    it('should return 404 for nonexistent code', (done) => {
+      chai.request(server)
+        .get('/vendors/code')
+        .query({ code: 'fuck' })
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(404);
+          done();
+        });
+    });
+  });
+
   describe('#viewAvailable()', () => {
     it('should return all vendors available', (done) => {
       alasql('UPDATE Vendors SET removed = 1 WHERE id = 1');

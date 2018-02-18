@@ -5,25 +5,19 @@ import { withRouter } from 'react-router';
 import Cookies from 'universal-cookie';
 import logoutFunc from '../homepage/LogOut';
 
-import AddIngredientWindow from '../homepage/AdminSection/AddIngredientWindow';
-import IngredientList from '../homepage/AdminSection/EditIngredient/IngredientList';
-import AddVendor from '../homepage/AdminSection/AddVendor';
-import VendorList from '../homepage/AdminSection/EditVendor/VendorList';
-import BulkImport from '../homepage/AdminSection/BulkImport';
-import VendorIngredientList from '../homepage/AdminSection/EditVendorIngredient/VendorIngredientList';
-import AddVendorIngredientList from '../homepage/AdminSection/EditVendorIngredient/AddVendorIngredientList';
-import EditStorageCapacity from '../homepage/AdminSection/Storage/EditStorageCapacity';
-import InventoryList from '../homepage/AdminSection/InventoryQuantity/InventoryList';
-import ViewInventory from '../homepage/UserSection/inventory/ViewInventory';
+import NewIngredientList from '../homepage/ingredient/IngredientList';
+import NewVendorList from '../homepage/vendor/VendorList';
+import ViewInventory from '../homepage/inventory/ViewInventory';
 import LogOrder from '../homepage/UserSection/order/LogOrder';
 import CheckOut from '../homepage/UserSection/checkout/CheckOut';
 import SpendingLog from '../homepage/UserSection/spendinglog/SpendingLog';
+import StorageList from '../homepage/storage/StorageList';
 
 class HomePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      funcName: 'bulkImport',
+      funcName: 'viewIngredients',
     };
     this.cookies = new Cookies();
     this.logout = this.logout.bind(this);
@@ -39,38 +33,12 @@ class HomePage extends Component {
     this.setState({
       funcName
     });
+    this.forceUpdate();
   }
 
   renderComponent() {
     const funcName = this.state.funcName;
-    if (funcName == "editVendor") {
-      return <VendorList />;
-    }
-    else if (funcName == "addVendor") {
-      return <AddVendor />;
-    }
-    else if (funcName == "editIngredient") {
-      return <IngredientList />;
-    }
-    else if (funcName == "addIngredient") {
-      return <AddIngredientWindow />;
-    }
-    else if (funcName == "editVendorIngredient") {
-      return <VendorIngredientList />;
-    }
-    else if (funcName == "addVendorIngredient") {
-      return <AddVendorIngredientList />;
-    }
-    else if (funcName == "editStorage") {
-      return <EditStorageCapacity />;
-    }
-    else if (funcName == 'inventoryQuantity') {
-      return <InventoryList />;
-    }
-    else if (funcName == "bulkImport") {
-      return <BulkImport />;
-    }
-    else if (funcName == "viewInventory") {
+    if (funcName == "viewInventory") {
       return <ViewInventory mode="view" />;
     }
     else if (funcName == "logOrder") {
@@ -82,6 +50,15 @@ class HomePage extends Component {
     else if (funcName == "spendingLog") {
       return <SpendingLog />;
     }
+    else if (funcName == "viewIngredients") {
+      return <NewIngredientList />;
+    }
+    else if (funcName == "viewVendors") {
+      return <NewVendorList />;
+    }
+    else if (funcName == "viewStorages") {
+      return <StorageList />;
+    }
   }
 
   render() {
@@ -90,11 +67,29 @@ class HomePage extends Component {
         <NavBar />
         <div className="row row-nomargin">
           <SideBar
-            logout={this.logout}
             link={this.link}
           />
           <div className="ContentMain col-sm-8 col-md-9 col-lg-10 col-xl-10">
             {this.renderComponent()}
+          </div>
+        </div>
+        <div className="modal fade" id="logOutModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">Confirm Log Out</h5>
+                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Are you sure you want to log out?
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" data-dismiss="modal">Back</button>
+                <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={this.logout}>Yes</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

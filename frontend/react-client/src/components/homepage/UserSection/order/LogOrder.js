@@ -57,7 +57,7 @@ class LogOrder extends Component {
 
   changedQuantity(event, idx) {
     const orders = this.state.orders.slice();
-    orders[idx].quantity = event.target.value ? parseInt(event.target.value) : '';
+    orders[idx].quantity = parseInt(event.target.value);
     this.setState({
       orders
     });

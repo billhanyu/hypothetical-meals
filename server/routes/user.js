@@ -59,14 +59,9 @@ export function loginOauth(req, res, next) {
           (username, name, oauth, user_group) VALUES
           ('${netid}', '${name}', 1, 'noob')`)
           .then(result => {
-            const userInfo = {
-              username: netid,
-              name: name,
-              oauth: 1,
-              user_group: 'noob',
-            };
-            return tokenForOauth(userInfo, res);
+            return connection.query(`SELECT * FROM Users WHERE username = '${netid}' AND oauth = 1`);
           })
+          .then(result => tokenForOauth(result[0], res))
           .catch(err => {
             throw err;
           });
