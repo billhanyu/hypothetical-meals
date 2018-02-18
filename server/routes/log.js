@@ -77,7 +77,11 @@ function addLogEntryHelper(logs, userId) {
       vendorIngredientMap[log.vendor_ingredient_id] = log.quantity;
       packageTypes.push(`'${log.package_type}'`);
     }
-    connection.query(`SELECT id, package_type, ingredient_id, price FROM VendorsIngredients WHERE id IN (${Object.keys(vendorIngredientMap).join(', ')}) AND package_type IN (${packageTypes.join(', ')})`)
+    connection.query(`SELECT VendorsIngredients.id, VendorsIngredients.ingredient_id, VendorsIngredients.price, Ingredients.package_type
+      FROM VendorsIngredients
+      INNER JOIN Ingredients
+      ON VendorsIngredients.ingredient_id = Ingredients.id
+      WHERE VendorsIngredients.id IN (${Object.keys(vendorIngredientMap).join(', ')})`)
     .then(results => {
       if (results.length < Object.keys(vendorIngredientMap).length) {
         throw createError('Placing order for nonexistent vendor ingredient for package type.');

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PageBar from '../PageBar';
+import PageBar from '../../../GeneralComponents/PageBar';
 import axios from 'axios';
 import SpendingLogEntry from './SpendingLogEntry';
 
@@ -39,20 +39,27 @@ class SpendingLog extends Component {
   render() {
     return (
       <div>
-        <div className="InventoryHead">
-          <span className="InventoryColumn">Ingredient Name</span>
-          <span className="InventoryColumn">Total Weight Ordered</span>
-          <span className="InventoryColumn">Total Spending</span>
-          <span className="InventoryColumn">Production Spending</span>
-        </div>
-        {
-          this.state.entries.map((entry, key) =>
-            <SpendingLogEntry
-              item={entry}
-              key={key}
-            />
-          )
-        }
+        <h2>Spending Log</h2>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Ingredient Name</th>
+              <th>Total Weight Ordered</th>
+              <th>Total Spending</th>
+              <th>Production Spending</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              this.state.entries.map((entry, key) =>
+                <SpendingLogEntry
+                  item={entry}
+                  key={key}
+                />
+              )
+            }
+          </tbody>
+        </table>
         <PageBar
           pages={this.state.pages}
           selectPage={this.selectPage}

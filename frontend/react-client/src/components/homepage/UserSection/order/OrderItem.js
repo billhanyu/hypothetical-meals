@@ -68,7 +68,7 @@ class OrderItem extends Component {
         </select>
         <input
           className="OrderColumn inputitem"
-          type="text"
+          type="number"
           name="quantity"
           onChange={e => this.props.changedQuantity(e, this.props.idx)}
           value={this.props.data.quantity}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import tempStates from '../../../Constants/TempStates';
-import packageTypes from '../../../Constants/PackageTypes';
+import tempStates from '../../Constants/TempStates';
+import packageTypes from '../../Constants/PackageTypes';
 
 class FilterBar extends Component {
   constructor(props) {

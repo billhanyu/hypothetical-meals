@@ -73,7 +73,7 @@ describe('Storage', () => {
         .put('/storages')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
-          '1': 1400,
+          '1': 200,
         })
         .end((err, res) => {
           res.should.have.status(400);
