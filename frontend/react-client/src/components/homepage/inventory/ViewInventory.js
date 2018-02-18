@@ -42,7 +42,7 @@ class ViewInventory extends Component {
       this.selectPage(1);
     })
     .catch(error => {
-      console.error(error);
+      alert('Data loading error');
     });
   }
 
@@ -119,6 +119,8 @@ class ViewInventory extends Component {
         this.setState({
           editIdx: -1,
         });
+        alert('Updated!');
+        this.reloadData();
       })
       .catch(err => {
         const message = err.response.data;
@@ -160,7 +162,7 @@ class ViewInventory extends Component {
         });
       })
       .catch(err => {
-        console.error(err);
+        alert('Data retrieval error');
       });
   }
 

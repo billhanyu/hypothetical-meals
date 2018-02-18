@@ -7,8 +7,6 @@ import logoutFunc from '../homepage/LogOut';
 
 import NewIngredientList from '../homepage/ingredient/IngredientList';
 import NewVendorList from '../homepage/vendor/VendorList';
-import VendorIngredientList from '../homepage/AdminSection/EditVendorIngredient/VendorIngredientList';
-import AddVendorIngredientList from '../homepage/AdminSection/EditVendorIngredient/AddVendorIngredientList';
 import ViewInventory from '../homepage/inventory/ViewInventory';
 import LogOrder from '../homepage/UserSection/order/LogOrder';
 import CheckOut from '../homepage/UserSection/checkout/CheckOut';
@@ -40,13 +38,7 @@ class HomePage extends Component {
 
   renderComponent() {
     const funcName = this.state.funcName;
-    if (funcName == "editVendorIngredient") {
-      return <VendorIngredientList />;
-    }
-    else if (funcName == "addVendorIngredient") {
-      return <AddVendorIngredientList />;
-    }
-    else if (funcName == "viewInventory") {
+    if (funcName == "viewInventory") {
       return <ViewInventory mode="view" />;
     }
     else if (funcName == "logOrder") {

@@ -136,3 +136,19 @@ button:focus {
   height: calc(100vh - 60px);
   overflow-y: auto;
 }
+
+.tablerow-hover:hover {
+  background-color: #e5e5e5;
+}
+
+.tablerow-hover {
+  cursor: pointer;
+}
+
+.hiddenRow {
+    padding: 0 !important;
+}
+
+.table td {
+  vertical-align: middle;
+}
