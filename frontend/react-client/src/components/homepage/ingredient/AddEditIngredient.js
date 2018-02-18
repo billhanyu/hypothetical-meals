@@ -78,7 +78,7 @@ class AddEditIngredient extends Component {
 
   confirmDelete() {
     axios.delete('/vendoringredients', {
-      data: { ids: [this.state.deleting] },
+      data: { ids: [this.state.vendoringredients[this.state.deleting].id] },
       headers: { Authorization: "Token " + global.token }
     })
       .then(response => {
