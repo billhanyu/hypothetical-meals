@@ -46,6 +46,7 @@ class AddVendor extends Component {
         self.setState({
           errorMessage: error.response.data
         });
+        alert(error.response.data);
       });
   }
 

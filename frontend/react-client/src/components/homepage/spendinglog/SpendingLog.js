@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PageBar from '../../../GeneralComponents/PageBar';
+import PageBar from '../../GeneralComponents/PageBar';
 import axios from 'axios';
 import SpendingLogEntry from './SpendingLogEntry';
 
