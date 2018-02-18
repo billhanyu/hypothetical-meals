@@ -8,10 +8,12 @@ import logoutFunc from '../homepage/LogOut';
 import NewIngredientList from '../homepage/ingredient/IngredientList';
 import NewVendorList from '../homepage/vendor/VendorList';
 import ViewInventory from '../homepage/inventory/ViewInventory';
-import LogOrder from '../homepage/UserSection/order/LogOrder';
-import CheckOut from '../homepage/UserSection/checkout/CheckOut';
-import SpendingLog from '../homepage/UserSection/spendinglog/SpendingLog';
+import LogOrder from '../homepage/order/LogOrder';
+import CheckOut from '../homepage/checkout/CheckOut';
+import SpendingLog from '../homepage/spendinglog/SpendingLog';
 import StorageList from '../homepage/storage/StorageList';
+import Registration from '../Registration/RegistrationContainer';
+import ChangePermission from '../homepage/user/ChangePermission';
 
 class HomePage extends Component {
   constructor(props) {
@@ -40,6 +42,12 @@ class HomePage extends Component {
     const funcName = this.state.funcName;
     if (funcName == "viewInventory") {
       return <ViewInventory mode="view" />;
+    }
+    else if (funcName == "register") {
+      return <Registration />;
+    }
+    else if (funcName == "changePermission") {
+      return <ChangePermission />;
     }
     else if (funcName == "logOrder") {
       return <LogOrder />;
