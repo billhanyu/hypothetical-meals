@@ -79,6 +79,7 @@ class IngredientList extends Component {
       adding: false,
       editing: false,
     });
+    this.selectPage(this.state.page);
   }
   
   add() {
@@ -136,6 +137,7 @@ class IngredientList extends Component {
     <AddEditIngredient
       mode="edit"
       ingredient={this.state.ingredients[this.state.editingIdx]}
+      backToList={this.backToList}
       finishEdit={this.finishEdit}
     />;
 
@@ -145,8 +147,8 @@ class IngredientList extends Component {
     const main = 
     <div>
       <h2>Ingredients</h2>
-        {global.user_group == 'admin' && <button type="button" className="btn btn-primary" onClick={this.add}>Add Ingredient</button>}
-        {global.user_group == 'admin' && <button type="button" className="btn btn-primary" onClick={this.bulkImport}>Bulk Import</button>}
+      {global.user_group == 'admin' && <button type="button" className="btn btn-primary" onClick={this.add}>Add Ingredient</button>}
+      {global.user_group == 'admin' && <button type="button" className="btn btn-primary" onClick={this.bulkImport}>Bulk Import</button>}
       <table className="table">
         <thead>
           <tr>
@@ -161,21 +163,19 @@ class IngredientList extends Component {
             }
           </tr>
         </thead>
-        <tbody>
-          {
-            this.state.ingredients.map((ingredient, idx) => {
-              return (
-                <IngredientListItem
-                  key={idx}
-                  idx={idx}
-                  edit={this.edit}
-                  delete={this.delete}
-                  ingredient={ingredient}
-                />
-              );
-            })
-          }
-        </tbody>
+        {
+          this.state.ingredients.map((ingredient, idx) => {
+            return (
+              <IngredientListItem
+                key={idx}
+                idx={idx}
+                edit={this.edit}
+                delete={this.delete}
+                ingredient={ingredient}
+              />
+            );
+          })
+        }
       </table>
       <div className="modal fade" id="deleteIngredientModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div className="modal-dialog" role="document">
@@ -202,6 +202,7 @@ class IngredientList extends Component {
     const add =
     <AddEditIngredient
       mode="add"
+      backToList={this.backToList}
       finishAdd={this.finishAdd}
     />;
 

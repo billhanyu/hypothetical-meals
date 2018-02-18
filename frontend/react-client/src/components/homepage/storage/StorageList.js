@@ -61,11 +61,15 @@ class StorageList extends Component {
       this.setState({
         editIdx: -1,
       });
+      alert('Updated!');
+      this.reloadData();
     })
     .catch(err => {
       const message = err.response.data;
       if (message.indexOf('smaller than')) {
         alert(message);
+      } else {
+        alert('Some error occurred!');
       }
     });
   }

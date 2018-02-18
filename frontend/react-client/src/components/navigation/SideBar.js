@@ -25,20 +25,10 @@ class SideBar extends Component {
               href="#nav-ingredient"
               role="button"
               className="nav-link PermissionCategory"
-              data-toggle="collapse"
-              aria-expanded="false"
-              aria-controls="nav-ingredient"
               data-parent="#SideBar"
               onClick={e => this.props.link('viewIngredients')}>
-              Ingredient&nbsp;&nbsp;
-              {global.user_group !== 'noob' && <i className="fa fa-caret-down"></i>}
+              Ingredient
             </a>
-            <div className="collapse" id="nav-ingredient">
-              <ul className="nav flex-column">
-                <PermissionLink linkKey={2} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('addVendorIngredient')} text="Add Vendor for Ingredient" permission="admin" />
-                <PermissionLink linkKey={3} setActive={this.setActive} activeKey={this.state.activeLinkKey} action={e => this.props.link('editVendorIngredient')} text="Edit Vendor for Ingredient" permission="admin" />
-              </ul>
-            </div>
           </li>
           <li className="nav-item">
             <a
