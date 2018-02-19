@@ -60,7 +60,7 @@ class ChangePermission extends Component {
         
         <form className="col-xl-6 col-lg-6 col-sm-8">
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="username">Username / netID</label>
             <input type="text" className="form-control" id="username" aria-describedby="username" placeholder="username" onChange={e => this.handleInputChange('username', e)} value={this.state.username} required />
           </div>
           <div className="form-group">
