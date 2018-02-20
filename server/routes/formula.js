@@ -42,18 +42,12 @@ export function view(req, res, next) {
                 };
                 myFormulas[`${x.id}`] = formulaObject;
             });
-            return connection.query(`${formulaEntryQuery}, Ingredients.* FROM FormulaEntries
+            return connection.query(`${formulaEntryQuery}, Ingredients.name, Ingredients.package_type, Ingredients.storage_id, Ingredients.native_unit, Ingredients.num_native_units as ingredient_num_native_units, Ingredients.removed FROM FormulaEntries
             JOIN Ingredients ON FormulaEntries.ingredient_id = Ingredients.id`);
         })
         .then((formulaEntries) => {
             formulaEntries.forEach(x => {
-                let currentFormula = myFormulas[`${x['formula_id']}`];
-                if (!('ingredients' in currentFormula)) {
-                    currentFormula['ingredients'] = {};
-                    currentFormula['ingredients'][`${x.name}`] = x;
-                } else {
-                    myFormulas[`${x['formula_id']}`]['ingredients'][`${x.name}`] = x;
-                }
+                myFormulas[`${x['formula_id']}`]['ingredients'][`${x.name}`] = x;
             });
             res.status(200).send(Object.values(myFormulas));
         })
