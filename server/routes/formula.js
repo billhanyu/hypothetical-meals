@@ -50,7 +50,7 @@ export function view(req, res, next) {
                 let currentFormula = myFormulas[`${x['formula_id']}`];
                 if (!('ingredients' in currentFormula)) {
                     currentFormula['ingredients'] = {};
-                    currentFormula['ingredients'][`${x.name}`] = ingredientTuple;
+                    currentFormula['ingredients'][`${x.name}`] = x;
                 } else {
                     myFormulas[`${x['formula_id']}`]['ingredients'][`${x.name}`] = x;
                 }
