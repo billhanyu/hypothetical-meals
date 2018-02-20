@@ -20,9 +20,9 @@ describe('Formulas', () => {
                     assert.strictEqual(formulas[0].description, 'A simple cake', 'Description for cake');
                     assert.strictEqual(formulas[0].num_product, 1, 'Number of product produced by formula');
                     const ingredient = formulas[0]['ingredients']['boop'];
-                    assert.strictEqual(Object.keys(ingredient).length, 9, 'Properties in ingredient');
+                    assert.strictEqual(Object.keys(ingredient).length, 10, 'Properties in ingredient');
                     assert.strictEqual(ingredient['ingredient_id'], 3, 'Id of ingredient in formula');
-                    assert.strictEqual(ingredient['num_native_units'], 20, 'Number of native units of boop');
+                    assert.strictEqual(ingredient['num_native_units'], 1, 'Number of native units of boop');
                     assert.strictEqual(ingredient['native_unit'], 'kg', 'Native unit of boop');
                     assert.strictEqual(ingredient['formula_id'], 1, 'Formula id boop is part of');
                     assert.strictEqual(ingredient['storage_id'], 1, 'Storage id of boop');
@@ -72,7 +72,7 @@ describe('Formulas', () => {
                             'ingredients': [
                                 {
                                     'ingredient_id': 1,
-                                    'num_native_units': 10,
+                                    'num_native_units': 0.5,
                                 },
                                 {
                                     'ingredient_id': 2,
@@ -92,7 +92,7 @@ describe('Formulas', () => {
                     const formulaIngredients = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[3].id}`);
                     assert.strictEqual(formulaIngredients.length, 2, 'Number of ingredients in formula 3');
                     assert.strictEqual(formulaIngredients[0].ingredient_id, 1, 'First ingredient id in formula 3');
-                    assert.strictEqual(formulaIngredients[0].num_native_units, 10, 'First ingredient native units formula 3');
+                    assert.strictEqual(formulaIngredients[0].num_native_units, 0.5, 'First ingredient native units formula 3');
                     done();
                 });
         });

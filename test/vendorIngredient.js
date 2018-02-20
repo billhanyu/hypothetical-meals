@@ -114,6 +114,25 @@ describe('VendorIngredient', () => {
         });
     });
 
+    it('should reject vendoringredient with invalid price', (done) => {
+      chai.request(server)
+        .post('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'vendoringredients': [
+            {
+              'ingredient_id': 1,
+              'vendor_id': 1,
+              'price': '',
+            },
+          ],
+        })
+        .end((err, res) => {
+          res.should.have.status(400); // check error code
+          done();
+        });
+    });
+
     it('should reject noobs', (done) => {
       chai.request(server)
         .post('/vendoringredients')
@@ -248,6 +267,23 @@ describe('VendorIngredient', () => {
           'vendoringredients': {
             '1': {
               'price': -1,
+            },
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should fail invalid price', (done) => {
+      chai.request(server)
+        .put('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'vendoringredients': {
+            '1': {
+              'price': '',
             },
           },
         })
