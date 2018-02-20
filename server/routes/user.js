@@ -13,7 +13,7 @@ export function signupNoob(req, res, next) {
 }
 
 function signupUser(req, res, next, isAdmin) {
-  const error = checkParams.checkBlankParams(req.body.user, ['username', 'password']);
+  const error = checkParams.checkBlankParams(req.body.user, ['username', 'name', 'password']);
   if (error) return res.status(422).send(error);
 
   let regex = new RegExp('^([ \u00c0-\u01ffa-zA-Z\'\-])+$');
@@ -38,7 +38,7 @@ function signupUser(req, res, next, isAdmin) {
 }
 
 export function login(req, res, next) {
-  const error = checkParams.checkBlankParams(req.body.user, ['username', 'name', 'password']);
+  const error = checkParams.checkBlankParams(req.body.user, ['username', 'password']);
   if (error) return res.status(422).send(error);
   passport.authenticate('local', {session: false}, function(err, user, info) {
     if (err) return next(err);
