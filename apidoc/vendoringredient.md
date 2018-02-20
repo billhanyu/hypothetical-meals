@@ -64,13 +64,11 @@ request.body.vendoringredients = [
   {
     'ingredient_id': 1,
     'vendor_id': 1,
-    'num_native_units': 50,
     'price': 100.1,
   },
   {
     'ingredient_id': 2,
     'vendor_id': 2,
-    'num_native_units': 50,
     'price': 200.5,
   },
 ];
@@ -91,11 +89,9 @@ you can modify the price or num_native_units.
 request.body.vendoringredients = {
   '1': {
     'price': 100,
-    'num_native_units': 150.2
   },
   '2': {
     'price': 500,
-    'num_native_units': 200.1
   },
 };
 ```
