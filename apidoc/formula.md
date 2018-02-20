@@ -23,7 +23,7 @@ res.body: [{
         'formula_id': 1,
         'name': 'boop',
         'storage_id': 1,
-        'package_type': 'pai',
+        'package_type': 'pail',
         'native_unit': 'kg',
         'removed': 0,
     }
