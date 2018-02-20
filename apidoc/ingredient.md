@@ -49,12 +49,14 @@ request.body.ingredients = [
     'name': 'ingredient1_name',
     'storage_id': 1,
     'native_unit': 'lbs',
+    'num_native_units': 1.1,
     'package_type': 'pail',
   },
   {
     'name': 'other_name',
     'storage_id': 2,
     'native_unit': 'lbs',
+    'num_native_units': 1.1,
     'package_type': 'pail',
   },
 ];
@@ -77,11 +79,13 @@ request.body.ingredients = {
     'storage_id': 1,
     'native_unit': 'lbs',
     'package_type': 'pail',
+    'num_native_units': 1.1,
   },
   'id2': {
     'name': 'other_name',
     'storage_id': 2,
     'native_unit': 'lbs',
+    'num_native_units': 1.1,
     'package_type': 'pail',
   },
 }
