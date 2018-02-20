@@ -156,7 +156,7 @@ class IngredientList extends Component {
             <th>Name</th>
             <th>Package Type</th>
             <th>Storage</th>
-            <th>Unit</th>
+            <th>Size</th>
             {
               global.user_group == 'admin' &&
               <th>Options</th>

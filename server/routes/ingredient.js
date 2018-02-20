@@ -66,6 +66,9 @@ function addIngredientHelper(ingredients, req, res, next) {
   }
   const ingredientsToAdd = [];
   for (let ingredient of ingredients) {
+    if (isNaN(ingredient.num_native_units) || parseFloat(ingredient.num_native_units) <= 0) {
+      return res.status(400).send('Invalid size, has to be greater than 0.');
+    }
     ingredientsToAdd.push(`('${ingredient.name}', '${ingredient.package_type}', '${ingredient.native_unit}', ${ingredient.num_native_units}, ${ingredient.storage_id})`);
   }
   connection.query(`INSERT INTO Ingredients (name, package_type, native_unit, num_native_units, storage_id) VALUES ${ingredientsToAdd.join(', ')}`)
