@@ -38,7 +38,7 @@ function signupUser(req, res, next, isAdmin) {
 }
 
 export function login(req, res, next) {
-  const error = checkParams.checkBlankParams(req.body.user, ['username', 'password']);
+  const error = checkParams.checkBlankParams(req.body.user, ['username', 'name', 'password']);
   if (error) return res.status(422).send(error);
   passport.authenticate('local', {session: false}, function(err, user, info) {
     if (err) return next(err);
