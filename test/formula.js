@@ -22,7 +22,7 @@ describe('Formulas', () => {
                     const ingredient = formulas[0]['ingredients']['boop'];
                     assert.strictEqual(Object.keys(ingredient).length, 9, 'Properties in ingredient');
                     assert.strictEqual(ingredient['ingredient_id'], 3, 'Id of ingredient in formula');
-                    assert.strictEqual(ingredient['num_native_units'], 1, 'Number of native units of boop');
+                    assert.strictEqual(ingredient['num_native_units'], 20, 'Number of native units of boop');
                     assert.strictEqual(ingredient['native_unit'], 'kg', 'Native unit of boop');
                     assert.strictEqual(ingredient['formula_id'], 1, 'Formula id boop is part of');
                     assert.strictEqual(ingredient['storage_id'], 1, 'Storage id of boop');

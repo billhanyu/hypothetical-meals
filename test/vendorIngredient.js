@@ -95,25 +95,6 @@ describe('VendorIngredient', () => {
         });
     });
 
-    it('should reject request with incomplete fields', (done) => {
-      chai.request(server)
-        .post('/vendoringredients')
-        .set('Authorization', `Token ${testTokens.adminTestToken}`)
-        .send({
-          'vendoringredients': [
-            {
-              'ingredient_id': 1,
-              'vendor_id': 2,
-              'price': 100,
-            },
-          ],
-        })
-        .end((err, res) => {
-          res.should.have.status(400);
-          done();
-        });
-    });
-
     it('should reject vendoringredient already existing', (done) => {
       chai.request(server)
         .post('/vendoringredients')
@@ -128,7 +109,7 @@ describe('VendorIngredient', () => {
           ],
         })
         .end((err, res) => {
-          res.should.have.status(400);
+          res.should.have.status(500); // check error code
           done();
         });
     });
@@ -166,13 +147,11 @@ describe('VendorIngredient', () => {
             {
               'ingredient_id': 4,
               'vendor_id': 1,
-              'num_native_units': 10.8,
               'price': 100.1,
             },
             {
               'ingredient_id': 3,
               'vendor_id': 2,
-              'num_native_units': 40,
               'price': 100,
             },
           ],
@@ -212,7 +191,6 @@ describe('VendorIngredient', () => {
           'vendoringredients': {
             '1a': {
               'price': 100,
-              'num_native_units': 90,
             },
           },
         })
@@ -230,11 +208,9 @@ describe('VendorIngredient', () => {
           'vendoringredients': {
             '1': {
               'price': 999,
-              'num_native_units': 10,
             },
             '100': {
               'price': 99,
-              'num_native_units': 15,
             },
           },
         })
@@ -252,11 +228,9 @@ describe('VendorIngredient', () => {
           'vendoringredients': {
             '1': {
               'price': 999,
-              'num_native_units': 10,
             },
             '2': {
               'price': 99,
-              'num_native_units': 15,
             },
           },
         })
@@ -274,25 +248,6 @@ describe('VendorIngredient', () => {
           'vendoringredients': {
             '1': {
               'price': -1,
-              'num_native_units': 10,
-            },
-          },
-        })
-        .end((err, res) => {
-          res.should.have.status(400);
-          done();
-        });
-    });
-
-    it('should fail negative num_native_units', (done) => {
-      chai.request(server)
-        .put('/vendoringredients')
-        .set('Authorization', `Token ${testTokens.adminTestToken}`)
-        .send({
-          'vendoringredients': {
-            '1': {
-              'price': 1,
-              'num_native_units': -10,
             },
           },
         })
@@ -310,15 +265,12 @@ describe('VendorIngredient', () => {
           'vendoringredients': {
             '1': {
               'price': 999,
-              'num_native_units': 10,
             },
             '2': {
               'price': 99,
-              'num_native_units': 15,
             },
             '3': {
               'price': 30,
-              'num_native_units': 1129,
             },
           },
         })
@@ -327,7 +279,6 @@ describe('VendorIngredient', () => {
           const changed = alasql('SELECT * FROM VendorsIngredients WHERE id IN (1, 2, 3)');
           assert.equal(changed[0]['price'], 999, 'price for id 1');
           assert.equal(changed[1]['price'], 99, 'price for id 2');
-          assert.equal(changed[2]['num_native_units'], 1129, 'num_native_units for id 3');
           done();
         });
     });
