@@ -124,7 +124,7 @@ CREATE TABLE FormulaEntries(
 CREATE TABLE SystemLogs(
 	id int not null AUTO_INCREMENT,
 	user_id int not null,
-	ingredient_id int,
+	description text not null,
 	created_at timestamp DEFAULT now() not null,
 
 	FOREIGN KEY (user_id) REFERENCES Users(id),
