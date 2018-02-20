@@ -2,6 +2,7 @@
 
 * [Introduction](README.md)
 * [Developer Guide](./DeveloperGuide.md)
+* [Formula](formula.md)
 * [Ingredient](ingredient.md)
 * [Inventory](inventory.md)
 * [Log](log.md)
