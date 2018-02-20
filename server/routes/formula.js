@@ -11,21 +11,6 @@ const dbFormulaNameCheck = `${formulaQueryString} WHERE name IN`;
  *
  * @param {*} req
  * @param {*} res
- * res.body: [{
- *      id: 'myId',
- *      name: 'myName',
- *      description: 'myDescription',
- *      num_product: 1
- *      ingredients: {
- *          'ingredient1': {
- *              'ingredient_id': 1,
- *              'num_native_units': 1,
- *              'native_unit': kg,
- *          }
- *          ...
- *      },
- *      ...
- * ]
  * @param {*} next
  */
 export function view(req, res, next) {
@@ -50,7 +35,7 @@ export function view(req, res, next) {
                 let currentFormula = myFormulas[`${x['formula_id']}`];
                 if (!('ingredients' in currentFormula)) {
                     currentFormula['ingredients'] = {};
-                    currentFormula['ingredients'][`${x.name}`] = ingredientTuple;
+                    currentFormula['ingredients'][`${x.name}`] = x;
                 } else {
                     myFormulas[`${x['formula_id']}`]['ingredients'][`${x.name}`] = x;
                 }
