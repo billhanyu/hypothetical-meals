@@ -26,6 +26,33 @@ All columns in Inventories table AND
 {% endmethod %}
 
 {% method %}
+## GET '/inventory/stock'
+
+Get in stock quantity in the inventory for selective ingredients.
+
+{% sample lang="js" %}
+```js
+request.body.ids = [1, 2, 4]; // ingredients with id 1 and 2
+```
+
+{% endmethod %}
+
+{% sample lang="js" %}
+```js
+response.body = {
+  1: {
+    Inventories.*,
+    Ingredients.name as ingredient_name, Ingredients.package_type as ingredient_package_type, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed
+  },
+  2: {
+    ...
+  } // ingredient 4 not in inventory then there is no value with 4 as key
+};
+```
+
+{% endmethod %}
+
+{% method %}
 ## PUT '/inventory/admin'
 
 Admin only - modify the quantities of ingredients in the inventory.
