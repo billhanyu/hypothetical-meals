@@ -29,6 +29,32 @@ export function view(req, res, next) {
 }
 
 /* request body format:
+ * req.body.ids = [
+ *   1, 2, 3
+ * ]
+ */
+export function getStock(req, res, next) {
+  const ids = req.body.ids;
+  if (!ids || ids.length == 0) {
+    return res.status(400).send('No ingredient queried');
+  }
+  for (let id of ids) {
+    if (!checkNumber.isPositiveInteger(id)) {
+      return res.status(400).send('Invalid ingredient id');
+    }
+  }
+  const stock = {};
+  connection.query(`${basicViewQueryString} WHERE Ingredients.id IN (${ids.join(', ')})`)
+    .then(results => {
+      for (let result of results) {
+        stock[result.id] = result;
+      }
+      return res.json(stock);
+    })
+    .catch(err => handleError(err, res));
+}
+
+/* request body format:
  * request.body.changes = {
  *   "inventory_id1": new_quantity1,
  *   "inventory_id2": new_quantity2

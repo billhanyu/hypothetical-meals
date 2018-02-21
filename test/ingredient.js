@@ -55,21 +55,6 @@ describe('Ingredient', () => {
     });
   });
 
-  describe('#viewAvailable()', () => {
-    it('should return all ingredients available', (done) => {
-      alasql('UPDATE Ingredients SET removed = 1 WHERE id = 1');
-      chai.request(server)
-        .get('/ingredients-available/page/1')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.a('array');
-          res.body.length.should.be.eql(3);
-          done();
-        });
-    });
-  });
-
   describe('#addIngredient()', () => {
     beforeEach(() => {
       alasql('SOURCE "./server/create_database.sql"');

@@ -2,7 +2,7 @@ import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import success from './common/success';
 import { fakeDeleteMultipleVendorIngredients } from './vendorIngredient';
-import { getNumPages, queryWithPagination } from './common/pagination';
+import { getAvailableNumPages, queryWithPagination } from './common/pagination';
 import { getWeight, ignoreWeights } from './common/packageUtilies';
 import { validStorageTypes } from './common/storageUtilities';
 
@@ -12,14 +12,8 @@ const Papa = require('papaparse');
 const numColumnsForBulkImport = 6;
 const basicViewQueryString = 'SELECT Ingredients.*, Storages.name as storage_name, Storages.capacity as storage_capacity FROM Ingredients INNER JOIN Storages ON Storages.id = Ingredients.storage_id';
 
-export function allAvailable(req, res, next) {
-  connection.query(`${basicViewQueryString} WHERE removed = 0`)
-    .then(results => res.status(200).send(results))
-    .catch(err => handleError(err, res));
-}
-
 export function pages(req, res, next) {
-  getNumPages('Ingredients')
+  getAvailableNumPages('Ingredients')
     .then(results => res.status(200).send(results))
     .catch(err => {
       console.error(err);
@@ -29,15 +23,6 @@ export function pages(req, res, next) {
 
 export function view(req, res, next) {
   queryWithPagination(req.params.page_num, 'Ingredients', basicViewQueryString)
-    .then(results => res.status(200).send(results))
-    .catch(err => {
-      console.error(err);
-      return res.status(500).send('Database error');
-    });
-}
-
-export function viewAvailable(req, res, next) {
-  queryWithPagination(req.params.page_num, 'Ingredients', `${basicViewQueryString} WHERE removed = 0`)
     .then(results => res.status(200).send(results))
     .catch(err => {
       console.error(err);
