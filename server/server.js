@@ -110,6 +110,7 @@ app.get('/spendinglogs/:ingredient_id', beNoob, spendinglog.logsForIngredient);
 app.get('/inventory', beNoob, inventory.all);
 app.get('/inventory/pages', beNoob, inventory.pages);
 app.get('/inventory/page/:page_num', beNoob, inventory.view);
+app.get('/inventory/stock', beManager, inventory.getStock);
 app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
 app.put('/inventory', beNoob, inventory.commitCart);
 
