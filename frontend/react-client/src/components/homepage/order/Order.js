@@ -30,18 +30,22 @@ class Order extends Component {
     Promise.all(promises)
       .then(responses => {
         for (let response of responses) {
-          if (response.data.length > 0) {
-            const vendoringredients = response.data;
+          const vendoringredients = response.data;
+          if (vendoringredients.length > 0) {
             const id = vendoringredients[0].ingredient_id;
-            const item = this.state.cart.find(x => x.id == id);
-            item.vendoringredients = vendoringredients;
             let lowest = vendoringredients[0];
             for (let vendoringredient of vendoringredients) {
               if (vendoringredient.price < lowest.price) {
                 lowest = vendoringredient;
               }
             }
-            item.selected = lowest;
+            const ingredient = {
+              vendoringredients,
+              selected: lowest,
+            };
+            const state = {};
+            state["ingredient"+id] = ingredient;
+            this.setState(state);
           }
         }
       })
@@ -110,17 +114,19 @@ class Order extends Component {
           this.state.chooseVendor &&
           <div>
             <h2>Choose Vendors</h2>
-            <form>
+            <div className="row justify-content-md-center">
+              <form className="col-xl-6 col-lg-6 col-sm-8">
               {
                 this.state.cart.map((item, idx) => {
+                  const ingredient = this.state["ingredient" + item.id];
+                  let vendoringredients = ingredient ? ingredient.vendoringredients : ['N/A'];
                   return (
-                    <div className="form-row" key={idx}>
-                      <label htmlFor="vendor" className="col-*-5 col-form-label">{item.name}</label>
-                      <div className="col-*-7">
-                        <select className="form-control" onChange={this.handleInputChange}>
+                    <div className="form-group" key={idx}>
+                      <label htmlFor="vendor">{item.name}</label>
+                      <div className="col-*-8">
+                        <select className="form-control" onChange={e=>this.handleInputChange(e, idx)}>
                           {
-                            item.vendoringredients &&
-                            item.vendoringredients.map((vendoringredient, idx) => {
+                            vendoringredients.map((vendoringredient, idx) => {
                               return <option key={idx} value={vendoringredient.id}>{vendoringredient.vendor_name + vendoringredient.price}</option>;
                             })
                           }
@@ -130,8 +136,9 @@ class Order extends Component {
                   );
                 })
               }
-              <button type="submit" className="btn btn-primary">Order</button>
-            </form>
+              <button type="submit" className="btn btn-primary" onClick={this.orderWithVendors}>Order</button>
+              </form>
+            </div>
           </div>
         }
       </div>
