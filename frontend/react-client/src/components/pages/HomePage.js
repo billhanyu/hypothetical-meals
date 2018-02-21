@@ -9,7 +9,7 @@ import NewIngredientList from '../homepage/ingredient/IngredientList';
 import NewVendorList from '../homepage/vendor/VendorList';
 import ViewInventory from '../homepage/inventory/ViewInventory';
 import FormulaList from '../homepage/formula/FormulaList';
-import LogOrder from '../homepage/order/LogOrder';
+import Order from '../homepage/order/Order';
 import CheckOut from '../homepage/checkout/CheckOut';
 import SpendingLog from '../homepage/spendinglog/SpendingLog';
 import StorageList from '../homepage/storage/StorageList';
@@ -53,7 +53,7 @@ class HomePage extends Component {
       return <ChangePermission />;
     }
     else if (funcName == "logOrder") {
-      return <LogOrder />;
+      return <Order />;
     }
     else if (funcName == "checkOut") {
       return <CheckOut />;

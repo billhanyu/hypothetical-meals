@@ -1,20 +1,27 @@
 import React, { Component } from 'react';
-import ViewInventory from '../inventory/ViewInventory';
-import axios from 'axios';
+import IngredientList from '../ingredient/IngredientList';
+import Cart from './Cart';
 
-class CheckOut extends Component {
+class Order extends Component {
   constructor(props) {
     super(props);
     this.state = {
       cart: [],
+      chooseVendor: false,
     };
-    this.onClickInventoryItem = this.onClickInventoryItem.bind(this);
-    this.checkout = this.checkout.bind(this);
+    this.orderIngredient = this.orderIngredient.bind(this);
     this.setQuantity = this.setQuantity.bind(this);
-    this.removeInventoryItem = this.removeInventoryItem.bind(this);
+    this.removeItem = this.removeItem.bind(this);
+    this.order = this.order.bind(this);
   }
 
-  onClickInventoryItem(item) {
+  order() {
+    this.setState({
+      chooseVendor: true,
+    });
+  }
+
+  orderIngredient(item) {
     const cart = this.state.cart.slice();
     const itemInCart = cart.filter(s => s.id === item.id);
     if (itemInCart.length == 0) {
@@ -30,7 +37,7 @@ class CheckOut extends Component {
     });
   }
 
-  removeInventoryItem(id) {
+  removeItem(id) {
     let index = -1;
     for (let i = 0; i < this.state.cart.length; i++) {
       if (this.state.cart[i].id === id) {
@@ -56,41 +63,15 @@ class CheckOut extends Component {
     });
   }
 
-  checkout() {
-    const req = {};
-    const self = this;
-    for (let item of this.state.cart) {
-      req[item.id] = item.quantity;
-    }
-    axios.put('/inventory', {
-      cart: req
-    }, {
-        headers: { Authorization: "Token " + global.token }
-    })
-    .then(response => {
-      self.setState({
-        cart: []
-      });
-      self.viewInventory.reloadData();
-      this.cart.reset();
-      alert('Checked Out!');
-    })
-    .catch(error => {
-      alert('Error, please check that you checked out valid numbers.');
-    });
-  }
-
   render() {
     return (
       <div>
-        <ViewInventory
-          ref={e => {this.viewInventory = e;}}
-          mode="cart"
-          onClickInventoryItem={this.onClickInventoryItem}
-        />
+        <h2>Order</h2>
+        <IngredientList order={true} orderIngredient={this.orderIngredient}/>
+        <Cart cart={this.state.cart} setQuantity={this.setQuantity} removeItem={this.removeItem} />
       </div>
     );
   }
 }
 
-export default CheckOut;
+export default Order;

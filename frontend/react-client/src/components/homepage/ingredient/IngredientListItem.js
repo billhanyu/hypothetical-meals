@@ -36,7 +36,7 @@ class IngredientListItem extends Component {
         <td>{Storage2State[ingredient.storage_name]}</td>
         <td>{ingredient.num_native_units+" "+ingredient.native_unit}</td>
         {
-          global.user_group == 'admin' &&
+          global.user_group == 'admin' && !this.props.order &&
           <td>
             <div className="btn-group" role="group" aria-label="Basic example">
               <button
@@ -55,6 +55,17 @@ class IngredientListItem extends Component {
               </button>
             </div>
           </td>
+        }
+        {
+          this.props.order &&
+            <td>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={e => {this.props.orderIngredient(this.props.idx);}}>
+              Order
+            </button>
+            </td>
         }
       </tr>
       <tr>
