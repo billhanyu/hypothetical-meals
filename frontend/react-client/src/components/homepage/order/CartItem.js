@@ -3,6 +3,9 @@ import React, { Component } from 'react';
 class CartItem extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      invalid: false,
+    };
     this.changeQuantity = this.changeQuantity.bind(this);
     this.remove = this.remove.bind(this);
   }
@@ -29,6 +32,7 @@ class CartItem extends Component {
         <td>
         <input
           type="number"
+          style={{'color': this.state.invalid ? "red" : "inherit"}}
           onChange={this.changeQuantity}
           value={this.props.item.quantity} 
         />

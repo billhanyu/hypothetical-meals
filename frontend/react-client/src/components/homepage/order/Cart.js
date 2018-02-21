@@ -84,7 +84,7 @@ class Cart extends Component {
           </tbody>
         </table>
         <div className="CartOrder" onClick={this.props.order}>
-          <span className="CartOrderText">Order</span>
+          <span className="CartOrderText">Choose Vendors</span>
         </div>
       </div>
     );
