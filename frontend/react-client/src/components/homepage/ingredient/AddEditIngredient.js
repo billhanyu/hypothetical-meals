@@ -132,7 +132,7 @@ class AddEditIngredient extends Component {
       this.reloadData();
     })
     .catch(err => {
-      alert('some error occurred');
+      alert(err.response.data);
     });
   }
 
@@ -235,7 +235,12 @@ class AddEditIngredient extends Component {
       })
       .catch(err => {
         console.log(err);
-        alert(err.response.data);
+        const msg = err.response.data;
+        if (msg == "ER_DUP_ENTRY") {
+          alert('A product with the same vendor code already exists.');
+        } else {
+          alert(msg);
+        }
       });
   }
 

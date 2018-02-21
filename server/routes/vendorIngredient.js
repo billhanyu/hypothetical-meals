@@ -158,17 +158,19 @@ function checkInputErrorAdd(item) {
   const vendorId = item['vendor_id'];
   const price = item['price'];
   if (!checkNumber.isPositiveInteger(ingredientId)
-    || !checkNumber.isPositiveInteger(vendorId)
-    || isNaN(price) || parseFloat(price) < 0) {
+    || !checkNumber.isPositiveInteger(vendorId)) {
     return 'Invalid input, check your property names and values.';
+  }
+  if (!parseFloat(price) || parseFloat(price) < 0) {
+    return 'Invalid price, has to be a nonnegative number.';
   }
   return null;
 }
 
 function checkInputErrorEdit(item) {
   const price = item['price'];
-  if (isNaN(price) || parseFloat(price) < 0) {
-    return 'Invalid input, check your property names and values.';
+  if (!parseFloat(price) || parseFloat(price) < 0) {
+    return 'Invalid price, has to be a nonnegative number.';
   }
   return null;
 }

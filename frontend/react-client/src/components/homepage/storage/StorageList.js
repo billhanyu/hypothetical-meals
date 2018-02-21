@@ -66,11 +66,7 @@ class StorageList extends Component {
     })
     .catch(err => {
       const message = err.response.data;
-      if (message.indexOf('smaller than')) {
-        alert(message);
-      } else {
-        alert('Some error occurred!');
-      }
+      alert(message);
     });
   }
 
@@ -101,9 +97,12 @@ class StorageList extends Component {
                       {
                         this.state.editIdx == idx
                           ?
-                          <input type="number" onChange={this.changeCapacity} value={this.state.editCapacity} />
+                          <div>
+                            <input type="number" onChange={this.changeCapacity} value={this.state.editCapacity} />
+                            <span>&nbsp;&nbsp;sqft</span>
+                          </div>
                           :
-                          storage.capacity
+                          storage.capacity + " sqft"
                       }
                     </td>
                     {
