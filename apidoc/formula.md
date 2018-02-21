@@ -18,10 +18,12 @@ res.body: [{
   'ingredients': {
     'ingredient1_name': {
         'id': 3,
+        'ingredient_id': 2,
         'num_native_units': 1,
         'formula_id': 1,
         'name': 'boop',
         'storage_id': 1,
+        'package_type': 'pail',
         'native_unit': 'kg',
         'removed': 0,
     }

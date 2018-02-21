@@ -1,6 +1,6 @@
 import * as checkParams from './common/checkParams';
 import User from '../models/User';
-import { handleError } from './common/customError';
+import { handleError, createError } from './common/customError';
 import success from './common/success';
 const passport = require('passport');
 
@@ -13,7 +13,7 @@ export function signupNoob(req, res, next) {
 }
 
 function signupUser(req, res, next, isAdmin) {
-  const error = checkParams.checkBlankParams(req.body.user, ['username', 'password']);
+  const error = checkParams.checkBlankParams(req.body.user, ['username', 'name', 'password']);
   if (error) return res.status(422).send(error);
 
   let regex = new RegExp('^([ \u00c0-\u01ffa-zA-Z\'\-])+$');
@@ -93,7 +93,7 @@ export function changePermission(req, res, next) {
   connection.query(`SELECT * FROM Users WHERE username = '${user.username}' AND oauth = ${user.oauth}`)
     .then(result => {
       if (result.length == 0) {
-        return res.status(400).send('User does not exist');
+        throw createError('User does not exist.');
       }
       return connection.query(`UPDATE Users SET user_group = '${user.permission}' WHERE id = ${result[0].id}`);
     })

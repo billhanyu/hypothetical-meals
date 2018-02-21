@@ -7,6 +7,13 @@ export function getNumPages(tableName) {
   });
 }
 
+export function getAvailableNumPages(tableName) {
+  return connection.query(`SELECT COUNT(id) FROM ${tableName} WHERE removed = 0`)
+    .then((data) => {
+      return { numPages: Math.ceil(data[0]['COUNT(id)'] / idsPerPage) };
+    });
+}
+
 export function queryWithPagination(pageNum, tableName, queryString) {
   const startId = (pageNum - 1) * idsPerPage + 1;
   const endId = pageNum * idsPerPage;
