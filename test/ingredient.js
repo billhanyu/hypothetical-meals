@@ -40,7 +40,7 @@ describe('Ingredient', () => {
 
     it('should only return one page of ingredients', (done) => {
       for (let i = 0; i < 52; i++) {
-        alasql(`INSERT INTO Ingredients (name, package_type, native_unit, storage_id) VALUES ('${i}', 'sack', 'pounds', 1)`);
+        alasql(`INSERT INTO Ingredients (name, package_type, native_unit, num_native_units, storage_id) VALUES ('${i}', 'sack', 'pounds', 1.1, 1)`);
       }
 
       chai.request(server)
@@ -50,21 +50,6 @@ describe('Ingredient', () => {
           res.should.have.status(200);
           res.body.should.be.a('array');
           res.body.length.should.be.eql(50);
-          done();
-        });
-    });
-  });
-
-  describe('#viewAvailable()', () => {
-    it('should return all ingredients available', (done) => {
-      alasql('UPDATE Ingredients SET removed = 1 WHERE id = 1');
-      chai.request(server)
-        .get('/ingredients-available/page/1')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.a('array');
-          res.body.length.should.be.eql(3);
           done();
         });
     });
@@ -98,12 +83,14 @@ describe('Ingredient', () => {
             'package_type': 'sail',
             'native_unit': 'kg',
             'storage_id': 1,
+            'num_native_units': 10,
           },
           {
             'name': 'rice',
             'package_type': 'truckload',
             'native_unit': 'g',
             'storage_id': 1,
+            'num_native_units': 15,
           },
         ],
       })
@@ -114,10 +101,12 @@ describe('Ingredient', () => {
         assert.strictEqual(changed[4]['package_type'], 'sail', 'Package type ingredient 4.');
         assert.strictEqual(changed[4]['native_unit'], 'kg', 'Native Unit for ingredient 4.');
         assert.strictEqual(changed[4]['storage_id'], 1, 'Storage id for ingredient 4.');
+        assert.strictEqual(changed[4]['num_native_units'], 10, 'Size for ingredient 4.');
         assert.strictEqual(changed[5]['name'], 'rice', 'Name for ingredient 5.');
         assert.strictEqual(changed[5]['package_type'], 'truckload', 'Package type ingredient 5.');
         assert.strictEqual(changed[5]['native_unit'], 'g', 'Native Unit for ingredient 5.');
         assert.strictEqual(changed[5]['storage_id'], 1, 'Storage id for ingredient 5.');
+        assert.strictEqual(changed[5]['num_native_units'], 15, 'Size for ingredient 5.');
         done();
       });
     });
@@ -201,7 +190,7 @@ describe('Ingredient', () => {
       });
     });
 
-    it('should modify the storage id, name, package_type and native unit of the ingredient', (done) => {
+    it('should modify the storage id, name, package_type, native unit and num_native_units of the ingredient', (done) => {
       const ingredients = alasql('SELECT * FROM Ingredients');
       ingredients[0].name = 'meow';
       ingredients[0].storage_id = '2';
@@ -209,6 +198,7 @@ describe('Ingredient', () => {
       ingredients[1].native_unit = 'handful';
       ingredients[2].name = 'pleb';
       ingredients[2].storage_id = '2';
+      ingredients[2].num_native_units = 100;
       chai.request(server)
       .put('/ingredients')
       .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -229,6 +219,7 @@ describe('Ingredient', () => {
         assert.strictEqual(changed[1]['native_unit'], 'handful', 'Native unit for ingredient 2.');
         assert.strictEqual(changed[2]['name'], 'pleb', 'Name for ingredient 3.');
         assert.strictEqual(changed[2]['storage_id'], 2, 'Storage id for ingredient 3.');
+        assert.strictEqual(changed[2]['num_native_units'], 100, 'Size for ingredient 3.');
         done();
       });
     });

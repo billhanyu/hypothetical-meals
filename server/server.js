@@ -71,16 +71,13 @@ app.post('/users/permission', beAdmin, user.changePermission);
 
 app.get('/vendors/pages', beNoob, vendor.pages);
 app.get('/vendors/page/:page_num', beNoob, vendor.view);
-app.get('/vendors-available/page/:page_num', beNoob, vendor.viewAvailable);
 app.post('/vendors', beAdmin, vendor.addVendors);
 app.put('/vendors', beAdmin, vendor.modifyVendors);
 app.delete('/vendors', beAdmin, vendor.deleteVendors);
 app.get('/vendors/code', beAdmin, vendor.getVendorWithCode);
 
-app.get('/ingredients-available', beNoob, ingredient.allAvailable);
 app.get('/ingredients/pages', beNoob, ingredient.pages);
 app.get('/ingredients/page/:page_num', beNoob, ingredient.view);
-app.get('/ingredients-available/page/:page_num', beNoob, ingredient.viewAvailable);
 app.post('/ingredients', beAdmin, ingredient.addIngredient);
 app.put('/ingredients', beAdmin, ingredient.modifyIngredient);
 app.delete('/ingredients', beAdmin, ingredient.deleteIngredient);
@@ -110,6 +107,7 @@ app.get('/spendinglogs/:ingredient_id', beNoob, spendinglog.logsForIngredient);
 app.get('/inventory', beNoob, inventory.all);
 app.get('/inventory/pages', beNoob, inventory.pages);
 app.get('/inventory/page/:page_num', beNoob, inventory.view);
+app.get('/inventory/stock', beManager, inventory.getStock);
 app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
 app.put('/inventory', beNoob, inventory.commitCart);
 

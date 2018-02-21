@@ -64,7 +64,7 @@ class RegistrationContainer extends Component {
         <RegistrationHeader HeaderText='Account Creation' HeaderIcon='fas fa-user fa-2x' />
 
         <RegistrationInput inputClass="RegistrationInput" placeholderText="Full Name" onKeyPress={this.keyPress} onChange={this.handleInputChange} id="name" />
-        <div className="RegistrationInfoText">* (Optional) User's full name</div>
+        <div className="RegistrationInfoText">* User's full name</div>
         <RegistrationInput inputClass="RegistrationInput" placeholderText="Username" onKeyPress={this.keyPress} onChange={this.handleInputChange} id="email" />
         <div className="RegistrationInfoText">* Used to login after registration</div>
         <RegistrationInput inputType="password" inputClass="RegistrationInput" placeholderText="Password" onChange={this.handleInputChange} onKeyPress={this.keyPress} id="password" />
