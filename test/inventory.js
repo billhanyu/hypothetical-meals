@@ -25,7 +25,7 @@ describe('Inventory', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(3);
+          res.body.length.should.be.eql(4);
           done();
         });
     });
@@ -75,15 +75,16 @@ describe('Inventory', () => {
       chai.request(server)
         .get('/inventory/stock')
         .send({
-          ids: [1, 2, 4],
+          ids: [1, 2, 4, 5],
         })
         .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
-          Object.keys(res.body).length.should.be.eql(2);
+          Object.keys(res.body).length.should.be.eql(3);
           const stock = res.body;
           assert.strictEqual(stock['1'].num_packages, 10, 'ingredient 1 stock');
           assert.strictEqual(stock['2'].num_packages, 20, 'ingredient 2 stock');
+          assert.strictEqual(stock['4'].num_packages, 20, 'ingredient 4 stock');
           done();
         });
     });
@@ -97,7 +98,7 @@ describe('Inventory', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(3);
+          res.body.length.should.be.eql(4);
           done();
         });
     });
@@ -159,11 +160,13 @@ describe('Inventory', () => {
         .end((err, res) => {
           res.should.have.status(200);
           const changed = alasql('SELECT * FROM Inventories');
-          changed.length.should.be.eql(2);
+          changed.length.should.be.eql(3);
           assert.strictEqual(changed[0].id, 2, 'Inventory item 2 left.');
           assert.strictEqual(changed[0].num_packages, 20, 'Inventory item 2 new number of packages.');
           assert.strictEqual(changed[1].id, 3, 'Inventory item 3 left.');
           assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 3 new number of packages.');
+          assert.strictEqual(changed[2].id, 4, 'Inventory item 4 left.');
+          assert.strictEqual(changed[2].num_packages, 20, 'Inventory item 4 new number of packages.');
           done();
         });
     });
@@ -247,20 +250,22 @@ describe('Inventory', () => {
     it('should reduce inventory quantities with valid request', (done) => {
       chai.request(server)
         .put('/inventory')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .send({
-          'cart': {
-            '1': 1,
-            '2': 1,
-          },
+          'formula_id': 1,
+          'num_products': 1,
         })
         .end((err, res) => {
           res.should.have.status(200);
           const changed = alasql('SELECT * FROM Inventories');
           assert.strictEqual(changed[0].id, 1, 'Inventory item 1 left.');
-          assert.strictEqual(changed[0].num_packages, 9, 'Inventory item 1 new number of packages.');
+          assert.strictEqual(changed[0].num_packages, 10, 'Inventory item 1 new number of packages.');
           assert.strictEqual(changed[1].id, 2, 'Inventory item 2 left.');
-          assert.strictEqual(changed[1].num_packages, 19, 'Inventory item 2 new number of packages.');
+          assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 2 new number of packages.');
+          assert.strictEqual(changed[2].id, 3, 'Inventory item 3 left.');
+          assert.strictEqual(changed[2].num_packages, 19.95, 'Inventory item 3 new number of packages.');
+          assert.strictEqual(changed[3].id, 4, 'Inventory item 4 left.');
+          assert.strictEqual(changed[3].num_packages, 19.96, 'Inventory item 4 new number of packages.');
           done();
         });
     });
@@ -268,39 +273,18 @@ describe('Inventory', () => {
     it('should update spendinglog valid request', (done) => {
       chai.request(server)
         .put('/inventory')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .send({
-          'cart': {
-            '1': 1,
-          },
+          'formula_id': 1,
+          'num_products': 1,
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const spending = alasql('SELECT * FROM SpendingLogs WHERE id = 1');
-          assert.strictEqual(spending[0].id, 1, 'spendinglog 1');
-          assert.strictEqual(spending[0].consumed, 550, 'spendinglog 1 consumed cost');
-          done();
-        });
-    });
-
-    it('should update spendinglog valid request multiple ingredients', (done) => {
-      alasql('INSERT INTO SpendingLogs (2, 2, 100000, 90000, 50)');
-      chai.request(server)
-        .put('/inventory')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
-        .send({
-          'cart': {
-            '1': 1,
-            '2': 1,
-          },
-        })
-        .end((err, res) => {
-          res.should.have.status(200);
-          const spending = alasql('SELECT * FROM SpendingLogs');
-          assert.strictEqual(spending[0].id, 1, 'spendinglog 1');
-          assert.strictEqual(spending[0].consumed, 550, 'spendinglog 1 consumed cost');
-          assert.strictEqual(spending[1].id, 2, 'spendinglog 2');
-          assert.strictEqual(spending[1].consumed, 45050, 'spendinglog 2 consumed cost');
+          const spending = alasql('SELECT * FROM SpendingLogs WHERE id IN (3, 4)');
+          assert.strictEqual(spending[0].id, 3, 'spendinglog for ingredient 3');
+          assert.strictEqual(spending[0].consumed, 60, 'spendinglog 3 consumed cost');
+          assert.strictEqual(spending[1].id, 4, 'spendinglog for ingredient 3');
+          assert.strictEqual(spending[1].consumed, 70, 'spendinglog 4 consumed cost');
           done();
         });
     });
@@ -308,21 +292,21 @@ describe('Inventory', () => {
     it('should delete from inventory when quantity is zero', (done) => {
       chai.request(server)
         .put('/inventory')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .send({
-          'cart': {
-            '1': 10,
-            '2': 2,
-          },
+          'formula_id': 1,
+          'num_products': 400,
         })
         .end((err, res) => {
           res.should.have.status(200);
           const changed = alasql('SELECT * FROM Inventories');
-          changed.length.should.be.eql(2);
-          assert.strictEqual(changed[0].id, 2, 'Inventory item 2 left.');
-          assert.strictEqual(changed[0].num_packages, 18, 'Inventory item 2 number packages left.');
-          assert.strictEqual(changed[1].id, 3, 'Inventory item 3 left.');
-          assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 3 number packages left.');
+          changed.length.should.be.eql(3);
+          assert.strictEqual(changed[0].id, 1, 'Inventory item 2 left.');
+          assert.strictEqual(changed[0].num_packages, 10, 'Inventory item 1 number packages left.');
+          assert.strictEqual(changed[1].id, 2, 'Inventory item 3 left.');
+          assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 2 number packages left.');
+          assert.strictEqual(changed[2].id, 4, 'Inventory item 4 left.');
+          assert.strictEqual(changed[2].num_packages, 4, 'Inventory item 4 number packages left.');
           done();
         });
     });
@@ -330,12 +314,10 @@ describe('Inventory', () => {
     it('should decline requests too large', (done) => {
       chai.request(server)
         .put('/inventory')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .send({
-          'cart': {
-            '1': 999,
-            '2': 99,
-          },
+          'formula_id': 1,
+          'num_products': 10000000,
         })
         .end((err, res) => {
           res.should.have.status(400);
@@ -344,14 +326,15 @@ describe('Inventory', () => {
     });
 
     it('should decline item not in inventory', (done) => {
+      alasql('INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units) VALUES (5, "eric\'s dick", "sack", 2, "g", 50)');
+      alasql('INSERT INTO Formulas (id, name, description, num_product) VALUES (3, "eric\'s shit", "just shit", 10)');
+      alasql('INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (1, 5, 1, 3)');
       chai.request(server)
         .put('/inventory')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .send({
-          'cart': {
-            '100': 1,
-            '2': 1,
-          },
+          'formula_id': 3,
+          'num_products': 1,
         })
         .end((err, res) => {
           res.should.have.status(400);
@@ -362,12 +345,10 @@ describe('Inventory', () => {
     it('should decline invalid numbers', (done) => {
       chai.request(server)
         .put('/inventory')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .send({
-          'cart': {
-            '1a': 999,
-            '2': 99,
-          },
+          'formula_id': '3a;',
+          'num_products': 1,
         })
         .end((err, res) => {
           res.should.have.status(400);
@@ -375,13 +356,25 @@ describe('Inventory', () => {
         });
     });
 
-    it('should decline empty cart object', (done) => {
+    it('should decline empty formula id', (done) => {
       chai.request(server)
         .put('/inventory')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .send({
-          'cart': {
-          },
+          'num_products': 1,
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should decline empty num products', (done) => {
+      chai.request(server)
+        .put('/inventory')
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
+        .send({
+          'formula_id': 1,
         })
         .end((err, res) => {
           res.should.have.status(400);

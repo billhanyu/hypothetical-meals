@@ -3,7 +3,7 @@ import { createError, handleError } from './common/customError';
 import success from './common/success';
 import { fakeDeleteMultipleVendorIngredients } from './vendorIngredient';
 import { getAvailableNumPages, queryWithPagination } from './common/pagination';
-import { getWeight, ignoreWeights } from './common/packageUtilies';
+import { getSpace } from './common/packageUtilies';
 import { validStorageTypes } from './common/storageUtilities';
 
 const fs = require('fs');
@@ -285,7 +285,7 @@ function checkSufficientStorage(storages, entries, backup) {
     for (let entry of entries) {
       const storageEntry = storages.find(storage => storage.name.toLowerCase() == entry.temperature.toLowerCase());
       if (!storageEntry) reject(createError(`Storage type is nonexistant in database: ${temperature}.`));
-      if (ignoreWeights.indexOf(entry.package) < 0) sums[storageEntry.id] += parseInt(entry.amount);
+      sums[storageEntry.id] += parseInt(entry.amount);
     }
 
     // Add already existing inventory to sums
@@ -295,9 +295,7 @@ function checkSufficientStorage(storages, entries, backup) {
                                   ON Inventories.ingredient_id = Ingredients.id`)
     .then(items => {
       items.forEach(item => {
-        if (ignoreWeights.indexOf(item.package_type) < 0) {
-          sums[item.storage_id] += getWeight(item.package_type) * item.num_packages;
-        }
+        sums[item.storage_id] += getSpace(item.package_type) * item.num_packages;
       });
       for (let id of Object.keys(sums)) {
         if (sums[id] > capacities[id]) {
@@ -328,7 +326,7 @@ function checkForBulkImportFormattingErrors(data) {
     }
     // Ensure valid package type
     try {
-      getWeight(data[i][1].toLowerCase());
+      getSpace(data[i][1].toLowerCase());
     } catch (error) {
       return `Invalid package type: ${data[i][1]}`;
     }

@@ -27,7 +27,7 @@ describe('SpendingLog', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(1);
+          res.body.length.should.be.eql(4);
           assert.strictEqual(res.body[0]['consumed'], 50, 'consumed cost');
           done();
         });
@@ -50,7 +50,8 @@ describe('SpendingLog', () => {
   });
 
   describe('#updateLogForIngredient()', () => {
-    it('should update the spending log for ingredients', function() {
+    it('should update the spending log for ingredients', done => {
+      alasql('DELETE FROM SpendingLogs WHERE id = 2');
       const request = {
         '1': {
           'total_weight': 100,
@@ -61,17 +62,18 @@ describe('SpendingLog', () => {
           'cost': 30,
           },
       };
-      Promise.resolve(updateLogForIngredient(request))
+      updateLogForIngredient(request)
       .then(() => {
         const spendingLogs = alasql('SELECT * FROM SpendingLogs');
-        assert.strictEqual(spendingLogs.length, 2, 'New length of spending logs');
+        assert.strictEqual(spendingLogs.length, 4, 'New length of spending logs');
         assert.strictEqual(spendingLogs[0]['total'], 5010, 'Total spent on ingredient with id 1.');
         assert.strictEqual(spendingLogs[0]['total_weight'], 600, 'Total weight for ingredient 1.');
-        assert.strictEqual(spendingLogs[1]['total'], 30, 'Total spent on ingredient with id 2.');
-        assert.strictEqual(spendingLogs[1]['total_weight'], 50, 'Total weight for ingredient 2.');
+        assert.strictEqual(spendingLogs[3]['total'], 30, 'Total spent on ingredient with id 2.');
+        assert.strictEqual(spendingLogs[3]['total_weight'], 50, 'Total weight for ingredient 2.');
+        done();
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(err => {
+        throw err;
       });
     });
   });
