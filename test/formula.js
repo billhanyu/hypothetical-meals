@@ -5,7 +5,7 @@ const assert = require('chai').assert;
 const testTokens = require('./testTokens');
 
 describe('Formulas', () => {
-    describe('#view()', () => {
+    describe('#viewAll()', () => {
         it('should return all formulas', (done) => {
             chai.request(server)
                 .get('/formulas')
@@ -390,6 +390,100 @@ describe('Formulas', () => {
                                 },
                             ],
                         },
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    done();
+                });
+        });
+    });
+
+    describe('#delete', () => {
+        beforeEach(() => {
+            alasql('SOURCE "./server/create_database.sql"');
+            alasql('SOURCE "./server/sample_data.sql"');
+        });
+
+        it('should delete two formulas', (done) => {
+            chai.request(server)
+                .delete('/formulas')
+                .set('Authorization', `Token ${testTokens.adminTestToken}`)
+                .send({
+                    'formulas': [
+                        1,
+                        2,
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    const formulas = alasql(`SELECT * FROM Formulas`);
+                    assert.strictEqual(formulas.length, 0, 'Should have deleted all formulas');
+                    const formulaEntries = alasql(`SELECT * FROM FormulaEntries`);
+                    assert.strictEqual(formulaEntries.length, 0, 'Should have deleted all formula entries');
+                    done();
+                });
+        });
+
+        it('should delete one formula', (done) => {
+            chai.request(server)
+                .delete('/formulas')
+                .set('Authorization', `Token ${testTokens.adminTestToken}`)
+                .send({
+                    'formulas': [
+                        1,
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    const formulas = alasql(`SELECT * FROM Formulas`);
+                    assert.strictEqual(formulas.length, 1, 'Should have deleted one formula');
+                    const formulaEntries = alasql(`SELECT * FROM FormulaEntries`);
+                    assert.strictEqual(formulaEntries.length, 2, 'Should have deleted all formula entries');
+                    formulaEntries.forEach(element => {
+                        assert.strictEqual(element.formula_id, 2, 'Should not be equal to deleted formula id');
+                    });
+                    done();
+                });
+        });
+
+        it('should reject delete for invalid formula id', (done) => {
+            chai.request(server)
+                .delete('/formulas')
+                .set('Authorization', `Token ${testTokens.adminTestToken}`)
+                .send({
+                    'formulas': [
+                        112,
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    done();
+                });
+        });
+
+        it('should reject delete for manager', (done) => {
+            chai.request(server)
+                .delete('/formulas')
+                .set('Authorization', `Token ${testTokens.managerTestToken}`)
+                .send({
+                    'formulas': [
+                        2,
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    done();
+                });
+        });
+
+        it('should reject delete for noob', (done) => {
+            chai.request(server)
+                .delete('/formulas')
+                .set('Authorization', `Token ${testTokens.noobTestToken}`)
+                .send({
+                    'formulas': [
+                        2,
                     ],
                 })
                 .end((err, res) => {
