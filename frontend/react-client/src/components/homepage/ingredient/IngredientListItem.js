@@ -63,7 +63,7 @@ class IngredientListItem extends Component {
               type="button"
               className="btn btn-primary"
               onClick={e => {this.props.orderIngredient(this.props.idx);}}>
-              Order
+              Add To Cart
             </button>
             </td>
         }
