@@ -1,7 +1,7 @@
 import { createError, handleError } from './common/customError';
 import success from './common/success';
 import { updateDatabaseHelper } from './common/updateUtilities';
-import { getPaginationQueryString } from './common/pagination';
+import { getPaginationQueryString, getNumPages } from './common/pagination';
 
 
 const formulaQueryString = 'SELECT * FROM Formulas';

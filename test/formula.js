@@ -5,6 +5,55 @@ const assert = require('chai').assert;
 const testTokens = require('./testTokens');
 
 describe('Formulas', () => {
+    describe('#pages()', () => {
+        it('should return number of pages of data', (done) => {
+          chai.request(server)
+            .get('/formulas/pages')
+            .set('Authorization', `Token ${testTokens.noobTestToken}`)
+            .end((err, res) => {
+              res.should.have.status(200);
+              res.body.should.be.a('object');
+              assert.strictEqual(res.body['numPages'], 1, 'number of pages');
+              done();
+            });
+        });
+      });
+
+    describe('#view()', () => {
+        beforeEach(() => {
+            alasql('SOURCE "./server/create_database.sql"');
+            alasql('SOURCE "./server/sample_data.sql"');
+        });
+
+        it('should return all formulas', (done) => {
+            chai.request(server)
+                .get('/formulas/page/1')
+                .set('Authorization', `Token ${testTokens.noobTestToken}`)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('array');
+                    res.body.length.should.be.eql(2);
+                    done();
+                });
+        });
+
+        it('should only return one page of formulas', (done) => {
+            for (let i = 0; i < 52; i++) {
+                alasql(`INSERT INTO Formulas (name, description, num_product) VALUES ('bleh${i}', 'bleh', 15)`);
+            }
+
+            chai.request(server)
+                .get('/formulas/page/1')
+                .set('Authorization', `Token ${testTokens.noobTestToken}`)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('array');
+                    res.body.length.should.be.eql(50);
+                    done();
+                });
+        });
+    });
+
     describe('#viewAll()', () => {
         it('should return all formulas', (done) => {
             chai.request(server)
@@ -399,7 +448,7 @@ describe('Formulas', () => {
         });
     });
 
-    describe('#delete', () => {
+    describe('#deleteFormulas()', () => {
         beforeEach(() => {
             alasql('SOURCE "./server/create_database.sql"');
             alasql('SOURCE "./server/sample_data.sql"');
