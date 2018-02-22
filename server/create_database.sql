@@ -47,6 +47,7 @@ CREATE TABLE Ingredients(
 	package_type enum('sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar') not null,
 	storage_id int not null,
 	native_unit varchar(70) not null,
+	num_native_units double not null,
 	removed BIT DEFAULT 0,
 
 	FOREIGN KEY (storage_id) REFERENCES Storages(id),
@@ -56,7 +57,6 @@ CREATE TABLE Ingredients(
 CREATE TABLE VendorsIngredients(
 	id int not null AUTO_INCREMENT,
 	ingredient_id int not null,
-	num_native_units double not null,
 	price double not null,
 	vendor_id int not null,
 	removed BIT DEFAULT 0,

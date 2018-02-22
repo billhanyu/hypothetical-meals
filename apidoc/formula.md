@@ -24,6 +24,7 @@ res.body: [{
         'name': 'boop',
         'package_type': 'blah',
         'storage_id': 1,
+        'package_type': 'pail',
         'native_unit': 'kg',
         'removed': 0,
     }

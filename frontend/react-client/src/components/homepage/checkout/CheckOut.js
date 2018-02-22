@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import ViewInventory from '../inventory/ViewInventory';
-import Cart from './Cart';
 import axios from 'axios';
 
 class CheckOut extends Component {
@@ -88,13 +87,6 @@ class CheckOut extends Component {
           ref={e => {this.viewInventory = e;}}
           mode="cart"
           onClickInventoryItem={this.onClickInventoryItem}
-        />
-        <Cart
-          ref={e => {this.cart = e;}}
-          cart={this.state.cart}
-          checkout={this.checkout}
-          setQuantity={this.setQuantity}
-          removeItem={this.removeInventoryItem}
         />
       </div>
     );

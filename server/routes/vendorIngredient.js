@@ -58,16 +58,15 @@ export function addVendorIngredients(req, res, next) {
     const item = items[i];
     const ingredientId = item['ingredient_id'];
     const vendorId = item['vendor_id'];
-    const numNativeUnits = item['num_native_units'];
     const price = item['price'];
     const err = checkInputErrorAdd(item);
     if (err) {
       return res.status(400).send(err);
     }
 
-    values.push(`(${ingredientId}, ${vendorId}, ${numNativeUnits}, ${price})`);
+    values.push(`(${ingredientId}, ${vendorId}, ${price})`);
   }
-  connection.query(`INSERT INTO VendorsIngredients (ingredient_id, vendor_id, num_native_units, price) VALUES ${values.join(', ')}`)
+  connection.query(`INSERT INTO VendorsIngredients (ingredient_id, vendor_id, price) VALUES ${values.join(', ')}`)
   .then(() => success(res))
   .catch(err => handleError(err, res));
 }
@@ -107,8 +106,7 @@ export function modifyVendorIngredients(req, res, next) {
       const cases = getCases(olds, items);
       return connection.query(
         `UPDATE VendorsIngredients
-          SET price = (case ${cases.prices.join(' ')} end),
-              num_native_units = (case ${cases.numNativeUnits.join(' ')} end)
+          SET price = (case ${cases.prices.join(' ')} end)
           WHERE id IN (${ids.join(', ')})`);
     })
     .then(() => success(res))
@@ -143,42 +141,36 @@ export function fakeDeleteMultipleVendorIngredients(ids) {
 
 function getCases(olds, items) {
   const prices = [];
-  const numNativeUnitsArr = [];
   for (let i = 0; i < olds.length; i++) {
     const old = olds[i];
     const id = old['ingredient_id'];
     const change = items[id];
     const price = change['price'];
-    const numNativeUnits = change['num_native_units'];
     prices.push(`when id = ${id} then ${price}`);
-    numNativeUnitsArr.push(`when id = ${id} then ${numNativeUnits}`);
   }
   return {
     prices,
-    numNativeUnits: numNativeUnitsArr,
   };
 }
 
 function checkInputErrorAdd(item) {
   const ingredientId = item['ingredient_id'];
   const vendorId = item['vendor_id'];
-  const numNativeUnits = item['num_native_units'];
   const price = item['price'];
   if (!checkNumber.isPositiveInteger(ingredientId)
-    || !checkNumber.isPositiveInteger(vendorId)
-    || isNaN(price) || parseFloat(price) < 0
-    || isNaN(numNativeUnits) || parseFloat(numNativeUnits) < 0) {
+    || !checkNumber.isPositiveInteger(vendorId)) {
     return 'Invalid input, check your property names and values.';
+  }
+  if (!parseFloat(price) || parseFloat(price) < 0) {
+    return 'Invalid price, has to be a nonnegative number.';
   }
   return null;
 }
 
 function checkInputErrorEdit(item) {
-  const numNativeUnits = item['num_native_units'];
   const price = item['price'];
-  if (isNaN(price) || parseFloat(price) < 0
-    || isNaN(numNativeUnits) || parseFloat(numNativeUnits) < 0) {
-    return 'Invalid input, check your property names and values.';
+  if (!parseFloat(price) || parseFloat(price) < 0) {
+    return 'Invalid price, has to be a nonnegative number.';
   }
   return null;
 }

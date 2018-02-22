@@ -48,13 +48,15 @@ function orderHelper(orders, req, res, next) {
     })
     .then((inventoryResults) => {
         let updateIngredients = {};
+        let updateIngredientIds = [];
         inventoryResults.forEach(x => {
             const myIngredientId = x.ingredient_id;
             const myVendorIngredientId = ingredientsMap[myIngredientId]['vendor_ingredient_id'];
             updateIngredients[x.id] = orders[myVendorIngredientId] + x.num_packages;
+            updateIngredientIds.push(x.ingredient_id);
         });
         for (let ingredientId of ingredientIds) {
-            if (!(ingredientId in updateIngredients)) {
+            if (updateIngredientIds.indexOf(ingredientId) < 0) {
                 const storageKey = ingredientsMap[ingredientId]['storage_id'];
                 newIngredientCases.push(`(${ingredientId}, ${ingredientsMap[ingredientId]['quantity']})`);
                 let itemPackage = ingredientsMap[ingredientId]['package_type'];

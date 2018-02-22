@@ -1,7 +1,6 @@
 export function checkBlankParams(obj, params) {
   let blankParams = [];
   for (let param of params) {
-    console.log(param);
     if (!obj || !obj[param]) {
       blankParams.push(param.charAt(0).toUpperCase() + param.slice(1));
     }
