@@ -26,6 +26,8 @@ All columns in VendorsIngredients table AND
 - Ingredients.name as ingredient_name
 - Ingredients.storage_id as ingredient_storage_id
 - Ingredients.removed as ingredient_removed
+- Ingredients.package_type as ingredient_package_type
+- Ingredients.native_unit as ingredient_native_unit
 
 {% endmethod %}
 
@@ -52,7 +54,7 @@ No parameter required.
 
 Add vendorsingredients.
 
-When there is already a row in the database with the same ingredient_id, vendor_id and package_type, the whole request fails with a status code 400.
+When there is already a row in the database with the same ingredient_id and vendor_id, the whole request fails with a status code 400.
 
 If you want to modify the price, use the modify `PUT` API instead.
 
@@ -62,14 +64,12 @@ request.body.vendoringredients = [
   {
     'ingredient_id': 1,
     'vendor_id': 1,
-    'package_type': 'sack',
-    'price': 100,
+    'price': 100.1,
   },
   {
     'ingredient_id': 2,
     'vendor_id': 2,
-    'package_type': 'truckload',
-    'price': 200,
+    'price': 200.5,
   },
 ];
 ```
@@ -78,19 +78,20 @@ request.body.vendoringredients = [
 {% method %}
 ## PUT '/vendoringredients'
 
-Modify the price or package type of multiple vendoringredients.
+Modify the price or native_units of multiple vendoringredients.
 
-you can modify either the price or the package type, or both, but make sure every object in the array modifies at least one of them.
+you can modify the price or num_native_units.
+
+**Send in the whole objects with fields modified. Ingredient_id or vendor_id changes will be ignored.**
 
 {% sample lang="js" %}
 ```js
 request.body.vendoringredients = {
   '1': {
     'price': 100,
-    'package_type': 'truckload',
   },
   '2': {
-    'package_type': 'sack'
+    'price': 500,
   },
 };
 ```

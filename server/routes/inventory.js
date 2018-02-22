@@ -5,7 +5,7 @@ import { getNumPages, queryWithPagination } from './common/pagination';
 import success from './common/success';
 import { updateConsumedSpendingLogForCart } from './spendinglog';
 
-const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
+const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.package_type as ingredient_package_type, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
 
 export function all(req, res, next) {
   connection.query(basicViewQueryString)
@@ -25,6 +25,32 @@ export function pages(req, res, next) {
 export function view(req, res, next) {
   queryWithPagination(req.params.page_num, 'Inventories', basicViewQueryString)
     .then(results => res.status(200).send(results))
+    .catch(err => handleError(err, res));
+}
+
+/* request body format:
+ * req.body.ids = [
+ *   1, 2, 3
+ * ]
+ */
+export function getStock(req, res, next) {
+  const ids = req.body.ids;
+  if (!ids || ids.length == 0) {
+    return res.status(400).send('No ingredient queried');
+  }
+  for (let id of ids) {
+    if (!checkNumber.isPositiveInteger(id)) {
+      return res.status(400).send('Invalid ingredient id');
+    }
+  }
+  const stock = {};
+  connection.query(`${basicViewQueryString} WHERE Ingredients.id IN (${ids.join(', ')})`)
+    .then(results => {
+      for (let result of results) {
+        stock[result.id] = result;
+      }
+      return res.json(stock);
+    })
     .catch(err => handleError(err, res));
 }
 
@@ -65,7 +91,11 @@ export function commitCart(req, res, next) {
     checkChangesProperties(cart);
     const ids = Object.keys(cart);
     let cartItems;
-    connection.query(`SELECT * FROM Inventories WHERE id IN (${ids.join(', ')})`)
+    connection.query(`SELECT Inventories.*, Ingredients.package_type
+      FROM Inventories
+      INNER JOIN Ingredients
+      ON Inventories.ingredient_id = Ingredients.id
+      WHERE Inventories.id IN (${ids.join(', ')})`)
       .then(results => {
         if (results.length < ids.length) {
           throw createError('Some inventory id not in database.');
@@ -161,7 +191,7 @@ export function checkStorageCapacityPromise(backup) {
           sums[storage.id] = 0;
           capacities[storage.id] = storage.capacity;
         }
-        return connection.query(`SELECT Inventories.package_type, Inventories.num_packages, Ingredients.storage_id
+        return connection.query(`SELECT Inventories.num_packages, Ingredients.storage_id, Ingredients.package_type
                                   FROM Inventories
                                   INNER JOIN Ingredients
                                   ON Inventories.ingredient_id = Ingredients.id`);
