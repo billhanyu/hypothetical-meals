@@ -2,10 +2,10 @@ import * as checkNumber from './common/checkNumber';
 import { handleError } from './common/customError';
 import success from './common/success';
 import { fakeDeleteMultipleVendorIngredients } from './vendorIngredient';
-import { getNumPages, queryWithPagination } from './common/pagination';
+import { getAvailableNumPages, queryWithPagination } from './common/pagination';
 
 export function pages(req, res, next) {
-  getNumPages('Vendors')
+  getAvailableNumPages('Vendors')
     .then(results => res.status(200).send(results))
     .catch(err => {
       console.error(err);
@@ -14,7 +14,7 @@ export function pages(req, res, next) {
 }
 
 export function view(req, res, next) {
-  queryWithPagination(req.params.page_num, 'Vendors', 'SELECT * FROM Vendors')
+  queryWithPagination(req.params.page_num, 'Vendors', 'SELECT * FROM Vendors WHERE removed = 0')
     .then(results => res.status(200).send(results))
     .catch(err => {
       console.error(err);
@@ -22,13 +22,22 @@ export function view(req, res, next) {
     });
 }
 
-export function viewAvailable(req, res, next) {
-  queryWithPagination(req.params.page_num, 'Vendors', 'SELECT * FROM Vendors WHERE removed = 0')
-    .then(results => res.status(200).send(results))
-    .catch(err => {
-      console.error(err);
-      return res.status(500).send('Database error');
-    });
+// req.query.code
+export function getVendorWithCode(req, res, next) {
+  if (!req.query.code) {
+    return res.status(400).send('No code provided');
+  }
+  connection.query(`SELECT * FROM Vendors WHERE code = '${req.query.code}'`)
+  .then(results => {
+    if (results.length > 0) {
+      return res.status(200).send(results[0]);
+    }
+    return res.status(404).send('Vendor Not Found');
+  })
+  .catch(err => {
+    console.error(err);
+    return res.status(500).send('Database error');
+  });
 }
 
 /* req.body.vendors = [
@@ -64,6 +73,9 @@ export function addVendors(req, res, next) {
   connection.query(`INSERT INTO Vendors (name, contact, code) VALUES ${values.join(', ')}`)
     .then(() => success(res))
     .catch(err => {
+      if (err.code == 'ER_DUP_ENTRY') {
+        return res.status(400).send('Duplicate code with other vendor');
+      }
       handleError(err, res);
     });
 }
@@ -121,6 +133,9 @@ export function modifyVendors(req, res, next) {
       })
       .then(() => success(res))
       .catch(err => {
+        if (err.code == 'ER_DUP_ENTRY') {
+          return res.status(400).send('Duplicate code with other vendor');
+        }
         handleError(err, res);
       });
 }

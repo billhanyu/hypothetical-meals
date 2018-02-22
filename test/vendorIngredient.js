@@ -95,25 +95,6 @@ describe('VendorIngredient', () => {
         });
     });
 
-    it('should reject request with incomplete fields', (done) => {
-      chai.request(server)
-        .post('/vendoringredients')
-        .set('Authorization', `Token ${testTokens.adminTestToken}`)
-        .send({
-          'vendoringredients': [
-            {
-              'ingredient_id': 1,
-              'vendor_id': 2,
-              'price': 100,
-            },
-          ],
-        })
-        .end((err, res) => {
-          res.should.have.status(400);
-          done();
-        });
-    });
-
     it('should reject vendoringredient already existing', (done) => {
       chai.request(server)
         .post('/vendoringredients')
@@ -123,13 +104,31 @@ describe('VendorIngredient', () => {
             {
               'ingredient_id': 1,
               'vendor_id': 1,
-              'package_type': 'sack',
               'price': 100,
             },
           ],
         })
         .end((err, res) => {
-          res.should.have.status(400);
+          res.should.have.status(500); // check error code
+          done();
+        });
+    });
+
+    it('should reject vendoringredient with invalid price', (done) => {
+      chai.request(server)
+        .post('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'vendoringredients': [
+            {
+              'ingredient_id': 1,
+              'vendor_id': 1,
+              'price': '',
+            },
+          ],
+        })
+        .end((err, res) => {
+          res.should.have.status(400); // check error code
           done();
         });
     });
@@ -143,13 +142,11 @@ describe('VendorIngredient', () => {
             {
               'ingredient_id': 1,
               'vendor_id': 2,
-              'package_type': 'sack',
               'price': 100,
             },
             {
               'ingredient_id': 2,
               'vendor_id': 1,
-              'package_type': 'sack',
               'price': 100,
             },
           ],
@@ -168,16 +165,12 @@ describe('VendorIngredient', () => {
           'vendoringredients': [
             {
               'ingredient_id': 4,
-              'vendor_id': 2,
-              'package_type': 'truckload',
-              'num_native_units': 10.8,
-              'price': 100,
+              'vendor_id': 1,
+              'price': 100.1,
             },
             {
               'ingredient_id': 3,
-              'vendor_id': 1,
-              'package_type': 'sack',
-              'num_native_units': 40,
+              'vendor_id': 2,
               'price': 100,
             },
           ],
@@ -233,10 +226,10 @@ describe('VendorIngredient', () => {
         .send({
           'vendoringredients': {
             '1': {
-              'price': 100,
+              'price': 999,
             },
             '100': {
-              'price': 100,
+              'price': 99,
             },
           },
         })
@@ -254,7 +247,6 @@ describe('VendorIngredient', () => {
           'vendoringredients': {
             '1': {
               'price': 999,
-              'package_type': 'truckload',
             },
             '2': {
               'price': 99,
@@ -267,6 +259,40 @@ describe('VendorIngredient', () => {
         });
     });
 
+    it('should fail negative price', (done) => {
+      chai.request(server)
+        .put('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'vendoringredients': {
+            '1': {
+              'price': -1,
+            },
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should fail invalid price', (done) => {
+      chai.request(server)
+        .put('/vendoringredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'vendoringredients': {
+            '1': {
+              'price': '',
+            },
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
     it('should modify vendoringredients with valid requests', (done) => {
       chai.request(server)
         .put('/vendoringredients')
@@ -275,13 +301,12 @@ describe('VendorIngredient', () => {
           'vendoringredients': {
             '1': {
               'price': 999,
-              'package_type': 'truckload',
             },
             '2': {
               'price': 99,
             },
             '3': {
-              'num_native_units': 1129,
+              'price': 30,
             },
           },
         })
@@ -289,9 +314,7 @@ describe('VendorIngredient', () => {
           res.should.have.status(200);
           const changed = alasql('SELECT * FROM VendorsIngredients WHERE id IN (1, 2, 3)');
           assert.equal(changed[0]['price'], 999, 'price for id 1');
-          assert.strictEqual(changed[0]['package_type'], 'truckload', 'package_type for id 1');
           assert.equal(changed[1]['price'], 99, 'price for id 2');
-          assert.equal(changed[2]['num_native_units'], 1129, 'num_native_units for id 3');
           done();
         });
     });

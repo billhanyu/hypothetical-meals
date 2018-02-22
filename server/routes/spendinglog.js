@@ -77,7 +77,7 @@ export function updateLogForIngredient(req) {
       for (let i = 0; i < newConsumed.length; i++) {
         newUpdate.push(`(${newIngredientIds[i]}, ${newIngredientTotals[i]}, ${newIngredientWeights[i]}, ${newConsumed[i]})`);
       }
-      connection.query(`INSERT INTO SpendingLogs (ingredient_id, total, total_weight, consumed) VALUES ${newUpdate.join(', ')}`)
+      connection.query(`INSERT INTO SpendingLogs (ingredient_id, total, total_weight, consumed) VALUES ${newUpdate.join(', ')}`);
       connection.query(`UPDATE SpendingLogs 
       SET total = (case ${updateTotalCostCases.join(' ')} end), total_weight = (case ${updateTotalWeightCases.join(' ')} end)
       WHERE id IN (${toUpdate['ids'].join(', ')})`);

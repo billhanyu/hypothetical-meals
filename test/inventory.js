@@ -31,6 +31,64 @@ describe('Inventory', () => {
     });
   });
 
+  describe('#getStock()', () => {
+    it('should reject noobs', (done) => {
+      chai.request(server)
+        .get('/inventory/stock')
+        .send({
+          ids: [1],
+        })
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
+    it('should reject invalid ids', (done) => {
+      chai.request(server)
+        .get('/inventory/stock')
+        .send({
+          ids: [''],
+        })
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should reject invalid input object', (done) => {
+      chai.request(server)
+        .get('/inventory/stock')
+        .send({
+          id: [1],
+        })
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should return inventory stock for valid input', (done) => {
+      chai.request(server)
+        .get('/inventory/stock')
+        .send({
+          ids: [1, 2, 4],
+        })
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          Object.keys(res.body).length.should.be.eql(2);
+          const stock = res.body;
+          assert.strictEqual(stock['1'].num_packages, 10, 'ingredient 1 stock');
+          assert.strictEqual(stock['2'].num_packages, 20, 'ingredient 2 stock');
+          done();
+        });
+    });
+  });
+
   describe('#view()', () => {
     it('should return inventory items', (done) => {
       chai.request(server)
@@ -105,7 +163,7 @@ describe('Inventory', () => {
           assert.strictEqual(changed[0].id, 2, 'Inventory item 2 left.');
           assert.strictEqual(changed[0].num_packages, 20, 'Inventory item 2 new number of packages.');
           assert.strictEqual(changed[1].id, 3, 'Inventory item 3 left.');
-          assert.strictEqual(changed[1].num_packages, 2, 'Inventory item 3 new number of packages.');
+          assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 3 new number of packages.');
           done();
         });
     });
@@ -128,7 +186,7 @@ describe('Inventory', () => {
           assert.strictEqual(left[1].id, 2, 'Inventory item 2 left.');
           assert.strictEqual(left[1].num_packages, 20, 'Inventory item 2 number of packages.');
           assert.strictEqual(left[2].id, 3, 'Inventory item 3 left.');
-          assert.strictEqual(left[2].num_packages, 2, 'Inventory item 3 number of packages.');
+          assert.strictEqual(left[2].num_packages, 20, 'Inventory item 3 number of packages.');
           done();
         });
     });
@@ -226,15 +284,14 @@ describe('Inventory', () => {
     });
 
     it('should update spendinglog valid request multiple ingredients', (done) => {
-      alasql('INSERT INTO SpendingLogs (2, 2, 101000, 90000, 50)');
+      alasql('INSERT INTO SpendingLogs (2, 2, 100000, 90000, 50)');
       chai.request(server)
         .put('/inventory')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
           'cart': {
             '1': 1,
-            '2': 10,
-            '3': 1,
+            '2': 1,
           },
         })
         .end((err, res) => {
@@ -265,7 +322,7 @@ describe('Inventory', () => {
           assert.strictEqual(changed[0].id, 2, 'Inventory item 2 left.');
           assert.strictEqual(changed[0].num_packages, 18, 'Inventory item 2 number packages left.');
           assert.strictEqual(changed[1].id, 3, 'Inventory item 3 left.');
-          assert.strictEqual(changed[1].num_packages, 2, 'Inventory item 3 number packages left.');
+          assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 3 number packages left.');
           done();
         });
     });

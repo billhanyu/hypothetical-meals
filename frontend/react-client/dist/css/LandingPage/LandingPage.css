@@ -30,10 +30,14 @@
 @media (max-width: 1300px) {
   .LoginWindow {
     right: 10%;
-    z-index: 3;
     top: 40px;
-    width: 20%;
-    min-width: 430px;
+  }
+}
+
+@media (max-width: 1600px) {
+  .LoginWindow {
+    right: 15%;
+    top: 60px;
   }
 }
 
