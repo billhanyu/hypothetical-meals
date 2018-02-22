@@ -111,9 +111,10 @@ app.get('/inventory/stock', beManager, inventory.getStock);
 app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
 app.put('/inventory', beNoob, inventory.commitCart);
 
-app.get('/formulas', beNoob, formulas.view);
+app.get('/formulas', beNoob, formulas.viewAll);
 app.put('/formulas', beAdmin, formulas.modify);
 app.post('/formulas', beAdmin, formulas.add);
+app.delete('/formulas', beAdmin, formulas.deleteFormulas);
 
 const distDir = `${__dirname}/../frontend/react-client/dist`;
 app.use(express.static(distDir));

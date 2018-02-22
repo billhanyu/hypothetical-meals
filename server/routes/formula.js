@@ -251,13 +251,13 @@ export function modify(req, res, next) {
  * @param {*} next
  */
 export function deleteFormulas(req, res, next) {
-    const toDelete = req.res.formulas;
+    const toDelete = req.body.formulas;
     connection.query(`${formulaQueryString} WHERE id IN (${toDelete.join(', ')})`)
         .then((results) => {
             if (results.length != toDelete.length) {
                 throw createError('Trying to delete element not in database');
             }
-            return connection.query(`DELETE FROM FormulaEntries WHERE formula_id IN (${toDelete.join(', ')})`)
+            return connection.query(`DELETE FROM FormulaEntries WHERE formula_id IN (${toDelete.join(', ')})`);
         })
         .then(() => {
             return connection.query(`DELETE FROM Formulas WHERE id IN (${toDelete.join(', ')})`);
