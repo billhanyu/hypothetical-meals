@@ -1,11 +1,25 @@
 import { createError, handleError } from './common/customError';
 import success from './common/success';
 import { updateDatabaseHelper } from './common/updateUtilities';
+import { getPaginationQueryString } from './common/pagination';
 
 
 const formulaQueryString = 'SELECT * FROM Formulas';
 const formulaEntryQuery = 'SELECT FormulaEntries.*';
 const dbFormulaNameCheck = `${formulaQueryString} WHERE name IN`;
+
+export function pages(req, res, next) {
+    getNumPages('Formulas')
+    .then(results => res.status(200).send(results))
+    .catch(err => {
+      return res.status(500).send('Database error');
+    });
+}
+
+export function view(req, res, next) {
+    const viewByPageQuery = getPaginationQueryString(req.params.page_num, 'Formulas', formulaQueryString);
+    getFormulas(viewByPageQuery, req, res, next);
+}
 
 /**
  *
@@ -28,9 +42,13 @@ const dbFormulaNameCheck = `${formulaQueryString} WHERE name IN`;
  * ]
  * @param {*} next
  */
-export function view(req, res, next) {
+export function viewAll(req, res, next) {
+    getFormulas(formulaQueryString, req, res, next);
+}
+
+function getFormulas(queryString, req, res, next) {
     let myFormulas = {};
-    connection.query(`${formulaQueryString}`)
+    connection.query(`${queryString}`)
         .then((results) => {
             results.forEach(x => {
                 let formulaObject = {
@@ -216,6 +234,33 @@ export function modify(req, res, next) {
         .then(() => {
             // add all new updated entries
             return addFormulaEntries(formulas);
+        })
+        .then(() => {
+            success(res);
+        })
+        .catch((err) => {
+            handleError(err, res);
+        });
+}
+
+/**
+ * Actually deletes from database, not a fake delete
+ * @param {*} req
+ * req.body.formulas = [1, 2, 3]
+ * @param {*} res
+ * @param {*} next
+ */
+export function deleteFormulas(req, res, next) {
+    const toDelete = req.res.formulas;
+    connection.query(`${formulaQueryString} WHERE id IN (${toDelete.join(', ')})`)
+        .then((results) => {
+            if (results.length != toDelete.length) {
+                throw createError('Trying to delete element not in database');
+            }
+            return connection.query(`DELETE FROM FormulaEntries WHERE formula_id IN (${toDelete.join(', ')})`)
+        })
+        .then(() => {
+            return connection.query(`DELETE FROM Formulas WHERE id IN (${toDelete.join(', ')})`);
         })
         .then(() => {
             success(res);
