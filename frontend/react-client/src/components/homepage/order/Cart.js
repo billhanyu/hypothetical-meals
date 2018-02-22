@@ -58,17 +58,19 @@ class Cart extends Component {
         <div className="CartHeader" onClick={this.onClickHeader}>
           <span className="CartHeaderText">Cart ({this.props.cart.length})</span>
         </div>
-        <div className="CartBody">
-          <div className="CartItem">
-            <span 
+        <table className="table" style={{'background-color': 'white'}}>
+          <thead>
+            <th>
+            <div 
               className="fa fa-remove CartDeleteColumn DeleteCartItem"
               aria-hidden="true"
               style={{'color': 'rgba(0,0,0,0)', 'cursor': ''}}
             />
-            <span className="CartItemColumn CartItemColumnHeader">Ingredient</span>
-            <span className="CartItemColumn CartItemColumnHeader">Package</span>
-            <span className="CartQuantityColumn CartItemColumnHeader">Quantity</span>
-          </div>
+            </th>
+            <th>Ingredient</th>
+            <th>Quantity</th>
+          </thead>
+          <tbody>
           {
             this.props.cart.map((item, key) => {
               return <CartItem
@@ -79,9 +81,10 @@ class Cart extends Component {
               />;
             })
           }
-        </div>
-        <div className="CartOrder" onClick={this.props.checkout}>
-          <span className="CartOrderText">Check Out</span>
+          </tbody>
+        </table>
+        <div className="CartOrder" onClick={this.props.order}>
+          <span className="CartOrderText">Choose Vendors</span>
         </div>
       </div>
     );

@@ -22,6 +22,7 @@ class AddEditIngredient extends Component {
         name: props.ingredient.name,
         package_type: props.ingredient.package_type,
         native_unit: props.ingredient.native_unit,
+        num_native_units: props.ingredient.num_native_units,
         storage_id: props.ingredient.storage_id,
         storage: Storage2State[props.ingredient.storage_name],
         id: props.ingredient.id,
@@ -30,7 +31,6 @@ class AddEditIngredient extends Component {
         adding: false,
         mode: "edit",
         vendor_code: '', // add
-        vendor_quantity: 1, // add
         price: 1, // add
         editing: false,
         editIdx: -1,
@@ -41,6 +41,7 @@ class AddEditIngredient extends Component {
         package_type: 'sack',
         native_unit: '',
         storage_id: 1,
+        num_native_units: '',
         storage: 'Frozen',
         vendoringredients: [],
         adding: false,
@@ -116,7 +117,6 @@ class AddEditIngredient extends Component {
     const id = this.state.vendoringredients[this.state.editIdx].id;
     const putObj = {};
     putObj[id] = Object.assign({}, this.state.vendoringredients[this.state.editIdx]);
-    putObj[id].num_native_units = this.state.editNumNativeUnits;
     putObj[id].price = this.state.editPrice;
     axios.put('/vendoringredients', {
       vendoringredients: putObj
@@ -132,7 +132,7 @@ class AddEditIngredient extends Component {
       this.reloadData();
     })
     .catch(err => {
-      alert('some error occurred');
+      alert(err.response.data);
     });
   }
 
@@ -145,8 +145,8 @@ class AddEditIngredient extends Component {
   handleSubmitButtonClick(event) {
     event.preventDefault();
 
-    if (!this.state.name || !this.state.native_unit) {
-      alert('Please fill out the name and native unit');
+    if (!this.state.name || !this.state.native_unit || !this.state.num_native_units) {
+      alert('Please fill out the name, unit, and size');
       return;
     }
 
@@ -165,6 +165,7 @@ class AddEditIngredient extends Component {
       name: this.state.name,
       native_unit: this.state.native_unit,
       package_type: this.state.package_type,
+      num_native_units: this.state.num_native_units,
     };
 
     if (this.state.mode == "edit") {
@@ -219,7 +220,6 @@ class AddEditIngredient extends Component {
           vendoringredients: [{
             ingredient_id: this.state.id,
             vendor_id,
-            num_native_units: this.state.vendor_quantity,
             price: this.state.price,
           }]
         }, {
@@ -235,7 +235,12 @@ class AddEditIngredient extends Component {
       })
       .catch(err => {
         console.log(err);
-        alert(err.response.data);
+        const msg = err.response.data;
+        if (msg == "ER_DUP_ENTRY") {
+          alert('A product with the same vendor code already exists.');
+        } else {
+          alert(msg);
+        }
       });
   }
 
@@ -268,6 +273,10 @@ class AddEditIngredient extends Component {
               <label htmlFor="native_unit">Unit</label>
               <input type="text" className="form-control" id="native_unit" aria-describedby="unit" placeholder="Pounds" onChange={e => this.handleInputChange('native_unit', e)} value={this.state.native_unit} required />
             </div>
+            <div className="form-group">
+              <label htmlFor="num_native_units">Size (in native unit above)</label>
+              <input type="text" className="form-control" id="num_native_units" aria-describedby="num_native_units" placeholder="1" onChange={e => this.handleInputChange('num_native_units', e)} value={this.state.num_native_units} required />
+            </div>
             <button type="submit" className="btn btn-primary" onClick={this.handleSubmitButtonClick}>Submit</button>
           </form>
         </div>
@@ -290,10 +299,6 @@ class AddEditIngredient extends Component {
                     <input type="text" className="form-control" id="vendor_code" aria-describedby="vendor_code" placeholder="code" onChange={e => this.handleInputChange('vendor_code', e)} value={this.state.vendor_code} />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="vendor_quantity">Quantity of native units in product</label>
-                    <input type="number" className="form-control" id="vendor_quantity" aria-describedby="vendor_quantity" placeholder="quantity" onChange={e => this.handleInputChange('vendor_quantity', e)} value={this.state.vendor_quantity} />
-                  </div>
-                  <div className="form-group">
                     <label htmlFor="price">Price</label>
                     <input type="number" className="form-control" id="price" aria-describedby="price" placeholder="price" onChange={e => this.handleInputChange('price', e)} value={this.state.price} />
                   </div>
@@ -304,7 +309,6 @@ class AddEditIngredient extends Component {
             <table className="table">
               <tr>
                 <th>Vendor</th>
-                <th>Quantity in Package</th>
                 <th>Price</th>
                 <th>Options</th>
               </tr>
@@ -313,12 +317,6 @@ class AddEditIngredient extends Component {
                   return (
                     <tr key={idx}>
                       <td>{vendoringredient.vendor_name}</td>
-                      <td>
-                        {this.state.editIdx !== idx && vendoringredient.num_native_units + " " + this.props.ingredient.native_unit}
-                        {this.state.editIdx == idx &&
-                          <input type="number" className="form-control" id="vendor_quantity" aria-describedby="vendor_quantity" placeholder="quantity" onChange={e => this.handleInputChange('editNumNativeUnits', e)} value={this.state.editNumNativeUnits} />
-                        }
-                      </td>
                       <td>
                         {this.state.editIdx !== idx && vendoringredient.price}
                         {this.state.editIdx == idx &&

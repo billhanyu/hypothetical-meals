@@ -34,9 +34,9 @@ class IngredientListItem extends Component {
         <td>{ingredient.name}</td>
         <td>{ingredient.package_type}</td>
         <td>{Storage2State[ingredient.storage_name]}</td>
-        <td>{ingredient.native_unit}</td>
+        <td>{ingredient.num_native_units+" "+ingredient.native_unit}</td>
         {
-          global.user_group == 'admin' &&
+          global.user_group == 'admin' && !this.props.order &&
           <td>
             <div className="btn-group" role="group" aria-label="Basic example">
               <button
@@ -56,6 +56,17 @@ class IngredientListItem extends Component {
             </div>
           </td>
         }
+        {
+          this.props.order &&
+            <td>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={e => {this.props.orderIngredient(this.props.idx);}}>
+              Order
+            </button>
+            </td>
+        }
       </tr>
       <tr>
         <td colSpan={2} className="hiddenRow"></td>
@@ -64,7 +75,6 @@ class IngredientListItem extends Component {
             <table className="table">
             <tr>
               <th>Sold By</th>
-              <th>Quantity</th>
               <th>Price</th>
             </tr>
             {
@@ -72,7 +82,6 @@ class IngredientListItem extends Component {
                 return (
                   <tr key={idx}>
                     <td>{vendoringredient.vendor_name}</td>
-                    <td>{vendoringredient.num_native_units + " " + this.props.ingredient.native_unit}</td>
                     <td>{vendoringredient.price}</td>
                   </tr>
                 );

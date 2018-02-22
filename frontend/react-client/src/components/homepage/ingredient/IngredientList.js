@@ -28,6 +28,7 @@ class IngredientList extends Component {
     this.finishAdd = this.finishAdd.bind(this);
     this.bulkImport = this.bulkImport.bind(this);
     this.backToList = this.backToList.bind(this);
+    this.orderIngredient = this.orderIngredient.bind(this);
   }
 
   componentDidMount() {
@@ -44,7 +45,7 @@ class IngredientList extends Component {
           pages: response.data.numPages,
         });
       })
-      .catch(err => console.error(err));
+      .catch(err => alert('Retrieving data error'));
   }
 
   selectPage(page) {
@@ -56,15 +57,13 @@ class IngredientList extends Component {
       headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
-      const ingredients = response.data.filter(ingredient => {
-        return ingredient.removed.data[0] == 0;
-      });
+      const ingredients = response.data;
       ingredients.sort((a, b) => a.id - b.id);
       this.setState({
         ingredients,
       });
     })
-    .catch(err => console.error(err));
+    .catch(err => alert('Retrieving data error'));
   }
 
   bulkImport() {
@@ -132,6 +131,11 @@ class IngredientList extends Component {
     });
   }
 
+  orderIngredient(idx) {
+    console.log(this.state.ingredients[idx]);
+    this.props.orderIngredient(this.state.ingredients[idx]);
+  }
+
   render() {
     const edit =
     <AddEditIngredient
@@ -146,9 +150,13 @@ class IngredientList extends Component {
 
     const main = 
     <div>
+      {!this.props.order &&
+      <div>
       <h2>Ingredients</h2>
       {global.user_group == 'admin' && <button type="button" className="btn btn-primary" onClick={this.add}>Add Ingredient</button>}
       {global.user_group == 'admin' && <button type="button" className="btn btn-primary" onClick={this.bulkImport}>Bulk Import</button>}
+      </div>
+      }
       <table className="table">
         <thead>
           <tr>
@@ -156,10 +164,14 @@ class IngredientList extends Component {
             <th>Name</th>
             <th>Package Type</th>
             <th>Storage</th>
-            <th>Unit</th>
+            <th>Size</th>
             {
-              global.user_group == 'admin' &&
+              global.user_group == 'admin' && !this.props.order &&
               <th>Options</th>
+            }
+            {
+              this.props.order &&
+              <th>Order</th>
             }
           </tr>
         </thead>
@@ -169,6 +181,9 @@ class IngredientList extends Component {
               <IngredientListItem
                 key={idx}
                 idx={idx}
+                onClick={this.props.onClickIngredient}
+                order={this.props.order}
+                orderIngredient={this.orderIngredient}
                 edit={this.edit}
                 delete={this.delete}
                 ingredient={ingredient}

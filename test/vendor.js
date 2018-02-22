@@ -56,22 +56,6 @@ describe('Vendor', () => {
     });
   });
 
-  describe('#viewAvailable()', () => {
-    it('should return all vendors available', (done) => {
-      alasql('UPDATE Vendors SET removed = 1 WHERE id = 1');
-      chai.request(server)
-        .get('/vendors-available/page/1')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.a('array');
-          res.body.length.should.be.eql(1);
-          assert.strictEqual(res.body[0].id, 2, 'returned vendor id should be 2');
-          done();
-        });
-    });
-  });
-
   describe('#addVendors()', () => {
     beforeEach(() => {
       alasql('SOURCE "./server/create_database.sql"');

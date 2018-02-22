@@ -2,7 +2,7 @@ import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import success from './common/success';
 import { fakeDeleteMultipleVendorIngredients } from './vendorIngredient';
-import { getNumPages, queryWithPagination } from './common/pagination';
+import { getAvailableNumPages, queryWithPagination } from './common/pagination';
 import { getWeight, ignoreWeights } from './common/packageUtilies';
 import { validStorageTypes } from './common/storageUtilities';
 
@@ -12,14 +12,8 @@ const Papa = require('papaparse');
 const numColumnsForBulkImport = 6;
 const basicViewQueryString = 'SELECT Ingredients.*, Storages.name as storage_name, Storages.capacity as storage_capacity FROM Ingredients INNER JOIN Storages ON Storages.id = Ingredients.storage_id';
 
-export function allAvailable(req, res, next) {
-  connection.query(`${basicViewQueryString} WHERE removed = 0`)
-    .then(results => res.status(200).send(results))
-    .catch(err => handleError(err, res));
-}
-
 export function pages(req, res, next) {
-  getNumPages('Ingredients')
+  getAvailableNumPages('Ingredients')
     .then(results => res.status(200).send(results))
     .catch(err => {
       console.error(err);
@@ -36,21 +30,13 @@ export function view(req, res, next) {
     });
 }
 
-export function viewAvailable(req, res, next) {
-  queryWithPagination(req.params.page_num, 'Ingredients', `${basicViewQueryString} WHERE removed = 0`)
-    .then(results => res.status(200).send(results))
-    .catch(err => {
-      console.error(err);
-      return res.status(500).send('Database error');
-    });
-}
-
 /* request body format:
  * request.body.ingredients = [
  *   {
  *     'name': 'p',
  *     'native_unit': 'kg',
  *     'storage_id': 1,
+ *     'num_native_units': 100.9
  *   }, ...
  * ]
  * This adds a new ingredient into the Ingredients table.
@@ -65,9 +51,12 @@ function addIngredientHelper(ingredients, req, res, next) {
   }
   const ingredientsToAdd = [];
   for (let ingredient of ingredients) {
-    ingredientsToAdd.push(`('${ingredient.name}', '${ingredient.package_type}', '${ingredient.native_unit}', ${ingredient.storage_id})`);
+    if (isNaN(ingredient.num_native_units) || parseFloat(ingredient.num_native_units) <= 0) {
+      return res.status(400).send('Invalid size, has to be greater than 0.');
+    }
+    ingredientsToAdd.push(`('${ingredient.name}', '${ingredient.package_type}', '${ingredient.native_unit}', ${ingredient.num_native_units}, ${ingredient.storage_id})`);
   }
-  connection.query(`INSERT INTO Ingredients (name, package_type, native_unit, storage_id) VALUES ${ingredientsToAdd.join(', ')}`)
+  connection.query(`INSERT INTO Ingredients (name, package_type, native_unit, num_native_units, storage_id) VALUES ${ingredientsToAdd.join(', ')}`)
   .then(() => success(res))
   .catch(err => handleError(err, res));
 }
@@ -106,12 +95,17 @@ function modifyIngredientHelper(items, req, res, next) {
     if (!checkNumber.isNonNegativeInteger(storageId) || storageId > 3) {
       return res.status(400).send(`New storage id ${storageId} is invalid`);
     }
+    const numNativeUnits = items[idString]['num_native_units'];
+    if (isNaN(numNativeUnits) || parseFloat(numNativeUnits) <= 0) {
+      return res.status(400).send(`Size of the package invalid, has to be greater than 0.`);
+    }
     ingredientIds.push(idString);
   }
 
   const nameCases = [];
   const storageCases = [];
   const nativeUnitCases = [];
+  const numNativeUnitsCases = [];
   const packageTypeCases = [];
   connection.query(`SELECT id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
   .then(results => {
@@ -123,17 +117,20 @@ function modifyIngredientHelper(items, req, res, next) {
       const newStorage = items[ingredient.id]['storage_id'];
       const newNativeUnit = items[ingredient.id]['native_unit'];
       const newPackageType = items[ingredient.id]['package_type'];
+      const newNumNativeUnits = items[ingredient.id]['num_native_units'];
       nameCases.push(`when id = ${ingredient.id} then '${newName}'`);
       storageCases.push(`when id = ${ingredient.id} then ${newStorage}`);
       nativeUnitCases.push(`when id = ${ingredient.id} then '${newNativeUnit}'`);
       packageTypeCases.push(`when id = ${ingredient.id} then '${newPackageType}'`);
+      numNativeUnitsCases.push(`when id = ${ingredient.id} then ${newNumNativeUnits}`);
     }
     return connection.query(
       `UPDATE Ingredients
         SET storage_id = (case ${storageCases.join(' ')} end),
             package_type = (case ${packageTypeCases.join(' ')} end),
             name = (case ${nameCases.join(' ')} end),
-            native_unit = (case ${nativeUnitCases.join(' ')} end)
+            native_unit = (case ${nativeUnitCases.join(' ')} end),
+            num_native_units = (case ${numNativeUnitsCases.join(' ')} end)
         WHERE id IN (${ingredientIds.join(', ')})`);
   })
   .then(() => success(res))

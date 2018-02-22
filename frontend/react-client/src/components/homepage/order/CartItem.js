@@ -4,22 +4,10 @@ class CartItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      overflow: false
+      invalid: false,
     };
     this.changeQuantity = this.changeQuantity.bind(this);
     this.remove = this.remove.bind(this);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.item.quantity > nextProps.item.num_packages || nextProps.item.quantity <= 0) {
-      this.setState({
-        overflow: true
-      });
-    } else {
-      this.setState({
-        overflow: false
-      });
-    }
   }
 
   remove() {
@@ -31,23 +19,25 @@ class CartItem extends Component {
   }
 
   render() {
-    const inputClassName = `CartQuantityColumn${this.state.overflow ? " Overflow" : ""}`;
     return (
-      <div className="CartItem">
+      <tr>
+        <td>
         <div
-          className="fa fa-remove CartDeleteColumn DeleteCartItem"
+          className="fa fa-remove DeleteCartItem"
           aria-hidden="true"
           onClick={this.remove}
         />
-        <span className="CartItemColumn">{this.props.item.ingredient_name}</span>
-        <span className="CartItemColumn">{this.props.item.package_type}</span>
+        </td>
+        <td>{this.props.item.name}</td>
+        <td>
         <input
           type="number"
-          className={inputClassName}
+          style={{'color': this.state.invalid ? "red" : "inherit"}}
           onChange={this.changeQuantity}
           value={this.props.item.quantity} 
         />
-      </div>
+        </td>
+      </tr>
     );
   }
 }

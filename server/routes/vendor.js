@@ -2,10 +2,10 @@ import * as checkNumber from './common/checkNumber';
 import { handleError } from './common/customError';
 import success from './common/success';
 import { fakeDeleteMultipleVendorIngredients } from './vendorIngredient';
-import { getNumPages, queryWithPagination } from './common/pagination';
+import { getAvailableNumPages, queryWithPagination } from './common/pagination';
 
 export function pages(req, res, next) {
-  getNumPages('Vendors')
+  getAvailableNumPages('Vendors')
     .then(results => res.status(200).send(results))
     .catch(err => {
       console.error(err);
@@ -14,15 +14,6 @@ export function pages(req, res, next) {
 }
 
 export function view(req, res, next) {
-  queryWithPagination(req.params.page_num, 'Vendors', 'SELECT * FROM Vendors')
-    .then(results => res.status(200).send(results))
-    .catch(err => {
-      console.error(err);
-      return res.status(500).send('Database error');
-    });
-}
-
-export function viewAvailable(req, res, next) {
   queryWithPagination(req.params.page_num, 'Vendors', 'SELECT * FROM Vendors WHERE removed = 0')
     .then(results => res.status(200).send(results))
     .catch(err => {
