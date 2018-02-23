@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS SystemLogs;
+DROP TABLE IF EXISTS ProductionLogs;
 DROP TABLE IF EXISTS FormulaEntries;
 DROP TABLE IF EXISTS Formulas;
 DROP TABLE IF EXISTS SpendingLogs;
@@ -116,6 +117,16 @@ CREATE TABLE FormulaEntries(
 
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
+	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE ProductionLogs(
+	id int not null AUTO_INCREMENT,
+	formula_id int not null unique,
+	num_product int not null,
+	total_cost double not null,
+
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
 	PRIMARY KEY (id)
 );
