@@ -34,10 +34,12 @@ class EditFormula extends Component {
 
   onDelete(formulaID){
     //DELETE REQUEST HERE
-    axios.delete(`/formulas`, {'formulas':[
-          formulaID
-    ]}, {
-      headers: {Authorization: "Token " + global.token}
+    const self = this;
+    axios.delete(`/formulas`, {
+      headers: {
+        Authorization: "Token " + global.token,
+        formulaID,
+      }
     }).then(response => {
       axios.get(`/formulas`, {
         headers: {Authorization: "Token " + global.token}
