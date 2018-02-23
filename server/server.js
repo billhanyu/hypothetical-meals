@@ -17,6 +17,7 @@ import * as vendorIngredient from './routes/vendorIngredient';
 import * as spendinglog from './routes/spendinglog';
 import * as order from './routes/order';
 import * as formulas from './routes/formula';
+import * as productionlog from './routes/productionlog';
 import { adminRequired, noobRequired, managerRequired } from './authMiddleware';
 
 import getConfig from './getConfig';
@@ -103,6 +104,9 @@ app.get('/logs/ingredients/page/:page_num', beNoob, log.viewLogForIngredient);
 app.get('/spendinglogs/pages', beNoob, spendinglog.pages);
 app.get('/spendinglogs/page/:page_num', beNoob, spendinglog.view);
 app.get('/spendinglogs/:ingredient_id', beNoob, spendinglog.logsForIngredient);
+
+app.get('/productionlogs/pages', beNoob, productionlog.pages);
+app.get('/productionlogs/page/:page_num', beNoob, productionlog.view);
 
 app.get('/inventory', beNoob, inventory.all);
 app.get('/inventory/pages', beNoob, inventory.pages);
