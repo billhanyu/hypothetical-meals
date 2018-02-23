@@ -7,12 +7,13 @@ class FormulaButton extends Component {
 
   /*** REQUIRED PROPS
     1. onClick (Func)
+    2. text (String)
   */
 
   render() {
     return (
       <div className="FormulaButton" onClick={this.props.onClick}>
-        Create New Formula
+        {this.props.text}
       </div>
     );
   }
