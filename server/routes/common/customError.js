@@ -14,6 +14,5 @@ export function handleError(err, res) {
     const code = err.code || 400;
     return res.status(code).send(err.custom);
   }
-  console.error(err);
   res.status(500).send('Database error');
 }

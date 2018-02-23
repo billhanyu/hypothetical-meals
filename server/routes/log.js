@@ -1,5 +1,4 @@
 import * as checkNumber from './common/checkNumber';
-import * as packageCalc from './common/packageUtilies';
 import { updateLogForIngredient } from './spendinglog';
 import { createError } from './common/customError';
 import { getNumPages, queryWithPagination } from './common/pagination';
@@ -70,6 +69,7 @@ function addLogEntryHelper(logs, userId) {
     const vendorIngredientMap = {};
     const packageTypes = [];
     const userLogs = [];
+    const spendingLogReq = {};
     for (let log of logs) {
       if (!checkNumber.isPositiveInteger(log.vendor_ingredient_id)) {
         throw createError(`Vendor ingredient ID ${log.vendor_ingredient_id} is invalid.`);
@@ -77,7 +77,7 @@ function addLogEntryHelper(logs, userId) {
       vendorIngredientMap[log.vendor_ingredient_id] = log.quantity;
       packageTypes.push(`'${log.package_type}'`);
     }
-    connection.query(`SELECT VendorsIngredients.id, VendorsIngredients.ingredient_id, VendorsIngredients.price, Ingredients.package_type
+    connection.query(`SELECT VendorsIngredients.id, VendorsIngredients.ingredient_id, VendorsIngredients.price, Ingredients.num_native_units
       FROM VendorsIngredients
       INNER JOIN Ingredients
       ON VendorsIngredients.ingredient_id = Ingredients.id
@@ -86,10 +86,9 @@ function addLogEntryHelper(logs, userId) {
       if (results.length < Object.keys(vendorIngredientMap).length) {
         throw createError('Placing order for nonexistent vendor ingredient for package type.');
       }
-      const spendingLogReq = {};
       for (let vendorIngredient of results) {
         try {
-          let unitWeight = packageCalc.getWeight(vendorIngredient['package_type']);
+          let unitWeight = vendorIngredient['num_native_units'];
           let quantity = vendorIngredientMap[vendorIngredient['ingredient_id']];
           spendingLogReq[vendorIngredient['ingredient_id']] = {
             'total_weight': unitWeight * quantity,
@@ -100,20 +99,10 @@ function addLogEntryHelper(logs, userId) {
           throw err;
         }
       }
-      connection.query(`INSERT INTO Logs (user_id, vendor_ingredient_id, quantity) VALUES ${userLogs.join(', ')}`)
-      .then(() => {
-        Promise.resolve(updateLogForIngredient(spendingLogReq))
-        .then(() => {
-          resolve();
-        })
-        .catch(err => {
-          throw err;
-        });
-      })
-      .catch(err => {
-        throw err;
-      });
+      return connection.query(`INSERT INTO Logs (user_id, vendor_ingredient_id, quantity) VALUES ${userLogs.join(', ')}`);
     })
+    .then(() => updateLogForIngredient(spendingLogReq))
+    .then(() => resolve())
     .catch(err => {
       reject(err);
     });
