@@ -458,12 +458,7 @@ describe('Formulas', () => {
             chai.request(server)
                 .delete('/formulas')
                 .set('Authorization', `Token ${testTokens.adminTestToken}`)
-                .send({
-                    'formulas': [
-                        1,
-                        2,
-                    ],
-                })
+                .set('formulaid', '1, 2')
                 .end((err, res) => {
                     res.should.have.status(200);
                     const formulas = alasql(`SELECT * FROM Formulas`);
@@ -478,11 +473,7 @@ describe('Formulas', () => {
             chai.request(server)
                 .delete('/formulas')
                 .set('Authorization', `Token ${testTokens.adminTestToken}`)
-                .send({
-                    'formulas': [
-                        1,
-                    ],
-                })
+                .set('formulaid', '1')
                 .end((err, res) => {
                     res.should.have.status(200);
                     const formulas = alasql(`SELECT * FROM Formulas`);
@@ -500,11 +491,7 @@ describe('Formulas', () => {
             chai.request(server)
                 .delete('/formulas')
                 .set('Authorization', `Token ${testTokens.adminTestToken}`)
-                .send({
-                    'formulas': [
-                        112,
-                    ],
-                })
+                .set('formulaid', '112')
                 .end((err, res) => {
                     res.should.have.status(400);
                     done();
@@ -515,11 +502,7 @@ describe('Formulas', () => {
             chai.request(server)
                 .delete('/formulas')
                 .set('Authorization', `Token ${testTokens.managerTestToken}`)
-                .send({
-                    'formulas': [
-                        2,
-                    ],
-                })
+                .set('formulaid', '2')
                 .end((err, res) => {
                     res.should.have.status(401);
                     done();
@@ -530,11 +513,7 @@ describe('Formulas', () => {
             chai.request(server)
                 .delete('/formulas')
                 .set('Authorization', `Token ${testTokens.noobTestToken}`)
-                .send({
-                    'formulas': [
-                        2,
-                    ],
-                })
+                .set('formulaid', '2')
                 .end((err, res) => {
                     res.should.have.status(401);
                     done();
