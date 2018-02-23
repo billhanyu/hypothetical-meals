@@ -5,7 +5,7 @@ const testTokens = require('./testTokens');
 describe('SpendingLog', () => {
   describe('#pages()', () => {
     it('should return number of pages of data', (done) => {
-      alasql('INSERT INTO ProductionLogs (formula_id, num_product, total_cost) VALUES (1, 2, 3)');      
+      alasql('INSERT INTO ProductionLogs (formula_id, num_product, total_cost) VALUES (1, 2, 3)');
       chai.request(server)
         .get('/productionlogs/pages')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
