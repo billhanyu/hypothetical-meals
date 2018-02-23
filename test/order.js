@@ -24,7 +24,7 @@ describe('Order', () => {
             const inventory = alasql('SELECT * FROM Inventories');
             const logs = alasql('SELECT * FROM Logs');
             const spendingLogs = alasql('SELECT * FROM SpendingLogs');
-            assert.strictEqual(inventory.length, 3, 'Number of things in inventory');
+            assert.strictEqual(inventory.length, 4, 'Number of things in inventory');
             assert.strictEqual(inventory[0].id, 1, 'Id for inventory 1');
             assert.strictEqual(inventory[0].ingredient_id, 1, 'Ingredient for inventory 1');
             assert.strictEqual(inventory[0].num_packages, 12, 'Number of packages for inventory 1');
@@ -34,20 +34,24 @@ describe('Order', () => {
             assert.strictEqual(logs.length, 4, 'Number of logs');
             assert.strictEqual(logs[2].user_id, 4, 'User id for log 3');
             assert.strictEqual(logs[2].vendor_ingredient_id, 1, 'Vendor ingredient for log 3');
-            assert.strictEqual(logs[2].quantity, 100, 'Quantity for log 3');
+            assert.strictEqual(logs[2].quantity, 20, 'Quantity for log 3');
             assert.strictEqual(logs[3].user_id, 4, 'User id for log 4');
             assert.strictEqual(logs[3].vendor_ingredient_id, 3, 'Vendor ingredient for log 4');
-            assert.strictEqual(logs[3].quantity, 50, 'Quantity for log 4');
+            assert.strictEqual(logs[3].quantity, 20, 'Quantity for log 4');
 
-            assert.strictEqual(spendingLogs.length, 2, 'Length of spending logs');
+            assert.strictEqual(spendingLogs.length, 4, 'Length of spending logs');
             assert.strictEqual(spendingLogs[0].ingredient_id, 1, 'Ingredient id for spending log 1');
-            assert.strictEqual(spendingLogs[0].total_weight, 600, 'Ingredient weight for spending log 1');
+            assert.strictEqual(spendingLogs[0].total_weight, 520, 'Ingredient weight for spending log 1');
             assert.strictEqual(spendingLogs[0].total, 5020, 'Total amount spent for ingredient 1');
             assert.strictEqual(spendingLogs[0].consumed, 50, 'Total amount consumed in weight for ingredient 1');
-            assert.strictEqual(spendingLogs[1].ingredient_id, 3, 'Ingredient id for spending log 2');
-            assert.strictEqual(spendingLogs[1].total_weight, 50, 'Ingredient weight for spending log 2');
-            assert.strictEqual(spendingLogs[1].total, 30, 'Total amount spent for ingredient 2');
-            assert.strictEqual(spendingLogs[1].consumed, 0, 'Total amount consumed in weight for ingredient 2');
+            assert.strictEqual(spendingLogs[1].ingredient_id, 2, 'Ingredient id for spending log 2');
+            assert.strictEqual(spendingLogs[1].total_weight, 500, 'Ingredient weight for spending log 2');
+            assert.strictEqual(spendingLogs[1].total, 5000, 'Total amount spent for ingredient 2');
+            assert.strictEqual(spendingLogs[1].consumed, 50, 'Total amount consumed in weight for ingredient 2');
+            assert.strictEqual(spendingLogs[2].ingredient_id, 3, 'Ingredient id for spending log 3');
+            assert.strictEqual(spendingLogs[2].total_weight, 520, 'Ingredient weight for spending log 3');
+            assert.strictEqual(spendingLogs[2].total, 5030, 'Total amount spent for ingredient 3');
+            assert.strictEqual(spendingLogs[2].consumed, 50, 'Total amount consumed in weight for ingredient 3');
             done();
         });
     });
@@ -68,18 +72,18 @@ describe('Order', () => {
         });
     });
 
-    it('should place reject an order with ingredient over capacity', (done) => {
+    it('should reject an order with ingredient over capacity', (done) => {
         chai.request(server)
         .post('/order')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .send({
             'orders': {
-                '4': 1,
+                '4': 100,
             },
         })
         .end((err, res) => {
             res.should.have.status(400);
-            assert.strictEqual(res.text, 'Requested quantity exceeds capacity.');
+            assert.strictEqual(res.text, 'New quantities too large for current storages');
             done();
         });
     });
