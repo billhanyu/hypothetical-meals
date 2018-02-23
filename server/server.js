@@ -17,6 +17,7 @@ import * as vendorIngredient from './routes/vendorIngredient';
 import * as spendinglog from './routes/spendinglog';
 import * as order from './routes/order';
 import * as formulas from './routes/formula';
+import * as productionlog from './routes/productionlog';
 import { adminRequired, noobRequired, managerRequired } from './authMiddleware';
 
 import getConfig from './getConfig';
@@ -65,6 +66,7 @@ const beManager = [auth.required, managerRequired];
 
 app.post('/users/admin', user.signupAdmin);
 app.post('/users/noob', beAdmin, user.signupNoob);
+app.post('/users/manager', beAdmin, user.signupManager);
 app.post('/users/login', user.login);
 app.post('/users/login/oauth', user.loginOauth);
 app.post('/users/permission', beAdmin, user.changePermission);
@@ -103,6 +105,9 @@ app.get('/logs/ingredients/page/:page_num', beNoob, log.viewLogForIngredient);
 app.get('/spendinglogs/pages', beNoob, spendinglog.pages);
 app.get('/spendinglogs/page/:page_num', beNoob, spendinglog.view);
 app.get('/spendinglogs/:ingredient_id', beNoob, spendinglog.logsForIngredient);
+
+app.get('/productionlogs/pages', beNoob, productionlog.pages);
+app.get('/productionlogs/page/:page_num', beNoob, productionlog.view);
 
 app.get('/inventory', beNoob, inventory.all);
 app.get('/inventory/pages', beNoob, inventory.pages);
