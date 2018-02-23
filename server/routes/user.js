@@ -5,14 +5,18 @@ import success from './common/success';
 const passport = require('passport');
 
 export function signupAdmin(req, res, next) {
-  signupUser(req, res, next, true);
+  signupUser(req, res, next, 'admin');
 }
 
 export function signupNoob(req, res, next) {
-  signupUser(req, res, next, false);
+  signupUser(req, res, next, 'noob');
 }
 
-function signupUser(req, res, next, isAdmin) {
+export function signupManager(req, res, next) {
+  signupUser(req, res, next, 'manager');
+}
+
+function signupUser(req, res, next, userGroup) {
   const error = checkParams.checkBlankParams(req.body.user, ['username', 'name', 'password']);
   if (error) return res.status(422).send(error);
 
@@ -22,7 +26,6 @@ function signupUser(req, res, next, isAdmin) {
   let user = new User(req.body.user);
   user.setPassword(req.body.user.password);
 
-  const userGroup = isAdmin ? 'admin' : 'noob';
   connection.query(`INSERT INTO Users (username, name, hash, salt, user_group) VALUES ('${user.username}', '${user.name || ''}', '${user.hash}', '${user.salt}', '${userGroup}');`)
   .then(() => connection.query(`SELECT id FROM Users WHERE username = '${user.username}';`))
   .then((results) => {
