@@ -251,7 +251,7 @@ export function modify(req, res, next) {
  * @param {*} next
  */
 export function deleteFormulas(req, res, next) {
-    const toDelete = [...req.headers.formulaid];
+    const toDelete = req.headers.formulaid.split(", ");
     connection.query(`${formulaQueryString} WHERE id IN (${toDelete.join(', ')})`)
         .then((results) => {
             if (results.length != toDelete.length) {
