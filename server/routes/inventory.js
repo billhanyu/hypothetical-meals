@@ -1,11 +1,11 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
-import {getWeight, ignoreWeights} from './common/packageUtilies';
+import { getSpace } from './common/packageUtilies';
 import { getNumPages, queryWithPagination } from './common/pagination';
 import success from './common/success';
 import { updateConsumedSpendingLogForCart } from './spendinglog';
 
-const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.package_type as ingredient_package_type, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
+const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.num_native_units as ingredient_num_native_units, Ingredients.package_type as ingredient_package_type, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
 
 export function all(req, res, next) {
   connection.query(basicViewQueryString)
@@ -17,7 +17,6 @@ export function pages(req, res, next) {
   getNumPages('Inventories')
     .then(results => res.status(200).send(results))
     .catch(err => {
-      console.error(err);
       return res.status(500).send('Database error');
     });
 }
@@ -43,15 +42,23 @@ export function getStock(req, res, next) {
       return res.status(400).send('Invalid ingredient id');
     }
   }
-  const stock = {};
-  connection.query(`${basicViewQueryString} WHERE Ingredients.id IN (${ids.join(', ')})`)
-    .then(results => {
-      for (let result of results) {
-        stock[result.id] = result;
-      }
-      return res.json(stock);
-    })
+  getStockPromise(ids)
+    .then(result => res.json(result))
     .catch(err => handleError(err, res));
+}
+
+function getStockPromise(ids) {
+  return new Promise((resolve, reject) => {
+    const stock = {};
+    connection.query(`${basicViewQueryString} WHERE Ingredients.id IN (${ids.join(', ')})`)
+      .then(results => {
+        for (let result of results) {
+          stock[result.id] = result;
+        }
+        resolve(stock);
+      })
+      .catch(err => reject(err));
+  });
 }
 
 /* request body format:
@@ -69,59 +76,73 @@ export function getStock(req, res, next) {
 export function modifyQuantities(req, res, next) {
   modifyInventoryQuantitiesPromise(req.body.changes)
     .then(() => success(res))
-    .catch(err => handleError(err, res));
+    .catch(err => {
+      return handleError(err, res);
+    });
 }
 
 /* request body format:
- * request.body.cart = {
- *   "inventory_id1": request_quantity1,
- *   "inventory_id2": request_quantity2
+ * request.body = {
+ *   "formula_id": formula_id,
+ *   "num_products": num_products
  * }
  * example:
  * {
- *   "1": 123,
- *   "2": 456
+ *   "formula_id": 3,
+ *   "num_products": 10
  * }
- * This decreases inventory id 1's num_packages by 123 and 2's num_packages by 456
  */
 export function commitCart(req, res, next) {
-  try {
-    const cart = req.body.cart;
-    checkInputChanges(cart);
-    checkChangesProperties(cart);
-    const ids = Object.keys(cart);
-    let cartItems;
-    connection.query(`SELECT Inventories.*, Ingredients.package_type
-      FROM Inventories
-      INNER JOIN Ingredients
-      ON Inventories.ingredient_id = Ingredients.id
-      WHERE Inventories.id IN (${ids.join(', ')})`)
-      .then(results => {
-        if (results.length < ids.length) {
-          throw createError('Some inventory id not in database.');
-        }
-        cartItems = results.map(a => Object.assign({}, a));
-        cartItems.forEach(item => {
-          item.num_packages = cart[item.id];
-        });
-        for (let item of results) {
-          const id = item.id;
-          const newNum = item.num_packages - cart[id];
-          if (newNum < 0) {
-            throw createError('Requesting more than what\'s in the database.');
-          }
-          cart[id] = newNum;
-        }
-        return modifyInventoryQuantitiesPromise(cart);
-      })
-      .then(() => updateConsumedSpendingLogForCart(cartItems))
-      .then(() => success(res))
-      .catch(err => {
-        handleError(err, res);
-      });
-  } catch (err) {
-    handleError(err, res);
+  const formulaId = req.body.formula_id;
+  const numProducts = req.body.num_products;
+
+  let formula;
+  let formulaEntries;
+  const cartItems = [];
+
+  if (!checkNumber.isPositiveInteger(formulaId)) {
+    return res.status(400).send('Invalid formula id');
   }
+  if (!checkNumber.isPositiveInteger(numProducts)) {
+    return res.status(400).send('Invalid number of products');
+  }
+  connection.query(`SELECT * FROM Formulas WHERE id =${formulaId}`)
+    .then((results) => {
+      if (results.length != 1) {
+        throw createError('Invalid formula id');
+      }
+      formula = results[0];
+      return connection.query(`SELECT * FROM FormulaEntries WHERE formula_id =${formulaId}`);
+    })
+    .then((results) => {
+      if (results.length == 0) throw createError('Invalid formula id');
+      formulaEntries = results;
+      const ingredientIds = [];
+      for (let formulaEntry of formulaEntries) {
+        ingredientIds.push(formulaEntry.ingredient_id);
+      }
+      return getStockPromise(ingredientIds);
+    })
+    .then((inventories) => {
+      const changes = {};
+      for (let inventory of Object.values(inventories)) {
+        const formulaEntrySearch = formulaEntries.find((formulaEntry) => inventory.ingredient_id == formulaEntry.ingredient_id);
+        const reqNumPackages = formulaEntrySearch.num_native_units / inventory.ingredient_num_native_units * numProducts / formula.num_product;
+        changes[inventory.id] = inventory.num_packages - reqNumPackages;
+        cartItems.push({
+          id: inventory.id,
+          ingredient_id: inventory.ingredient_id,
+          ingredient_num_native_units: inventory.ingredient_num_native_units,
+          num_packages: reqNumPackages,
+        });
+      }
+      return modifyInventoryQuantitiesPromise(changes);
+    })
+    .then(() => updateConsumedSpendingLogForCart(cartItems, formulaId, numProducts))
+    .then(() => success(res))
+    .catch(err => {
+      handleError(err, res);
+    });
 }
 
 /* changes: {
@@ -158,12 +179,12 @@ export function modifyInventoryQuantitiesPromise(changes) {
       .catch(err => {
         reject(err);
       });
-    });
+  });
 }
 
 function checkInputChanges(changes) {
   if (!changes || Object.keys(changes) < 1) {
-    throw createError('Invlaid input object, see doc.');
+    throw createError('Invalid input object, see doc.');
   }
 }
 
@@ -173,7 +194,7 @@ function checkChangesProperties(changes) {
       throw createError(`inventory_id ${id} invalid.`);
     }
     const value = changes[id];
-    if (!checkNumber.isNonNegativeInteger(value)) {
+    if (!parseFloat(value) && parseFloat(value) !== 0 || parseFloat(value) < 0) {
       throw createError(`new inventory quantity ${value} invalid.`);
     }
   }
@@ -198,9 +219,7 @@ export function checkStorageCapacityPromise(backup) {
       })
       .then(items => {
         items.forEach(item => {
-          if (ignoreWeights.indexOf(item.package_type) < 0) {
-            sums[item.storage_id] += getWeight(item.package_type) * item.num_packages;
-          }
+          sums[item.storage_id] += getSpace(item.package_type) * item.num_packages;
         });
         for (let id of Object.keys(sums)) {
           if (sums[id] > capacities[id]) {

@@ -109,7 +109,7 @@ app.get('/inventory/pages', beNoob, inventory.pages);
 app.get('/inventory/page/:page_num', beNoob, inventory.view);
 app.get('/inventory/stock', beManager, inventory.getStock);
 app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
-app.put('/inventory', beNoob, inventory.commitCart);
+app.put('/inventory', beManager, inventory.commitCart);
 
 app.get('/formulas', beNoob, formulas.viewAll);
 app.get('/formulas/pages', beNoob, formulas.pages);

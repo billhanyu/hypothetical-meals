@@ -1,4 +1,4 @@
-import {getWeight, ignoreWeights} from './packageUtilies';
+import { getSpace } from './packageUtilies';
 import { createError } from './customError';
 
 /*
@@ -30,9 +30,7 @@ export function checkStoragePromise(req) {
       })
       .then(items => {
         items.forEach(item => {
-          if (ignoreWeights.indexOf(item.package_type) < 0) {
-            sums[item.storage_id] += getWeight(item.package_type) * item.num_packages;
-          }
+          sums[item.storage_id] += getSpace(item.package_type) * item.num_packages;
         });
         let remainingCapacity = {};
         for (const storage in capacities) {
