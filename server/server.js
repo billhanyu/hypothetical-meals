@@ -66,6 +66,7 @@ const beManager = [auth.required, managerRequired];
 
 app.post('/users/admin', user.signupAdmin);
 app.post('/users/noob', beAdmin, user.signupNoob);
+app.post('/users/manager', beAdmin, user.signupManager);
 app.post('/users/login', user.login);
 app.post('/users/login/oauth', user.loginOauth);
 app.post('/users/permission', beAdmin, user.changePermission);

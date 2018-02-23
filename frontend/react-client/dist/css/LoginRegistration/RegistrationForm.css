@@ -184,3 +184,16 @@
 .OAuthButton:hover {
   background-color: inherit;
 }
+
+.groupRadios {
+  width: 400px;
+  margin: 40px auto 0 auto;
+}
+
+.groupRadio {
+  margin: 0 20px;
+}
+
+.groupRadioInput {
+  margin-right: 5px;
+}
