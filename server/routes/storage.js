@@ -1,6 +1,6 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
-import { getWeight, ignoreWeights } from './common/packageUtilies';
+import { getSpace } from './common/packageUtilies';
 import success from './common/success';
 
 export function view(req, res, next) {
@@ -44,9 +44,7 @@ export function changeStorage(req, res, next) {
   .then(results => {
     let sum = 0;
     results.forEach(item => {
-      if (ignoreWeights.indexOf(item.package_type) < 0) {
-        sum += getWeight(item.package_type) * item.num_packages;
-      }
+      sum += getSpace(item.package_type) * item.num_packages;
     });
     if (newCapacity < sum) {
       throw createError(`New capacity ${newCapacity} is smaller than current total storage weight ${sum}`);
