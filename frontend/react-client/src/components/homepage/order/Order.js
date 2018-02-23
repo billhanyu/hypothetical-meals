@@ -7,7 +7,7 @@ class Order extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      cart: [],
+      cart: global.cart == null ? [] : global.cart,
       chooseVendor: false,
     };
     this.orderIngredient = this.orderIngredient.bind(this);
@@ -23,6 +23,8 @@ class Order extends Component {
     }
     const promises = [];
     for (let item of this.state.cart) {
+      console.log(item.id);
+      console.log(item);
       promises.push(axios.get(`/vendoringredients/${item.id}`, {
         headers: {Authorization: "Token " + global.token}
       }));
