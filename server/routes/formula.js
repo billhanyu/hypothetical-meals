@@ -4,9 +4,9 @@ import { updateDatabaseHelper } from './common/updateUtilities';
 import { getPaginationQueryString, getNumPages } from './common/pagination';
 
 
-const formulaQueryString = 'SELECT * FROM Formulas';
+const formulaQueryString = 'SELECT * FROM Formulas WHERE removed = 0';
 const formulaEntryQuery = 'SELECT FormulaEntries.*';
-const dbFormulaNameCheck = `${formulaQueryString} WHERE name IN`;
+const dbFormulaNameCheck = `${formulaQueryString} AND name IN`;
 
 export function pages(req, res, next) {
     getNumPages('Formulas')
@@ -194,7 +194,7 @@ export function modify(req, res, next) {
     }
 
     let toUpdate = [];
-    connection.query(`${formulaQueryString} WHERE id IN (${formulaIds.join(', ')})`)
+    connection.query(`${formulaQueryString} AND id IN (${formulaIds.join(', ')})`)
         .then((formulaResults) => {
             if (formulaResults.length != formulas.length) {
                 throw createError('Trying to modify formula not in database');
@@ -237,7 +237,7 @@ export function modify(req, res, next) {
  */
 export function deleteFormulas(req, res, next) {
     const toDelete = req.body.formulas;
-    connection.query(`${formulaQueryString} WHERE id IN (${toDelete.join(', ')})`)
+    connection.query(`${formulaQueryString} AND id IN (${toDelete.join(', ')})`)
         .then((results) => {
             if (results.length != toDelete.length) {
                 throw createError('Trying to delete element not in database');
@@ -245,7 +245,7 @@ export function deleteFormulas(req, res, next) {
             return connection.query(`DELETE FROM FormulaEntries WHERE formula_id IN (${toDelete.join(', ')})`);
         })
         .then(() => {
-            return connection.query(`DELETE FROM Formulas WHERE id IN (${toDelete.join(', ')})`);
+            return connection.query(`UPDATE Formulas SET removed = 1 WHERE id IN (${toDelete.join(', ')})`);
         })
         .then(() => {
             success(res);
