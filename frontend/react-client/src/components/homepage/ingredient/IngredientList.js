@@ -132,7 +132,6 @@ class IngredientList extends Component {
   }
 
   orderIngredient(idx) {
-    console.log(this.state.ingredients[idx]);
     this.props.orderIngredient(this.state.ingredients[idx]);
   }
 
