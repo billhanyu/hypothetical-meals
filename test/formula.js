@@ -5,7 +5,56 @@ const assert = require('chai').assert;
 const testTokens = require('./testTokens');
 
 describe('Formulas', () => {
+    describe('#pages()', () => {
+        it('should return number of pages of data', (done) => {
+          chai.request(server)
+            .get('/formulas/pages')
+            .set('Authorization', `Token ${testTokens.noobTestToken}`)
+            .end((err, res) => {
+              res.should.have.status(200);
+              res.body.should.be.a('object');
+              assert.strictEqual(res.body['numPages'], 1, 'number of pages');
+              done();
+            });
+        });
+      });
+
     describe('#view()', () => {
+        beforeEach(() => {
+            alasql('SOURCE "./server/create_database.sql"');
+            alasql('SOURCE "./server/sample_data.sql"');
+        });
+
+        it('should return all formulas', (done) => {
+            chai.request(server)
+                .get('/formulas/page/1')
+                .set('Authorization', `Token ${testTokens.noobTestToken}`)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('array');
+                    res.body.length.should.be.eql(2);
+                    done();
+                });
+        });
+
+        it('should only return one page of formulas', (done) => {
+            for (let i = 0; i < 52; i++) {
+                alasql(`INSERT INTO Formulas (name, description, num_product) VALUES ('bleh${i}', 'bleh', 15)`);
+            }
+
+            chai.request(server)
+                .get('/formulas/page/1')
+                .set('Authorization', `Token ${testTokens.noobTestToken}`)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('array');
+                    res.body.length.should.be.eql(50);
+                    done();
+                });
+        });
+    });
+
+    describe('#viewAll()', () => {
         it('should return all formulas', (done) => {
             chai.request(server)
                 .get('/formulas')
@@ -390,6 +439,100 @@ describe('Formulas', () => {
                                 },
                             ],
                         },
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    done();
+                });
+        });
+    });
+
+    describe('#deleteFormulas()', () => {
+        beforeEach(() => {
+            alasql('SOURCE "./server/create_database.sql"');
+            alasql('SOURCE "./server/sample_data.sql"');
+        });
+
+        it('should delete two formulas', (done) => {
+            chai.request(server)
+                .delete('/formulas')
+                .set('Authorization', `Token ${testTokens.adminTestToken}`)
+                .send({
+                    'formulas': [
+                        1,
+                        2,
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    const formulas = alasql(`SELECT * FROM Formulas`);
+                    assert.strictEqual(formulas.length, 0, 'Should have deleted all formulas');
+                    const formulaEntries = alasql(`SELECT * FROM FormulaEntries`);
+                    assert.strictEqual(formulaEntries.length, 0, 'Should have deleted all formula entries');
+                    done();
+                });
+        });
+
+        it('should delete one formula', (done) => {
+            chai.request(server)
+                .delete('/formulas')
+                .set('Authorization', `Token ${testTokens.adminTestToken}`)
+                .send({
+                    'formulas': [
+                        1,
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    const formulas = alasql(`SELECT * FROM Formulas`);
+                    assert.strictEqual(formulas.length, 1, 'Should have deleted one formula');
+                    const formulaEntries = alasql(`SELECT * FROM FormulaEntries`);
+                    assert.strictEqual(formulaEntries.length, 2, 'Should have deleted all formula entries');
+                    formulaEntries.forEach(element => {
+                        assert.strictEqual(element.formula_id, 2, 'Should not be equal to deleted formula id');
+                    });
+                    done();
+                });
+        });
+
+        it('should reject delete for invalid formula id', (done) => {
+            chai.request(server)
+                .delete('/formulas')
+                .set('Authorization', `Token ${testTokens.adminTestToken}`)
+                .send({
+                    'formulas': [
+                        112,
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    done();
+                });
+        });
+
+        it('should reject delete for manager', (done) => {
+            chai.request(server)
+                .delete('/formulas')
+                .set('Authorization', `Token ${testTokens.managerTestToken}`)
+                .send({
+                    'formulas': [
+                        2,
+                    ],
+                })
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    done();
+                });
+        });
+
+        it('should reject delete for noob', (done) => {
+            chai.request(server)
+                .delete('/formulas')
+                .set('Authorization', `Token ${testTokens.noobTestToken}`)
+                .send({
+                    'formulas': [
+                        2,
                     ],
                 })
                 .end((err, res) => {
