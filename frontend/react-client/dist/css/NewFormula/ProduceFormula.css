@@ -1,0 +1,177 @@
+.ProduceFormulaHeader {
+  width: 80%;
+  padding: 20px;
+  text-align: left;
+  font-size: 22px;
+  font-weight: 500;
+  color: #599BC6;
+}
+
+/**** BEGIN STUFF FOR MAIN INGREDIENT SLIDER ***/
+.ProduceFormulaListItem {
+  border: 1px solid #E7E7E7;
+  border-radius: 2px;
+  width: 42.5%;
+  margin-left: 5%;
+  float: left;
+  min-width: 500px;
+  margin-bottom: 40px;
+}
+
+.ProduceFormulaListItem .ProduceFormulaListItemContainer {
+  background-color: #FAFAFA;
+  border-bottom: 1px solid #6B6B6B;
+  padding: 12px;
+  height: 50px;
+}
+
+.ProduceFormulaListItemContainer .ProduceFormulaItemName {
+  float: left;
+  font-size: 15px;
+  font-weight: 500;
+  color: #000;
+  margin-top: 2px;
+}
+
+.ProduceFormulaListItemContainer input {
+  float: left;
+  width: 100px;
+  border: 1px solid #EDEDED;
+  margin-left: 2%;
+}
+
+.ProduceFormulaListItemContainer .ProduceFormulaQuantity {
+  float: left;
+  margin-left: 1%;
+  font-size: 14px;
+  margin-top: 2px;
+}
+
+.ProduceFormulaListItemIngredientHeader {
+  font-size: 20px;
+  color: #599BC6;
+  font-weight: 500;
+  margin-left: 40px;
+  margin-top: 16px;
+  clear: both;
+  float: left;
+}
+
+/*** BEGIN STUFF FOR FORMULA INGREDIENTS ****/
+.ProduceFormulaListItemIngredient {
+  height: 40px;
+  color: #000;
+  clear: both;
+  font-size: 16px;
+  padding: 0 24px;
+  line-height: 40px;
+}
+
+.ProduceFormulaListItemIngredient .Quantity {
+  width: 20%;
+  float: left;
+  text-align: right;
+}
+
+.ProduceFormulaListItemIngredient .IngredientName {
+  width: 75%;
+  text-align: left;
+  float: left;
+  margin-left: 5%;
+}
+
+/*** BEGIN BUTTON STUFF ***/
+.ProduceFormulaButton {
+  width: 40%;
+  border-radius: 6px;
+  text-align: center;
+  padding: 24px;
+  background-color: #4783C9;
+  border: 1px solid #939393;
+  transition: all 0.5s ease;
+  cursor: pointer;
+  clear: both;
+  font-size: 16px;
+  color: #FFF;
+  position: fixed;
+  bottom: 50px;
+  left: 40%;
+}
+
+.ProduceFormulaButton:hover {
+  background-color: #579DF1;
+}
+
+/*** BEGIN COMPARATOR STUFF ****/
+.ProduceFormulaComparator {
+  width: 80%;
+  margin: 0 auto;
+  border-radius: 6px;
+  clear: both;
+  position: relative;
+}
+
+.ProduceFormulaComparatorBackButton {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  cursor: pointer;
+  color: #939393;
+}
+
+.ProduceFormulaComparator table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.ProduceFormulaComparator thead {
+  border-bottom: 1px solid black;
+  width: 100%;
+  padding: 16px;
+}
+
+.ProduceFormulaComparator td, th {
+    text-align: center;
+    padding: 12px;
+    width: 25%;
+    font-weight: 300;
+    font-size: 14px;
+}
+
+.ProduceFormulaComparator td {
+    border-top: 1px dotted #d1d9e2;
+}
+
+.ProduceFormulaComparator th {
+    font-weight: 500;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 8px;
+}
+
+.ProduceFormulaComparator tbody tr:nth-child(odd) {
+    background-color: #f8f8f8;
+}
+
+.ProduceFormulaButtonTable {
+  width: 40%;
+  margin: 0 auto;
+  border-radius: 6px;
+  text-align: center;
+  padding: 24px;
+  background-color: #4783C9;
+  border: 1px solid #939393;
+  transition: all 0.5s ease;
+  cursor: pointer;
+  clear: both;
+  font-size: 16px;
+  color: #FFF;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+.ProduceFormulaButtonTable:hover {
+  background-color: #579DF1;
+}

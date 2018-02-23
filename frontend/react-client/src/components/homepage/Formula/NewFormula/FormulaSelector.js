@@ -81,7 +81,7 @@ class FormulaInput extends Component {
 
         <SelectField
            multiple={true}
-           hintText="Select Coin data"
+           hintText="Select Ingredients"
            value={this.state.values}
            onChange={this.handleChange}
            listStyle={{color: '#31749d', padding: '0px !important', paddingTop: '0px !important', paddingBottom: '0px !important',}}
