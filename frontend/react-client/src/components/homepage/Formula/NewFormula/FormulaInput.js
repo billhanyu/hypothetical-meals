@@ -9,12 +9,18 @@ class FormulaInput extends Component {
     1. HeaderText (String)
     2. ContentText (String)
     3. useTextArea (Bool)
+    4. onChange (Func)
+    5. id (String) - name, desc, or quantity
 
     OPTIONAL PROPS
     1. placeholder (String)
     2. inputStyle (JSON Style Object)
     3. value (String)
   */
+
+  _handleChange(e) {
+    this.props.onChange(event.target.value, this.props.id);
+  }
 
   render() {
     return (
@@ -24,7 +30,7 @@ class FormulaInput extends Component {
           <div className="FormulaTextContent">{this.props.ContentText}</div>
         </div>
         {
-          this.props.useTextArea ? <textarea></textarea> : <input value={this.props.value != null ? this.props.value : null} style={this.props.inputStyle} placeholder={this.props.placeholder}/>
+          this.props.useTextArea ? <textarea value={this.props.value != null ? this.props.value : null} onChange={this._handleChange.bind(this)}></textarea> : <input onChange={this._handleChange.bind(this)} value={this.props.value != null ? this.props.value : null} style={this.props.inputStyle} placeholder={this.props.placeholder}/>
         }
 
       </div>

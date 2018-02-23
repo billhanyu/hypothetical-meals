@@ -6,19 +6,22 @@ class FormulaInput extends Component {
   }
 
   /*** REQUIRED PROPS
-    1. element (String)
+    1. elementName (String)
     2. onInputChange (Func)
+
+    OPTIONAL PROPS
+    1. value (Number)
   */
 
   _handleChange(event) {
-    this.props.onInputChange(this.props.element, event.target.value);
+    this.props.onInputChange(this.props.elementName, event.target.value);
   }
 
   render() {
     return (
       <div className="FormulaIngredientItemContainer">
-        <span>{this.props.element}</span>
-        <input placeholder="Quantity of Ingredient" onChange={this._handleChange.bind(this)} />
+        <span>{this.props.elementName}</span>
+        <input value={this.props.value} placeholder="Quantity of Ingredient" onChange={this._handleChange.bind(this)} />
       </div>
     );
   }

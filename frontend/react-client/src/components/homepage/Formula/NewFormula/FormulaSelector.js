@@ -2,37 +2,54 @@ import React, { Component } from 'react';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import FormulaIngredientItem from './FormulaIngredientItem.js';
+import axios from 'axios';
 
 class FormulaInput extends Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
-    this.names = [
-      'Chicken',
-      'Beans',
-      'Beef',
-      'Salmon',
-    ];
     this.state = {
-      values:props.values != null ? props.values : ['Chicken'],
-      nameToQuantityMap: {},
+      values: props.values != null ? props.values : [],
+      allIngredients: [],
+      ingredientData: [],
+      nameToQuantityMap: props.nameToQuantityMap != null ? props.nameToQuantityMap : {},
+      ingredientNameToQuantityMap: props.ingredientNameToQuantityMap,
     };
   }
 
   /*** REQUIRED PROPS
     1. HeaderText (String)
     2. ContentText (String)
+    3. onChange (Func)
+    4. nameToQuantityMap (JSON Object)
+    5. onValueChange (Func)
+    6. values (String)
+    7. ingredientNameToQuantityMap (JSON Object)
 
     OPTIONAL PROPS
-    1. values (Array of Srings)
   */
+
+  componentWillMount() {
+    //GET REQUEST HERE
+    axios.get(`/ingredients/page/1`, {
+      headers: {Authorization: "Token " + global.token}
+    })
+    .then(response => {
+      const allIngredients = response.data.map(element => element.name);
+      this.setState({
+        ingredientData: response.data,
+        allIngredients,
+      });
+    });
+  }
 
   handleChange(event, index, values) {
     this.setState({values});
+    this.props.onValueChange(values);
   }
 
   menuItems(values) {
-    return this.names.map((name) => (
+    return this.state.allIngredients.map((name) => (
       <MenuItem
         key={name}
         insetChildren={true}
@@ -43,12 +60,15 @@ class FormulaInput extends Component {
     ));
   }
 
-  handleInputChange(element, newQuantity) {
-    const newQuantityMap = this.state.nameToQuantityMap;
-    newQuantityMap[element] = newQuantity;
-    this.setState({
-      nameToQuantityMap: newQuantityMap,
-    });
+  handleInputChange(elementName, newQuantity) {
+    const newQuantityMap = this.props.nameToQuantityMap;
+    const newIngredientNameToQuantityMap = this.props.ingredientNameToQuantityMap;
+    const IDforElement = this.state.ingredientData.find(element => {
+      return elementName === element.name;
+    }).id;
+    newQuantityMap[IDforElement] = newQuantity;
+    newIngredientNameToQuantityMap[elementName] = newQuantity;
+    this.props.onChange(newQuantityMap, newIngredientNameToQuantityMap);
   }
 
   render() {
@@ -69,8 +89,12 @@ class FormulaInput extends Component {
            {this.menuItems(this.state.values)}
          </SelectField>
          {
-           this.state.values.map((element, key) => {
-             return <FormulaIngredientItem key={key} element={element} onInputChange={this.handleInputChange.bind(this)}/>
+           this.state.values.map((elementName, key) => {
+             return <FormulaIngredientItem
+             key={key}
+             elementName={elementName}
+             value={this.state.ingredientNameToQuantityMap[elementName]}
+             onInputChange={this.handleInputChange.bind(this)}/>
            })
          }
       </div>
