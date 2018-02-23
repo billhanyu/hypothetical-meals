@@ -23,8 +23,6 @@ class Order extends Component {
     }
     const promises = [];
     for (let item of this.state.cart) {
-      console.log(item.id);
-      console.log(item);
       promises.push(axios.get(`/vendoringredients/${item.id}`, {
         headers: {Authorization: "Token " + global.token}
       }));
