@@ -1,38 +1,36 @@
-function getWeight(type) {
-    let unitWeight = 0;
+function getSpace(type) {
+    let unitSpace = 0;
     switch (String(type).toLowerCase()) {
         case 'sack':
-            unitWeight = 50;
+            unitSpace = 0.5;
             break;
         case 'pail':
-            unitWeight = 50;
+            unitSpace = 1;
             break;
         case 'drum':
-            unitWeight = 500;
+            unitSpace = 3;
         break;
         case 'supersack':
-            unitWeight = 2000;
+            unitSpace = 16;
         break;
         case 'truckload':
-            unitWeight = 50000;
+            unitSpace = 0;
         break;
         case 'railcar':
-            unitWeight = 280000;
+            unitSpace = 0;
         break;
         default:
-            unitWeight = -1;
+            unitSpace = -1;
     }
 
-    if (unitWeight < 0) {
+    if (unitSpace < 0) {
         const err = {
             custom: 'Invalid package type.',
         };
         throw err;
     } else {
-        return unitWeight;
+        return unitSpace;
     }
 }
 
-const ignoreWeights = ['truckload', 'railcar'];
-
-export { getWeight, ignoreWeights};
+export { getSpace };
