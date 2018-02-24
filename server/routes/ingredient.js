@@ -167,8 +167,21 @@ function deleteIngredientHelper(items, req, res, next) {
     if (results.length < ingredientIds.length) {
       throw createError('Deleting nonexistent ingredient.');
     }
+    return Promise.resolve();
   })
-  .then(() => connection.query(`UPDATE Ingredients SET removed = 1 WHERE id IN (${ingredientIds.join(', ')})`))
+  .then(() => connection.query(`SELECT DISTINCT formula_id FROM FormulaEntries WHERE ingredient_id IN (${ingredientIds.join(', ')})`))
+  .then((results) => {
+    const formulaIds = [];
+    for (let result of results) {
+      formulaIds.push(result.formula_id);
+    }
+    return connection.query(`SELECT removed FROM Formulas WHERE id IN (${formulaIds.join(', ')})`);
+  })
+  .then((results) => {
+    const existingFormulas = results.find(result => result.removed == 0);
+    if (existingFormulas) throw createError('One or more ingredients contained in a formula');
+    return connection.query(`UPDATE Ingredients SET removed = 1 WHERE id IN (${ingredientIds.join(', ')})`);
+  })
   .then(() => connection.query(`SELECT id FROM VendorsIngredients WHERE ingredient_id IN (${ingredientIds.join(', ')})`))
   .then(results => {
     const vendorsIngredientsIds = results.map(e => e.id);
