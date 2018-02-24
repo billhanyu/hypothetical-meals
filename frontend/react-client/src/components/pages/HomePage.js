@@ -18,6 +18,7 @@ import NewFormula from '../homepage/Formula/NewFormula.js';
 import EditFormula from '../homepage/Formula/EditFormula.js';
 import ProduceFormula from '../homepage/inventory/ProduceFormula.js';
 import ProductionLog from '../homepage/productionlog/ProductionLog';
+
 class HomePage extends Component {
   constructor(props) {
     super(props);
