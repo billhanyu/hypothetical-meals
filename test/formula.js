@@ -133,7 +133,7 @@ describe('Formulas', () => {
                 })
                 .end((err, res) => {
                     res.should.have.status(200);
-                    const formulas = alasql(`SELECT * FROM Formulas`);
+                    const formulas = alasql(`SELECT * FROM Formulas WHERE removed = 0`);
                     assert.strictEqual(formulas.length, 4, 'Number of formulas in database');
                     assert.strictEqual(formulas[3].name, 'Bill', 'Name for formula 3');
                     assert.strictEqual(formulas[3].description, 'Fried up Bill', 'Description for formula 3');
@@ -241,7 +241,7 @@ describe('Formulas', () => {
                 })
                 .end((err, res) => {
                     res.should.have.status(200);
-                    const formulas = alasql(`SELECT * FROM Formulas`);
+                    const formulas = alasql(`SELECT * FROM Formulas WHERE removed = 0`);
                     assert.strictEqual(formulas.length, 2, 'Number of formulas in database');
                     assert.strictEqual(formulas[0].name, 'cake', 'Name for formula 1');
                     assert.strictEqual(formulas[0].description, 'A blob', 'Description for formula 3');
@@ -298,7 +298,7 @@ describe('Formulas', () => {
                 })
                 .end((err, res) => {
                     res.should.have.status(200);
-                    const formulas = alasql(`SELECT * FROM Formulas`);
+                    const formulas = alasql(`SELECT * FROM Formulas WHERE removed = 0`);
                     assert.strictEqual(formulas.length, 2, 'Number of formulas in database');
                     assert.strictEqual(formulas[0].name, 'yellow cake', 'Name for formula 1');
                     assert.strictEqual(formulas[0].description, 'A simple cake', 'Description for formula 3');
@@ -454,7 +454,7 @@ describe('Formulas', () => {
             alasql('SOURCE "./server/sample_data.sql"');
         });
 
-        it('should delete two formulas', (done) => {
+        it('should fake delete two formulas', (done) => {
             chai.request(server)
                 .delete('/formulas')
                 .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -462,14 +462,18 @@ describe('Formulas', () => {
                 .end((err, res) => {
                     res.should.have.status(200);
                     const formulas = alasql(`SELECT * FROM Formulas`);
-                    assert.strictEqual(formulas.length, 0, 'Should have deleted all formulas');
+                    const formulasRemoved = alasql(`SELECT * FROM Formulas WHERE removed = 1`);
+                    assert.strictEqual(formulasRemoved.length, 2, 'Should have marked as removed');
+                    assert.strictEqual(formulas.length, 2, 'Should have not actually removed all formulas');
+                    assert.strictEqual(formulas[0].removed, 1, 'Formula 1 marked at removed');
+                    assert.strictEqual(formulas[1].removed, 1, 'Formula 2 marked as removed');
                     const formulaEntries = alasql(`SELECT * FROM FormulaEntries`);
                     assert.strictEqual(formulaEntries.length, 0, 'Should have deleted all formula entries');
                     done();
                 });
         });
 
-        it('should delete one formula', (done) => {
+        it('should fake delete one formula', (done) => {
             chai.request(server)
                 .delete('/formulas')
                 .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -477,7 +481,9 @@ describe('Formulas', () => {
                 .end((err, res) => {
                     res.should.have.status(200);
                     const formulas = alasql(`SELECT * FROM Formulas`);
-                    assert.strictEqual(formulas.length, 1, 'Should have deleted one formula');
+                    assert.strictEqual(formulas.length, 2, 'Should have fake deleted one formula');
+                    const formula1 = alasql(`SELECT * FROM Formulas WHERE id = 1`);
+                    assert.strictEqual(formula1[0].removed, 1, 'Formula 1 marked as removed');
                     const formulaEntries = alasql(`SELECT * FROM FormulaEntries`);
                     assert.strictEqual(formulaEntries.length, 2, 'Should have deleted all formula entries');
                     formulaEntries.forEach(element => {

@@ -12,19 +12,19 @@ class RegistrationContainer extends Component {
     super(props);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmitButtonClick = this.handleSubmitButtonClick.bind(this);
-    this._handleCheckboxClick = this._handleCheckboxClick.bind(this);
+    this.handleOptionChange = this.handleOptionChange.bind(this);
     this.keyPress = this.keyPress.bind(this);
     this.state = {
       name: '',
       email: '',
       password: '',
-      isAdmin: false,
+      selectedGroup: 'noob',
     };
   }
 
-  _handleCheckboxClick() {
+  handleOptionChange(e) {
     this.setState({
-      isAdmin: !this.state.isAdmin
+      selectedGroup: e.target.value,
     });
   }
 
@@ -35,7 +35,7 @@ class RegistrationContainer extends Component {
   }
 
   handleSubmitButtonClick() {
-    axios.post(this.state.isAdmin ? '/users/admin' : '/users/noob', {
+    axios.post(`/users/${this.state.selectedGroup}`, {
       'user': {
         username: this.state.email,
         name: this.state.name,
@@ -70,7 +70,21 @@ class RegistrationContainer extends Component {
         <RegistrationInput inputType="password" inputClass="RegistrationInput" placeholderText="Password" onChange={this.handleInputChange} onKeyPress={this.keyPress} id="password" />
 
         <PasswordStrengthContainer passwordText={this.state.password} />
-        <div style={{ marginTop: '12px', marginLeft: '24px', float: 'left', marginBottom: '20px' }}><input type="checkbox" onClick={this._handleCheckboxClick} /> Admin?</div>
+        
+        <div className="groupRadios">
+          <label className="radio-inline groupRadio">
+            <input className="groupRadioInput" type="radio" name="groupRadio" value="noob" checked={this.state.selectedGroup === "noob"} onChange={this.handleOptionChange} />
+            Unprivileged
+          </label>
+          <label className="radio-inline groupRadio">
+            <input className="groupRadioInput" type="radio" name="groupRadio" value="manager" checked={this.state.selectedGroup === "manager"} onChange={this.handleOptionChange} />
+            Manager
+          </label>
+          <label className="radio-inline groupRadio">
+            <input className="groupRadioInput" type="radio" name="groupRadio" value="admin" checked={this.state.selectedGroup === "admin"} onChange={this.handleOptionChange} />
+            Admin
+          </label>
+        </div>
         <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>CREATE ACCOUNT</div>
       </div>
     );

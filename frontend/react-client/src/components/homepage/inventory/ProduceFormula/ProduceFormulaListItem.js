@@ -33,7 +33,7 @@ class ProduceFormulaListItem extends Component {
     this.setState({
       numFormula: event.target.value,
     });
-    this.props.handleNumChange(event.target.value, this.props.id, Number(this.state.numFormula) * Number(this.props.num_product));
+    this.props.handleNumChange(event.target.value, this.props.id, Number(event.target.value) * Number(this.props.num_product));
   }
 
   render() {

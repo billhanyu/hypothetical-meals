@@ -108,10 +108,10 @@ class ProduceFormulaComparator extends Component {
   produceFormulas() {
     const promiseArray = [];
     Object.keys(this.props.formulaToFormulaAmountTotalMap).forEach(formula_id => {
-      promiseArray.push(axios.put(`/inventory`, {'cart':{
-        formula_id,
+      promiseArray.push(axios.put(`/inventory`, {
+        formula_id: Number(formula_id),
         num_products: this.props.formulaToFormulaAmountTotalMap[formula_id],
-      }}, {
+      }, {
         headers: {Authorization: "Token " + global.token}
       }));
     });
