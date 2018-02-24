@@ -17,7 +17,7 @@ import ChangePermission from '../homepage/user/ChangePermission';
 import NewFormula from '../homepage/Formula/NewFormula.js';
 import EditFormula from '../homepage/Formula/EditFormula.js';
 import ProduceFormula from '../homepage/inventory/ProduceFormula.js';
-
+import ProductionLog from '../homepage/productionlog/ProductionLog';
 class HomePage extends Component {
   constructor(props) {
     super(props);
@@ -59,6 +59,9 @@ class HomePage extends Component {
     }
     else if (funcName == "spendingLog") {
       return <SpendingLog />;
+    }
+    else if (funcName == "productionLog") {
+      return <ProductionLog />;
     }
     else if (funcName == "viewIngredients") {
       return <NewIngredientList />;

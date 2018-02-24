@@ -131,7 +131,7 @@
   padding: 16px;
 }
 
-.ProduceFormulaComparator td, th {
+.ProduceFormulaComparator td, .ProduceFormulaComparator th {
     text-align: center;
     padding: 12px;
     width: 25%;
