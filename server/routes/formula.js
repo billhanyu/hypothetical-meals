@@ -55,7 +55,6 @@ function getFormulas(queryString, req, res, next) {
             res.status(200).send(Object.values(myFormulas));
         })
         .catch((err) => {
-            console.log(err);
             handleError(err, res);
         });
 }
