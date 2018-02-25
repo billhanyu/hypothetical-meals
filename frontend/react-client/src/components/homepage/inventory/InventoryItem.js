@@ -12,6 +12,8 @@ class InventoryItem extends Component {
 
   render() {
     const cssClassName = this.props.mode == "view" ? "" : "InventoryRowCart";
+    const rawQuantity = this.props.item.num_packages * this.props.item.ingredient_num_native_units;
+    const quantity = Math.round(rawQuantity * 100) / 100;
     return (
       <tr className={cssClassName} onClick={this.selectSelf}>
         <td>{this.props.item.ingredient_name}</td>
@@ -22,7 +24,7 @@ class InventoryItem extends Component {
             ?
             <input type="number" onChange={this.props.changeQuantity} value={this.props.editQuantity} />
             :
-            this.props.item.num_packages
+            `${quantity}  ${this.props.item.ingredient_native_unit}`
         }</td>
         {
           global.user_group == 'admin' && this.props.editIdx !== this.props.idx &&

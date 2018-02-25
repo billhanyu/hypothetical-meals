@@ -2,7 +2,7 @@ import * as checkNumber from './common/checkNumber';
 import { getNumPages, queryWithPagination } from './common/pagination';
 import { addFormulaCheckoutToProductionLog } from './productionlog';
 
-const basicViewQueryString = 'SELECT SpendingLogs.*, Ingredients.name AS ingredient_name, Ingredients.storage_id AS ingredient_storage_id, Ingredients.removed AS ingredient_removed FROM SpendingLogs INNER JOIN Ingredients ON SpendingLogs.ingredient_id = Ingredients.id';
+const basicViewQueryString = 'SELECT SpendingLogs.*, Ingredients.name AS ingredient_name, Ingredients.native_unit AS ingredient_native_unit, Ingredients.storage_id AS ingredient_storage_id, Ingredients.removed AS ingredient_removed FROM SpendingLogs INNER JOIN Ingredients ON SpendingLogs.ingredient_id = Ingredients.id';
 
 export function pages(req, res, next) {
   getNumPages('SpendingLogs')
