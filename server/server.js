@@ -78,6 +78,7 @@ app.put('/vendors', beAdmin, vendor.modifyVendors);
 app.delete('/vendors', beAdmin, vendor.deleteVendors);
 app.get('/vendors/code', beAdmin, vendor.getVendorWithCode);
 
+app.get('/ingredients/id/:id', beNoob, ingredient.viewWithId);
 app.get('/ingredients/pages', beNoob, ingredient.pages);
 app.get('/ingredients/page/:page_num', beNoob, ingredient.view);
 app.post('/ingredients', beAdmin, ingredient.addIngredient);

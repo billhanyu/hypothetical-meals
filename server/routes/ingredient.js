@@ -30,6 +30,20 @@ export function view(req, res, next) {
     });
 }
 
+export function viewWithId(req, res, next) {
+  if (!req.params.id || !checkNumber.isPositiveInteger(req.params.id)) {
+    return res.status(400).send('Invalid ingredient id');
+  }
+  connection.query(`${basicViewQueryString} WHERE Ingredients.id = ${req.params.id}`)
+  .then(results => {
+    if (results.length != 1) {
+      return res.status(404).send('Ingredient not found');
+    }
+    return res.json(results[0]);
+  })
+  .catch(err => handleError(err, res));
+}
+
 /* request body format:
  * request.body.ingredients = [
  *   {
