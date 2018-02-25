@@ -212,7 +212,7 @@ class AddEditIngredient extends Component {
     event.preventDefault();
     axios.get('/vendors/code', {
       params: { code: this.state.vendor_code },
-        headers: { Authorization: "Token " + global.token }
+      headers: { Authorization: "Token " + global.token }
       })
       .then(response => {
         const vendor_id = response.data.id;
@@ -245,7 +245,7 @@ class AddEditIngredient extends Component {
   }
 
   render() {
-    const header = this.state.mode == "edit" ? "Edit Ingredient" : "Add Ingredient";
+    const header = "Ingredient: " + this.state.name;
     return (
       <div>
         <h2>{header}</h2>
@@ -259,39 +259,42 @@ class AddEditIngredient extends Component {
           <form className="col-xl-6 col-lg-6 col-sm-8">
             <div className="form-group">
               <label htmlFor="name">Ingredient Name</label>
-              <input type="text" className="form-control" id="name" aria-describedby="name" placeholder="Name" onChange={e => this.handleInputChange('name', e)} value={this.state.name} required />
+              <input type="text" className="form-control" id="name" aria-describedby="name" placeholder="Name" onChange={e => this.handleInputChange('name', e)} value={this.state.name} readOnly={global.user_group !== "admin"} />
             </div>
             <div className="form-group">
               <label htmlFor="package_type">Package Type</label>
-              <ComboBox className="form-control" id="package_type" Options={packageTypes} onChange={this.handleInputChange} selected={this.state.package_type} />
+              <ComboBox className="form-control" id="package_type" Options={packageTypes} onChange={this.handleInputChange} selected={this.state.package_type} readOnly={global.user_group !== "admin"} />
             </div>
             <div className="form-group">
               <label htmlFor="storage">Temperature State</label>
-              <ComboBox className="form-control" id="storage" Options={["Frozen", "Refrigerated", "Room Temperature"]} onChange={this.handleInputChange} selected={this.state.storage} />
+              <ComboBox className="form-control" id="storage" Options={["Frozen", "Refrigerated", "Room Temperature"]} onChange={this.handleInputChange} selected={this.state.storage} readOnly={global.user_group !== "admin"} />
             </div>
             <div className="form-group">
               <label htmlFor="native_unit">Unit</label>
-              <input type="text" className="form-control" id="native_unit" aria-describedby="unit" placeholder="Pounds" onChange={e => this.handleInputChange('native_unit', e)} value={this.state.native_unit} required />
-            </div>
+              <input type="text" className="form-control" id="native_unit" aria-describedby="unit" placeholder="Pounds" onChange={e => this.handleInputChange('native_unit', e)} value={this.state.native_unit} readOnly={global.user_group !== "admin"}/>
+              </div>
             <div className="form-group">
               <label htmlFor="num_native_units">Size (in native unit above)</label>
-              <input type="text" className="form-control" id="num_native_units" aria-describedby="num_native_units" placeholder="1" onChange={e => this.handleInputChange('num_native_units', e)} value={this.state.num_native_units} required />
-            </div>
-            <button type="submit" className="btn btn-primary" onClick={this.handleSubmitButtonClick}>Submit</button>
+              <input type="text" className="form-control" id="num_native_units" aria-describedby="num_native_units" placeholder="1" onChange={e => this.handleInputChange('num_native_units', e)} value={this.state.num_native_units} readOnly={global.user_group !== "admin"} />
+              </div>
+            {
+              global.user_group == "admin" &&
+              <button type="submit" className="btn btn-primary" onClick={this.handleSubmitButtonClick}>Submit</button>
+            }
           </form>
         </div>
 
         {this.state.mode == "edit" &&
           <div>
             <h3>Vendors That Produce This Ingredient</h3>
-            {!this.state.adding &&
+            {!this.state.adding && global.user_group == "admin" &&
               <button
                 type="button"
                 className="btn btn-primary"
                 onClick={this.addvendor}>
                 Add Vendor
-        </button>}
-            {this.state.adding &&
+              </button>}
+            {this.state.adding && global.user_group == "admin" &&
               <div className="row justify-content-md-center">
                 <form className="col-xl-6 col-lg-6 col-sm-8">
                   <div className="form-group">
@@ -310,7 +313,10 @@ class AddEditIngredient extends Component {
               <tr>
                 <th>Vendor</th>
                 <th>Price</th>
+                {
+                global.user_group == "admin" &&
                 <th>Options</th>
+                }
               </tr>
               {
                 this.state.vendoringredients.map((vendoringredient, idx) => {
@@ -325,7 +331,7 @@ class AddEditIngredient extends Component {
                       </td>
                       <td>
                         {
-                          this.state.editing &&
+                          this.state.editing && global.user_group == "admin" &&
                           <div className="btn-group" role="group" aria-label="Basic example">
                             <button
                               type="button"
@@ -342,14 +348,14 @@ class AddEditIngredient extends Component {
                           </div>
                         }
                         {
-                          !this.state.editing &&
+                          !this.state.editing && global.user_group == "admin" &&
                           <div className="btn-group" role="group" aria-label="Basic example">
                             <button
                               type="button"
                               className="btn btn-secondary"
                               onClick={e=>this.editvendor(idx)}>
                               Edit
-                      </button>
+                            </button>
                             <button
                               type="button"
                               className="btn btn-danger"
@@ -357,7 +363,7 @@ class AddEditIngredient extends Component {
                               data-toggle="modal"
                               data-target="#deleteVendorIngredientModal">
                               Delete
-                      </button>
+                            </button>
                           </div>
                         }
                       </td>

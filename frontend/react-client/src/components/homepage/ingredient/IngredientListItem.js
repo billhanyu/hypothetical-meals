@@ -42,7 +42,7 @@ class IngredientListItem extends Component {
       <tbody>
         <tr data-toggle="collapse" data-target={`#vendoringredient_${this.props.idx}`} className="accordion-toggle tablerow-hover">
         <td>{ingredient.id}</td>
-        <td>{ingredient.name}</td>
+        <td><a href="javascript:void(0)" onClick={e=>this.props.viewIngredient(this.props.idx)}>{ingredient.name}</a></td>
         <td>{ingredient.package_type}</td>
         <td>{Storage2State[ingredient.storage_name]}</td>
         <td>{ingredient.num_native_units+" "+ingredient.native_unit}</td>
