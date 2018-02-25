@@ -350,10 +350,9 @@ describe('Ingredient', () => {
     });
 
     it('should fail bulk import as noob', (done) => {
-      chai.request(server)
-        .post('/ingredients/import')
+      supertest(server).post('/ingredients/import')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
-        .send({})
+        .attach('bulk', './test/bulk_import/ingredients/validData.csv')
         .end((err, res) => {
           res.should.have.status(401);
           done();
@@ -363,7 +362,7 @@ describe('Ingredient', () => {
     it('should fail data with bad amount (in lbs)', (done) => {
       supertest(server).post('/ingredients/import')
       .set('Authorization', `Token ${testTokens.adminTestToken}`)
-      .attach('bulk', './test/bulk_import/badAmountData.csv')
+      .attach('bulk', './test/bulk_import/ingredients/badAmountData.csv')
       .end(function(err, res) {
         res.should.have.status(400);
         done();
@@ -373,17 +372,7 @@ describe('Ingredient', () => {
     it('should fail data with bad price for ingredient', (done) => {
       supertest(server).post('/ingredients/import')
       .set('Authorization', `Token ${testTokens.adminTestToken}`)
-      .attach('bulk', './test/bulk_import/badPriceArgumentData.csv')
-      .end(function(err, res) {
-        res.should.have.status(400);
-        done();
-      });
-    });
-
-    it('should fail class data with invalid vendor codes', (done) => {
-      supertest(server).post('/ingredients/import')
-      .set('Authorization', `Token ${testTokens.adminTestToken}`)
-      .attach('bulk', './test/bulk_import/classData.csv')
+      .attach('bulk', './test/bulk_import/ingredients/badPriceArgumentData.csv')
       .end(function(err, res) {
         res.should.have.status(400);
         done();
@@ -393,7 +382,7 @@ describe('Ingredient', () => {
     it('should fail data with extra argument for ingredient', (done) => {
       supertest(server).post('/ingredients/import')
       .set('Authorization', `Token ${testTokens.adminTestToken}`)
-      .attach('bulk', './test/bulk_import/extraArgumentData.csv')
+      .attach('bulk', './test/bulk_import/ingredients/extraArgumentData.csv')
       .end(function(err, res) {
         res.should.have.status(400);
         done();
@@ -403,7 +392,7 @@ describe('Ingredient', () => {
     it('should fail data with incorrect package type for ingredient', (done) => {
       supertest(server).post('/ingredients/import')
       .set('Authorization', `Token ${testTokens.adminTestToken}`)
-      .attach('bulk', './test/bulk_import/incorrectPackageTypeData.csv')
+      .attach('bulk', './test/bulk_import/ingredients/incorrectPackageTypeData.csv')
       .end(function(err, res) {
         res.should.have.status(400);
         done();
@@ -413,7 +402,7 @@ describe('Ingredient', () => {
     it('should fail data with incorrect storage type for ingredient', (done) => {
       supertest(server).post('/ingredients/import')
       .set('Authorization', `Token ${testTokens.adminTestToken}`)
-      .attach('bulk', './test/bulk_import/incorrectStorageTypeData.csv')
+      .attach('bulk', './test/bulk_import/ingredients/incorrectStorageTypeData.csv')
       .end(function(err, res) {
         res.should.have.status(400);
         done();
@@ -423,7 +412,7 @@ describe('Ingredient', () => {
     it('should fail data with invalid header data', (done) => {
       supertest(server).post('/ingredients/import')
       .set('Authorization', `Token ${testTokens.adminTestToken}`)
-      .attach('bulk', './test/bulk_import/invalidHeaderData.csv')
+      .attach('bulk', './test/bulk_import/ingredients/invalidHeaderData.csv')
       .end(function(err, res) {
         res.should.have.status(400);
         done();
@@ -433,41 +422,31 @@ describe('Ingredient', () => {
     it('should fail data with missing argument for ingredient', (done) => {
       supertest(server).post('/ingredients/import')
       .set('Authorization', `Token ${testTokens.adminTestToken}`)
-      .attach('bulk', './test/bulk_import/missingArgumentData.csv')
+      .attach('bulk', './test/bulk_import/ingredients/missingArgumentData.csv')
       .end(function(err, res) {
         res.should.have.status(400);
         done();
       });
     });
 
-    it('should fail class data with too much ingredients for storage', (done) => {
+    it('should pass valid data', (done) => {
+      alasql('UPDATE Storages SET capacity = 1000000');
       supertest(server).post('/ingredients/import')
       .set('Authorization', `Token ${testTokens.adminTestToken}`)
-      .attach('bulk', './test/bulk_import/tooMuchToStoreData.csv')
+      .attach('bulk', './test/bulk_import/ingredients/validData.csv')
       .end(function(err, res) {
-        res.should.have.status(400);
-        done();
-      });
-    });
+        res.should.have.status(200);
 
-    xit('should pass valid data', (done) => {
-      supertest(server).post('/ingredients/import')
-      .set('Authorization', `Token ${testTokens.adminTestToken}`)
-      .attach('bulk', './test/bulk_import/validData.csv')
-      .end(function(err, res) {
+
         const ingredients = alasql(`SELECT * FROM Ingredients`);
-        assert.strictEqual(ingredients.length, 4 + 6, 'Five of six ingredients added to ingredients table.');
+        assert.strictEqual(ingredients.length, 4 + 5, 'Five of six ingredients added to ingredients table.');
 
         const vendorsIngredients = alasql(`SELECT * FROM VendorsIngredients`);
-        assert.strictEqual(vendorsIngredients.length, 4 + 6, 'Five of six vendor ingredients added to vendor ingredients table.');
+        assert.strictEqual(vendorsIngredients.length, 4 + 5, 'Five of six vendor ingredients added to vendor ingredients table.');
 
-        const newVendorIngredient = vendorsIngredients.find(vendorsIngredient => vendorsIngredient.ingredient_id == 9 && vendorsIngredient.price == 32.1 && vendorsIngredient.vendor_id == 1 && vendorsIngredient.package_type == 'drum');
+        const newVendorIngredient = vendorsIngredients.find(vendorsIngredient => vendorsIngredient.ingredient_id == 8 && vendorsIngredient.price == 32.1 && vendorsIngredient.vendor_id == 1);
         assert.notEqual(newVendorIngredient, null, 'Potatoes-drum ingredient added exactly once with correct price, vendor, and package type');
         newVendorIngredient.should.not.be.a('array');
-
-        // const inventories = alasql(`SELECT * FROM Inventories`);
-        // const spendingLogs = alasql(`SELECT * FROM SpendingLogs`);
-        // const storages = alasql(`SELECT * FROM Storages`);
 
         res.should.have.status(200);
         done();
