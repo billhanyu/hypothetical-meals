@@ -163,21 +163,6 @@ function deleteIngredientHelper(items, req, res, next) {
   }
 
   connection.query(`SELECT id, storage_id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
-<<<<<<< HEAD
-    .then(results => {
-      if (results.length < ingredientIds.length) {
-        throw createError('Deleting nonexistent ingredient.');
-      }
-    })
-    .then(() => connection.query(`UPDATE Ingredients SET removed = 1 WHERE id IN (${ingredientIds.join(', ')})`))
-    .then(() => connection.query(`SELECT id FROM VendorsIngredients WHERE ingredient_id IN (${ingredientIds.join(', ')})`))
-    .then(results => {
-      const vendorsIngredientsIds = results.map(e => e.id);
-      return fakeDeleteMultipleVendorIngredients(vendorsIngredientsIds);
-    })
-    .then(() => success(res))
-    .catch(err => handleError(err, res));
-=======
   .then(results => {
     if (results.length < ingredientIds.length) {
       throw createError('Deleting nonexistent ingredient.');
@@ -204,7 +189,6 @@ function deleteIngredientHelper(items, req, res, next) {
   })
   .then(() => success(res))
   .catch(err => handleError(err, res));
->>>>>>> a2e58c24f2f18a2284b20434d7bcaef4b0cb7985
 }
 
 export function bulkImport(req, res, next) {
