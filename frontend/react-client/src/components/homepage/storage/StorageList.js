@@ -80,6 +80,7 @@ class StorageList extends Component {
               <th>id</th>
               <th>Name</th>
               <th>Capacity</th>
+              <th>Occupied Space</th>
               {
                 global.user_group == 'admin' &&
                 <th>Options</th>
@@ -105,6 +106,7 @@ class StorageList extends Component {
                           storage.capacity + " sqft"
                       }
                     </td>
+                    <td>{storage.used + " sqft"}</td>
                     {
                       global.user_group == 'admin' && this.state.editIdx !== idx &&
                       <td>

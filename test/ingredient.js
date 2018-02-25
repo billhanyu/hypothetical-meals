@@ -278,7 +278,8 @@ describe('Ingredient', () => {
         });
     });
 
-    it('should delete the ingredients with the ids given', (done) => {
+    it('should delete the ingredients when no formula uses ingredient', (done) => {
+      alasql('UPDATE Formulas SET removed = 1 WHERE id = 2');
       chai.request(server)
       .delete('/ingredients')
       .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -296,7 +297,21 @@ describe('Ingredient', () => {
       });
     });
 
+    it('should fail to delete the ingredients when formula uses ingedient', (done) => {
+      chai.request(server)
+      .delete('/ingredients')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .send({
+        'ingredients': [1, 2],
+      })
+      .end((err, res) => {
+        res.should.have.status(400);
+        done();
+      });
+    });
+
     it('should delete corresponding vendorsingredients', (done) => {
+      alasql('UPDATE Formulas SET removed = 1 WHERE id = 2');
       chai.request(server)
         .delete('/ingredients')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
