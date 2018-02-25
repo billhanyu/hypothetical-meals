@@ -9,7 +9,7 @@ import { validStorageTypes } from './common/storageUtilities';
 const fs = require('fs');
 const Papa = require('papaparse');
 
-const numColumnsForBulkImport = 6;
+const numColumnsForBulkImport = 8;
 const basicViewQueryString = 'SELECT Ingredients.*, Storages.name as storage_name, Storages.capacity as storage_capacity FROM Ingredients INNER JOIN Storages ON Storages.id = Ingredients.storage_id';
 
 export function pages(req, res, next) {
@@ -57,8 +57,8 @@ function addIngredientHelper(ingredients, req, res, next) {
     ingredientsToAdd.push(`('${ingredient.name}', '${ingredient.package_type}', '${ingredient.native_unit}', ${ingredient.num_native_units}, ${ingredient.storage_id})`);
   }
   connection.query(`INSERT INTO Ingredients (name, package_type, native_unit, num_native_units, storage_id) VALUES ${ingredientsToAdd.join(', ')}`)
-  .then(() => success(res))
-  .catch(err => handleError(err, res));
+    .then(() => success(res))
+    .catch(err => handleError(err, res));
 }
 
 /* request body format:
@@ -108,33 +108,33 @@ function modifyIngredientHelper(items, req, res, next) {
   const numNativeUnitsCases = [];
   const packageTypeCases = [];
   connection.query(`SELECT id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
-  .then(results => {
-    if (results.length < ingredientIds.length) {
-      throw createError('Changing storage id or name of invalid ingredient.');
-    }
-    for (let ingredient of results) {
-      const newName = items[ingredient.id]['name'];
-      const newStorage = items[ingredient.id]['storage_id'];
-      const newNativeUnit = items[ingredient.id]['native_unit'];
-      const newPackageType = items[ingredient.id]['package_type'];
-      const newNumNativeUnits = items[ingredient.id]['num_native_units'];
-      nameCases.push(`when id = ${ingredient.id} then '${newName}'`);
-      storageCases.push(`when id = ${ingredient.id} then ${newStorage}`);
-      nativeUnitCases.push(`when id = ${ingredient.id} then '${newNativeUnit}'`);
-      packageTypeCases.push(`when id = ${ingredient.id} then '${newPackageType}'`);
-      numNativeUnitsCases.push(`when id = ${ingredient.id} then ${newNumNativeUnits}`);
-    }
-    return connection.query(
-      `UPDATE Ingredients
+    .then(results => {
+      if (results.length < ingredientIds.length) {
+        throw createError('Changing storage id or name of invalid ingredient.');
+      }
+      for (let ingredient of results) {
+        const newName = items[ingredient.id]['name'];
+        const newStorage = items[ingredient.id]['storage_id'];
+        const newNativeUnit = items[ingredient.id]['native_unit'];
+        const newPackageType = items[ingredient.id]['package_type'];
+        const newNumNativeUnits = items[ingredient.id]['num_native_units'];
+        nameCases.push(`when id = ${ingredient.id} then '${newName}'`);
+        storageCases.push(`when id = ${ingredient.id} then ${newStorage}`);
+        nativeUnitCases.push(`when id = ${ingredient.id} then '${newNativeUnit}'`);
+        packageTypeCases.push(`when id = ${ingredient.id} then '${newPackageType}'`);
+        numNativeUnitsCases.push(`when id = ${ingredient.id} then ${newNumNativeUnits}`);
+      }
+      return connection.query(
+        `UPDATE Ingredients
         SET storage_id = (case ${storageCases.join(' ')} end),
             package_type = (case ${packageTypeCases.join(' ')} end),
             name = (case ${nameCases.join(' ')} end),
             native_unit = (case ${nativeUnitCases.join(' ')} end),
             num_native_units = (case ${numNativeUnitsCases.join(' ')} end)
         WHERE id IN (${ingredientIds.join(', ')})`);
-  })
-  .then(() => success(res))
-  .catch(err => handleError(err, res));
+    })
+    .then(() => success(res))
+    .catch(err => handleError(err, res));
 }
 
 
@@ -204,12 +204,14 @@ export function bulkImport(req, res, next) {
   const slicedData = data.slice(1);
   const entries = slicedData.map(a => {
     return {
-      'ingredient': a[0],
-      'package': a[1],
-      'amount': a[2],
-      'price': a[3],
-      'vendorCode': a[4],
-      'temperature': a[5],
+      ingredient: a[0],
+      package: a[1],
+      amount: a[2],
+      nativeUnit: a[3],
+      unitsPerPackage: a[4],
+      price: a[5],
+      vendorCode: a[6],
+      temperature: a[7],
     };
   });
 
@@ -226,63 +228,72 @@ export function bulkImport(req, res, next) {
   let storages;
 
   Promise.all([getIngredients, getVendors, getVendorsIngredients, getInventories, getStorages])
-  .then((response) => {
-    [ingredients, vendors, vendorsIngredients, inventories, storages] = response;
+    .then((response) => {
+      [ingredients, vendors, vendorsIngredients, inventories, storages] = response;
 
-    // Ensure all vendors exist, and add vendor id and storage id parameter
-    for (let entry of entries) {
-      const existingVendor = vendors.find(vendor => entry.vendorCode.toLowerCase() == vendor.code.toLowerCase());
-      if (!existingVendor) throw createError(`Invalid vendor code ${entry.vendorCode}.`);
-      entry.vendor_id = existingVendor.id;
-      const currStorage = storages.find(storage => entry.temperature.toLowerCase() == storage.name.toLowerCase());
-      if (currStorage) entry.storage_id = currStorage.id;
-      else throw createError(`Storage type is nonexistant in database: ${entry.temperature}.`);
-    }
-
-    // Ensure added ingredients do not exceed storage
-    // return resolve();
-    return checkSufficientStorage(storages, entries, inventories);
-  })
-  .then(() => {
-    // Compile list of new ingredients to add to db
-    let ingredsToAdd = '';
-    for (let entry of entries) {
-      const existingIngredient = ingredients.find(ingredient => entry.ingredient.toLowerCase() == ingredient.name.toLowerCase() && entry.storage_id == ingredient.storage_id);
-      if (!existingIngredient) {
-        ingredsToAdd += `('${entry.ingredient}', ${entry.storage_id}),`;
-        ingredients.push({
-          'name': entry.ingredient,
-          'storage_name': entry.temperature,
-        });
+      // Ensure all vendors exist, and add vendor id and storage id parameter
+      for (let entry of entries) {
+        const existingVendor = vendors.find(vendor => entry.vendorCode.toLowerCase() == vendor.code.toLowerCase());
+        if (!existingVendor) throw createError(`Invalid vendor code ${entry.vendorCode}.`);
+        entry.vendor_id = existingVendor.id;
+        const currStorage = storages.find(storage => entry.temperature.toLowerCase() == storage.name.toLowerCase());
+        if (currStorage) entry.storage_id = currStorage.id;
+        else throw createError(`Storage type is nonexistant in database: ${entry.temperature}.`);
       }
-    }
-    return connection.query(`INSERT INTO Ingredients (name, storage_id) VALUES ${ingredsToAdd.slice(0, -1)}`);
-  })
-  .then(() => connection.query(`SELECT Ingredients.*, Storages.name as storage_name FROM Ingredients INNER JOIN Storages ON Storages.id = Ingredients.storage_id`))
-  .then((response) => {
-    ingredients = response;
 
-    let vendorsIngredsToAdd = '';
-    for (let entry of entries) {
-      // Find ingredient id (could be just added)
-      const entryIngredient = ingredients.find(ingredient => entry.ingredient.toLowerCase() == ingredient.name.toLowerCase() && entry.storage_id == ingredient.storage_id);
-      entry.ingredient_id = entryIngredient.id;
+      // Ensure added ingredients do not exceed storage
+      // return resolve();
+    //   return checkSufficientStorage(storages, entries, inventories);
+    // })
+    // .then(() => {
+      // Compile list of new ingredients to add to db
+      let ingredsToAdd = '';
+      for (let entry of entries) {
+        const existingIngredient = ingredients.find(ingredient => entry.ingredient.toLowerCase() == ingredient.name.toLowerCase());
 
-      const existingVendorsIngredients = vendorsIngredients.find(vendorsIngredient => entry.ingredient_id == vendorsIngredient.ingredient_id && entry.vendor_id == vendorsIngredient.vendor_id);
-      if (!existingVendorsIngredients) {
-        vendorsIngredsToAdd += `(${entry.ingredient_id}, '${entry.package}', ${entry.price}, ${entry.vendor_id}),`;
-        vendorsIngredients.push({
-          'ingredient_id': entry.ingredient_id,
-          'vendor_id': entry.vendor_id,
-        });
+        if (!existingIngredient) {
+          ingredsToAdd += `('${entry.ingredient}', '${entry.package}', ${validStorageTypes.indexOf(entry.temperature) + 1}, '${entry.nativeUnit}', '${entry.unitsPerPackage}'),`;
+          ingredients.push({
+            'name': entry.ingredient,
+            'storage_name': entry.temperature,
+            'package_type': entry.package,
+            'native_unit': entry.nativeUnit,
+            'num_native_units': entry.unitsPerPackage,
+          });
+        } else {
+          if (existingIngredient.package_type != entry.package) throw createError(`Ingredient ${entry.ingredient} is in database but package types do not match`);
+          if (existingIngredient.storage_name != entry.temperature) throw createError(`Ingredient ${entry.ingredient} is in database but storage types do not match`);
+          if (existingIngredient.native_unit != entry.nativeUnit) throw createError(`Ingredient ${entry.ingredient} is in database but native units do not match`);
+          if (existingIngredient.num_native_units != entry.unitsPerPackage) throw createError(`Ingredient ${entry.ingredient} is in database but number of units per package do not match`);
+        }
       }
-    }
-    return connection.query(`INSERT INTO VendorsIngredients (ingredient_id, package_type, price, vendor_id) VALUES ${vendorsIngredsToAdd.slice(0, -1)}`);
-  })
-  .then(() => success(res))
-  .catch((err) => {
-    handleError(err, res);
-  });
+      return ingredsToAdd == '' ? Promise.resolve() : connection.query(`INSERT INTO Ingredients (name, package_type, storage_id, native_unit, num_native_units) VALUES ${ingredsToAdd.slice(0, -1)}`);
+    })
+    .then(() => connection.query(`SELECT Ingredients.*, Storages.name as storage_name FROM Ingredients INNER JOIN Storages ON Storages.id = Ingredients.storage_id`))
+    .then((response) => {
+      ingredients = response;
+
+      let vendorsIngredsToAdd = '';
+      for (let entry of entries) {
+        // Find ingredient id (could be just added)
+        const entryIngredient = ingredients.find(ingredient => entry.ingredient.toLowerCase() == ingredient.name.toLowerCase() && entry.storage_id == ingredient.storage_id);
+        entry.ingredient_id = entryIngredient.id;
+
+        const existingVendorsIngredients = vendorsIngredients.find(vendorsIngredient => entry.ingredient_id == vendorsIngredient.ingredient_id && entry.vendor_id == vendorsIngredient.vendor_id);
+        if (!existingVendorsIngredients) {
+          vendorsIngredsToAdd += `(${entry.ingredient_id}, ${entry.price}, ${entry.vendor_id}),`;
+          vendorsIngredients.push({
+            'ingredient_id': entry.ingredient_id,
+            'vendor_id': entry.vendor_id,
+          });
+        }
+      }
+      return connection.query(`INSERT INTO VendorsIngredients (ingredient_id, price, vendor_id) VALUES ${vendorsIngredsToAdd.slice(0, -1)}`);
+    })
+    .then(() => success(res))
+    .catch((err) => {
+      handleError(err, res);
+    });
 }
 
 function checkSufficientStorage(storages, entries, backup) {
@@ -306,24 +317,24 @@ function checkSufficientStorage(storages, entries, backup) {
                                   FROM Inventories
                                   INNER JOIN Ingredients
                                   ON Inventories.ingredient_id = Ingredients.id`)
-    .then(items => {
-      items.forEach(item => {
-        sums[item.storage_id] += getSpace(item.package_type) * item.num_packages;
-      });
-      for (let id of Object.keys(sums)) {
-        if (sums[id] > capacities[id]) {
-             reject(createError('New quantities too large for current storages'));
+      .then(items => {
+        items.forEach(item => {
+          sums[item.storage_id] += getSpace(item.package_type) * item.num_packages;
+        });
+        for (let id of Object.keys(sums)) {
+          if (sums[id] > capacities[id]) {
+            reject(createError('New quantities too large for current storages'));
+          }
         }
-      }
-    })
-    .then(() => resolve())
-    .catch(err => reject(err));
+      })
+      .then(() => resolve())
+      .catch(err => reject(err));
   });
 }
 
 function checkForBulkImportFormattingErrors(data) {
-  if (data[0].length != numColumnsForBulkImport) return `Incorrect number of columns in row ${i + 1}. Should be ${numColumnsForBulkImport} but received ${data[0].length}.`;
-  const headers = ['INGREDIENT', 'PACKAGE', 'AMOUNT (LBS)', 'PRICE PER PACKAGE', 'VENDOR FREIGHT CODE', 'TEMPERATURE'];
+  if (data[0].length != numColumnsForBulkImport) return `Headers incorrectly formatted. Should be ${numColumnsForBulkImport} but received ${data[0].length}.`;
+  const headers = ['INGREDIENT', 'PACKAGE', 'AMOUNT (NATIVE UNITS)', 'NATIVE UNIT', 'UNITS PER PACKAGE', 'PRICE PER PACKAGE', 'VENDOR FREIGHT CODE', 'TEMPERATURE'];
   for (let i = 0; i < headers.length; i++) {
     if (data[0][i] !== headers[i]) {
       return `Incorrect header in column ${i + 1}. Should be ${headers[i]} but received ${data[0][i]}.`;
@@ -343,15 +354,17 @@ function checkForBulkImportFormattingErrors(data) {
     } catch (error) {
       return `Invalid package type: ${data[i][1]}`;
     }
-    // Ensure valid weight in lbs
-    if (!checkNumber.isPositiveInteger(data[i][2])) return `Invalid package weight: ${data[i][2]}`;
+    // Ensure integer number of native units
+    if (!checkNumber.isPositiveInteger(data[i][2])) return `Invalid amount in native units: ${data[i][2]}`;
+    // Ensure integer number of units per package
+    if (!checkNumber.isPositiveInteger(data[i][4])) return `Invalid number of units per package: ${data[i][2]}`;
     // Ensure valid price
-    if (isNaN(data[i][3]) || data[i][3] <= 0) return `Invalid package price: ${data[i][3]}`;
+    if (isNaN(data[i][5]) || data[i][5] <= 0) return `Invalid package price: ${data[i][5]}`;
     // Ensure valid storage type
     // Edit #6 changed it to frozen and refrigerated, changing back to freezer and refrigerator for ease of integration
-    if (data[i][5] == 'frozen') data[i][5] = 'freezer';
-    else if (data[i][5] == 'refrigerated') data[i][5] = 'refrigerator';
-    else if (data[i][5] == 'room temperature') data[i][5] = 'warehouse';
-    if (validStorageTypes.indexOf(data[i][5].toLowerCase()) < 0) return `Invalid package type: ${data[i][5]}`;
+    if (data[i][7] == 'frozen') data[i][7] = 'freezer';
+    else if (data[i][7] == 'refrigerated') data[i][7] = 'refrigerator';
+    else if (data[i][7] == 'room temperature') data[i][7] = 'warehouse';
+    if (validStorageTypes.indexOf(data[i][7].toLowerCase()) < 0) return `Invalid package type: ${data[i][7]}`;
   }
 }
