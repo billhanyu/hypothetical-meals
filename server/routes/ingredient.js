@@ -275,12 +275,10 @@ export function bulkImport(req, res, next) {
           });
         }
       }
-      console.log(vendorsIngredsToAdd);
       return connection.query(`INSERT INTO VendorsIngredients (ingredient_id, price, vendor_id) VALUES ${vendorsIngredsToAdd.slice(0, -1)}`);
     })
     .then(() => success(res))
     .catch((err) => {
-      console.log(err);
       handleError(err, res);
     });
 }

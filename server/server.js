@@ -122,6 +122,7 @@ app.get('/formulas/page/:page_num', beNoob, formulas.view);
 app.put('/formulas', beAdmin, formulas.modify);
 app.post('/formulas', beAdmin, formulas.add);
 app.delete('/formulas', beAdmin, formulas.deleteFormulas);
+app.post('/formulas/import', [auth.required, adminRequired, upload.single('bulk')], formulas.bulkImport);
 
 const distDir = `${__dirname}/../frontend/react-client/dist`;
 app.use(express.static(distDir));
