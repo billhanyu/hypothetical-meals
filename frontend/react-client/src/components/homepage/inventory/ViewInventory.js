@@ -90,7 +90,7 @@ class ViewInventory extends Component {
   edit(idx) {
     this.setState({
       editIdx: idx,
-      editQuantity: this.state.inventories[idx].num_packages,
+      editQuantity: this.state.inventories[idx].num_packages * this.state.inventories[idx].ingredient_num_native_units,
     });
   }
 
@@ -109,7 +109,8 @@ class ViewInventory extends Component {
   finishEdit() {
     const putObj = {};
     const id = this.state.inventories[this.state.editIdx].id;
-    putObj[id] = this.state.editQuantity;
+    const newQuantity = this.state.editQuantity / this.state.inventories[this.state.editIdx].ingredient_num_native_units;
+    putObj[id] = newQuantity;
     axios.put('/inventory/admin', {
       changes: putObj
     }, {
@@ -181,7 +182,7 @@ class ViewInventory extends Component {
               <th>Ingredient Name</th>
               <th>Temperature State</th>
               <th>Package Type</th>
-              <th>Number of Packages</th>
+              <th>Quantity</th>
               {
                 global.user_group == "admin" &&
                 <th>Options</th>
