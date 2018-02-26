@@ -45,7 +45,7 @@ class ProduceFormulaComparator extends Component {
       const inventoryOfIngredient = Object.keys(props.inventoryStock).find(inventoryStockObjID => {
         return ingredientid == props.inventoryStock[inventoryStockObjID].ingredient_id;
       });
-      ingredientIDtoAmountMap[ingredientid].stock = inventoryOfIngredient == null ? 0 : props.inventoryStock[inventoryOfIngredient].ingredient_num_native_units;
+      ingredientIDtoAmountMap[ingredientid].stock = inventoryOfIngredient == null ? 0 : +(props.inventoryStock[inventoryOfIngredient].num_packages).toFixed(5);
     });
     this.ingredientIDtoAmountMap = ingredientIDtoAmountMap;
     this.ingredientList = ingredientList;
