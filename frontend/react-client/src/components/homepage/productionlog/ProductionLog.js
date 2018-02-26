@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PageBar from '../../GeneralComponents/PageBar';
 import axios from 'axios';
-import SpendingLogEntry from './SpendingLogEntry';
+import ProductionLogEntry from './ProductionLogEntry';
 
-class SpendingLog extends Component {
+class ProductionLog extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -14,45 +14,44 @@ class SpendingLog extends Component {
   }
 
   componentDidMount() {
-    axios.get('/spendinglogs/pages', {
+    axios.get('/productionlogs/pages', {
       headers: { Authorization: "Token " + global.token }
     })
-    .then(response => {
-      this.setState({
-        pages: response.data.numPages
+      .then(response => {
+        this.setState({
+          pages: response.data.numPages
+        });
+        this.selectPage(1);
       });
-      this.selectPage(1);
-    });
   }
 
   selectPage(idx) {
-    axios.get(`/spendinglogs/page/${idx}`, {
+    axios.get(`/productionlogs/page/${idx}`, {
       headers: { Authorization: "Token " + global.token }
     })
-    .then(response => {
-      this.setState({
-        entries: response.data
+      .then(response => {
+        this.setState({
+          entries: response.data
+        });
       });
-    });
   }
 
   render() {
     return (
       <div>
-        <h2>Spending Log</h2>
+        <h2>Production Log</h2>
         <table className="table">
           <thead>
             <tr>
-              <th>Ingredient Name</th>
-              <th>Total Unit Ordered</th>
-              <th>Total Spending</th>
-              <th>Production Spending</th>
+              <th>Formula Name</th>
+              <th>Total Product Produced</th>
+              <th>Total Cost</th>
             </tr>
           </thead>
           <tbody>
             {
               this.state.entries.map((entry, key) =>
-                <SpendingLogEntry
+                <ProductionLogEntry
                   item={entry}
                   key={key}
                 />
@@ -69,4 +68,4 @@ class SpendingLog extends Component {
   }
 }
 
-export default SpendingLog;
+export default ProductionLog;

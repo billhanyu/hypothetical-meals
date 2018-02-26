@@ -18,6 +18,7 @@ import * as spendinglog from './routes/spendinglog';
 import * as systemlogs from './routes/systemLogs';
 import * as order from './routes/order';
 import * as formulas from './routes/formula';
+import * as productionlog from './routes/productionlog';
 import { adminRequired, noobRequired, managerRequired } from './authMiddleware';
 
 import getConfig from './getConfig';
@@ -66,6 +67,7 @@ const beManager = [auth.required, managerRequired];
 
 app.post('/users/admin', user.signupAdmin);
 app.post('/users/noob', beAdmin, user.signupNoob);
+app.post('/users/manager', beAdmin, user.signupManager);
 app.post('/users/login', user.login);
 app.post('/users/login/oauth', user.loginOauth);
 app.post('/users/permission', beAdmin, user.changePermission);
@@ -77,6 +79,7 @@ app.put('/vendors', beAdmin, vendor.modifyVendors);
 app.delete('/vendors', beAdmin, vendor.deleteVendors);
 app.get('/vendors/code', beAdmin, vendor.getVendorWithCode);
 
+app.get('/ingredients/id/:id', beNoob, ingredient.viewWithId);
 app.get('/ingredients/pages', beNoob, ingredient.pages);
 app.get('/ingredients/page/:page_num', beNoob, ingredient.view);
 app.post('/ingredients', beAdmin, ingredient.addIngredient);
@@ -109,6 +112,9 @@ app.get('/systemlogs/pages', beManager, systemlogs.pages);
 app.get('/systemlogs/page/:page_num', beManager, systemlogs.view);
 app.get('/systemlogs', beManager, systemlogs.viewAll);
 
+app.get('/productionlogs/pages', beNoob, productionlog.pages);
+app.get('/productionlogs/page/:page_num', beNoob, productionlog.view);
+
 app.get('/inventory', beNoob, inventory.all);
 app.get('/inventory/pages', beNoob, inventory.pages);
 app.get('/inventory/page/:page_num', beNoob, inventory.view);
@@ -122,6 +128,7 @@ app.get('/formulas/page/:page_num', beNoob, formulas.view);
 app.put('/formulas', beAdmin, formulas.modify);
 app.post('/formulas', beAdmin, formulas.add);
 app.delete('/formulas', beAdmin, formulas.deleteFormulas);
+app.post('/formulas/import', [auth.required, adminRequired, upload.single('bulk')], formulas.bulkImport);
 
 const distDir = `${__dirname}/../frontend/react-client/dist`;
 app.use(express.static(distDir));

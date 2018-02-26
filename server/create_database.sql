@@ -105,6 +105,7 @@ CREATE TABLE Formulas(
 	name varchar(70) not null UNIQUE,
 	description text not null,
 	num_product int not null,
+	removed BIT DEFAULT 0,
 
 	PRIMARY KEY (id)
 );
