@@ -102,6 +102,15 @@ export function add(req, res, next) {
         .then(() => {
             success(res);
         })
+        .then(() => {
+            return connection.query(`${dbFormulaNameCheck} (${names.join(', ')})`);
+        })
+        .then((results) => {
+            const formulaStrings = results.map(x => {
+                `${x.name}{formula_id: ${x.id}}`;
+            });
+            logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} added.`);
+        })
         .catch((err) => {
             handleError(err, res);
         });
@@ -229,13 +238,22 @@ export function modify(req, res, next) {
         .then(() => {
             success(res);
         })
+        .then(() => {
+            return connection.query(`${formulaQueryString} AND id IN (${formulaIds.join(', ')})`);
+        })
+        .then((results) => {
+            const formulaStrings = results.map(x => {
+                `${x.name}{formula_id: ${x.id}}`;
+            });
+            logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} modified.`);
+        })
         .catch((err) => {
             handleError(err, res);
         });
 }
 
 /**
- * Actually deletes from database, not a fake delete
+ * Fake delete from database
  * @param {*} req
  * req.body.formulas = [1, 2, 3]
  * @param {*} res
@@ -243,8 +261,10 @@ export function modify(req, res, next) {
  */
 export function deleteFormulas(req, res, next) {
     const toDelete = req.body.formulas;
+    let oldFormulas;
     connection.query(`${formulaQueryString} AND id IN (${toDelete.join(', ')})`)
         .then((results) => {
+            oldFormulas = results;
             if (results.length != toDelete.length) {
                 throw createError('Trying to delete element not in database');
             }
@@ -255,6 +275,12 @@ export function deleteFormulas(req, res, next) {
         })
         .then(() => {
             success(res);
+        })
+        .then(() => {
+            const formulaStrings = oldFormulas.map(x => {
+                `${x.name}{formula_id: ${x.id}}`;
+            });
+            logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} deleted.`);
         })
         .catch((err) => {
             handleError(err, res);

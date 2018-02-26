@@ -76,6 +76,17 @@ function getStockPromise(ids) {
 export function modifyQuantities(req, res, next) {
   modifyInventoryQuantitiesPromise(req.body.changes)
     .then(() => success(res))
+    .then(() => {
+      const changes = req.body.changes;
+      return connection.query(`SELECT Inventories.*, Ingredient.name 
+          FROM Inventories JOIN Ingredients ON Inventories.ingredient_id = Ingredient.id
+          WHERE Inventories.id IN (${changes.keys.join(', ')})`);
+    })
+    .then((results) => {
+      let modified = results.map(x => `${x.name}: ${x.num_packages}`);
+      let nameStrings = results.map(x => `${x.name}{ingredient_id: ${x.ingredient_id}}`);
+      logAction(req.payload.id, `CORRECTION: Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} modified. Inventory now has ${modified.join(', ')}`);
+    })
     .catch(err => {
       return handleError(err, res);
     });

@@ -72,6 +72,9 @@ export function addVendors(req, res, next) {
 
   connection.query(`INSERT INTO Vendors (name, contact, code) VALUES ${values.join(', ')}`)
     .then(() => success(res))
+    .then(() => {
+      logAction(req.payload.id, `Vendor${names.length > 1 ? 's' : ''} ${names.join(', ')} added.`);
+    })
     .catch(err => {
       if (err.code == 'ER_DUP_ENTRY') {
         return res.status(400).send('Duplicate code with other vendor');
@@ -132,6 +135,9 @@ export function modifyVendors(req, res, next) {
           WHERE id IN (${Object.keys(vendors).join(', ')})`);
       })
       .then(() => success(res))
+      .then(() => {
+        logAction(req.payload.id, `Vendor${names.length > 1 ? 's' : ''} ${names.join(', ')} modified.`);
+      })
       .catch(err => {
         if (err.code == 'ER_DUP_ENTRY') {
           return res.status(400).send('Duplicate code with other vendor');
@@ -147,6 +153,7 @@ export function modifyVendors(req, res, next) {
  */
 export function deleteVendors(req, res, next) {
   const ids = req.body.ids;
+  let vendors;
   if (!ids || ids.length < 1) {
     return res.status(400).send('Invalid input object, see doc.');
   }
@@ -157,13 +164,18 @@ export function deleteVendors(req, res, next) {
   }
   connection.query(`UPDATE Vendors SET removed = 1 WHERE id IN (${ids.join(', ')})`)
     .then(() => {
-      return connection.query(`SELECT id FROM VendorsIngredients WHERE vendor_id IN (${ids.join(', ')})`);
+      return connection.query(`SELECT id, name FROM VendorsIngredients WHERE vendor_id IN (${ids.join(', ')})`);
     })
     .then(results => {
+      vendors = results;
       const vendorIngredientIds = results.map(e => e.id);
       return fakeDeleteMultipleVendorIngredients(vendorIngredientIds);
     })
     .then(() => success(res))
+    .then(() => {
+      const names = vendors.map(x => x.name);
+      logAction(req.payload.id, `Vendor${names.length > 1 ? 's' : ''} ${names.join(', ')} deleted.`);
+    })
     .catch(err => {
       console.error(err);
       res.status(500).send('Database error');

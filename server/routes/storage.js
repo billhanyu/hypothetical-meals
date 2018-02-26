@@ -50,6 +50,14 @@ export function changeStorage(req, res, next) {
     return connection.query(`UPDATE Storages SET capacity = ${newCapacity} WHERE id = ${storageId}`);
   })
   .then(() => success(res))
+  .then(() => {
+    return connetion.query(`SELECT * FROM Storages WHERE id = ${storageId}`);
+  })
+  .then((results) => {
+    const name = results[0].name;
+    const storageSpace = results[0].capacity;
+    logAction(req.payload.id, `Storage area ${name} capacity changed to ${storageSpace}.`);
+  })
   .catch(err => handleError(err, res));
 }
 
