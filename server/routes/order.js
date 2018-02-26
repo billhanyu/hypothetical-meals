@@ -29,7 +29,7 @@ function orderHelper(orders, req, res, next) {
   let newIngredientCases = [];
   let ingredientsMap = {};
 
-  connection.query(`SELECT VendorsIngredients.id, VendorsIngredients.ingredient_id, Ingredients.package_type, Ingredients.storage_id 
+  connection.query(`SELECT VendorsIngredients.id, VendorsIngredients.ingredient_id, Ingredients.package_type, Ingredients.storage_id
     FROM VendorsIngredients JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id WHERE VendorsIngredients.id IN (${Object.keys(orders).join(', ')})`)
     .then((results) => {
       if (results.length < Object.keys(orders).length) {
