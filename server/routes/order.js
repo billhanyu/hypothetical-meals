@@ -4,6 +4,7 @@ import { createError, handleError } from './common/customError';
 import { getSpace } from './common/packageUtilies';
 import { checkStoragePromise } from './common/storageUtilities';
 import success from './common/success';
+import { logAction } from './systemLogs';
 
 /* request body format:
  * request.body.order = {
@@ -85,9 +86,9 @@ function orderHelper(orders, req, res, next) {
     .then(() => {
       let vendorIngredientIds = Object.keys(orders);
       return connection.query(`SELECT Ingredients.name, Ingredients.id, Vendors.name as vendor_name 
-        FROM VendorIngredients JOIN Ingredients ON VendorIngredients.ingredient_id = Ingredients.id
-        JOIN Vendors ON VendorIngredients.vendor_id = Vendors.id 
-        WHERE VendorIngredients.id IN (${vendorIngredientIds.join(', ')})`);
+        FROM VendorsIngredients JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id
+        JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id 
+        WHERE VendorsIngredients.id IN (${vendorIngredientIds.join(', ')})`);
     })
     .then((results) => {
       let orderStrings = results.map(x => {
