@@ -122,29 +122,15 @@ class SideBar extends Component {
                   text="Order"
                   permission="manager" />
                 <PermissionLink
-                  linkKey={10}
+                  linkKey={16}
                   setActive={this.setActive}
                   activeKey={this.state.activeLinkKey}
                   action={e => {
-                    this.props.link('checkOut');
+                    this.props.link('produceFormulas');
                     this.setActiveCategory(3);
                   }}
-                  text="Check Out"
+                  text="Produce Formulas"
                   permission="manager" />
-                {
-                  (global.user_group == "manager" || global.user_group == "admin") ?
-                  <PermissionLink
-                    linkKey={16}
-                    setActive={this.setActive}
-                    activeKey={this.state.activeLinkKey}
-                    action={e => {
-                      this.props.link('produceFormulas');
-                      this.setActiveCategory(3);
-                    }}
-                    text="Produce Formulas"
-                    permission="manager" />
-                  : null
-                }
               </ul>
             </div>
           </li>
