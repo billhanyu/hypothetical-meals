@@ -27,6 +27,7 @@ class FormulaInput extends Component {
     7. ingredientNameToQuantityMap (JSON Object)
 
     OPTIONAL PROPS
+    1. errorText
   */
 
   componentWillMount() {
@@ -60,14 +61,26 @@ class FormulaInput extends Component {
     ));
   }
 
+  _isNumeric(n) {
+    return !isNaN(parseFloat(n)) && (n >=0);
+  }
+
   handleInputChange(elementName, newQuantity) {
     const newQuantityMap = this.props.nameToQuantityMap;
     const newIngredientNameToQuantityMap = this.props.ingredientNameToQuantityMap;
     const IDforElement = this.state.ingredientData.find(element => {
       return elementName === element.name;
     }).id;
-    newQuantityMap[IDforElement] = newQuantity;
-    newIngredientNameToQuantityMap[elementName] = newQuantity;
+
+    if((isNaN(Number(newQuantity)) || Number(newQuantity) <= 0) && (newQuantity != '')) {
+      newQuantityMap[IDforElement] = '';
+      newIngredientNameToQuantityMap[elementName] = '';
+    }
+    else {
+      newQuantityMap[IDforElement] = newQuantity;
+      newIngredientNameToQuantityMap[elementName] = newQuantity;
+    }
+
     this.props.onChange(newQuantityMap, newIngredientNameToQuantityMap);
   }
 
@@ -84,6 +97,7 @@ class FormulaInput extends Component {
            hintText="Select Ingredients"
            value={this.state.values}
            onChange={this.handleChange}
+           errorText={this.props.errorText}
            listStyle={{color: '#31749d', padding: '0px !important', paddingTop: '0px !important', paddingBottom: '0px !important',}}
          >
            {this.menuItems(this.state.values)}
@@ -93,8 +107,9 @@ class FormulaInput extends Component {
              return <FormulaIngredientItem
              key={key}
              elementName={elementName}
-             value={this.state.ingredientNameToQuantityMap[elementName]}
-             onInputChange={this.handleInputChange.bind(this)}/>
+             value={this.props.ingredientNameToQuantityMap[elementName]}
+             onInputChange={this.handleInputChange.bind(this)}
+             />
            })
          }
       </div>

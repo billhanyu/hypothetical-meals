@@ -125,6 +125,7 @@ class Order extends Component {
         cart: [],
         chooseVendor: false,
       });
+      global.cart = [];
     })
     .catch(err => {
       alert(err.response.data);

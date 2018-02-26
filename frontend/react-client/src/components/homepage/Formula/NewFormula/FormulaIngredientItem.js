@@ -11,6 +11,7 @@ class FormulaInput extends Component {
 
     OPTIONAL PROPS
     1. value (Number)
+    2. error (Bool)
   */
 
   _handleChange(event) {

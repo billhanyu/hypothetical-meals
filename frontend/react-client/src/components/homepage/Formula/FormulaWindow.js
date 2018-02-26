@@ -47,6 +47,17 @@ class FormulaWindow extends Component {
   handleInputChange(newInput, id) {
     const newState = this.state;
     newState[id] = newInput;
+    let errorObj = {};
+    if(id == 'name'){
+      Object.assign(errorObj, {nameError: false,});
+    }
+    if(id == 'desc'){
+      Object.assign(errorObj, {descError: false,});
+    }
+    if (id == 'quantity'){
+      Object.assign(errorObj, {quantityError: false,});
+    }
+    Object.assign(newState, errorObj);
     this.setState(newState);
   }
 
@@ -60,10 +71,24 @@ class FormulaWindow extends Component {
   _handleValueChange(values) {
     this.setState({
       values,
+      ingredError: false,
     });
   }
 
   _onFinish() {
+    const isNameEmpty = this.state.name == '' || this.state.name == null;
+    const isDescEmpty = this.state.desc == '' || this.state.desc == null;
+    const isQuantityEmpty = this.state.quantity == '' || this.state.quantity == null || isNaN(Number(this.state.quantity)) || Number(this.state.quantity <= 0);
+    const isIngredEmpty = this.state.values.length == 0;
+    if(isNameEmpty || isDescEmpty || isQuantityEmpty || isIngredEmpty) {
+      return this.setState({
+        nameError: isNameEmpty,
+        descError: isDescEmpty,
+        quantityError: isQuantityEmpty,
+        ingredError: isIngredEmpty,
+      });
+    }
+
     this.props.onFinish(this.state, this.props.activeId);
   }
 
@@ -74,8 +99,8 @@ class FormulaWindow extends Component {
           this.props.BackButtonShown ? <i className="far fa-arrow-alt-circle-left fa-2x BackButtonFormulaContainer" onClick={this.props.onBackClick} ></i> : null
         }
         <div className="NewFormulaHeader">New Formula</div>
-        <FormulaInput value={this.state.name} id="name" onChange={this.handleInputChange} HeaderText="Unique Formula Name" ContentText="Name of the amalgamated entity" placeholder="Formula Name"/>
-        <FormulaInput value={this.state.desc} id="desc" onChange={this.handleInputChange} HeaderText="Formula Description" ContentText="Full description or important notes for this particular formula" useTextArea/>
+        <FormulaInput error={this.state.nameError} errorText="Invalid Name" value={this.state.name} id="name" onChange={this.handleInputChange} HeaderText="Unique Formula Name" ContentText="Name of the amalgamated entity" placeholder="Formula Name"/>
+        <FormulaInput error={this.state.descError} errorText="Invalid Desc" value={this.state.desc} id="desc" onChange={this.handleInputChange} HeaderText="Formula Description" ContentText="Full description or important notes for this particular formula" useTextArea/>
         <FormulaSelector
           onChange={this._handleIngredientChange.bind(this)}
           onValueChange={this._handleValueChange.bind(this)}
@@ -84,8 +109,9 @@ class FormulaWindow extends Component {
           ingredientNameToQuantityMap={this.state.ingredientNameToQuantityMap}
           HeaderText="Formula Ingredients"
           ContentText="List of all formula ingredients utilized, with corresponding quantities"
+          errorText={this.state.ingredError ? "Select at least 1 ingredient" : null}
         />
-        <FormulaInput value={this.state.quantity} id="quantity" onChange={this.handleInputChange} HeaderText="Quantity Created" ContentText="Total quantity created per instance of formula recipe / ingredient usage" placeholder="Quantity Created" inputStyle={{marginTop:'12px'}}/>
+        <FormulaInput error={this.state.quantityError} errorText="Invalid Quantity" value={this.state.quantity} id="quantity" onChange={this.handleInputChange} HeaderText="Quantity Created" ContentText="Total quantity created per instance of formula recipe / ingredient usage" placeholder="Quantity Created" inputStyle={{marginTop:'12px'}}/>
         <FormulaButton text={this.props.isEditing ? "Edit Formula" : "Create New Formula"} onChange={this.handleInputChange} onClick={this._onFinish.bind(this)}/>
         <div style={{clear: 'both'}}></div>
       </div>
