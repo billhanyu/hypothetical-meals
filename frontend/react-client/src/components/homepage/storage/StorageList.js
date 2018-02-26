@@ -100,7 +100,7 @@ class StorageList extends Component {
                         this.state.editIdx == idx
                           ?
                           <div>
-                            <input type="number" onChange={this.changeCapacity} value={this.state.editCapacity} />
+                            <input type="number" style={{'width': '100px'}} onChange={this.changeCapacity} value={this.state.editCapacity} />
                             <span>&nbsp;&nbsp;sqft</span>
                           </div>
                           :
