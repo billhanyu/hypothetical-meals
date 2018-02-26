@@ -16,11 +16,15 @@ class FormulaInput extends Component {
     1. placeholder (String)
     2. inputStyle (JSON Style Object)
     3. value (String)
+    4. error (Bool)
+    5. errorText (String)
   */
 
   _handleChange(e) {
     this.props.onChange(event.target.value, this.props.id);
   }
+
+
 
   render() {
     return (
@@ -32,7 +36,11 @@ class FormulaInput extends Component {
         {
           this.props.useTextArea ? <textarea value={this.props.value != null ? this.props.value : null} onChange={this._handleChange.bind(this)}></textarea> : <input onChange={this._handleChange.bind(this)} value={this.props.value != null ? this.props.value : null} style={this.props.inputStyle} placeholder={this.props.placeholder}/>
         }
-
+        {
+          this.props.error ? <div className="FormulaTextError">
+            {this.props.errorText}
+          </div> : null
+        }
       </div>
     );
   }
