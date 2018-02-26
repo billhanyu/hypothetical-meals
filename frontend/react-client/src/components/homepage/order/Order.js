@@ -7,7 +7,7 @@ class Order extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      cart: global.cart == null ? [] : global.cart,
+      cart: [],
       chooseVendor: false,
     };
     this.orderIngredient = this.orderIngredient.bind(this);
@@ -17,6 +17,11 @@ class Order extends Component {
     this.orderWithVendors = this.orderWithVendors.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.backToCart = this.backToCart.bind(this);
+    if (global.cart != null) {
+      for (let item of global.cart) {
+        this.orderIngredient(item);
+      }
+    }
   }
 
   handleInputChange(e, idx) {
@@ -62,7 +67,7 @@ class Order extends Component {
             const itemInCart = cart.filter(s => s.id === item.id);
             if (itemInCart.length == 0) {
               const newItem = Object.assign(item);
-              newItem.quantity = 1;
+              newItem.quantity = item.quantity || 1;
               cart.push(newItem);
             } else {
               const newItem = itemInCart[0];
