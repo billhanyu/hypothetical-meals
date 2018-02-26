@@ -163,3 +163,7 @@ button:focus {
 .form-control::-moz-placeholder { color: rgba(0,0,0,.3); }  /* Mozilla Firefox 19+ */
 .form-control:-ms-input-placeholder { color: rgba(0,0,0,.3); }  /* Internet Explorer 10-11 */
 .form-control::-ms-input-placeholder { color: rgba(0,0,0,.3); }  /* Microsoft Edge */
+
+.UserName {
+  font-size: 150%;
+}

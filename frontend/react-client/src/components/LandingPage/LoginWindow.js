@@ -55,6 +55,7 @@ class LoginWindow extends Component {
         this.cookies.set('token', response.data.user.token, { path: '/' });
         global.token = response.data.user.token;
         global.user_group = response.data.user.user_group;
+        global.user_username = response.data.user.username;
         this.props.history.push(`/dashboard`);
       }
     })
