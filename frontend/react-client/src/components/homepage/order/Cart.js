@@ -26,7 +26,6 @@ class Cart extends Component {
     };
     this.state = {
       cartStyle: this.cartDownTranslateStyle,
-      cartUp: false,
     };
     this.onClickHeader = this.onClickHeader.bind(this);
   }

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import AddEditIngredient from '../ingredient/AddEditIngredient';
 import SystemLogFilterBar from './SystemLogFilterBar';
+import PageBar from '../../GeneralComponents/PageBar';
 import axios from 'axios';
 
 class SystemLog extends Component {
@@ -11,6 +12,7 @@ class SystemLog extends Component {
       logs: [],
       ingredient: null,
       viewIngredient: false,
+      pages: 0,
     };
     this.changeName = this.changeName.bind(this);
     this.changeStartTime = this.changeStartTime.bind(this);
@@ -19,29 +21,38 @@ class SystemLog extends Component {
     this.search = this.search.bind(this);
     this.viewIngredient = this.viewIngredient.bind(this);
     this.back = this.back.bind(this);
+    this.selectPage = this.selectPage.bind(this);
   }
 
   componentDidMount() {
-    const data = [
-      {
-        username: 'shit',
-        description: 'fuck that shit{ingredientId: 1} and this thing{formulaId: 2} fqewfwef',
-        time: '2018-02-18',
-      },
-      {
-        username: 'damn',
-        description: 'bitch',
-        time: '2018-02-12',
-      },
-      {
-        username: 'cum',
-        description: 'cuck',
-        time: '2018-02-10',
-      },
-    ];
-    this.setState({
-      logs: data,
-      filteredLogs: data,
+    axios.get('/systemlogs/pages', {
+      headers: { Authorization: "Token " + global.token }
+    })
+      .then(response => {
+        this.setState({
+          pages: response.data.numPages,
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Error retrieving system logs');
+      });
+    this.selectPage(1);
+  }
+
+  selectPage(idx) {
+    axios.get(`/systemlogs/page/${idx}`, {
+      headers: {Authorization: "Token " + global.token}
+    })
+    .then(response => {
+      this.setState({
+        logs: response.data,
+        filteredLogs: response.data,
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Error retrieving system logs');
     });
   }
 
@@ -81,10 +92,10 @@ class SystemLog extends Component {
       });
     }
     if (this.filterStartTime) {
-      newLogs = newLogs.filter(log => log.time > this.filterStartTime);
+      newLogs = newLogs.filter(log => log.created_at.split('T')[0] >= this.filterStartTime);
     }
     if (this.filterEndTime) {
-      newLogs = newLogs.filter(log => log.time < this.filterEndTime);
+      newLogs = newLogs.filter(log => log.created_at.split('T')[0] <= this.filterEndTime);
     }
     if (this.filterUser) {
       newLogs = newLogs.filter(log => log.username.indexOf(this.filterUser) > -1);
@@ -155,7 +166,7 @@ class SystemLog extends Component {
         />
         <table className="table">
           <thead>
-            <tr className="row">
+            <tr className="row" style={{'margin': 0}}>
               <th className="col-md-3">Time</th>
               <th className="col-md-3">Username</th>
               <th className="col-md-6">Description</th>
@@ -165,8 +176,8 @@ class SystemLog extends Component {
             {
               this.state.filteredLogs.map((log, idx) => {
                 return (
-                  <tr className="row" key={idx}>
-                    <td className="col-md-3">{log.time}</td>
+                  <tr className="row" style={{ 'margin': 0 }} key={idx}>
+                    <td className="col-md-3">{log.created_at.split('T')[0]}</td>
                     <td className="col-md-3">{log.username}</td>
                     <td className="col-md-6">{this.display(log.description)}</td>
                   </tr>
@@ -175,6 +186,7 @@ class SystemLog extends Component {
             }
           </tbody>
         </table>
+        <PageBar pages={this.state.pages} selectPage={this.selectPage} />
       </div>;
     return this.state.viewIngredient ? viewIng : systemlog;
   }
