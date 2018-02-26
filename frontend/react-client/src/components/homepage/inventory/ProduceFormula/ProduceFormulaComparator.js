@@ -45,7 +45,10 @@ class ProduceFormulaComparator extends Component {
       const inventoryOfIngredient = Object.keys(props.inventoryStock).find(inventoryStockObjID => {
         return ingredientid == props.inventoryStock[inventoryStockObjID].ingredient_id;
       });
-      ingredientIDtoAmountMap[ingredientid].stock = inventoryOfIngredient == null ? 0 : props.inventoryStock[inventoryOfIngredient].ingredient_num_native_units;
+      ingredientIDtoAmountMap[ingredientid].stock = 
+        inventoryOfIngredient == null
+        ? 0
+        : props.inventoryStock[inventoryOfIngredient].ingredient_num_native_units * props.inventoryStock[inventoryOfIngredient].num_packages;
     });
     this.ingredientIDtoAmountMap = ingredientIDtoAmountMap;
     this.ingredientList = ingredientList;
@@ -103,6 +106,7 @@ class ProduceFormulaComparator extends Component {
       open: true,
       snackbarMessage: "Added to Cart",
     });
+    this.props.link('logOrder');
   }
 
   produceFormulas() {
@@ -164,7 +168,7 @@ class ProduceFormulaComparator extends Component {
           this.negativeEntries.length > 0 ?
           <div>
             <div style={{margin: '12px 0', clear:'both', textAlign:'center', fontSize:'15px', width: '100%'}}> Cannot Order - Not enough ingredients. </div>
-            <div className="ProduceFormulaButtonTable" onClick={this.addIngredientsToCart.bind(this)}>Add Difference to Cart <br /> (See cart in Order sub-tab)</div>
+            <div className="ProduceFormulaButtonTable" onClick={this.addIngredientsToCart.bind(this)}>Add Difference to Cart</div>
           </div>
           : <div className="ProduceFormulaButtonTable" onClick={this.produceFormulas.bind(this)}>Produce Formulas</div>
         }
