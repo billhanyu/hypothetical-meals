@@ -74,9 +74,7 @@ describe('Inventory', () => {
     it('should return inventory stock for valid input', (done) => {
       chai.request(server)
         .get('/inventory/stock')
-        .send({
-          ids: [1, 2, 4, 5],
-        })
+        .query({ids: [1, 2, 4, 5]})
         .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);

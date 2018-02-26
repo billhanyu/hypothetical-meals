@@ -83,7 +83,7 @@ class IngredientList extends Component {
     });
     this.selectPage(this.state.page);
   }
-  
+
   add() {
     this.setState({
       adding: true,
@@ -163,7 +163,7 @@ class IngredientList extends Component {
     const bulkImport =
     <BulkImport backToList={this.backToList} />;
 
-    const main = 
+    const main =
     <div>
       {!this.props.order &&
       <div>
