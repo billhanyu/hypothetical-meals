@@ -11,6 +11,16 @@ Return parameters:
 {% endmethod %}
 
 {% method %}
+## GET '/ingredients/:id' {#getWithId}
+
+Get an ingredient with its id.
+
+Return parameters:
+everything in Ingredients table and storage_name, storage_capacity.
+
+{% endmethod %}
+
+{% method %}
 ## GET '/ingredients/page/:page_num' {#view}
 
 Get all ingredients in the `Ingredients` table, requires no parameter input.

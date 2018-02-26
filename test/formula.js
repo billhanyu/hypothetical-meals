@@ -554,7 +554,7 @@ describe('Formulas', () => {
           alasql('SOURCE "./server/create_database.sql"');
           alasql('SOURCE "./server/sample_data.sql"');
         });
-    
+
         it('should fail bulk import as noob', (done) => {
             supertest(server).post('/formulas/import')
             .set('Authorization', `Token ${testTokens.noobTestToken}`)
@@ -564,7 +564,7 @@ describe('Formulas', () => {
               done();
             });
         });
-    
+
         it('should fail data with bad ingredient units', (done) => {
           supertest(server).post('/formulas/import')
           .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -574,7 +574,7 @@ describe('Formulas', () => {
             done();
           });
         });
-    
+
         it('should fail data with bad product units', (done) => {
           supertest(server).post('/formulas/import')
           .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -584,7 +584,7 @@ describe('Formulas', () => {
             done();
           });
         });
-    
+
         it('should fail data with extra argument for formula', (done) => {
           supertest(server).post('/formulas/import')
           .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -594,7 +594,7 @@ describe('Formulas', () => {
             done();
           });
         });
-    
+
         it('should fail data with invalid header data', (done) => {
           supertest(server).post('/formulas/import')
           .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -604,7 +604,7 @@ describe('Formulas', () => {
             done();
           });
         });
-    
+
         it('should fail data with missing argument for formula', (done) => {
           supertest(server).post('/formulas/import')
           .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -644,7 +644,7 @@ describe('Formulas', () => {
               done();
             });
           });
-    
+
         it('should pass valid data', (done) => {
             const formulaResult = alasql(`SELECT COUNT(1) FROM Formulas`);
             const numFormulas = formulaResult[0]['COUNT(1)'];
@@ -656,7 +656,7 @@ describe('Formulas', () => {
           .attach('bulk', './test/bulk_import/formulas/validData.csv')
           .end(function(err, res) {
             res.should.have.status(200);
-            
+
             const formulas = alasql(`SELECT * FROM Formulas`);
             const formulaEntries = alasql(`SELECT * FROM FormulaEntries`);
 

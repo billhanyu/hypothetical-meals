@@ -20,6 +20,20 @@ describe('Ingredient', () => {
     });
   });
 
+  describe('#viewWithId()', () => {
+    it('should return ingredient with id', (done) => {
+      chai.request(server)
+        .get('/ingredients/id/1')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          assert.strictEqual(res.body.name, 'poop', 'ingredient 1 name');
+          done();
+        });
+    });
+  });
+
   describe('#view()', () => {
     beforeEach(() => {
       alasql('SOURCE "./server/create_database.sql"');
