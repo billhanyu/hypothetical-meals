@@ -24,6 +24,7 @@ export function getAuthorizeLink() {
 export function logInWithRedirectedHash(hash, history, cookies) {
   const params = qs.parse(hash.substring(1));
   const token = params.access_token;
+  let dukeInfo;
   axios.get(IDENTITY_API_URL, {
     headers: {
       'x-api-key': config.oauth.client_id,
@@ -31,7 +32,7 @@ export function logInWithRedirectedHash(hash, history, cookies) {
     }
   })
     .then(response => {
-      const dukeInfo = response.data;
+      dukeInfo = response.data;
       axios.post('/users/login/oauth', {
         info: {
           netid: dukeInfo.netid,
@@ -44,6 +45,7 @@ export function logInWithRedirectedHash(hash, history, cookies) {
             cookies.set('token', response.data.user.token, { path: '/' });
             global.token = response.data.user.token;
             global.user_group = response.data.user.user_group;
+            global.user_username = dukeInfo.displayName;
             history.push(`/dashboard`);
           }
         })
