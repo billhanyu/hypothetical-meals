@@ -16,6 +16,7 @@ class IngredientList extends Component {
       storages: [],
       editing: false,
       adding: false,
+      viewingIdx: -1,
       bulkImport: false,
       editingIdx: 0,
     };
@@ -29,6 +30,7 @@ class IngredientList extends Component {
     this.bulkImport = this.bulkImport.bind(this);
     this.backToList = this.backToList.bind(this);
     this.orderIngredient = this.orderIngredient.bind(this);
+    this.viewIngredient = this.viewIngredient.bind(this);
   }
 
   componentDidMount() {
@@ -77,6 +79,7 @@ class IngredientList extends Component {
       bulkImport: false,
       adding: false,
       editing: false,
+      viewingIdx: -1,
     });
     this.selectPage(this.state.page);
   }
@@ -135,6 +138,12 @@ class IngredientList extends Component {
     this.props.orderIngredient(this.state.ingredients[idx]);
   }
 
+  viewIngredient(idx) {
+    this.setState({
+      viewingIdx: idx,
+    });
+  }
+
   render() {
     const edit =
     <AddEditIngredient
@@ -143,6 +152,13 @@ class IngredientList extends Component {
       backToList={this.backToList}
       finishEdit={this.finishEdit}
     />;
+
+    const view =
+      <AddEditIngredient
+        mode="edit"
+        ingredient={this.state.ingredients[this.state.viewingIdx]}
+        backToList={this.backToList}
+      />;
 
     const bulkImport =
     <BulkImport backToList={this.backToList} />;
@@ -183,6 +199,7 @@ class IngredientList extends Component {
                 onClick={this.props.onClickIngredient}
                 order={this.props.order}
                 orderIngredient={this.orderIngredient}
+                viewIngredient={this.viewIngredient}
                 edit={this.edit}
                 delete={this.delete}
                 ingredient={ingredient}
@@ -222,6 +239,8 @@ class IngredientList extends Component {
 
     if (this.state.editing) {
       return edit;
+    } else if (this.state.viewingIdx > -1) {
+      return view;
     } else if (this.state.bulkImport) {
       return bulkImport;
     } else if (this.state.adding) {
