@@ -44,7 +44,7 @@ class SpendingLog extends Component {
           <thead>
             <tr>
               <th>Ingredient Name</th>
-              <th>Total Weight Ordered</th>
+              <th>Total Unit Ordered</th>
               <th>Total Spending</th>
               <th>Production Spending</th>
             </tr>

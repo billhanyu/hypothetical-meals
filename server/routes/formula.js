@@ -1,19 +1,25 @@
+import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import success from './common/success';
 import { updateDatabaseHelper } from './common/updateUtilities';
 import { getPaginationQueryString, getNumPages } from './common/pagination';
+
+const fs = require('fs');
+const Papa = require('papaparse');
 
 
 const formulaQueryString = 'SELECT * FROM Formulas WHERE removed = 0';
 const formulaEntryQuery = 'SELECT FormulaEntries.*';
 const dbFormulaNameCheck = `${formulaQueryString} AND name IN`;
 
+const numColumnsForBulkImport = 5;
+
 export function pages(req, res, next) {
     getNumPages('Formulas')
-    .then(results => res.status(200).send(results))
-    .catch(err => {
-      return res.status(500).send('Database error');
-    });
+        .then(results => res.status(200).send(results))
+        .catch(err => {
+            return res.status(500).send('Database error');
+        });
 }
 
 export function view(req, res, next) {
@@ -253,4 +259,101 @@ export function deleteFormulas(req, res, next) {
         .catch((err) => {
             handleError(err, res);
         });
+}
+
+
+export function bulkImport(req, res, next) {
+    const csv = fs.readFileSync(req.file.path);
+    const papaResponse = Papa.parse(csv.toString());
+    const data = papaResponse.data;
+
+    const formattingError = checkForBulkImportFormattingErrors(data);
+    if (formattingError) {
+        return handleError(createError(formattingError), res);
+    }
+
+    const slicedData = data.slice(1);
+    const entries = slicedData.map(a => {
+        return {
+            formula: a[0],
+            amount: a[1],
+            description: a[2],
+            ingredient: a[3],
+            numNativeUnits: a[4],
+        };
+    });
+
+    let formulasToAdd = '';
+    let prevFormulaNames = [];
+    // Make sure no repeated formulas
+    connection.query(`SELECT name FROM Formulas`)
+        .then(formulas => {
+            for (let entry of entries) {
+                const duplicateFormula = formulas.find(formula => formula.name.toLowerCase() == entry.formula.toLowerCase());
+                if (duplicateFormula) throw createError(`Formula ${entry.formula} already exists`);
+
+                if (prevFormulaNames.length == 0 || entry.formula != prevFormulaNames[prevFormulaNames.length - 1]) {
+                    prevFormulaNames.push(entry.formula);
+                    formulasToAdd += `('${entry.formula}', '${entry.description}', ${entry.amount}),`;
+                }
+            }
+            return connection.query(`SELECT id, name, removed FROM Ingredients`);
+        })
+        // Make sure ingredients exist
+        .then(ingredients => {
+            for (let entry of entries) {
+                const existingIngredient = ingredients.find(ingredient => ingredient.name.toLowerCase() == entry.ingredient.toLowerCase() && ingredient.removed == 0);
+                if (!existingIngredient) throw createError(`Ingredient ${entry.ingredient} does not exist`);
+                entry.ingredientId = existingIngredient.id;
+            }
+            // Add formulas
+            return connection.query(`INSERT INTO Formulas (name, description, num_product) VALUES ${formulasToAdd.slice(0, -1)}`);
+        })
+        .then(() => connection.query(`SELECT * FROM Formulas`))
+        .then(formulas => {
+            // Add formula entries
+            let formulaEntriesToAdd = '';
+            for (let entry of entries) {
+                const formulaFromDb = formulas.find(formula => formula.name == entry.formula);
+                formulaEntriesToAdd += `(${entry.ingredientId}, ${entry.numNativeUnits}, ${formulaFromDb.id}),`;
+            }
+            return connection.query(`INSERT INTO FormulaEntries (ingredient_id, num_native_units, formula_id) VALUES ${formulaEntriesToAdd.slice(0, -1)}`);
+        })
+        .then(() => res.sendStatus(200))
+        .catch((err) => {
+            handleError(err, res);
+        });
+}
+
+function checkForBulkImportFormattingErrors(data) {
+    if (data[0].length != numColumnsForBulkImport) return `Headers incorrectly formatted. Should be ${numColumnsForBulkImport} but received ${data[0].length}.`;
+    const headers = ['FORMULA', 'PRODUCT UNITS', 'DESCRIPTION', 'INGREDIENT', 'INGREDIENT UNITS'];
+    for (let i = 0; i < headers.length; i++) {
+        if (data[0][i] !== headers[i]) {
+            return `Incorrect header in column ${i + 1}. Should be ${headers[i]} but received ${data[0][i]}.`;
+        }
+    }
+    let prevFormulaNames = [];
+    let isFirstRowOfFormula = true;
+    for (let i = 1; i < data.length; i++) {
+        if (data[i].length != numColumnsForBulkImport) {
+            // Check for the new line at bottom of sheet
+            if (i == data.length - 1 && data[i].length == 1 && data[i][0] == '') {
+                data = data.pop();
+                return;
+            } else return `Incorrect number of columns in row ${i + 1}. Should be ${numColumnsForBulkImport} but received ${data[i].length}.`;
+        }
+        // Ensure valid formula name
+        if (prevFormulaNames.length == 0 || data[i][0] != prevFormulaNames[prevFormulaNames.length - 1]) {
+            if (prevFormulaNames.indexOf(data[i][0]) >= 0) return `${data[i][0]} formula is not in consecutive rows`;
+            prevFormulaNames.push(data[i][0]);
+            isFirstRowOfFormula = true;
+        } else {
+            isFirstRowOfFormula = false;
+        }
+        // Ensure integer number of product units
+        if (isFirstRowOfFormula && !checkNumber.isPositiveInteger(data[i][1])) return `Invalid amount in product units: ${data[i][1]}`;
+        // Ensure valid ingredient num native units
+        if (isNaN(data[i][4]) || data[i][4] <= 0) return `Invalid ingredient units: ${data[i][4]}`;
+    }
 }

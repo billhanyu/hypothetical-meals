@@ -28,6 +28,9 @@ class SideBar extends Component {
     return (
       <div className="SideBar col-sm-4 col-md-3 col-lg-2 col-xl-2" id="SideBar">
         <ul className="nav flex-column">
+          <li className="nav-item UserName">
+            Hi {global.user_username}
+          </li>
           <li className="nav-item">
             <a
               href="javascript:void(0)"
@@ -185,6 +188,16 @@ class SideBar extends Component {
                   }}
                   text="Production Log"
                   permission="noob" />
+                <PermissionLink
+                  linkKey={20}
+                  setActive={this.setActive}
+                  activeKey={this.state.activeLinkKey}
+                  action={e => {
+                    this.props.link('systemLog');
+                    this.setActiveCategory(4);
+                  }}
+                  text="System Log"
+                  permission="manager" />
               </ul>
             </div>
           </li>

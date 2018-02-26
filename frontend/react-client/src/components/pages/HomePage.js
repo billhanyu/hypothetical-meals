@@ -19,6 +19,7 @@ import EditFormula from '../homepage/Formula/EditFormula.js';
 import ProduceFormula from '../homepage/inventory/ProduceFormula.js';
 import ViewAllFormulas from '../homepage/inventory/ViewAllFormulas.js';
 import ProductionLog from '../homepage/productionlog/ProductionLog';
+import SystemLog from '../homepage/systemlog/SystemLog';
 
 class HomePage extends Component {
   constructor(props) {
@@ -52,6 +53,9 @@ class HomePage extends Component {
     }
     else if (funcName == "changePermission") {
       return <ChangePermission />;
+    }
+    else if (funcName == "systemLog") {
+      return <SystemLog />;
     }
     else if (funcName == "logOrder") {
       return <Order />;

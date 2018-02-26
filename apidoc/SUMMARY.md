@@ -7,6 +7,7 @@
 * [Inventory](inventory.md)
 * [Log](log.md)
 * [SpendingLog](spendinglog.md)
+* [SystemLog](systemLogs.md)
 * [Storage](storage.md)
 * [User](user.md)
 * [Vendor](vendor.md)
