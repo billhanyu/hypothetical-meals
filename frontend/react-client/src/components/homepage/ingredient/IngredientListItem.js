@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Storage2State from '../../Constants/Storage2State';
 import axios from 'axios';
 
+let noCollapseButton = false;
+
 class IngredientListItem extends Component {
   constructor(props) {
     super(props);
@@ -23,6 +25,15 @@ class IngredientListItem extends Component {
       console.log(err);
       alert('Error getting product info for ingredient');
     });
+    $('.collapse').on('show.bs.collapse', function (e) {
+      if (noCollapseButton) {
+        e.preventDefault();
+        noCollapseButton = false;
+      }
+    });
+    $('.no-collapse').on('click', function (e) {
+      noCollapseButton = true;
+    });
   }
   
   render() {
@@ -31,7 +42,7 @@ class IngredientListItem extends Component {
       <tbody>
         <tr data-toggle="collapse" data-target={`#vendoringredient_${this.props.idx}`} className="accordion-toggle tablerow-hover">
         <td>{ingredient.id}</td>
-        <td>{ingredient.name}</td>
+        <td><a href="javascript:void(0)" onClick={e=>this.props.viewIngredient(this.props.idx)}>{ingredient.name}</a></td>
         <td>{ingredient.package_type}</td>
         <td>{Storage2State[ingredient.storage_name]}</td>
         <td>{ingredient.num_native_units+" "+ingredient.native_unit}</td>
@@ -41,13 +52,13 @@ class IngredientListItem extends Component {
             <div className="btn-group" role="group" aria-label="Basic example">
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="btn btn-secondary no-collapse"
                 onClick={e => this.props.edit(this.props.idx)}>
                 Edit
               </button>
               <button
                 type="button"
-                className="btn btn-danger"
+                className="btn btn-danger no-collapse"
                 onClick={e=>this.props.delete(this.props.idx)}
                 data-toggle="modal"
                 data-target="#deleteIngredientModal">
@@ -61,9 +72,9 @@ class IngredientListItem extends Component {
             <td>
             <button
               type="button"
-              className="btn btn-primary"
+              className="btn btn-primary no-collapse"
               onClick={e => {this.props.orderIngredient(this.props.idx);}}>
-              Order
+              Add To Cart
             </button>
             </td>
         }

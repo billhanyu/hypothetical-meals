@@ -71,18 +71,20 @@ class StorageList extends Component {
   }
 
   render() {
+    const columnClass = global.user_group == "admin" ? "OneFifthWidth" : "OneFourthWidth";
     return (
       <div>
         <h2>Storages</h2>
         <table className="table">
           <thead>
             <tr>
-              <th>id</th>
-              <th>Name</th>
-              <th>Capacity</th>
+              <th className={columnClass}>id</th>
+              <th className={columnClass}>Name</th>
+              <th className={columnClass}>Capacity</th>
+              <th className={columnClass}>Occupied Space</th>
               {
                 global.user_group == 'admin' &&
-                <th>Options</th>
+                <th className={columnClass}>Options</th>
               }
             </tr>
           </thead>
@@ -91,9 +93,9 @@ class StorageList extends Component {
               this.state.storages.map((storage, idx) => {
                 return (
                   <tr key={idx}>
-                    <td>{storage.id}</td>
-                    <td>{storage.name}</td>
-                    <td>
+                    <td className={columnClass}>{storage.id}</td>
+                    <td className={columnClass}>{storage.name}</td>
+                    <td className={columnClass}>
                       {
                         this.state.editIdx == idx
                           ?
@@ -105,9 +107,10 @@ class StorageList extends Component {
                           storage.capacity + " sqft"
                       }
                     </td>
+                    <td className={columnClass}>{storage.used + " sqft"}</td>
                     {
                       global.user_group == 'admin' && this.state.editIdx !== idx &&
-                      <td>
+                      <td className={columnClass}>
                         <button
                           type="button"
                           className="btn btn-secondary"
@@ -118,7 +121,7 @@ class StorageList extends Component {
                     }
                     {
                       global.user_group == 'admin' && this.state.editIdx == idx &&
-                      <td>
+                      <td className={columnClass}>
                       <div className="btn-group" role="group" aria-label="Basic example">
                         <button
                           type="button"
