@@ -1,4 +1,4 @@
-# Formulas API
+# System Logs API
 
 {% method %}
 ## GET '/systemLogs/pages' {#pages}
