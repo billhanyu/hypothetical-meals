@@ -80,7 +80,7 @@ class HomePage extends Component {
       return <EditFormula />;
     }
     else if (funcName == 'produceFormulas') {
-      return <ProduceFormula />;
+      return <ProduceFormula link={this.link} />;
     }
   }
 
