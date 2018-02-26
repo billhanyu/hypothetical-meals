@@ -23,10 +23,12 @@ class NewFormula extends Component {
     const ingredients = [];
     const self = this;
     Object.keys(idToQuantityMap).forEach(key => {
-      ingredients.push({
-        ingredient_id: key,
-        num_native_units: idToQuantityMap[key],
-      });
+      if(Number(idToQuantityMap[key]) > 0){
+        ingredients.push({
+          ingredient_id: key,
+          num_native_units: idToQuantityMap[key],
+        });
+      }
     });
     axios.post(`/formulas`, {'formulas':[
       {
