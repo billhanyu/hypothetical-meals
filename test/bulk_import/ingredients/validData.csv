@@ -1,0 +1,7 @@
+INGREDIENT,PACKAGE,AMOUNT (NATIVE UNITS),NATIVE UNIT,UNITS PER PACKAGE,PRICE PER PACKAGE,VENDOR FREIGHT CODE,TEMPERATURE
+poop,sack,90,pounds,10,20.15,code_duke,frozen
+"Carrots, pail",pail,300,lbs,15,16.89,code_unc,room temperature
+Carrots - railcar,railcar,432,lbs,432,4000,code_duke,room temperature
+Grapes - supersack,supersack,100,bunches,25,69.32,code_unc,frozen
+Potatoes - drum,drum,64,units,8,32.1,code_duke,refrigerated
+"Potatoes, sack",sack,32,units,4,6.01,code_unc,refrigerated

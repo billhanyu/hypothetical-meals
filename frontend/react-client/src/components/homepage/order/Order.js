@@ -14,25 +14,37 @@ class Order extends Component {
     this.setQuantity = this.setQuantity.bind(this);
     this.removeItem = this.removeItem.bind(this);
     this.order = this.order.bind(this);
+    this.orderWithVendors = this.orderWithVendors.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.backToCart = this.backToCart.bind(this);
+  }
+
+  handleInputChange(e, idx) {
+    const ingredientId = "ingredient" + this.state.cart[idx].id;
+    const ingredient = this.state[ingredientId];
+    ingredient.selected = e.target.value;
+  }
+
+  backToCart() {
+    this.setState({
+      chooseVendor: false,
+    });
   }
 
   order() {
-    if (this.state.cart.length == 0) {
-      alert('Please choose something first');
-      return;
-    }
-    const promises = [];
-    for (let item of this.state.cart) {
-      promises.push(axios.get(`/vendoringredients/${item.id}`, {
-        headers: {Authorization: "Token " + global.token}
-      }));
-    }
-    Promise.all(promises)
-      .then(responses => {
-        for (let response of responses) {
+    this.setState({
+      chooseVendor: true,
+    });
+  }
+
+  orderIngredient(item) {
+    axios.get(`/vendoringredients/${item.id}`, {
+      headers: { Authorization: "Token " + global.token }
+    })
+      .then(response => {
           const vendoringredients = response.data;
           if (vendoringredients.length > 0) {
-            const id = vendoringredients[0].ingredient_id;
+            const id = item.id;
             let lowest = vendoringredients[0];
             for (let vendoringredient of vendoringredients) {
               if (vendoringredient.price < lowest.price) {
@@ -41,36 +53,31 @@ class Order extends Component {
             }
             const ingredient = {
               vendoringredients,
-              selected: lowest,
+              selected: lowest.id,
             };
             const state = {};
-            state["ingredient"+id] = ingredient;
+            state["ingredient" + id] = ingredient;
             this.setState(state);
+            const cart = this.state.cart.slice();
+            const itemInCart = cart.filter(s => s.id === item.id);
+            if (itemInCart.length == 0) {
+              const newItem = Object.assign(item);
+              newItem.quantity = 1;
+              cart.push(newItem);
+            } else {
+              const newItem = itemInCart[0];
+              newItem.quantity += 1;
+            }
+            this.setState({
+              cart
+            });
+          } else {
+            alert('There is no vendor for this ingredient!');
           }
-        }
-      })
+        })
       .catch(err => {
         alert('Error retrieving vendor information for ingredients');
       });
-    this.setState({
-      chooseVendor: true,
-    });
-  }
-
-  orderIngredient(item) {
-    const cart = this.state.cart.slice();
-    const itemInCart = cart.filter(s => s.id === item.id);
-    if (itemInCart.length == 0) {
-      const newItem = Object.assign(item);
-      newItem.quantity = 1;
-      cart.push(newItem);
-    } else {
-      const newItem = itemInCart[0];
-      newItem.quantity += 1;
-    }
-    this.setState({
-      cart
-    });
   }
 
   removeItem(id) {
@@ -96,6 +103,31 @@ class Order extends Component {
     itemInCart.quantity = quantity;
     this.setState({
       cart
+    });
+  }
+
+  orderWithVendors(event) {
+    event.preventDefault();
+    const orderObj = {};
+    for (let item of this.state.cart) {
+      const ingredientId = "ingredient" + item.id;
+      const ingredient = this.state[ingredientId];
+      orderObj[ingredient.selected] = item.quantity;
+    }
+    axios.post('/order', {
+      orders: orderObj,
+    }, {
+      headers: {Authorization: "Token " + global.token}
+    })
+    .then(response => {
+      alert('order completed!');
+      this.setState({
+        cart: [],
+        chooseVendor: false,
+      });
+    })
+    .catch(err => {
+      alert(err.response.data);
     });
   }
 
@@ -127,7 +159,8 @@ class Order extends Component {
                         <select className="form-control" onChange={e=>this.handleInputChange(e, idx)}>
                           {
                             vendoringredients.map((vendoringredient, idx) => {
-                              return <option key={idx} value={vendoringredient.id}>{vendoringredient.vendor_name + vendoringredient.price}</option>;
+                              const selectedClass = ingredient && ingredient.selected == vendoringredient.id ? "selected" : "";
+                              return <option selected={selectedClass} key={idx} value={vendoringredient.id}>{`${vendoringredient.vendor_name} - $${vendoringredient.price}`}</option>;
                             })
                           }
                         </select>
@@ -136,6 +169,7 @@ class Order extends Component {
                   );
                 })
               }
+              <button type="button" className="btn btn-secondary" onClick={this.backToCart}>Back</button>
               <button type="submit" className="btn btn-primary" onClick={this.orderWithVendors}>Order</button>
               </form>
             </div>

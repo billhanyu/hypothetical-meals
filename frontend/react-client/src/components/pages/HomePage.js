@@ -15,6 +15,8 @@ import SpendingLog from '../homepage/spendinglog/SpendingLog';
 import StorageList from '../homepage/storage/StorageList';
 import Registration from '../Registration/RegistrationContainer';
 import ChangePermission from '../homepage/user/ChangePermission';
+import ProductionLog from '../homepage/productionlog/ProductionLog';
+import SystemLog from '../homepage/systemlog/SystemLog';
 
 class HomePage extends Component {
   constructor(props) {
@@ -52,6 +54,9 @@ class HomePage extends Component {
     else if (funcName == "changePermission") {
       return <ChangePermission />;
     }
+    else if (funcName == "systemLog") {
+      return <SystemLog />;
+    }
     else if (funcName == "logOrder") {
       return <Order />;
     }
@@ -60,6 +65,9 @@ class HomePage extends Component {
     }
     else if (funcName == "spendingLog") {
       return <SpendingLog />;
+    }
+    else if (funcName == "productionLog") {
+      return <ProductionLog />;
     }
     else if (funcName == "viewIngredients") {
       return <NewIngredientList />;
