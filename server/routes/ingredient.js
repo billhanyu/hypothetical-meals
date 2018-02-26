@@ -72,6 +72,17 @@ function addIngredientHelper(ingredients, req, res, next) {
   }
   connection.query(`INSERT INTO Ingredients (name, package_type, native_unit, num_native_units, storage_id) VALUES ${ingredientsToAdd.join(', ')}`)
     .then(() => success(res))
+    .then(() => {
+      const names = ingredients.map(x => '${x.name}');
+      return connection.query(`SELECT * FROM ingredients WHERE names IN (${names.join(', ')})`);
+    })
+    .then((results) => {
+      const nameStrings = [];
+      results.forEach(x => {
+        nameStrings.push(`${x.name}{ingredient_id: ${x.id}}`);
+      });
+      logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} added.`);
+    })
     .catch(err => handleError(err, res));
 }
 
@@ -148,6 +159,17 @@ function modifyIngredientHelper(items, req, res, next) {
         WHERE id IN (${ingredientIds.join(', ')})`);
     })
     .then(() => success(res))
+    .then(() => {
+      const myIds = Object.keys(items);
+      return connection.query(`SELECT * FROM ingredients WHERE ids IN (${myIds.join(', ')})`);
+    })
+    .then((results) => {
+      const nameStrings = [];
+      results.forEach(x => {
+        nameStrings.push(`${x.name}{ingredient_id: ${x.id}}`);
+      });
+      logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} modified.`);
+    })
     .catch(err => handleError(err, res));
 }
 
@@ -202,6 +224,17 @@ function deleteIngredientHelper(items, req, res, next) {
     return fakeDeleteMultipleVendorIngredients(vendorsIngredientsIds);
   })
   .then(() => success(res))
+  .then(() => {
+    const myIds = items;
+    return connection.query(`SELECT * FROM ingredients WHERE ids IN (${myIds.join(', ')})`);
+  })
+  .then((results) => {
+    const nameStrings = [];
+    results.forEach(x => {
+      nameStrings.push(`${x.name}{ingredient_id: ${x.id}}`);
+    });
+    logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} deleted.`);
+  })
   .catch(err => handleError(err, res));
 }
 
