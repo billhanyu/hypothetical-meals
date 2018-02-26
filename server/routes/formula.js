@@ -3,6 +3,7 @@ import { createError, handleError } from './common/customError';
 import success from './common/success';
 import { updateDatabaseHelper } from './common/updateUtilities';
 import { getPaginationQueryString, getNumPages } from './common/pagination';
+import { logAction } from './systemLogs';
 
 const fs = require('fs');
 const Papa = require('papaparse');
