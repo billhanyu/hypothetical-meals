@@ -246,6 +246,7 @@ class AddEditIngredient extends Component {
 
   render() {
     const header = "Ingredient: " + this.state.name;
+    const columnClass = global.user_group == "admin" ? "OneThirdWidth" : "HalfWidth";
     return (
       <div>
         <h2>{header}</h2>
@@ -311,25 +312,25 @@ class AddEditIngredient extends Component {
             }
             <table className="table">
               <tr>
-                <th>Vendor</th>
-                <th>Price</th>
+                <th className={columnClass}>Vendor</th>
+              <th className={columnClass}>Price</th>
                 {
                 global.user_group == "admin" &&
-                <th>Options</th>
+                <th className={columnClass}>Options</th>
                 }
               </tr>
               {
                 this.state.vendoringredients.map((vendoringredient, idx) => {
                   return (
                     <tr key={idx}>
-                      <td>{vendoringredient.vendor_name}</td>
-                      <td>
+                      <td className={columnClass}>{vendoringredient.vendor_name}</td>
+                      <td className={columnClass}>
                         {this.state.editIdx !== idx && vendoringredient.price}
                         {this.state.editIdx == idx &&
                           <input type="number" id="price" aria-describedby="price" placeholder="price" onChange={e => this.handleInputChange('editPrice', e)} value={this.state.editPrice} />
                         }
                       </td>
-                      <td>
+                      <td className={columnClass}>
                         {
                           this.state.editing && global.user_group == "admin" &&
                           <div className="btn-group" role="group" aria-label="Basic example">

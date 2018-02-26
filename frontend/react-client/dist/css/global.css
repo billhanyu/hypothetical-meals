@@ -167,3 +167,23 @@ button:focus {
 .UserName {
   font-size: 150%;
 }
+
+.HalfWidth {
+  width: 50%;
+}
+
+.OneThirdWidth {
+  width: 33.3333%;
+}
+
+.OneFourthWidth {
+  width: 25%;
+}
+
+.OneFifthWidth {
+  width: 20%;
+}
+
+.OneSixthWidth {
+  width: 16.6666%;
+}
