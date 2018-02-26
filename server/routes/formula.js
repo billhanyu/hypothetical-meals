@@ -3,6 +3,7 @@ import { createError, handleError } from './common/customError';
 import success from './common/success';
 import { updateDatabaseHelper } from './common/updateUtilities';
 import { getPaginationQueryString, getNumPages } from './common/pagination';
+import { logAction } from './systemLogs';
 
 const fs = require('fs');
 const Papa = require('papaparse');
@@ -98,6 +99,15 @@ export function add(req, res, next) {
         })
         .then(() => {
             return addFormulaEntries(formulas);
+        })
+        .then(() => {
+            return connection.query(`${dbFormulaNameCheck} (${names.join(', ')})`);
+        })
+        .then((results) => {
+            const formulaStrings = results.map(x => {
+                return `${x.name}{formula_id: ${x.id}}`;
+            });
+            return logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} added.`);
         })
         .then(() => {
             success(res);
@@ -227,6 +237,15 @@ export function modify(req, res, next) {
             return addFormulaEntries(formulas);
         })
         .then(() => {
+            return connection.query(`${formulaQueryString} AND id IN (${formulaIds.join(', ')})`);
+        })
+        .then((results) => {
+            const formulaStrings = results.map(x => {
+                return `${x.name}{formula_id: ${x.id}}`;
+            });
+            return logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} modified.`);
+        })
+        .then(() => {
             success(res);
         })
         .catch((err) => {
@@ -235,16 +254,18 @@ export function modify(req, res, next) {
 }
 
 /**
- * Actually deletes from database, not a fake delete
+ * Fake delete from database
  * @param {*} req
  * req.body.formulas = [1, 2, 3]
  * @param {*} res
  * @param {*} next
  */
 export function deleteFormulas(req, res, next) {
+    let oldFormulas;
     const toDelete = req.headers.formulaid.split(', ');
     connection.query(`${formulaQueryString} AND id IN (${toDelete.join(', ')})`)
         .then((results) => {
+            oldFormulas = results;
             if (results.length != toDelete.length) {
                 throw createError('Trying to delete element not in database');
             }
@@ -252,6 +273,12 @@ export function deleteFormulas(req, res, next) {
         })
         .then(() => {
             return connection.query(`UPDATE Formulas SET removed = 1 WHERE id IN (${toDelete.join(', ')})`);
+        })
+        .then(() => {
+            const formulaStrings = oldFormulas.map(x => {
+                return `${x.name}{formula_id: ${x.id}}`;
+            });
+            return logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} deleted.`);
         })
         .then(() => {
             success(res);

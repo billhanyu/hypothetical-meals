@@ -2,6 +2,7 @@ import * as checkParams from './common/checkParams';
 import User from '../models/User';
 import { handleError, createError } from './common/customError';
 import success from './common/success';
+import { logAction } from './systemLogs';
 const passport = require('passport');
 
 export function signupAdmin(req, res, next) {
@@ -27,25 +28,28 @@ function signupUser(req, res, next, userGroup) {
   user.setPassword(req.body.user.password);
 
   connection.query(`INSERT INTO Users (username, name, hash, salt, user_group) VALUES ('${user.username}', '${user.name || ''}', '${user.hash}', '${user.salt}', '${userGroup}');`)
-  .then(() => connection.query(`SELECT id FROM Users WHERE username = '${user.username}';`))
-  .then((results) => {
-    if (results.length == 0) return res.status(500).send('Database error');
-    user.id = results[0].id;
-    return res.status(200).json({user: user.getBasicInfo()});
-  })
-  .catch((error) => {
-    if (error.code == 'ER_DUP_ENTRY') return res.status(422).json('Username is already registered');
-    else if (error.code == 'ER_DATA_TOO_LONG') return res.status(422).json('Username or name is too long');
-    else console.log(error);
-  });
+    .then(() => connection.query(`SELECT id FROM Users WHERE username = '${user.username}';`))
+    .then((results) => {
+      if (results.length == 0) return res.status(500).send('Database error');
+      user.id = results[0].id;
+      return res.status(200).json({ user: user.getBasicInfo() });
+    })
+    .then(() => {
+      return logAction(req.payload ? req.payload.id : user.id, `Account created for user ${user.username}.`);
+    })
+    .catch((error) => {
+      if (error.code == 'ER_DUP_ENTRY') return res.status(422).json('Username is already registered');
+      else if (error.code == 'ER_DATA_TOO_LONG') return res.status(422).json('Username or name is too long');
+      else console.log(error);
+    });
 }
 
 export function login(req, res, next) {
   const error = checkParams.checkBlankParams(req.body.user, ['username', 'password']);
   if (error) return res.status(422).send(error);
-  passport.authenticate('local', {session: false}, function(err, user, info) {
+  passport.authenticate('local', { session: false }, function(err, user, info) {
     if (err) return next(err);
-    if (user) return res.json({user: user.getBasicInfo()});
+    if (user) return res.json({ user: user.getBasicInfo() });
     else return res.status(422).send('E-mail or password is incorrect');
   })(req, res, next);
 }
@@ -77,11 +81,12 @@ export function loginOauth(req, res, next) {
 
 function tokenForOauth(userData, res) {
   const user = new User(userData);
-  return res.json({user: user.getBasicInfo()});
+  return res.json({ user: user.getBasicInfo() });
 }
 
 export function changePermission(req, res, next) {
   const user = req.body.user;
+  let userId;
   const error = checkParams.checkBlankParams(user, ['username', 'permission']);
   if (error) {
     return res.status(400).send(error);
@@ -98,8 +103,12 @@ export function changePermission(req, res, next) {
       if (result.length == 0) {
         throw createError('User does not exist.');
       }
+      userId = result[0].id;
       return connection.query(`UPDATE Users SET user_group = '${user.permission}' WHERE id = ${result[0].id}`);
     })
     .then(result => success(res))
+    .then(() => {
+      return logAction(req.payload.id, `Account permission for user ${user.username} changed to ${user.permission == 'noob' ? 'unprivileged' : user.permission}.`);
+    })
     .catch(err => handleError(err, res));
 }

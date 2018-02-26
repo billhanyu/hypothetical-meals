@@ -42,4 +42,4 @@ INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (2, 5, 'Use
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (3, 6, 'User 6 added formula cake{formula_id: 3}', '2018.01.02 12:56:21.000');
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (4, 6, 'User 6 did blah', '2018.01.02 23:11:02.000');
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (5, 6, 'User 6 did blah', '2018.01.03 13:11:02.000');
-INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (2, 4, 'User 4 added 1 boop{ingredient_id: 3}', '2018.01.03 12:00:00.000');
+INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (6, 4, 'User 4 added 1 boop{ingredient_id: 3}', '2018.01.03 12:00:00.000');

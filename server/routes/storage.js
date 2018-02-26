@@ -2,6 +2,7 @@ import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import { getSpace } from './common/packageUtilies';
 import success from './common/success';
+import { logAction } from './systemLogs';
 
 export function view(req, res, next) {
   let storages;
@@ -50,6 +51,16 @@ export function changeStorage(req, res, next) {
     return connection.query(`UPDATE Storages SET capacity = ${newCapacity} WHERE id = ${storageId}`);
   })
   .then(() => success(res))
+  // .then(() => {
+  //   return connetion.query(`SELECT * FROM Storages WHERE id = ${storageId}`);
+  // })
+  // .then((results) => {
+  //   console.log(results);
+  //   const name = results[0].name;
+  //   const storageSpace = results[0].capacity;
+  //   console.log(`Storage area ${name} capacity changed to ${storageSpace}.`);
+  //   return logAction(req.payload.id, `Storage area ${name} capacity changed to ${storageSpace}.`);
+  // })
   .catch(err => handleError(err, res));
 }
 

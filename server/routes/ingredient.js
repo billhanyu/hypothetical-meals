@@ -5,6 +5,7 @@ import { fakeDeleteMultipleVendorIngredients } from './vendorIngredient';
 import { getAvailableNumPages, queryWithPagination } from './common/pagination';
 import { getSpace } from './common/packageUtilies';
 import { validStorageTypes } from './common/storageUtilities';
+import { logAction } from './systemLogs';
 
 const fs = require('fs');
 const Papa = require('papaparse');
@@ -71,6 +72,17 @@ function addIngredientHelper(ingredients, req, res, next) {
     ingredientsToAdd.push(`('${ingredient.name}', '${ingredient.package_type}', '${ingredient.native_unit}', ${ingredient.num_native_units}, ${ingredient.storage_id})`);
   }
   connection.query(`INSERT INTO Ingredients (name, package_type, native_unit, num_native_units, storage_id) VALUES ${ingredientsToAdd.join(', ')}`)
+    .then(() => {
+      const names = ingredients.map(x => `'${x.name}'`);
+      return connection.query(`SELECT * FROM Ingredients WHERE name IN (${names.join(', ')})`);
+    })
+    .then((results) => {
+      const nameStrings = [];
+      results.forEach(x => {
+        nameStrings.push(`${x.name}{ingredient_id: ${x.id}}`);
+      });
+      return logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} added.`);
+    })
     .then(() => success(res))
     .catch(err => handleError(err, res));
 }
@@ -147,6 +159,17 @@ function modifyIngredientHelper(items, req, res, next) {
             num_native_units = (case ${numNativeUnitsCases.join(' ')} end)
         WHERE id IN (${ingredientIds.join(', ')})`);
     })
+    .then(() => {
+      const myIds = Object.keys(items);
+      return connection.query(`SELECT * FROM Ingredients WHERE id IN (${myIds.join(', ')})`);
+    })
+    .then((results) => {
+      const nameStrings = [];
+      results.forEach(x => {
+        nameStrings.push(`${x.name}{ingredient_id: ${x.id}}`);
+      });
+      return logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} modified.`);
+    })
     .then(() => success(res))
     .catch(err => handleError(err, res));
 }
@@ -200,6 +223,17 @@ function deleteIngredientHelper(items, req, res, next) {
   .then(results => {
     const vendorsIngredientsIds = results.map(e => e.id);
     return fakeDeleteMultipleVendorIngredients(vendorsIngredientsIds);
+  })
+  .then(() => {
+    const myIds = items;
+    return connection.query(`SELECT * FROM Ingredients WHERE id IN (${myIds.join(', ')})`);
+  })
+  .then((results) => {
+    const nameStrings = [];
+    results.forEach(x => {
+      nameStrings.push(`${x.name}{ingredient_id: ${x.id}}`);
+    });
+    return logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} deleted.`);
   })
   .then(() => success(res))
   .catch(err => handleError(err, res));

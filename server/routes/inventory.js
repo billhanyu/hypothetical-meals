@@ -4,6 +4,7 @@ import { getSpace } from './common/packageUtilies';
 import { getNumPages, queryWithPagination } from './common/pagination';
 import success from './common/success';
 import { updateConsumedSpendingLogForCart } from './spendinglog';
+import { logAction } from './systemLogs';
 
 const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.num_native_units as ingredient_num_native_units, Ingredients.package_type as ingredient_package_type, Ingredients.storage_id as ingredient_storage_id, Ingredients.native_unit AS ingredient_native_unit, Ingredients.removed as ingredient_removed FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
 
@@ -74,8 +75,23 @@ function getStockPromise(ids) {
  * This changes inventory 1's num_packages to 123 and 2's num_packages to 456
  */
 export function modifyQuantities(req, res, next) {
+  const changes = req.body.changes;
   modifyInventoryQuantitiesPromise(req.body.changes)
     .then(() => success(res))
+    .then(() => {
+      return connection.query(`SELECT Inventories.*, Ingredients.name 
+          FROM Inventories JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id
+          WHERE Inventories.id IN (${Object.keys(changes).join(', ')})`);
+    })
+    .then((results) => {
+      let modified = results.map(x => {
+        return `${x.name}: ${x.num_packages}`;
+      });
+      let nameStrings = results.map(x => {
+        return `${x.name}{ingredient_id: ${x.ingredient_id}}`;
+      });
+      logAction(req.payload.id, `CORRECTION: Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} modified. Inventory now has ${modified.join(', ')}.`);
+    })
     .catch(err => {
       return handleError(err, res);
     });
