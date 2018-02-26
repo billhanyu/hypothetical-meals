@@ -1,0 +1,49 @@
+.EditFormulaBox {
+  width: 120px;
+  height: 120px;
+  margin-left: 25px;
+  margin-right: 25px;
+  border-radius: 6px;
+  border: 1px solid #d1d9e2;
+  background-color: #F7F7F7;
+  color: #909FAD;
+  transition: all 0.5s ease;
+  cursor: pointer;
+  position: relative;
+  margin-top: 24px;
+  float: left;
+}
+
+.EditFormulaBox:hover {
+  background-color: #F2F5F9;
+  color: #657788;
+}
+
+.EditFormulaBox .FormulaBoxFork {
+  text-align: center;
+  clear: both;
+  margin-left: 35%;
+  margin-top: 15%;
+}
+
+.EditFormulaBox .CloseEditFormulaBox {
+  position: absolute;
+  margin-top: 6px;
+  margin-left: 6px;
+  z-index: 2;
+}
+
+.EditFormulaBox .CloseEditFormulaBox:hover {
+  color: #000;
+}
+
+.EditFormulaBox div {
+  text-align: center;
+  width: 100%;
+  font-size: 16px;
+  clear: both;
+  font-weight: 500;
+  margin-top: 12px;
+  max-height: 40px;
+  overflow: auto;
+}
