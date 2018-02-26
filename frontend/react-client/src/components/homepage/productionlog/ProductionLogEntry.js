@@ -10,7 +10,7 @@ class ProductionLogEntry extends Component {
       <tr>
         <td>{this.props.item.formula_name}</td>
         <td>{this.props.item.num_product}</td>
-        <td>${this.props.item.total_cost}</td>
+        <td>${Math.round(this.props.item.total_cost * 100) / 100}</td>
       </tr>
     );
   }
