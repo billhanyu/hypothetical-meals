@@ -261,8 +261,8 @@ export function modify(req, res, next) {
  * @param {*} next
  */
 export function deleteFormulas(req, res, next) {
-    const toDelete = req.body.formulas;
     let oldFormulas;
+    const toDelete = req.headers.formulaid.split(', ');
     connection.query(`${formulaQueryString} AND id IN (${toDelete.join(', ')})`)
         .then((results) => {
             oldFormulas = results;
