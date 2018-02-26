@@ -9,7 +9,6 @@ import NewIngredientList from '../homepage/ingredient/IngredientList';
 import NewVendorList from '../homepage/vendor/VendorList';
 import ViewInventory from '../homepage/inventory/ViewInventory';
 import Order from '../homepage/order/Order';
-import CheckOut from '../homepage/checkout/CheckOut';
 import SpendingLog from '../homepage/spendinglog/SpendingLog';
 import StorageList from '../homepage/storage/StorageList';
 import Registration from '../Registration/RegistrationContainer';
@@ -58,9 +57,6 @@ class HomePage extends Component {
     }
     else if (funcName == "logOrder") {
       return <Order />;
-    }
-    else if (funcName == "checkOut") {
-      return <CheckOut />;
     }
     else if (funcName == "spendingLog") {
       return <SpendingLog />;
