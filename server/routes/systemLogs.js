@@ -67,7 +67,6 @@ export function getQueryString(queryParams) {
 
 export function view(req, res, next) {
     const queryParams = req.query;
-    console.log(getQueryString(queryParams));
     queryWithPagination(req.params.page_num, 'SystemLogs', getQueryString(queryParams))
         .then((results) => {
             const filteredResults = ingredientFilter(queryParams, results);

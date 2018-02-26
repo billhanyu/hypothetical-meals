@@ -75,18 +75,22 @@ function getStockPromise(ids) {
  * This changes inventory 1's num_packages to 123 and 2's num_packages to 456
  */
 export function modifyQuantities(req, res, next) {
+  const changes = req.body.changes;
   modifyInventoryQuantitiesPromise(req.body.changes)
     .then(() => success(res))
     .then(() => {
-      const changes = req.body.changes;
-      return connection.query(`SELECT Inventories.*, Ingredient.name 
-          FROM Inventories JOIN Ingredients ON Inventories.ingredient_id = Ingredient.id
-          WHERE Inventories.id IN (${changes.keys.join(', ')})`);
+      return connection.query(`SELECT Inventories.*, Ingredients.name 
+          FROM Inventories JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id
+          WHERE Inventories.id IN (${Object.keys(changes).join(', ')})`);
     })
     .then((results) => {
-      let modified = results.map(x => `${x.name}: ${x.num_packages}`);
-      let nameStrings = results.map(x => `${x.name}{ingredient_id: ${x.ingredient_id}}`);
-      logAction(req.payload.id, `CORRECTION: Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} modified. Inventory now has ${modified.join(', ')}`);
+      let modified = results.map(x => {
+        return `${x.name}: ${x.num_packages}`;
+      });
+      let nameStrings = results.map(x => {
+        return `${x.name}{ingredient_id: ${x.ingredient_id}}`;
+      });
+      logAction(req.payload.id, `CORRECTION: Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} modified. Inventory now has ${modified.join(', ')}.`);
     })
     .catch(err => {
       return handleError(err, res);

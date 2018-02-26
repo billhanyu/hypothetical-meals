@@ -101,16 +101,16 @@ export function add(req, res, next) {
             return addFormulaEntries(formulas);
         })
         .then(() => {
-            success(res);
-        })
-        .then(() => {
             return connection.query(`${dbFormulaNameCheck} (${names.join(', ')})`);
         })
         .then((results) => {
             const formulaStrings = results.map(x => {
-                `${x.name}{formula_id: ${x.id}}`;
+                return `${x.name}{formula_id: ${x.id}}`;
             });
-            logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} added.`);
+            return logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} added.`);
+        })
+        .then(() => {
+            success(res);
         })
         .catch((err) => {
             handleError(err, res);
@@ -237,16 +237,16 @@ export function modify(req, res, next) {
             return addFormulaEntries(formulas);
         })
         .then(() => {
-            success(res);
-        })
-        .then(() => {
             return connection.query(`${formulaQueryString} AND id IN (${formulaIds.join(', ')})`);
         })
         .then((results) => {
             const formulaStrings = results.map(x => {
-                `${x.name}{formula_id: ${x.id}}`;
+                return `${x.name}{formula_id: ${x.id}}`;
             });
-            logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} modified.`);
+            return logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} modified.`);
+        })
+        .then(() => {
+            success(res);
         })
         .catch((err) => {
             handleError(err, res);
@@ -275,13 +275,13 @@ export function deleteFormulas(req, res, next) {
             return connection.query(`UPDATE Formulas SET removed = 1 WHERE id IN (${toDelete.join(', ')})`);
         })
         .then(() => {
-            success(res);
+            const formulaStrings = oldFormulas.map(x => {
+                return `${x.name}{formula_id: ${x.id}}`;
+            });
+            return logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} deleted.`);
         })
         .then(() => {
-            const formulaStrings = oldFormulas.map(x => {
-                `${x.name}{formula_id: ${x.id}}`;
-            });
-            logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} deleted.`);
+            success(res);
         })
         .catch((err) => {
             handleError(err, res);

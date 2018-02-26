@@ -29,16 +29,16 @@ export function getVendorWithCode(req, res, next) {
     return res.status(400).send('No code provided');
   }
   connection.query(`SELECT * FROM Vendors WHERE code = '${req.query.code}'`)
-  .then(results => {
-    if (results.length > 0) {
-      return res.status(200).send(results[0]);
-    }
-    return res.status(404).send('Vendor Not Found');
-  })
-  .catch(err => {
-    console.error(err);
-    return res.status(500).send('Database error');
-  });
+    .then(results => {
+      if (results.length > 0) {
+        return res.status(200).send(results[0]);
+      }
+      return res.status(404).send('Vendor Not Found');
+    })
+    .catch(err => {
+      console.error(err);
+      return res.status(500).send('Database error');
+    });
 }
 
 /* req.body.vendors = [
@@ -71,10 +71,10 @@ export function addVendors(req, res, next) {
     values.push(`('${name}', '${contact}', '${code}')`);
   }
 
-  connection.query(`INSERT INTO Vendors (name, contact, code) VALUES ${values.join(', ')}`)
+  return connection.query(`INSERT INTO Vendors (name, contact, code) VALUES ${values.join(', ')}`)
     .then(() => success(res))
     .then(() => {
-      logAction(req.payload.id, `Vendor${names.length > 1 ? 's' : ''} ${names.join(', ')} added.`);
+      return logAction(req.payload.id, `Vendor${names.length > 1 ? 's' : ''} ${names.join(', ')} added.`);
     })
     .catch(err => {
       if (err.code == 'ER_DUP_ENTRY') {
@@ -134,17 +134,17 @@ export function modifyVendors(req, res, next) {
             contact = (case ${contactCases.join(' ')} end),
             code = (case ${codeCases.join(' ')} end)
           WHERE id IN (${Object.keys(vendors).join(', ')})`);
-      })
-      .then(() => success(res))
-      .then(() => {
-        logAction(req.payload.id, `Vendor${names.length > 1 ? 's' : ''} ${names.join(', ')} modified.`);
-      })
-      .catch(err => {
-        if (err.code == 'ER_DUP_ENTRY') {
-          return res.status(400).send('Duplicate code with other vendor');
-        }
-        handleError(err, res);
-      });
+    })
+    .then(() => {
+      return logAction(req.payload.id, `Vendor${names.length > 1 ? 's' : ''} ${names.join(', ')} modified.`);
+    })
+    .then(() => success(res))
+    .catch(err => {
+      if (err.code == 'ER_DUP_ENTRY') {
+        return res.status(400).send('Duplicate code with other vendor');
+      }
+      handleError(err, res);
+    });
 }
 
 /* req.body.ids = [
@@ -165,20 +165,22 @@ export function deleteVendors(req, res, next) {
   }
   connection.query(`UPDATE Vendors SET removed = 1 WHERE id IN (${ids.join(', ')})`)
     .then(() => {
-      return connection.query(`SELECT id, name FROM VendorsIngredients WHERE vendor_id IN (${ids.join(', ')})`);
+      return connection.query(`SELECT id FROM VendorsIngredients WHERE vendor_id IN (${ids.join(', ')})`);
     })
     .then(results => {
-      vendors = results;
       const vendorIngredientIds = results.map(e => e.id);
       return fakeDeleteMultipleVendorIngredients(vendorIngredientIds);
     })
     .then(() => success(res))
     .then(() => {
-      const names = vendors.map(x => x.name);
+      return connection.query(`SELECT name FROM Vendors WHERE id IN (${ids.join(', ')})`);
+    })
+    .then((results) => {
+      const names = results.map(x => x.name);
       logAction(req.payload.id, `Vendor${names.length > 1 ? 's' : ''} ${names.join(', ')} deleted.`);
     })
     .catch(err => {
       console.error(err);
       res.status(500).send('Database error');
-  });
+    });
 }

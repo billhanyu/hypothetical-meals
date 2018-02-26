@@ -35,7 +35,7 @@ function signupUser(req, res, next, userGroup) {
       return res.status(200).json({ user: user.getBasicInfo() });
     })
     .then(() => {
-      logAction(req.payload.id, `Account created for user ${user.id}{user_id: ${user.id}}. ${user.getBasicInfo()}`);
+      return logAction(req.payload ? req.payload.id : user.id, `Account created for user ${user.username}.`);
     })
     .catch((error) => {
       if (error.code == 'ER_DUP_ENTRY') return res.status(422).json('Username is already registered');
@@ -108,7 +108,7 @@ export function changePermission(req, res, next) {
     })
     .then(result => success(res))
     .then(() => {
-      logAction(req.payload.id, `Account permission for user ${userId}{user_id: ${userId}} changed to ${user.permission}.`);
+      return logAction(req.payload.id, `Account permission for user ${user.username} changed to ${user.permission == 'noob' ? 'unprivileged' : user.permission}.`);
     })
     .catch(err => handleError(err, res));
 }
