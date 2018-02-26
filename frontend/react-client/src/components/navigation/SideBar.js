@@ -28,6 +28,9 @@ class SideBar extends Component {
     return (
       <div className="SideBar col-sm-4 col-md-3 col-lg-2 col-xl-2" id="SideBar">
         <ul className="nav flex-column">
+          <li className="nav-item UserName">
+            Hi {global.user_username}
+          </li>
           <li className="nav-item">
             <a
               href="javascript:void(0)"
