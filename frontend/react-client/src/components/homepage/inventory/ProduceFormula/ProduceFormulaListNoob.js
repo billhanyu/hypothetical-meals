@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ProduceFormulaListItemIngredient from './ProduceFormulaListItemIngredient.js';
 
-class ProduceFormulaListNoob extends Component {
+class ProduceFormulaListItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -25,8 +25,6 @@ class ProduceFormulaListNoob extends Component {
           package_type: sack
         }
        }
-    4. id (Number)
-    5. handleNumChange (Func)
   */
 
   handleInputChange(event) {
@@ -41,8 +39,7 @@ class ProduceFormulaListNoob extends Component {
       <div className="ProduceFormulaListItem">
         <div className="ProduceFormulaListItemContainer">
           <div className="ProduceFormulaItemName">{this.props.name}</div>
-          <input value={this.state.numFormula} onChange={this.handleInputChange.bind(this)} />
-          <div className="ProduceFormulaQuantity">x {Number(this.props.num_product)} (Amt per package) = {Number(this.state.numFormula) * Number(this.props.num_product)}</div>
+          <div className="ProduceFormulaQuantity">- Amount Created: {Number(this.props.num_product)} (Amount per package)</div>
         </div>
         <div className="ProduceFormulaListItemIngredientHeader">Ingredients Used in Formula Production: </div>
         <div style={{maxHeight: '150px', overflow:'auto', width:'100%', float:'left', clear:'both'}}>
@@ -50,7 +47,7 @@ class ProduceFormulaListNoob extends Component {
           Object.keys(this.props.ingredients).map((elementKey, key) => {
             return <ProduceFormulaListItemIngredient key={key}
                       ingredient={this.props.ingredients[elementKey]}
-                      numFormula={this.state.numFormula}
+                      numFormula={1}
                     />;
           })
         }
@@ -60,4 +57,4 @@ class ProduceFormulaListNoob extends Component {
   }
 }
 
-export default ProduceFormulaListNoob;
+export default ProduceFormulaListItem;
