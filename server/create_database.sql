@@ -135,8 +135,8 @@ CREATE TABLE ProductionLogs(
 CREATE TABLE SystemLogs(
 	id int not null AUTO_INCREMENT,
 	user_id int not null,
-	ingredient_id int,
-	created_at timestamp DEFAULT now() not null,
+	description text not null,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
 
 	FOREIGN KEY (user_id) REFERENCES Users(id),
 	PRIMARY KEY (id)

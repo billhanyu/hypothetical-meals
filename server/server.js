@@ -15,6 +15,7 @@ import * as inventory from './routes/inventory';
 import * as vendor from './routes/vendor';
 import * as vendorIngredient from './routes/vendorIngredient';
 import * as spendinglog from './routes/spendinglog';
+import * as systemlogs from './routes/systemLogs';
 import * as order from './routes/order';
 import * as formulas from './routes/formula';
 import * as productionlog from './routes/productionlog';
@@ -78,6 +79,7 @@ app.put('/vendors', beAdmin, vendor.modifyVendors);
 app.delete('/vendors', beAdmin, vendor.deleteVendors);
 app.get('/vendors/code', beAdmin, vendor.getVendorWithCode);
 
+app.get('/ingredients/id/:id', beNoob, ingredient.viewWithId);
 app.get('/ingredients/pages', beNoob, ingredient.pages);
 app.get('/ingredients/page/:page_num', beNoob, ingredient.view);
 app.post('/ingredients', beAdmin, ingredient.addIngredient);
@@ -106,6 +108,10 @@ app.get('/spendinglogs/pages', beNoob, spendinglog.pages);
 app.get('/spendinglogs/page/:page_num', beNoob, spendinglog.view);
 app.get('/spendinglogs/:ingredient_id', beNoob, spendinglog.logsForIngredient);
 
+app.get('/systemlogs/pages', beManager, systemlogs.pages);
+app.get('/systemlogs/page/:page_num', beManager, systemlogs.view);
+app.get('/systemlogs', beManager, systemlogs.viewAll);
+
 app.get('/productionlogs/pages', beNoob, productionlog.pages);
 app.get('/productionlogs/page/:page_num', beNoob, productionlog.view);
 
@@ -122,6 +128,7 @@ app.get('/formulas/page/:page_num', beNoob, formulas.view);
 app.put('/formulas', beAdmin, formulas.modify);
 app.post('/formulas', beAdmin, formulas.add);
 app.delete('/formulas', beAdmin, formulas.deleteFormulas);
+app.post('/formulas/import', [auth.required, adminRequired, upload.single('bulk')], formulas.bulkImport);
 
 const distDir = `${__dirname}/../frontend/react-client/dist`;
 app.use(express.static(distDir));

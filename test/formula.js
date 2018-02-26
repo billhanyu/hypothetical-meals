@@ -3,6 +3,7 @@ import server from '../server/server';
 const alasql = require('alasql');
 const assert = require('chai').assert;
 const testTokens = require('./testTokens');
+const supertest = require('supertest');
 
 describe('Formulas', () => {
     describe('#pages()', () => {
@@ -526,4 +527,148 @@ describe('Formulas', () => {
                 });
         });
     });
+
+    describe('#bulkImport()', () => {
+        beforeEach(() => {
+          alasql('SOURCE "./server/create_database.sql"');
+          alasql('SOURCE "./server/sample_data.sql"');
+        });
+
+        it('should fail bulk import as noob', (done) => {
+            supertest(server).post('/formulas/import')
+            .set('Authorization', `Token ${testTokens.noobTestToken}`)
+            .attach('bulk', './test/bulk_import/formulas/validData.csv')
+            .end((err, res) => {
+              res.should.have.status(401);
+              done();
+            });
+        });
+
+        it('should fail data with bad ingredient units', (done) => {
+          supertest(server).post('/formulas/import')
+          .set('Authorization', `Token ${testTokens.adminTestToken}`)
+          .attach('bulk', './test/bulk_import/formulas/badIngredientUnitsData.csv')
+          .end(function(err, res) {
+            res.should.have.status(400);
+            done();
+          });
+        });
+
+        it('should fail data with bad product units', (done) => {
+          supertest(server).post('/formulas/import')
+          .set('Authorization', `Token ${testTokens.adminTestToken}`)
+          .attach('bulk', './test/bulk_import/formulas/badProductUnitsData.csv')
+          .end(function(err, res) {
+            res.should.have.status(400);
+            done();
+          });
+        });
+
+        it('should fail data with extra argument for formula', (done) => {
+          supertest(server).post('/formulas/import')
+          .set('Authorization', `Token ${testTokens.adminTestToken}`)
+          .attach('bulk', './test/bulk_import/formulas/extraArgumentData.csv')
+          .end(function(err, res) {
+            res.should.have.status(400);
+            done();
+          });
+        });
+
+        it('should fail data with invalid header data', (done) => {
+          supertest(server).post('/formulas/import')
+          .set('Authorization', `Token ${testTokens.adminTestToken}`)
+          .attach('bulk', './test/bulk_import/formulas/invalidHeaderData.csv')
+          .end(function(err, res) {
+            res.should.have.status(400);
+            done();
+          });
+        });
+
+        it('should fail data with missing argument for formula', (done) => {
+          supertest(server).post('/formulas/import')
+          .set('Authorization', `Token ${testTokens.adminTestToken}`)
+          .attach('bulk', './test/bulk_import/formulas/missingArgumentData.csv')
+          .end(function(err, res) {
+            res.should.have.status(400);
+            done();
+          });
+        });
+
+        it('should fail data with nonconsecutive formula entries', (done) => {
+            supertest(server).post('/formulas/import')
+            .set('Authorization', `Token ${testTokens.adminTestToken}`)
+            .attach('bulk', './test/bulk_import/formulas/notConsecutiveFormulaEntriesData.csv')
+            .end(function(err, res) {
+              res.should.have.status(400);
+              done();
+            });
+          });
+
+        it('should fail data with duplicate formula entries as database', (done) => {
+            supertest(server).post('/formulas/import')
+            .set('Authorization', `Token ${testTokens.adminTestToken}`)
+            .attach('bulk', './test/bulk_import/formulas/duplicateFormulaData.csv')
+            .end(function(err, res) {
+              res.should.have.status(400);
+              done();
+            });
+          });
+
+        it('should fail data with with missing ingredients in database', (done) => {
+            supertest(server).post('/formulas/import')
+            .set('Authorization', `Token ${testTokens.adminTestToken}`)
+            .attach('bulk', './test/bulk_import/formulas/missingIngredientsData.csv')
+            .end(function(err, res) {
+              res.should.have.status(400);
+              done();
+            });
+          });
+
+        it('should pass valid data', (done) => {
+            const formulaResult = alasql(`SELECT COUNT(1) FROM Formulas`);
+            const numFormulas = formulaResult[0]['COUNT(1)'];
+            const formulaEntryResult = alasql(`SELECT COUNT(1) FROM FormulaEntries`);
+            const numFormulaEntries = formulaEntryResult[0]['COUNT(1)'];
+          alasql('UPDATE Storages SET capacity = 1000000');
+          supertest(server).post('/formulas/import')
+          .set('Authorization', `Token ${testTokens.adminTestToken}`)
+          .attach('bulk', './test/bulk_import/formulas/validData.csv')
+          .end(function(err, res) {
+            res.should.have.status(200);
+
+            const formulas = alasql(`SELECT * FROM Formulas`);
+            const formulaEntries = alasql(`SELECT * FROM FormulaEntries`);
+
+            assert.strictEqual(formulas.length, numFormulas + 2, 'Two formulas added to formulas table.');
+            const chocolateCake = formulas[numFormulas];
+            assert.strictEqual(chocolateCake.name, 'Chocolate Cake', 'Name of chocolate cake');
+            assert.strictEqual(chocolateCake.description, 'This is a chocolate cake', 'Description of chocolate cake');
+            assert.strictEqual(chocolateCake.num_product, 1, 'Amount of chocolate cake');
+            assert.strictEqual(chocolateCake.removed, 0, 'Removed status of chocolate cake');
+            const soup = formulas[numFormulas + 1];
+            assert.strictEqual(soup.name, 'Soup', 'Name of soup');
+            assert.strictEqual(soup.description, 'This is soup', 'Description of soup');
+            assert.strictEqual(soup.num_product, 2, 'Amount of soup');
+            assert.strictEqual(soup.removed, 0, 'Removed status of soup');
+
+            assert.strictEqual(formulaEntries.length, numFormulaEntries + 5, 'Five formula entries added to formula entries table.');
+            assert.strictEqual(formulaEntries[4].ingredient_id, 1, 'Ingredient ID is correct');
+            assert.strictEqual(formulaEntries[4].num_native_units, 2, 'Number of native units is correct');
+            assert.strictEqual(formulaEntries[4].formula_id, 3, 'Formula ID is correct');
+            assert.strictEqual(formulaEntries[5].ingredient_id, 2, 'Ingredient ID is correct');
+            assert.strictEqual(formulaEntries[5].num_native_units, 1, 'Number of native units is correct');
+            assert.strictEqual(formulaEntries[5].formula_id, 3, 'Formula ID is correct');
+            assert.strictEqual(formulaEntries[6].ingredient_id, 3, 'Ingredient ID is correct');
+            assert.strictEqual(formulaEntries[6].num_native_units, 400, 'Number of native units is correct');
+            assert.strictEqual(formulaEntries[6].formula_id, 3, 'Formula ID is correct');
+            assert.strictEqual(formulaEntries[7].ingredient_id, 4, 'Ingredient ID is correct');
+            assert.strictEqual(formulaEntries[7].num_native_units, 4, 'Number of native units is correct');
+            assert.strictEqual(formulaEntries[7].formula_id, 4, 'Formula ID is correct');
+            assert.strictEqual(formulaEntries[8].ingredient_id, 1, 'Ingredient ID is correct');
+            assert.strictEqual(formulaEntries[8].num_native_units, 1, 'Number of native units is correct');
+            assert.strictEqual(formulaEntries[8].formula_id, 4, 'Formula ID is correct');
+            done();
+          });
+        });
+      });
 });
