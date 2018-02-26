@@ -75,6 +75,7 @@ class ProduceFormula extends Component {
         {
           this.state.shouldShowSummaryTable ?
             <ProduceFormulaComparator
+              link={this.props.link}
               onBackClick={this.handleReturn.bind(this)}
               EditFormulaBoxes={this.state.EditFormulaBoxes}
               inventoryStock={this.state.inventoryStock}
