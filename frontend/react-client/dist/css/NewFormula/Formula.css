@@ -108,6 +108,14 @@
   line-height: 30px;
 }
 
+.FormulaTextError {
+  color: red;
+  font-size: 16px;
+  clear: both;
+  width: 100%;
+  text-align: center;
+}
+
 /**** FORMULA INGREDIENT LIST ITEM ****/
 .FormulaIngredientItemContainer {
   width: 1000px;

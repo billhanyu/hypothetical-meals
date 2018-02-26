@@ -16,6 +16,7 @@ import ChangePermission from '../homepage/user/ChangePermission';
 import NewFormula from '../homepage/Formula/NewFormula.js';
 import EditFormula from '../homepage/Formula/EditFormula.js';
 import ProduceFormula from '../homepage/inventory/ProduceFormula.js';
+import ViewAllFormulas from '../homepage/inventory/ViewAllFormulas.js';
 import ProductionLog from '../homepage/productionlog/ProductionLog';
 import SystemLog from '../homepage/systemlog/SystemLog';
 
@@ -81,6 +82,9 @@ class HomePage extends Component {
     }
     else if (funcName == 'produceFormulas') {
       return <ProduceFormula link={this.link} />;
+    }
+    else if (funcName == 'viewFormulas') {
+      return <ViewAllFormulas />;
     }
   }
 

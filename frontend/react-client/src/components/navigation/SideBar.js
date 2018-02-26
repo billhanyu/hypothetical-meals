@@ -50,6 +50,21 @@ class SideBar extends Component {
             <a
               href="javascript:void(0)"
               role="button"
+              className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 7 ? "-Active" : "")}
+              id="category7"
+              data-parent="#SideBar"
+              onClick={e => {
+                this.props.link('viewFormulas');
+                this.setActiveCategory(7);
+                this.setActive(0);
+              }}>
+              View All Formulas
+            </a>
+          </li>
+          <li className="nav-item">
+            <a
+              href="javascript:void(0)"
+              role="button"
               className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 1 ? "-Active" : "")}
               id="category1"
               data-parent="#SideBar"
