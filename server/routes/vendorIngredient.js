@@ -2,6 +2,7 @@ import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import { getNumPages, queryWithPagination } from './common/pagination';
 import success from './common/success';
+import { logAction } from './systemLogs';
 const basicViewQueryString = 'SELECT VendorsIngredients.*, Vendors.name as vendor_name, Vendors.contact as vendor_contact, Vendors.code as vendor_code, Vendors.removed as vendor_removed, Ingredients.name as ingredient_name, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed, Ingredients.package_type as ingredient_package_type, Ingredients.native_unit as ingredient_native_unit FROM ((VendorsIngredients INNER JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id) INNER JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id)';
 
 export function pages(req, res, next) {
@@ -68,6 +69,24 @@ export function addVendorIngredients(req, res, next) {
   }
   connection.query(`INSERT INTO VendorsIngredients (ingredient_id, vendor_id, price) VALUES ${values.join(', ')}`)
   .then(() => success(res))
+  .then(() => {
+    const myVendors = items.map(x => x.vendor_id);
+    const myIngredients = items.map(x => x.ingredient_id);
+    return connection.query(`SELECT VendorsIngredients.price, Vendors.name as vendor_name, 
+      Vendors.id, Ingredients.name as ingredient_name, Ingredients.id as ingredient_id
+      FROM VendorsIngredients
+      JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id
+      JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id
+      WHERE VendorsIngredients.vendor_id IN (${myVendors.join(', ')}) 
+      AND VendorsIngredients.ingredient_id IN (${myIngredients.join(', ')}) 
+      AND VendorsIngredients.removed = 0`);
+  })
+  .then((results) => {
+    const vendorIngredientStrings = results.map(x => {
+      return `vendor ${x.vendor_name} for ingredient ${x.ingredient_name}{ingredient_id: ${x.ingredient_id}} at price ${x.price} per package`;
+    });
+    return logAction(req.payload.id, `Added ${vendorIngredientStrings.join(', ')}.`);
+  })
   .catch(err => handleError(err, res));
 }
 
@@ -110,6 +129,22 @@ export function modifyVendorIngredients(req, res, next) {
           WHERE id IN (${ids.join(', ')})`);
     })
     .then(() => success(res))
+    .then(() => {
+      const vendorIngredientIds = Object.keys(items);
+      return connection.query(`SELECT VendorsIngredients.price, Vendors.name as vendor_name, 
+        Vendors.id, Ingredients.name as ingredient_name, Ingredients.id as ingredient_id
+        FROM VendorsIngredients
+        JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id
+        JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id
+        WHERE VendorsIngredients.id IN (${vendorIngredientIds.join(', ')})
+        AND VendorsIngredients.removed =  0`);
+    })
+    .then((results) => {
+      const vendorIngredientStrings = results.map(x => {
+        return `ingredient ${x.ingredient_name}{ingredient_id: ${x.ingredient_id}} price for vendor ${x.vendor_name} to ${x.price} per package`;
+      });
+      return logAction(req.payload.id, `Changed ${vendorIngredientStrings.join(', ')}.`);
+    })
     .catch(err => handleError(err, res));
 }
 
@@ -131,6 +166,20 @@ export function deleteVendorIngredients(req, res, next) {
   }
   fakeDeleteMultipleVendorIngredients(ids)
     .then(() => success(res))
+    .then(() => {  
+      return connection.query(`SELECT Vendors.name as vendor_name, 
+        Vendors.id, Ingredients.name as ingredient_name, Ingredients.id as ingredient_id
+        FROM VendorsIngredients
+        JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id
+        JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id
+        WHERE VendorsIngredients.id IN (${ids.join(', ')})`);
+    })
+    .then((results) => {
+      const vendorIngredientStrings = results.map(x => {
+        return `vendor ${x.vendor_name} for ingredient ${x.ingredient_name}{ingredient_id: ${x.ingredient_id}}`;
+      });
+      return logAction(req.payload.id, `Removed ${vendorIngredientStrings.join(', ')}.`);
+    })
     .catch(err => handleError(err, res));
 }
 
