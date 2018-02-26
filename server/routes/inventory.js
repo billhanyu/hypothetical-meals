@@ -34,7 +34,7 @@ export function view(req, res, next) {
  * ]
  */
 export function getStock(req, res, next) {
-  const ids = req.body.ids;
+  const ids = req.query.ids;
   if (!ids || ids.length == 0) {
     return res.status(400).send('No ingredient queried');
   }

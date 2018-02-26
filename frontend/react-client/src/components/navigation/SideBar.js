@@ -50,6 +50,21 @@ class SideBar extends Component {
             <a
               href="javascript:void(0)"
               role="button"
+              className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 7 ? "-Active" : "")}
+              id="category7"
+              data-parent="#SideBar"
+              onClick={e => {
+                this.props.link('viewFormulas');
+                this.setActiveCategory(7);
+                this.setActive(0);
+              }}>
+              View All Formulas
+            </a>
+          </li>
+          <li className="nav-item">
+            <a
+              href="javascript:void(0)"
+              role="button"
               className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 1 ? "-Active" : "")}
               id="category1"
               data-parent="#SideBar"
@@ -59,21 +74,6 @@ class SideBar extends Component {
                 this.setActive(0);
               }}>
               Vendor
-            </a>
-          </li>
-          <li className="nav-item">
-            <a
-              href="javascript:void(0)"
-              role="button"
-              className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 6 ? "-Active" : "")}
-              id="category6"
-              data-parent="#SideBar"
-              onClick={e => {
-                this.props.link('viewFormulas');
-                this.setActiveCategory(6);
-                this.setActive(0);
-              }}>
-              Formula
             </a>
           </li>
           <li className="nav-item">
@@ -122,14 +122,14 @@ class SideBar extends Component {
                   text="Order"
                   permission="manager" />
                 <PermissionLink
-                  linkKey={10}
+                  linkKey={16}
                   setActive={this.setActive}
                   activeKey={this.state.activeLinkKey}
                   action={e => {
-                    this.props.link('checkOut');
+                    this.props.link('produceFormulas');
                     this.setActiveCategory(3);
                   }}
-                  text="Check Out"
+                  text="Produce Formulas"
                   permission="manager" />
               </ul>
             </div>
@@ -228,6 +228,52 @@ class SideBar extends Component {
                       this.setActiveCategory(5);
                     }}
                     text="Permission"
+                    permission="admin" />
+                </ul>
+              </div>
+            </li>
+          }
+          {
+            global.user_group == "admin" &&
+            <li className="nav-item">
+              <a
+                href="#nav-formula"
+                role="button"
+                className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 6 ? "-Active" : "")}
+                id="category6"
+                onClick={e=>{
+                  this.setActiveCategory(6);
+                  this.setActive(0);
+                }}
+                data-toggle="collapse"
+                aria-expanded="false"
+                aria-controls="nav-formula"
+                data-parent="#SideBar"
+              >
+                Formula&nbsp;&nbsp;
+            <i className="fa fa-caret-down"></i>
+              </a>
+              <div className="collapse" id="nav-formula">
+                <ul className="nav flex-column">
+                  <PermissionLink
+                    linkKey={17}
+                    setActive={this.setActive}
+                    activeKey={this.state.activeLinkKey}
+                    action={e => {
+                      this.props.link('NewFormula');
+                      this.setActiveCategory(6);
+                    }}
+                    text="New Formula"
+                    permission="admin" />
+                  <PermissionLink
+                    linkKey={15}
+                    setActive={this.setActive}
+                    activeKey={this.state.activeLinkKey}
+                    action={e => {
+                      this.props.link('EditFormula');
+                      this.setActiveCategory(6);
+                    }}
+                    text="Edit Existing Formula"
                     permission="admin" />
                 </ul>
               </div>

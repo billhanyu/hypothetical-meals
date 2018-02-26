@@ -1,0 +1,145 @@
+.NewFormulaContainer {
+  width: 870px;
+  margin: 0 auto;
+  margin-top: 40px;
+  border-radius: 6px;
+  min-width: 854px;
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.BackButtonFormulaContainer {
+  position: absolute;
+  transition: all 0.5s ease;
+  color: #909FAD;
+  cursor: pointer;
+  margin-top: 12px;
+  margin-left: 20px;
+}
+
+.BackButtonFormulaContainer:hover {
+  color: #657788;
+}
+
+.NewFormulaContainer .NewFormulaHeader {
+  text-align: center;
+  width: 100%;
+  font-size: 24px;
+  color: #4C8CB4;
+  font-weight: 600;
+  margin-top: 12px;
+}
+
+/*** FORMULA BUTTON **/
+.FormulaButton {
+  width: 250px;
+  margin: 0 auto;
+  border-radius: 4px;
+  height: 50px;
+  color: #FFF;
+  background-color: #4C8CB4;
+  clear: both;
+  line-height: 50px;
+  text-align: center;
+  transition: all 0.5s ease;
+  border: 1px solid black;
+  cursor: pointer;
+  margin-bottom: 24px;
+}
+
+.FormulaButton:hover {
+  background-color: #61A0C7;
+}
+
+/**** FORMULA STUFF ******/
+.FormulaInputContainer {
+  width: 90%;
+  padding: 24px 0;
+  float: left;
+  margin-left: 5%;
+}
+
+.FormulaInputContainer .FormulaTextContainer {
+  float: left;
+  width: 330px;
+}
+
+.FormulaInputContainer .FormulaTextContainer .FormulaTextHeader {
+  font-size: 18px;
+  font-weight: 600;
+  color: #41454E;
+  clear: both;
+}
+
+.FormulaInputContainer .FormulaTextContainer .FormulaTextContent {
+  color: #5a5f6d;
+  font-size: 15px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  clear: both;
+}
+
+.FormulaInputContainer input {
+  float: left;
+  width: 435px;
+  height: 40px;
+  padding: 24px;
+  border: 1px solid #ccc;
+  box-shadow: 0 1px 0px 0 rgba(0,0,0,0.02) inset;
+  background-color: #fff;
+  font-size: 14px;
+  color: #555;
+  border-radius: 2px;
+  line-height: 30px;
+}
+
+.FormulaInputContainer textarea {
+  float: left;
+  width: 435px;
+  padding: 8px 16px;
+  margin-top: 8px;
+  border: 1px solid #ccc;
+  box-shadow: 0 1px 0px 0 rgba(0,0,0,0.02) inset;
+  background-color: #fff;
+  font-size: 14px;
+  color: #555;
+  border-radius: 2px;
+  line-height: 30px;
+}
+
+.FormulaTextError {
+  color: red;
+  font-size: 16px;
+  clear: both;
+  width: 100%;
+  text-align: center;
+}
+
+/**** FORMULA INGREDIENT LIST ITEM ****/
+.FormulaIngredientItemContainer {
+  width: 1000px;
+  margin-left: 300px;
+  clear: both;
+  padding: 16px 0;
+}
+
+.FormulaIngredientItemContainer span {
+  float: left;
+  font-weight: 500;
+  font-size: 18px;
+  color: #656565;
+  width: 150px;
+  max-height: 60px;
+  overflow-y: auto;
+}
+
+.FormulaIngredientItemContainer input {
+  padding: 4px;
+  padding-left: 16px;
+  border-radius: 4px;
+  margin-left: 12px;
+  margin-top: -7px;
+  float: left;
+  width: 300px;
+}

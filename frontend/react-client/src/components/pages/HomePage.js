@@ -8,13 +8,15 @@ import logoutFunc from '../homepage/LogOut';
 import NewIngredientList from '../homepage/ingredient/IngredientList';
 import NewVendorList from '../homepage/vendor/VendorList';
 import ViewInventory from '../homepage/inventory/ViewInventory';
-import FormulaList from '../homepage/formula/FormulaList';
 import Order from '../homepage/order/Order';
-import CheckOut from '../homepage/checkout/CheckOut';
 import SpendingLog from '../homepage/spendinglog/SpendingLog';
 import StorageList from '../homepage/storage/StorageList';
 import Registration from '../Registration/RegistrationContainer';
 import ChangePermission from '../homepage/user/ChangePermission';
+import NewFormula from '../homepage/Formula/NewFormula.js';
+import EditFormula from '../homepage/Formula/EditFormula.js';
+import ProduceFormula from '../homepage/inventory/ProduceFormula.js';
+import ViewAllFormulas from '../homepage/inventory/ViewAllFormulas.js';
 import ProductionLog from '../homepage/productionlog/ProductionLog';
 import SystemLog from '../homepage/systemlog/SystemLog';
 
@@ -48,9 +50,6 @@ class HomePage extends Component {
     else if (funcName == "register") {
       return <Registration />;
     }
-    else if (funcName == "viewFormulas") {
-      return <FormulaList />;
-    }
     else if (funcName == "changePermission") {
       return <ChangePermission />;
     }
@@ -59,9 +58,6 @@ class HomePage extends Component {
     }
     else if (funcName == "logOrder") {
       return <Order />;
-    }
-    else if (funcName == "checkOut") {
-      return <CheckOut />;
     }
     else if (funcName == "spendingLog") {
       return <SpendingLog />;
@@ -77,6 +73,18 @@ class HomePage extends Component {
     }
     else if (funcName == "viewStorages") {
       return <StorageList />;
+    }
+    else if (funcName == "NewFormula") {
+      return <NewFormula />;
+    }
+    else if (funcName == "EditFormula") {
+      return <EditFormula />;
+    }
+    else if (funcName == 'produceFormulas') {
+      return <ProduceFormula link={this.link} />;
+    }
+    else if (funcName == 'viewFormulas') {
+      return <ViewAllFormulas />;
     }
   }
 
