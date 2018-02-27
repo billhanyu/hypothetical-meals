@@ -88,7 +88,17 @@ export function addVendors(req, res, next) {
   return connection.query(`INSERT INTO Vendors (name, contact, code) VALUES ${values.join(', ')}`)
     .then(() => success(res))
     .then(() => {
-      return logAction(req.payload.id, `Vendor${names.length > 1 ? 's' : ''} ${names.join(', ')} added.`);
+      let stringNames = [];
+      names.forEach(x => {
+        stringNames.push(`'${x}'`);
+      });
+      return connection.query(`SELECT * FROM Vendors WHERE name IN (${stringNames.join(', ')})`);
+    })
+    .then((results) => {
+      let nameStrings = results.map(x => {
+        return `{${x.name}=vendor_id=${x.id}}`;
+      });
+      return logAction(req.payload.id, `Vendor${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} added.`);
     })
     .catch(err => {
       if (err.code == 'ER_DUP_ENTRY') {
@@ -153,7 +163,7 @@ export function modifyVendors(req, res, next) {
       let stringNames = [];
       names.forEach(x => {
         stringNames.push(`'${x}'`);
-      })
+      });
       return connection.query(`SELECT * FROM Vendors WHERE name IN (${stringNames.join(', ')})`);
     })
     .then((results) => {
@@ -197,11 +207,13 @@ export function deleteVendors(req, res, next) {
     })
     .then(() => success(res))
     .then(() => {
-      return connection.query(`SELECT name FROM Vendors WHERE id IN (${ids.join(', ')})`);
+      return connection.query(`SELECT * FROM Vendors WHERE id IN (${ids.join(', ')})`);
     })
     .then((results) => {
-      const names = results.map(x => x.name);
-      logAction(req.payload.id, `Vendor${names.length > 1 ? 's' : ''} ${names.join(', ')} deleted.`);
+      const nameStrings = results.map(x => {
+        return `{${x.name}=vendor_id=${x.id}}`;
+      });
+      return logAction(req.payload.id, `Vendor${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} deleted.`);
     })
     .catch(err => {
       console.error(err);
