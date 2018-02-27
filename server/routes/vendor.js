@@ -23,6 +23,20 @@ export function view(req, res, next) {
     });
 }
 
+export function viewWithId(req, res, next) {
+  if (!req.params.id || !checkNumber.isPositiveInteger(req.params.id)) {
+    return res.status(400).send('Invalid vendor id');
+  }
+  connection.query(`SELECT * FROM Vendors WHERE id = ${req.params.id}`)
+    .then(results => {
+      if (results.length != 1) {
+        return res.status(404).send('Vendor not found');
+      }
+      return res.json(results[0]);
+    })
+    .catch(err => handleError(err, res));
+}
+
 // req.query.code
 export function getVendorWithCode(req, res, next) {
   if (!req.query.code) {
@@ -78,7 +92,7 @@ export function addVendors(req, res, next) {
     })
     .catch(err => {
       if (err.code == 'ER_DUP_ENTRY') {
-        return res.status(400).send('Duplicate code with other vendor');
+        return res.status(400).send('Duplicate name or code with other vendor');
       }
       handleError(err, res);
     });
@@ -136,12 +150,22 @@ export function modifyVendors(req, res, next) {
           WHERE id IN (${Object.keys(vendors).join(', ')})`);
     })
     .then(() => {
-      return logAction(req.payload.id, `Vendor${names.length > 1 ? 's' : ''} ${names.join(', ')} modified.`);
+      let stringNames = [];
+      names.forEach(x => {
+        stringNames.push(`'${x}'`);
+      })
+      return connection.query(`SELECT * FROM Vendors WHERE name IN (${stringNames.join(', ')})`);
+    })
+    .then((results) => {
+      let nameStrings = results.map(x => {
+        return `{${x.name}=vendor_id=${x.id}}`;
+      });
+      return logAction(req.payload.id, `Vendor${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} modified.`);
     })
     .then(() => success(res))
     .catch(err => {
       if (err.code == 'ER_DUP_ENTRY') {
-        return res.status(400).send('Duplicate code with other vendor');
+        return res.status(400).send('Duplicate name or code with other vendor');
       }
       handleError(err, res);
     });

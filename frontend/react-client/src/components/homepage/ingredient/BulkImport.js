@@ -11,6 +11,7 @@ class BulkImport extends Component {
   submit(e) {
     if (!this.file) {
       alert('Please choose some file!');
+      return;
     }
     const data = new FormData();
     data.set('bulk', this.file);

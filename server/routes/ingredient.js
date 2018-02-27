@@ -23,7 +23,7 @@ export function pages(req, res, next) {
 }
 
 export function view(req, res, next) {
-  queryWithPagination(req.params.page_num, 'Ingredients', basicViewQueryString)
+  queryWithPagination(req.params.page_num, 'Ingredients', basicViewQueryString + ' WHERE removed = 0')
     .then(results => res.status(200).send(results))
     .catch(err => {
       console.error(err);
@@ -79,7 +79,7 @@ function addIngredientHelper(ingredients, req, res, next) {
     .then((results) => {
       const nameStrings = [];
       results.forEach(x => {
-        nameStrings.push(`${x.name}{ingredient_id: ${x.id}}`);
+        nameStrings.push(`{${x.name}=ingredient_id=${x.id}}`);
       });
       return logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} added.`);
     })
@@ -166,7 +166,7 @@ function modifyIngredientHelper(items, req, res, next) {
     .then((results) => {
       const nameStrings = [];
       results.forEach(x => {
-        nameStrings.push(`${x.name}{ingredient_id: ${x.id}}`);
+        nameStrings.push(`{${x.name}=ingredient_id=${x.id}}`);
       });
       return logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} modified.`);
     })
@@ -222,27 +222,27 @@ function deleteIngredientHelper(items, req, res, next) {
           formulasWithIngredient.push(result.name);
         }
       }
-      if (formulasWithIngredient.length > 0) throw createError(`Formulas ${formulasWithIngredient.join(', ')} contains one or more ingredients that are attempted to be deleted`);
-      return connection.query(`UPDATE Ingredients SET removed = 1 WHERE id IN (${ingredientIds.join(', ')})`);
-    })
-    .then(() => connection.query(`SELECT id FROM VendorsIngredients WHERE ingredient_id IN (${ingredientIds.join(', ')})`))
-    .then(results => {
-      const vendorsIngredientsIds = results.map(e => e.id);
-      return fakeDeleteMultipleVendorIngredients(vendorsIngredientsIds);
-    })
-    .then(() => {
-      const myIds = items;
-      return connection.query(`SELECT * FROM Ingredients WHERE id IN (${myIds.join(', ')})`);
-    })
-    .then((results) => {
-      const nameStrings = [];
-      results.forEach(x => {
-        nameStrings.push(`${x.name}{ingredient_id: ${x.id}}`);
-      });
-      return logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} deleted.`);
-    })
-    .then(() => success(res))
-    .catch(err => handleError(err, res));
+    if (formulasWithIngredient.length > 0) throw createError(`Formulas ${formulasWithIngredient.join(', ')} contains one or more ingredients that are attempted to be deleted`);
+    return connection.query(`UPDATE Ingredients SET removed = 1 WHERE id IN (${ingredientIds.join(', ')})`);
+  })
+  .then(() => connection.query(`SELECT id FROM VendorsIngredients WHERE ingredient_id IN (${ingredientIds.join(', ')})`))
+  .then(results => {
+    const vendorsIngredientsIds = results.map(e => e.id);
+    return fakeDeleteMultipleVendorIngredients(vendorsIngredientsIds);
+  })
+  .then(() => {
+    const myIds = items;
+    return connection.query(`SELECT * FROM Ingredients WHERE id IN (${myIds.join(', ')})`);
+  })
+  .then((results) => {
+    const nameStrings = [];
+    results.forEach(x => {
+      nameStrings.push(`{${x.name}=ingredient_id=${x.id}}`);
+    });
+    return logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} deleted.`);
+  })
+  .then(() => success(res))
+  .catch(err => handleError(err, res));
 }
 
 export function bulkImport(req, res, next) {
