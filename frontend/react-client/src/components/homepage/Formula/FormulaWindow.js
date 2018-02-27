@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import FormulaInput from './NewFormula/FormulaInput.js';
 import FormulaSelector from './NewFormula/FormulaSelector.js';
 import FormulaButton from './NewFormula/FormulaButton.js';
+import axios from 'axios';
 
 class FormulaWindow extends Component {
   constructor(props) {
@@ -90,6 +90,41 @@ class FormulaWindow extends Component {
     }
 
     this.props.onFinish(this.state, this.props.activeId);
+
+    const { name, desc, quantity, idToQuantityMap } = this.state;
+    //PUT REQUEST HERE
+    const ingredients = [];
+    Object.keys(idToQuantityMap).forEach(key => {
+      if (Number(idToQuantityMap[key]) > 0) {
+        ingredients.push({
+          ingredient_id: key,
+          num_native_units: idToQuantityMap[key],
+        });
+      }
+    });
+
+    const id = this.props.activeId;
+
+    axios.put(`/formulas`, {
+      'formulas': [
+        {
+          id,
+          name,
+          description: desc,
+          num_product: quantity,
+          ingredients,
+        }
+      ]
+    }, {
+      headers: { Authorization: "Token " + global.token }
+    })
+    .then(response => {
+      this.props.onFinish();
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Error updating formula');
+    });
   }
 
   render() {
