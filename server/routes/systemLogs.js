@@ -18,9 +18,27 @@ export function pages(req, res, next) {
 }
 
 export function viewAll(req, res, next) {
+  const queryParams = req.query;
   connection.query(`${logQuery} ORDER BY SystemLogs.id`)
-    .then((results) => res.json(results))
+    .then((results) => {
+      const filteredResults = ingredientFilter(queryParams, results);
+      res.json(filteredResults);
+    })
     .catch((err) => handleError(err, res));
+}
+
+function ingredientFilter(queryParams, results) {
+  let filteredResults = [];
+  if ('ingredient_id' in queryParams) {
+      results.forEach(x => {
+          if (x.description.indexOf(`ingredient_id=${queryParams['ingredient_id']}`) >= 0) {
+              filteredResults.push(x);
+          }
+      });
+      return filteredResults;
+  } else {
+      return results;
+  }
 }
 
 export function view(req, res, next) {
