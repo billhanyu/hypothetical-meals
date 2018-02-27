@@ -128,9 +128,10 @@ class IngredientList extends Component {
     })
     .then(response => {
       this.selectPage(1);
+      alert('Deleted!');
     })
     .catch(err => {
-      alert('Some error occurred');
+      alert(err.response.data);
     });
   }
 
