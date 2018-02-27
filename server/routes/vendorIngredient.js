@@ -73,7 +73,7 @@ export function addVendorIngredients(req, res, next) {
     const myVendors = items.map(x => x.vendor_id);
     const myIngredients = items.map(x => x.ingredient_id);
     return connection.query(`SELECT VendorsIngredients.price, Vendors.name as vendor_name, 
-      Vendors.id, Ingredients.name as ingredient_name, Ingredients.id as ingredient_id
+      Vendors.id as vendor_id, Ingredients.name as ingredient_name, Ingredients.id as ingredient_id
       FROM VendorsIngredients
       JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id
       JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id
@@ -83,7 +83,7 @@ export function addVendorIngredients(req, res, next) {
   })
   .then((results) => {
     const vendorIngredientStrings = results.map(x => {
-      return `vendor ${x.vendor_name} for ingredient ${x.ingredient_name}{ingredient_id: ${x.ingredient_id}} at price ${x.price} per package`;
+      return `vendor {${x.vendor_name}=vendor_id=${x.vendor_id}} for ingredient {${x.ingredient_name}=ingredient_id=${x.ingredient_id}} at price ${x.price} per package`;
     });
     return logAction(req.payload.id, `Added ${vendorIngredientStrings.join(', ')}.`);
   })
@@ -132,7 +132,7 @@ export function modifyVendorIngredients(req, res, next) {
     .then(() => {
       const vendorIngredientIds = Object.keys(items);
       return connection.query(`SELECT VendorsIngredients.price, Vendors.name as vendor_name, 
-        Vendors.id, Ingredients.name as ingredient_name, Ingredients.id as ingredient_id
+        Vendors.id as vendor_id, Ingredients.name as ingredient_name, Ingredients.id as ingredient_id
         FROM VendorsIngredients
         JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id
         JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id
@@ -140,8 +140,9 @@ export function modifyVendorIngredients(req, res, next) {
         AND VendorsIngredients.removed =  0`);
     })
     .then((results) => {
+      console.log(results);
       const vendorIngredientStrings = results.map(x => {
-        return `ingredient ${x.ingredient_name}{ingredient_id: ${x.ingredient_id}} price for vendor ${x.vendor_name} to ${x.price} per package`;
+        return `ingredient {${x.ingredient_name}=ingredient_id=${x.ingredient_id}} price for vendor {${x.vendor_name}=${x.vendor_id}} to ${x.price} per package`;
       });
       return logAction(req.payload.id, `Changed ${vendorIngredientStrings.join(', ')}.`);
     })
@@ -166,9 +167,9 @@ export function deleteVendorIngredients(req, res, next) {
   }
   fakeDeleteMultipleVendorIngredients(ids)
     .then(() => success(res))
-    .then(() => {  
+    .then(() => {
       return connection.query(`SELECT Vendors.name as vendor_name, 
-        Vendors.id, Ingredients.name as ingredient_name, Ingredients.id as ingredient_id
+        Vendors.id as vendor_id, Ingredients.name as ingredient_name, Ingredients.id as ingredient_id
         FROM VendorsIngredients
         JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id
         JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id
@@ -176,7 +177,7 @@ export function deleteVendorIngredients(req, res, next) {
     })
     .then((results) => {
       const vendorIngredientStrings = results.map(x => {
-        return `vendor ${x.vendor_name} for ingredient ${x.ingredient_name}{ingredient_id: ${x.ingredient_id}}`;
+        return `vendor {${x.vendor_name}=vendor_id=${x.vendor_id}} for ingredient {${x.ingredient_name}=ingredient_id=${x.ingredient_id}}`;
       });
       return logAction(req.payload.id, `Removed ${vendorIngredientStrings.join(', ')}.`);
     })
@@ -189,10 +190,11 @@ export function fakeDeleteMultipleVendorIngredients(ids) {
 }
 
 function getCases(olds, items) {
+  // console.log(items);
   const prices = [];
   for (let i = 0; i < olds.length; i++) {
     const old = olds[i];
-    const id = old['ingredient_id'];
+    const id = old['id'];
     const change = items[id];
     const price = change['price'];
     prices.push(`when id = ${id} then ${price}`);

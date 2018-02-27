@@ -105,7 +105,7 @@ export function add(req, res, next) {
         })
         .then((results) => {
             const formulaStrings = results.map(x => {
-                return `${x.name}{formula_id: ${x.id}}`;
+                return `{${x.name}=formula_id=${x.id}}`;
             });
             return logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} added.`);
         })
@@ -241,7 +241,7 @@ export function modify(req, res, next) {
         })
         .then((results) => {
             const formulaStrings = results.map(x => {
-                return `${x.name}{formula_id: ${x.id}}`;
+                return `{${x.name}=formula_id=${x.id}}`;
             });
             return logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} modified.`);
         })
@@ -276,7 +276,7 @@ export function deleteFormulas(req, res, next) {
         })
         .then(() => {
             const formulaStrings = oldFormulas.map(x => {
-                return `${x.name}{formula_id: ${x.id}}`;
+                return `{${x.name}=formula_id=${x.id}}`;
             });
             return logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} deleted.`);
         })
@@ -342,12 +342,21 @@ export function bulkImport(req, res, next) {
             let formulaEntriesToAdd = '';
             for (let entry of entries) {
                 const formulaFromDb = formulas.find(formula => formula.name == entry.formula);
+                entry.id = formulaFromDb.id;
                 formulaEntriesToAdd += `(${entry.ingredientId}, ${entry.numNativeUnits}, ${formulaFromDb.id}),`;
             }
             return connection.query(`INSERT INTO FormulaEntries (ingredient_id, num_native_units, formula_id) VALUES ${formulaEntriesToAdd.slice(0, -1)}`);
         })
+        .then(() => {
+            let queryStrings = [];
+            for (let entry of entries) {
+                queryStrings.push(`{${entry.formula}=formula_id=${entry.id}}`);
+            }
+            return logAction(req.payload.id, `Bulk import added the following formulas: ${queryStrings.join(', ')}`);
+        })
         .then(() => res.sendStatus(200))
         .catch((err) => {
+            console.log(err);
             handleError(err, res);
         });
 }

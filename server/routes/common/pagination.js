@@ -14,7 +14,7 @@ export function getAvailableNumPages(tableName) {
     });
 }
 
-export function queryWithPagination(pageNum, tableName, queryString) {
+export function queryWithPagination(pageNum, tableName, queryString, orderByString) {
   const startId = (pageNum - 1) * idsPerPage + 1;
   const endId = pageNum * idsPerPage;
 
@@ -24,7 +24,7 @@ export function queryWithPagination(pageNum, tableName, queryString) {
     return connection.query(`${queryString.substring(0, whereIndex + 5)} (${tableName}.id BETWEEN ${startId} AND ${endId}) AND${queryString.substring(whereIndex + 5)}`);
   }
 
-  return connection.query(`${queryString} WHERE (${tableName}.id BETWEEN ${startId} AND ${endId})`);
+  return connection.query(`${queryString} WHERE (${tableName}.id BETWEEN ${startId} AND ${endId}) ${orderByString ? orderByString : ''}`);
 }
 
 export function getPaginationQueryString(pageNum, tableName, queryString) {
