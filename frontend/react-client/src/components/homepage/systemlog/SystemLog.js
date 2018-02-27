@@ -206,7 +206,7 @@ class SystemLog extends Component {
               this.state.filteredLogs.map((log, idx) => {
                 return (
                   <tr className="row" style={{ 'margin': 0 }} key={idx}>
-                    <td className="col-md-3">{log.created_at.split('T')[0]}</td>
+                    <td className="col-md-3">{(new Date(log.created_at)).toString().split(' GMT')[0]}</td>
                     <td className="col-md-3">{log.username}</td>
                     <td className="col-md-6">{this.display(log.description)}</td>
                   </tr>
