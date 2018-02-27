@@ -36,7 +36,13 @@ class FormulaInput extends Component {
       headers: {Authorization: "Token " + global.token}
     })
     .then(response => {
-      const allIngredients = response.data.map(element => element.name);
+      const allIngredients = [];
+      response.data.forEach(element => {
+        if(element.removed.data[0] == 0) {
+          allIngredients.push(element.name);
+        }
+      });
+
       this.setState({
         ingredientData: response.data,
         allIngredients,
@@ -61,10 +67,6 @@ class FormulaInput extends Component {
     ));
   }
 
-  _isNumeric(n) {
-    return !isNaN(parseFloat(n)) && (n >=0);
-  }
-
   handleInputChange(elementName, newQuantity) {
     const newQuantityMap = this.props.nameToQuantityMap;
     const newIngredientNameToQuantityMap = this.props.ingredientNameToQuantityMap;
@@ -72,9 +74,9 @@ class FormulaInput extends Component {
       return elementName === element.name;
     }).id;
 
-    if((isNaN(Number(newQuantity)) || Number(newQuantity) <= 0) && (newQuantity != '')) {
-      newQuantityMap[IDforElement] = '';
-      newIngredientNameToQuantityMap[elementName] = '';
+    if((isNaN(Number(newQuantity)) || Number(newQuantity) <= 0)) {
+      newQuantityMap[IDforElement] = 1;
+      newIngredientNameToQuantityMap[elementName] = 1;
     }
     else {
       newQuantityMap[IDforElement] = newQuantity;
@@ -109,7 +111,7 @@ class FormulaInput extends Component {
              elementName={elementName}
              value={this.props.ingredientNameToQuantityMap[elementName]}
              onInputChange={this.handleInputChange.bind(this)}
-             />
+            />
            })
          }
       </div>

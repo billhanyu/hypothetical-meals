@@ -107,7 +107,7 @@ class StorageList extends Component {
                           storage.capacity + " sqft"
                       }
                     </td>
-                    <td className={columnClass}>{storage.used + " sqft"}</td>
+                    <td className={columnClass}>{storage.used.toFixed(2) + " sqft"}</td>
                     {
                       global.user_group == 'admin' && this.state.editIdx !== idx &&
                       <td className={columnClass}>

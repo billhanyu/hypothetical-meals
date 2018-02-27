@@ -89,7 +89,7 @@ function addLogEntryHelper(logs, userId) {
       for (let vendorIngredient of results) {
         try {
           let unitWeight = vendorIngredient['num_native_units'];
-          let quantity = vendorIngredientMap[vendorIngredient['ingredient_id']];
+          let quantity = vendorIngredientMap[vendorIngredient.id];
           spendingLogReq[vendorIngredient['ingredient_id']] = {
             'total_weight': unitWeight * quantity,
             'cost': quantity * vendorIngredient['price'],

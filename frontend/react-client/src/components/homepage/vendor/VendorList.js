@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import PageBar from '../../GeneralComponents/PageBar';
 import VendorListItem from './VendorListItem';
-import AddVendor from './AddVendor';
-import EditVendor from './EditVendor';
+import AddEditVendor from './AddEditVendor';
 
 class VendorList extends Component {
   constructor(props) {
@@ -24,11 +23,19 @@ class VendorList extends Component {
     this.finishAdd = this.finishAdd.bind(this);
     this.edit = this.edit.bind(this);
     this.finishEdit = this.finishEdit.bind(this);
+    this.backToList = this.backToList.bind(this);
   }
 
   componentDidMount() {
     this.getPageNum();
     this.selectPage(1);
+  }
+
+  backToList() {
+    this.setState({
+      adding: false,
+      editing: false,
+    });
   }
   
   add() {
@@ -103,6 +110,7 @@ class VendorList extends Component {
     })
     .then(response => {
       this.selectPage(1);
+      alert('Deleted!');
     })
     .catch(err => alert('Some error occurred'));
   }
@@ -160,10 +168,10 @@ class VendorList extends Component {
       </div>;
     
     const edit =
-    <EditVendor vendor={this.state.vendors[this.state.editingIdx]} finishEdit={this.finishEdit} />;
+    <AddEditVendor mode="edit" backToList={this.backToList} vendor={this.state.vendors[this.state.editingIdx]} finishEdit={this.finishEdit} />;
 
     const add =
-    <AddVendor finishAdd={this.finishAdd} />;
+    <AddEditVendor mode="add" backToList={this.backToList} finishAdd={this.finishAdd} />;
 
     if (this.state.editing) {
       return edit;
