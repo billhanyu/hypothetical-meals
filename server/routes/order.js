@@ -91,9 +91,11 @@ function orderHelper(orders, req, res, next) {
         WHERE VendorsIngredients.id IN (${vendorIngredientIds.join(', ')})`);
     })
     .then((results) => {
+      console.log(results);
       let orderStrings = results.map(x => {
-        `${orders[x.id]} package${orders[x.id] > 1 ? 's' : ''} of ${x.name}{ingredient_id: ${x.id}} from ${x.vendor_name}`;
+        return `${orders[x.id]} package${orders[x.id] > 1 ? 's' : ''} of ${x.name}{ingredient_id: ${x.id}} from ${x.vendor_name}`;
       });
+      console.log(orderStrings);
       logAction(req.payload.id, `Ordered ${orderStrings.join(', ')}.`);
     })
     .then(() => {
