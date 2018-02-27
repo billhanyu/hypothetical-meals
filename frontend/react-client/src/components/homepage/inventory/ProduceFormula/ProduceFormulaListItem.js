@@ -5,8 +5,10 @@ class ProduceFormulaListNoob extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      numFormula: 0,
+      numProduct: 0,
+      belowMinError: false,
     };
+    props.handleNumChange(Number(props.num_product), props.id, Number(this.props.num_product), false);
   }
 
   /**** REQUIRED PROPS
@@ -30,10 +32,17 @@ class ProduceFormulaListNoob extends Component {
   */
 
   handleInputChange(event) {
+    let newValueNoDecimal = event.target.value.replace('.', '');
+    let newValueNoNeg = newValueNoDecimal.replace('-', '');
+    if(isNaN(newValueNoNeg)) {
+      return;
+    }
+    const belowMinError = (Number(newValueNoNeg) < this.props.num_product) && (Number(newValueNoNeg) != 0);
     this.setState({
-      numFormula: event.target.value,
+      numProduct: Number(newValueNoNeg),
+      belowMinError,
     });
-    this.props.handleNumChange(event.target.value, this.props.id, Number(event.target.value) * Number(this.props.num_product));
+    this.props.handleNumChange(Number(this.props.num_product), this.props.id, Number(newValueNoNeg), belowMinError);
   }
 
   render() {
@@ -41,17 +50,21 @@ class ProduceFormulaListNoob extends Component {
       <div className="ProduceFormulaListItem">
         <div className="ProduceFormulaListItemContainer">
           <div className="ProduceFormulaItemName">{this.props.name}</div>
-          <input value={this.state.numFormula} onChange={this.handleInputChange.bind(this)} />
-          <div className="ProduceFormulaQuantity">x {Number(this.props.num_product)} (Amt per package) = {Number(this.state.numFormula) * Number(this.props.num_product)}</div>
+          <div className="ProduceFormulaQuantity" style={{marginLeft:'12px'}}>Amount (packages):</div>
+          <input style={this.state.belowMinError ? {border:'1px solid red'} : null} value={this.state.numProduct} onChange={this.handleInputChange.bind(this)} />
+          {
+            this.state.belowMinError ? <div style={{color:'red', marginLeft:'12px', float:'left'}}>Below min. package size</div> : null
+          }
         </div>
         <div className="ProduceFormulaListItemIngredientHeader">Ingredients Used in Formula Production: </div>
         <div style={{maxHeight: '150px', overflow:'auto', width:'100%', float:'left', clear:'both'}}>
         {
           Object.keys(this.props.ingredients).map((elementKey, key) => {
-            return <ProduceFormulaListItemIngredient key={key}
-                      ingredient={this.props.ingredients[elementKey]}
-                      numFormula={this.state.numFormula}
-                    />;
+            return <ProduceFormulaListItemIngredient
+              key={key}
+              ingredient={this.props.ingredients[elementKey]}
+              numIngredients={this.state.numProduct / this.props.num_product * this.props.ingredients[elementKey].num_native_units}
+            />;
           })
         }
         </div>

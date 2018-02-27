@@ -47,6 +47,7 @@ class ProduceFormulaListItem extends Component {
           Object.keys(this.props.ingredients).map((elementKey, key) => {
             return <ProduceFormulaListItemIngredient key={key}
                       ingredient={this.props.ingredients[elementKey]}
+                      numIngredients={this.props.ingredients[elementKey].num_native_units}
                       numFormula={1}
                     />;
           })

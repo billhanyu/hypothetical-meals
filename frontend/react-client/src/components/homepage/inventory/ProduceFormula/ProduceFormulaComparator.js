@@ -22,12 +22,13 @@ class ProduceFormulaComparator extends Component {
     const ingredientList = [];
     Object.keys(props.formulaToFormulaAmountMap).forEach(formulaID => {
       const formulaAmount = props.formulaToFormulaAmountMap[formulaID];
+      const numProducts = props.formulaToFormulaAmountTotalMap[formulaID];
       const formulaPackageObject = props.EditFormulaBoxes.find(formulaBox => {
         return formulaBox.id == formulaID;
       });
       Object.keys(formulaPackageObject.ingredients).forEach(ingredient => {
         const ingredientObject = formulaPackageObject.ingredients[ingredient];
-        const addedIngredients = formulaAmount * ingredientObject.num_native_units;
+        const addedIngredients = numProducts / formulaAmount * ingredientObject.num_native_units;
         if(ingredientIDtoAmountMap[ingredientObject.ingredient_id] != null) {
           ingredientIDtoAmountMap[ingredientObject.ingredient_id].amount = ingredientIDtoAmountMap[ingredientObject.ingredient_id].amount + addedIngredients;
         }
@@ -48,7 +49,7 @@ class ProduceFormulaComparator extends Component {
       ingredientIDtoAmountMap[ingredientid].stock = 
         inventoryOfIngredient == null
         ? 0
-        : +(props.inventoryStock[inventoryOfIngredient].ingredient_num_native_units * props.inventoryStock[inventoryOfIngredient].num_packages).toFixed(5);
+        : +(props.inventoryStock[inventoryOfIngredient].ingredient_num_native_units * props.inventoryStock[inventoryOfIngredient].num_packages).toFixed(2);
     });
     this.ingredientIDtoAmountMap = ingredientIDtoAmountMap;
     this.ingredientList = ingredientList;
