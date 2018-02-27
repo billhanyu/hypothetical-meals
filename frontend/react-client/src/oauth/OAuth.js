@@ -42,6 +42,7 @@ export function logInWithRedirectedHash(hash, history, cookies) {
           if (response.status == 200) {
             cookies.set('user_group', response.data.user.user_group, { path: '/' });
             cookies.set('token', response.data.user.token, { path: '/' });
+            cookies.set('user_username', dukeInfo.displayName, { path: '/' });
             global.token = response.data.user.token;
             global.user_group = response.data.user.user_group;
             global.user_username = dukeInfo.displayName;
