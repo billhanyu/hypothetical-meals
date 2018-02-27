@@ -31,6 +31,20 @@ describe('Vendor', () => {
     });
   });
 
+  describe('#viewWithId()', () => {
+    it('should return vendor with id', (done) => {
+      chai.request(server)
+        .get('/vendors/id/1')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          assert.strictEqual(res.body.name, 'Duke', 'vendor 1 name');
+          done();
+        });
+    });
+  });
+
   describe('#getVendorWithCode()', () => {
     it('should return vendor with code', (done) => {
       chai.request(server)
