@@ -18,11 +18,13 @@ class AddEditIngredient extends Component {
     this.cancelEdit = this.cancelEdit.bind(this);
     this.finishEdit = this.finishEdit.bind(this);
     if (props.mode == "edit") {
+      console.log(props.ingredient);
       this.state = {
         name: props.ingredient.name,
         package_type: props.ingredient.package_type,
         native_unit: props.ingredient.native_unit,
         num_native_units: props.ingredient.num_native_units,
+        removed: props.ingredient.removed.data[0],
         storage_id: props.ingredient.storage_id,
         storage: Storage2State[props.ingredient.storage_name],
         id: props.ingredient.id,
@@ -247,9 +249,16 @@ class AddEditIngredient extends Component {
   render() {
     const header = "Ingredient: " + this.state.name;
     const columnClass = global.user_group == "admin" ? "OneThirdWidth" : "HalfWidth";
+    const readOnly = (global.user_group !== "admin") || (this.state.removed == 1);
     return (
       <div>
-        <h2>{header}</h2>
+        <h2>
+          {header}
+          {
+            this.state.removed == 1 &&
+            <span style={{'margin-left':'20px'}} className="badge badge-danger">Deleted</span>
+          }
+        </h2>
         <button
           type="button"
           className="btn btn-secondary"
@@ -260,32 +269,32 @@ class AddEditIngredient extends Component {
           <form className="col-xl-6 col-lg-6 col-sm-8">
             <div className="form-group">
               <label htmlFor="name">Ingredient Name</label>
-              <input type="text" className="form-control" id="name" aria-describedby="name" placeholder="Name" onChange={e => this.handleInputChange('name', e)} value={this.state.name} readOnly={global.user_group !== "admin"} />
+              <input type="text" className="form-control" id="name" aria-describedby="name" placeholder="Name" onChange={e => this.handleInputChange('name', e)} value={this.state.name} readOnly={readOnly} />
             </div>
             <div className="form-group">
               <label htmlFor="package_type">Package Type</label>
-              <ComboBox className="form-control" id="package_type" Options={packageTypes} onChange={this.handleInputChange} selected={this.state.package_type} readOnly={global.user_group !== "admin"} />
+              <ComboBox className="form-control" id="package_type" Options={packageTypes} onChange={this.handleInputChange} selected={this.state.package_type} readOnly={readOnly} />
             </div>
             <div className="form-group">
               <label htmlFor="storage">Temperature State</label>
-              <ComboBox className="form-control" id="storage" Options={["Frozen", "Refrigerated", "Room Temperature"]} onChange={this.handleInputChange} selected={this.state.storage} readOnly={global.user_group !== "admin"} />
+              <ComboBox className="form-control" id="storage" Options={["Frozen", "Refrigerated", "Room Temperature"]} onChange={this.handleInputChange} selected={this.state.storage} readOnly={readOnly} />
             </div>
             <div className="form-group">
               <label htmlFor="native_unit">Unit</label>
-              <input type="text" className="form-control" id="native_unit" aria-describedby="unit" placeholder="Pounds" onChange={e => this.handleInputChange('native_unit', e)} value={this.state.native_unit} readOnly={global.user_group !== "admin"}/>
+              <input type="text" className="form-control" id="native_unit" aria-describedby="unit" placeholder="Pounds" onChange={e => this.handleInputChange('native_unit', e)} value={this.state.native_unit} readOnly={readOnly}/>
               </div>
             <div className="form-group">
               <label htmlFor="num_native_units">Size (in native unit above)</label>
-              <input type="text" className="form-control" id="num_native_units" aria-describedby="num_native_units" placeholder="1" onChange={e => this.handleInputChange('num_native_units', e)} value={this.state.num_native_units} readOnly={global.user_group !== "admin"} />
+              <input type="text" className="form-control" id="num_native_units" aria-describedby="num_native_units" placeholder="1" onChange={e => this.handleInputChange('num_native_units', e)} value={this.state.num_native_units} readOnly={readOnly} />
               </div>
             {
-              global.user_group == "admin" &&
+              !readOnly &&
               <button type="submit" className="btn btn-primary" onClick={this.handleSubmitButtonClick}>Submit</button>
             }
           </form>
         </div>
 
-        {this.state.mode == "edit" &&
+        {this.state.mode == "edit" && !readOnly &&
           <div>
             <h3>Vendors That Produce This Ingredient</h3>
             {!this.state.adding && global.user_group == "admin" &&

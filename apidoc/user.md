@@ -107,3 +107,18 @@ request.body.user = 'user': {
 ```
 
 {% endmethod %}
+
+{% method %}
+## DELETE '/users/delete' {#deleteUser}
+
+Deletes a user, **requires admin permission level**.
+
+{% sample lang="js" %}
+```js
+# Request body format:
+request.body.user = 'user': {
+  'username': 'hy103',
+};
+```
+
+{% endmethod %}
