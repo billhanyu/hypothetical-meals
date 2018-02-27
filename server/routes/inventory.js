@@ -158,6 +158,20 @@ export function commitCart(req, res, next) {
       return modifyInventoryQuantitiesPromise(changes);
     })
     .then(() => updateConsumedSpendingLogForCart(cartItems, formulaId, numProducts))
+    .then(() => {
+      return connection.query(`SELECT FormulaEntries.ingredient_id, FormulaEntries.num_native_units,
+        Formulas.name as formula_name, Ingredients.name as ingredient_name 
+        FROM FormulaEntries JOIN Ingredients ON FormulaEntries.ingredient_id = Ingredients.id
+        JOIN Formulas ON FormulaEntries.formula_id = Formulas.id
+        WHERE FormulaEntries.formula_id = ${formulaId}`);
+    })
+    .then((results) => {
+      const formulaName = results[0].formula_name;
+      const productionStrings = results.map(x => {
+        return `${numProducts*x.num_native_units} {${x.ingredient_name}=ingredient_id=${x.ingredient_id}}`;
+      });
+      return logAction(req.payload.id, `Produced ${numProducts} products of ${formulaName} using ${productionStrings.join(', ')}.`);
+    })
     .then(() => success(res))
     .catch(err => {
       handleError(err, res);
