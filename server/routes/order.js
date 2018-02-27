@@ -85,23 +85,22 @@ function orderHelper(orders, req, res, next) {
     })
     .then(() => {
       let vendorIngredientIds = Object.keys(orders);
-      return connection.query(`SELECT Ingredients.name, Ingredients.id, Vendors.name as vendor_name 
+      return connection.query(`SELECT Ingredients.name, Ingredients.id, Vendors.name as vendor_name, Vendors.id as vendor_id, VendorsIngredients.id as vendor_ingredient_id 
         FROM VendorsIngredients JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id
         JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id 
         WHERE VendorsIngredients.id IN (${vendorIngredientIds.join(', ')})`);
     })
     .then((results) => {
-      console.log(results);
       let orderStrings = results.map(x => {
-        return `${orders[x.id]} package${orders[x.id] > 1 ? 's' : ''} of ${x.name}{ingredient_id: ${x.id}} from ${x.vendor_name}`;
+        return `${orders[x.vendor_ingredient_id]} package${orders[x.vendor_ingredient_id] > 1 ? 's' : ''} of {${x.name}=ingredient_id=${x.id}} from {${x.vendor_name}=vendor_id=${x.vendor_id}}`;
       });
-      console.log(orderStrings);
       logAction(req.payload.id, `Ordered ${orderStrings.join(', ')}.`);
     })
     .then(() => {
       success(res);
     })
     .catch((err) => {
+      console.log(err);
       handleError(err, res);
     });
 }

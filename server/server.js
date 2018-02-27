@@ -74,6 +74,7 @@ app.post('/users/permission', beAdmin, user.changePermission);
 
 app.get('/vendors/pages', beNoob, vendor.pages);
 app.get('/vendors/page/:page_num', beNoob, vendor.view);
+app.get('/vendors/id/:id', beNoob, vendor.viewWithId);
 app.post('/vendors', beAdmin, vendor.addVendors);
 app.put('/vendors', beAdmin, vendor.modifyVendors);
 app.delete('/vendors', beAdmin, vendor.deleteVendors);

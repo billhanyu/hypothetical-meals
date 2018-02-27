@@ -23,7 +23,7 @@ export function pages(req, res, next) {
 }
 
 export function view(req, res, next) {
-  queryWithPagination(req.params.page_num, 'Ingredients', basicViewQueryString)
+  queryWithPagination(req.params.page_num, 'Ingredients', basicViewQueryString + ' WHERE removed = 0')
     .then(results => res.status(200).send(results))
     .catch(err => {
       console.error(err);
