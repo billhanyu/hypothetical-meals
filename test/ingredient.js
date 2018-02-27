@@ -453,12 +453,12 @@ describe('Ingredient', () => {
 
 
         const ingredients = alasql(`SELECT * FROM Ingredients`);
-        assert.strictEqual(ingredients.length, 4 + 5, 'Five of six ingredients added to ingredients table.');
+        assert.strictEqual(ingredients.length, 4 + 6, 'Sixc of six ingredients added to ingredients table.');
 
         const vendorsIngredients = alasql(`SELECT * FROM VendorsIngredients`);
         assert.strictEqual(vendorsIngredients.length, 4 + 6, 'Six of six vendor ingredients added to vendor ingredients table.');
 
-        const newVendorIngredient = vendorsIngredients.find(vendorsIngredient => vendorsIngredient.ingredient_id == 8 && vendorsIngredient.price == 32.1 && vendorsIngredient.vendor_id == 1);
+        const newVendorIngredient = vendorsIngredients.find(vendorsIngredient => vendorsIngredient.ingredient_id == 9 && vendorsIngredient.price == 32.1 && vendorsIngredient.vendor_id == 1);
         assert.notEqual(newVendorIngredient, null, 'Potatoes-drum ingredient added exactly once with correct price, vendor, and package type');
         newVendorIngredient.should.not.be.a('array');
 
