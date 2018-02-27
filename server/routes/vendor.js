@@ -23,6 +23,20 @@ export function view(req, res, next) {
     });
 }
 
+export function viewWithId(req, res, next) {
+  if (!req.params.id || !checkNumber.isPositiveInteger(req.params.id)) {
+    return res.status(400).send('Invalid vendor id');
+  }
+  connection.query(`SELECT * FROM Vendors WHERE id = ${req.params.id}`)
+    .then(results => {
+      if (results.length != 1) {
+        return res.status(404).send('Vendor not found');
+      }
+      return res.json(results[0]);
+    })
+    .catch(err => handleError(err, res));
+}
+
 // req.query.code
 export function getVendorWithCode(req, res, next) {
   if (!req.query.code) {
