@@ -53,6 +53,7 @@ class EditFormula extends Component {
       });
     }).catch(error => {
       alert("Error deleting Formula");
+      console.log(error.response);
     });
   }
 
@@ -93,6 +94,7 @@ class EditFormula extends Component {
       });
     }).catch(error => {
       alert("Error updating Formula");
+      console.log(error.response);
     });
   }
 
