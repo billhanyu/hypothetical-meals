@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import ProduceFormulaHeader from './ProduceFormula/ProduceFormulaHeader.js';
 import ProduceFormulaListNoob from './ProduceFormula/ProduceFormulaListNoob.js';
 import axios from 'axios';
 
@@ -12,7 +11,7 @@ class ViewAllFormulas extends Component {
   }
 
   componentWillMount() {
-    axios.get(`/formulas`, {
+    axios.get('/formulas', {
       headers: {Authorization: "Token " + global.token}
     })
     .then(response => {
@@ -25,7 +24,9 @@ class ViewAllFormulas extends Component {
   render() {
     return (
       <div>
-        <ProduceFormulaHeader />
+      <div className="ProduceFormulaHeader">
+        All Formulas
+      </div>
         <div>
          {
            this.state.EditFormulaBoxes.map((element, key) => {

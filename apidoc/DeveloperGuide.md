@@ -29,14 +29,17 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
  - **Id** 
  - Name 
  - Hash 
- - Salt 
+ - Salt
+ - Oauth 
  - User Group (authorization level)
+ - Removed
 
 ### Vendor
  - **Id** 
  - Name 
  - Contact:  Alphanumeric freight
  - Carrier code (unique, case-insensitive)
+ - Removed
 
 ### Storages
 - **Id**
@@ -48,6 +51,15 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
  - **Id**
  - Name
  - *Storage id*
+ - Package Type (enum)
+	 - Sack
+	 - Pail
+	 - Drum
+	 - Supersack
+	 - Truckload
+	 - Railcar
+ - Native unit (lb, fluid ounces, etc).
+ - Number of native units (Quantity of native units in packaage)
  - Removed
  
 ### Vendor Ingredients
@@ -56,13 +68,6 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
  - Price
  - *Vendor id*
  - Removed
- - Package Type (enum)
-	 - Sack
-	 - Pail
-	 - Drum
-	 - Supersack
-	 - Truckload
-	 - Railcar
 	 
 ### Inventories
  - **Id**
@@ -85,6 +90,19 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
  - Total (Spending in money)
  - Total Weight (Weight of product bought)
  - Consumed (Weight of product used)
+ - Created at (time stamp)
+
+### Production Logs
+
+ - **Id**
+ - *Formula id*
+ - Number of products (Total number of product produced)
+ - Total cost
+
+### System Logs
+ - **Id**
+ - *User id*
+ - Description (refers to actions taken and entities involved)
  - Created at (time stamp)
 
 *Primary key in bold

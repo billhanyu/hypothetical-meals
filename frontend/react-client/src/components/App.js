@@ -10,6 +10,7 @@ class App extends Component {
     this.cookies = new Cookies();
     global.token = this.cookies.get('token');
     global.user_group = this.cookies.get('user_group');
+    global.user_username = this.cookies.get('user_username');
   }
 
   render() {

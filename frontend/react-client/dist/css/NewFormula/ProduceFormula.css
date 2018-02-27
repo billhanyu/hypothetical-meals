@@ -22,7 +22,7 @@
   background-color: #FAFAFA;
   border-bottom: 1px solid #6B6B6B;
   padding: 12px;
-  height: 50px;
+  height: 64px;
 }
 
 .ProduceFormulaListItemContainer .ProduceFormulaItemName {
@@ -84,7 +84,7 @@
 .ProduceFormulaButton {
   border-radius: 6px;
   text-align: center;
-  padding: 24px;
+  padding: 16px;
   background-color: #4783C9;
   border: 1px solid #939393;
   transition: all 0.5s ease;
@@ -92,9 +92,9 @@
   clear: both;
   font-size: 16px;
   color: #FFF;
-  position: fixed;
-  bottom: 50px;
-  left: 24px;
+  position: absolute;
+  margin-top: -68px;
+  margin-left: 250px;
 }
 
 .ProduceFormulaButton:hover {

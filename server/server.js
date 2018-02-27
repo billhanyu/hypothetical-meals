@@ -71,6 +71,7 @@ app.post('/users/manager', beAdmin, user.signupManager);
 app.post('/users/login', user.login);
 app.post('/users/login/oauth', user.loginOauth);
 app.post('/users/permission', beAdmin, user.changePermission);
+app.delete('/users/delete', beAdmin, user.deleteUser);
 
 app.get('/vendors/pages', beNoob, vendor.pages);
 app.get('/vendors/page/:page_num', beNoob, vendor.view);
