@@ -40,7 +40,7 @@ function signupUser(req, res, next, userGroup) {
   .catch((error) => {
     if (error.code == 'ER_DUP_ENTRY') return res.status(422).json('Username is already registered');
     else if (error.code == 'ER_DATA_TOO_LONG') return res.status(422).json('Username or name is too long');
-    else console.log(error);
+    else handleError(error, res);
   });
 }
 
