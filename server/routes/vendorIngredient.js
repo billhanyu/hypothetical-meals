@@ -140,7 +140,6 @@ export function modifyVendorIngredients(req, res, next) {
         AND VendorsIngredients.removed =  0`);
     })
     .then((results) => {
-      console.log(results);
       const vendorIngredientStrings = results.map(x => {
         return `ingredient {${x.ingredient_name}=ingredient_id=${x.ingredient_id}} price for vendor {${x.vendor_name}=${x.vendor_id}} to ${x.price} per package`;
       });

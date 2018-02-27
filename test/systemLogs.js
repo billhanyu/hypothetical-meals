@@ -90,6 +90,18 @@ describe('SystemLogs', () => {
         });
     });
 
+    it('Should get system logs where ingredient_id is 3', (done) => {
+      chai.request(server)
+          .get('/systemlogs?ingredient_id=3')
+          .set('Authorization', `Token ${testTokens.managerTestToken}`)
+          .end((err, res) => {
+              res.should.have.status(200);
+              const results = res.body;
+              assert.strictEqual(results.length, 2, 'Number of logs with boop');
+              done();
+          });
+  });
+
     it('Should reject if user is a noob', (done) => {
       chai.request(server)
         .get('/systemlogs')
