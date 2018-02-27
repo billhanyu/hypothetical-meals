@@ -162,7 +162,7 @@ class IngredientList extends Component {
       />;
 
     const bulkImport =
-    <BulkImport backToList={this.backToList} />;
+    <BulkImport endpoint='/ingredients/import' backToList={this.backToList} />;
 
     const main =
     <div>
