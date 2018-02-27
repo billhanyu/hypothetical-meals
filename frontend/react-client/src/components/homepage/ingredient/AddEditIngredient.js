@@ -18,7 +18,6 @@ class AddEditIngredient extends Component {
     this.cancelEdit = this.cancelEdit.bind(this);
     this.finishEdit = this.finishEdit.bind(this);
     if (props.mode == "edit") {
-      console.log(props.ingredient);
       this.state = {
         name: props.ingredient.name,
         package_type: props.ingredient.package_type,
@@ -32,6 +31,7 @@ class AddEditIngredient extends Component {
         deleting: -1,
         adding: false,
         mode: "edit",
+        logs: [],
         vendor_code: '', // add
         price: 1, // add
         editing: false,
@@ -71,6 +71,19 @@ class AddEditIngredient extends Component {
         console.error(err);
         alert('Error retrieving vendors for the ingredient');
       });
+
+    axios.get(`/systemlogs?ingredient_id=${this.state.id}`, {
+      headers: { Authorization: "Token " + global.token }
+    })
+    .then(response => {
+      this.setState({
+        logs: response.data,
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Error retrieving sytem logs related to this ingredient');
+    });
   }
 
   deletevendoringredient(idx) {
@@ -180,6 +193,7 @@ class AddEditIngredient extends Component {
         })
         .then(response => {
           alert('updated!');
+          this.reloadData();
         })
         .catch(error => {
           const msg = error.response.data;
@@ -244,6 +258,14 @@ class AddEditIngredient extends Component {
           alert(msg);
         }
       });
+  }
+
+  display(description) {
+    let arr = description.split(/{|}/);
+    for (let i = 1; i < arr.length; i+=2) {
+      arr[i] = arr[i].split('=')[0];
+    }
+    return arr.join('');
   }
 
   render() {
@@ -322,7 +344,7 @@ class AddEditIngredient extends Component {
             <table className="table">
               <tr>
                 <th className={columnClass}>Vendor</th>
-              <th className={columnClass}>Price</th>
+                <th className={columnClass}>Price</th>
                 {
                 global.user_group == "admin" &&
                 <th className={columnClass}>Options</th>
@@ -382,6 +404,32 @@ class AddEditIngredient extends Component {
                 })
               }
             </table>
+
+            <div>
+              <h3>Actions On This Ingredient</h3>
+              <table className="table">
+                <thead>
+                  <tr className="row" style={{ 'margin': 0 }}>
+                    <th className="col-md-3">Time</th>
+                    <th className="col-md-3">Username</th>
+                    <th className="col-md-6">Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {
+                    this.state.logs.map((log, idx) => {
+                      return (
+                        <tr className="row" style={{ 'margin': 0 }} key={idx}>
+                          <td className="col-md-3">{(new Date(log.created_at)).toString().split(' GMT')[0]}</td>
+                          <td className="col-md-3">{log.username}</td>
+                          <td className="col-md-6">{this.display(log.description)}</td>
+                        </tr>
+                      );
+                    })
+                  }
+                </tbody>
+              </table>
+            </div>
 
             <div className="modal fade" id="deleteVendorIngredientModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div className="modal-dialog" role="document">
