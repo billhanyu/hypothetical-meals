@@ -92,7 +92,7 @@ export function addVendors(req, res, next) {
     })
     .catch(err => {
       if (err.code == 'ER_DUP_ENTRY') {
-        return res.status(400).send('Duplicate code with other vendor');
+        return res.status(400).send('Duplicate name or code with other vendor');
       }
       handleError(err, res);
     });
@@ -155,7 +155,7 @@ export function modifyVendors(req, res, next) {
     .then(() => success(res))
     .catch(err => {
       if (err.code == 'ER_DUP_ENTRY') {
-        return res.status(400).send('Duplicate code with other vendor');
+        return res.status(400).send('Duplicate name or code with other vendor');
       }
       handleError(err, res);
     });
