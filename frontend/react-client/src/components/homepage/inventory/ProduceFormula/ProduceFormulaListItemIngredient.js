@@ -7,13 +7,13 @@ class ProduceFormulaListItemIngredient extends Component {
 
   /*** REQUIRED PROPS
     1. ingredient (JSON Object) - see parent element for sample obj
-    2. numFormula (Number)
+    2. numIngredients (Number)
   */
 
   render() {
     return (
       <div className="ProduceFormulaListItemIngredient">
-        <div className="Quantity"> {Number(this.props.ingredient.num_native_units) * Number(this.props.numFormula)} </div>
+        <div className="Quantity"> {Number(this.props.numIngredients)} </div>
         <div className="IngredientName"> {this.props.ingredient.name} </div>
       </div>
     );
