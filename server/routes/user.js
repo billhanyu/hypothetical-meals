@@ -67,6 +67,9 @@ export function deleteUser(req, res, next) {
     .then(() => {
       return logAction(req.payload.id, `Account deleted for user ${user.username}.`);
     })
+    .then(() => {
+      success(res);
+    })
     .catch((err) => {
       handleError(err, res);
     });
