@@ -2,7 +2,7 @@ import { handleError } from './common/customError';
 import { getNumPages, queryWithPagination } from './common/pagination';
 
 const logInsertString = 'INSERT INTO SystemLogs';
-const logQuery = 'SELECT SystemLogs.*, Users.username FROM SystemLogs INNER JOIN Users ON SystemLogs.user_id = Users.id';
+const logQuery = 'SELECT SystemLogs.*, Users.username FROM SystemLogs JOIN Users ON SystemLogs.user_id = Users.id';
 
 export function logAction(userId, logString) {
   return connection.query(`${logInsertString} (user_id, description) VALUES (${userId}, '${logString}')`);
@@ -18,15 +18,13 @@ export function pages(req, res, next) {
 }
 
 export function viewAll(req, res, next) {
-  connection.query(logQuery)
+  connection.query(`${logQuery} ORDER BY SystemLogs.id`)
     .then((results) => res.json(results))
-    .catch((err) => {
-      handleError(err, res);
-    });
+    .catch((err) => handleError(err, res));
 }
 
 export function view(req, res, next) {
-  queryWithPagination(req.params.page_num, 'SystemLogs', logQuery)
+  queryWithPagination(req.params.page_num, 'SystemLogs', logQuery, 'ORDER BY SystemLogs.id')
     .then((results) => res.json(results))
     .catch(err => handleError(err, res));
 }
