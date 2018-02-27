@@ -28,7 +28,7 @@ function signupUser(req, res, next, userGroup) {
   user.setPassword(req.body.user.password);
   
   connection.query(`INSERT INTO Users (username, name, hash, salt, user_group) VALUES ('${user.username}', '${user.name || ''}', '${user.hash}', '${user.salt}', '${userGroup}');`)
-  .then(() => connection.query(`SELECT id FROM Users WHERE username = '${user.username}';`))
+  .then(() => connection.query(`SELECT id FROM Users WHERE username = '${user.username}' AND removed = 0;`))
   .then((results) => {
     if (results.length == 0) return res.status(500).send('Database error');
     user.id = results[0].id;
@@ -47,7 +47,7 @@ function signupUser(req, res, next, userGroup) {
 export function deleteUser(req, res, next) {
   const user = req.body.user;
   let userId;
-  connection.query(`SELECT * FROM Users WHERE username IN (${user.username})`)
+  connection.query(`SELECT * FROM Users WHERE username IN (${user.username}) AND removed = 0`)
     .then((results) => {
       if (results.length != 1) {
         throw createError('Trying to delete nonexistant user');
@@ -75,14 +75,14 @@ export function loginOauth(req, res, next) {
   if (error) return res.status(400).send(error);
   const netid = req.body.info.netid;
   const name = req.body.info.name;
-  connection.query(`SELECT * FROM Users WHERE username = '${netid}' AND oauth = 1`)
+  connection.query(`SELECT * FROM Users WHERE username = '${netid}' AND oauth = 1 AND removed = 0`)
     .then(result => {
       if (result.length == 0) {
         connection.query(`INSERT INTO Users
           (username, name, oauth, user_group) VALUES
           ('${netid}', '${name}', 1, 'noob')`)
           .then(result => {
-            return connection.query(`SELECT * FROM Users WHERE username = '${netid}' AND oauth = 1`);
+            return connection.query(`SELECT * FROM Users WHERE username = '${netid}' AND oauth = 1 AND removed = 0`);
           })
           .then(result => tokenForOauth(result[0], res))
           .catch(err => {
@@ -114,13 +114,13 @@ export function changePermission(req, res, next) {
   if (validPermissions.indexOf(user.permission) < 0) {
     return res.status(400).send('Invalid New Permission.');
   }
-  connection.query(`SELECT * FROM Users WHERE username = '${user.username}' AND oauth = ${user.oauth}`)
+  connection.query(`SELECT * FROM Users WHERE username = '${user.username}' AND oauth = ${user.oauth} AND removed = 0`)
     .then(result => {
       if (result.length == 0) {
         throw createError('User does not exist.');
       }
       userId = result[0].id;
-      return connection.query(`UPDATE Users SET user_group = '${user.permission}' WHERE id = ${result[0].id}`);
+      return connection.query(`UPDATE Users SET user_group = '${user.permission}' WHERE id = ${result[0].id} AND removed = 0`);
     })
     .then(result => success(res))
     .then(() => {
