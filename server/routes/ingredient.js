@@ -36,13 +36,13 @@ export function viewWithId(req, res, next) {
     return res.status(400).send('Invalid ingredient id');
   }
   connection.query(`${basicViewQueryString} WHERE Ingredients.id = ${req.params.id}`)
-  .then(results => {
-    if (results.length != 1) {
-      return res.status(404).send('Ingredient not found');
-    }
-    return res.json(results[0]);
-  })
-  .catch(err => handleError(err, res));
+    .then(results => {
+      if (results.length != 1) {
+        return res.status(404).send('Ingredient not found');
+      }
+      return res.json(results[0]);
+    })
+    .catch(err => handleError(err, res));
 }
 
 /* request body format:
@@ -200,49 +200,49 @@ function deleteIngredientHelper(items, req, res, next) {
   }
 
   connection.query(`SELECT id, storage_id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
-  .then(results => {
-    if (results.length < ingredientIds.length) {
-      throw createError('Deleting nonexistent ingredient.');
-    }
-    return Promise.resolve();
-  })
-  .then(() => connection.query(`SELECT DISTINCT formula_id FROM FormulaEntries WHERE ingredient_id IN (${ingredientIds.join(', ')})`))
-  .then((results) => {
-    if (results.length == 0) return Promise.resolve();
-    const formulaIds = [];
-    for (let result of results) {
-      formulaIds.push(result.formula_id);
-    }
-    return connection.query(`SELECT name FROM Formulas WHERE id IN (${formulaIds.join(', ')}) AND removed = 0`);
-  })
-  .then((results) => {
-    const formulasWithIngredient = [];
-    if (results) {
-      for (let result of results) {
-       formulasWithIngredient.push(result.name);
+    .then(results => {
+      if (results.length < ingredientIds.length) {
+        throw createError('Deleting nonexistent ingredient.');
       }
-    }
-    if (formulasWithIngredient.length > 0) throw createError(`Formulas ${formulasWithIngredient.join(', ')} contains one or more ingredients that are attempted to be deleted`);
-    return connection.query(`UPDATE Ingredients SET removed = 1 WHERE id IN (${ingredientIds.join(', ')})`);
-  })
-  .then(() => connection.query(`SELECT id FROM VendorsIngredients WHERE ingredient_id IN (${ingredientIds.join(', ')})`))
-  .then(results => {
-    const vendorsIngredientsIds = results.map(e => e.id);
-    return fakeDeleteMultipleVendorIngredients(vendorsIngredientsIds);
-  })
-  .then(() => {
-    const myIds = items;
-    return connection.query(`SELECT * FROM Ingredients WHERE id IN (${myIds.join(', ')})`);
-  })
-  .then((results) => {
-    const nameStrings = [];
-    results.forEach(x => {
-      nameStrings.push(`${x.name}{ingredient_id: ${x.id}}`);
-    });
-    return logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} deleted.`);
-  })
-  .then(() => success(res))
-  .catch(err => handleError(err, res));
+      return Promise.resolve();
+    })
+    .then(() => connection.query(`SELECT DISTINCT formula_id FROM FormulaEntries WHERE ingredient_id IN (${ingredientIds.join(', ')})`))
+    .then((results) => {
+      if (results.length == 0) return Promise.resolve();
+      const formulaIds = [];
+      for (let result of results) {
+        formulaIds.push(result.formula_id);
+      }
+      return connection.query(`SELECT name FROM Formulas WHERE id IN (${formulaIds.join(', ')}) AND removed = 0`);
+    })
+    .then((results) => {
+      const formulasWithIngredient = [];
+      if (results) {
+        for (let result of results) {
+          formulasWithIngredient.push(result.name);
+        }
+      }
+      if (formulasWithIngredient.length > 0) throw createError(`Formulas ${formulasWithIngredient.join(', ')} contains one or more ingredients that are attempted to be deleted`);
+      return connection.query(`UPDATE Ingredients SET removed = 1 WHERE id IN (${ingredientIds.join(', ')})`);
+    })
+    .then(() => connection.query(`SELECT id FROM VendorsIngredients WHERE ingredient_id IN (${ingredientIds.join(', ')})`))
+    .then(results => {
+      const vendorsIngredientsIds = results.map(e => e.id);
+      return fakeDeleteMultipleVendorIngredients(vendorsIngredientsIds);
+    })
+    .then(() => {
+      const myIds = items;
+      return connection.query(`SELECT * FROM Ingredients WHERE id IN (${myIds.join(', ')})`);
+    })
+    .then((results) => {
+      const nameStrings = [];
+      results.forEach(x => {
+        nameStrings.push(`${x.name}{ingredient_id: ${x.id}}`);
+      });
+      return logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} deleted.`);
+    })
+    .then(() => success(res))
+    .catch(err => handleError(err, res));
 }
 
 export function bulkImport(req, res, next) {
@@ -297,9 +297,9 @@ export function bulkImport(req, res, next) {
 
       // Ensure added ingredients do not exceed storage
       // return resolve();
-    //   return checkSufficientStorage(storages, entries, inventories);
-    // })
-    // .then(() => {
+      //   return checkSufficientStorage(storages, entries, inventories);
+      // })
+      // .then(() => {
       // Compile list of new ingredients to add to db
       let ingredsToAdd = '';
       for (let entry of entries) {
@@ -327,26 +327,37 @@ export function bulkImport(req, res, next) {
     .then((response) => {
       ingredients = response;
 
-      let vendorsIngredsToAdd = '';
+      const vendorsIngredsToAdd = [];
       for (let entry of entries) {
         // Find ingredient id (could be just added)
         const entryIngredient = ingredients.find(ingredient => entry.ingredient.toLowerCase() == ingredient.name.toLowerCase() && entry.storage_id == ingredient.storage_id);
         entry.ingredient_id = entryIngredient.id;
 
-        const existingVendorsIngredients = vendorsIngredients.find(vendorsIngredient => entry.ingredient_id == vendorsIngredient.ingredient_id && entry.vendor_id == vendorsIngredient.vendor_id);
-        if (!existingVendorsIngredients) {
-          vendorsIngredsToAdd += `(${entry.ingredient_id}, ${entry.price}, ${entry.vendor_id}),`;
-          vendorsIngredients.push({
-            'ingredient_id': entry.ingredient_id,
-            'vendor_id': entry.vendor_id,
-          });
-        }
+        vendorsIngredsToAdd.push(`(${entry.ingredient_id}, ${entry.price}, ${entry.vendor_id})`);
+        vendorsIngredients.push({
+          'ingredient_id': entry.ingredient_id,
+          'vendor_id': entry.vendor_id,
+        });
       }
-      return connection.query(`INSERT INTO VendorsIngredients (ingredient_id, price, vendor_id) VALUES ${vendorsIngredsToAdd.slice(0, -1)}`);
+      return connection.query(`INSERT INTO VendorsIngredients (ingredient_id, price, vendor_id) VALUES ${vendorsIngredsToAdd.join(', ')}`);
+    })
+    .then(() => {
+      const ingredientNames = [];
+      for (let entry of entries) {
+        ingredientNames.push(`'${entry.ingredient}'`);
+      }
+      return connection.query(`SELECT id, name FROM Ingredients WHERE name IN (${ingredientNames.join(', ')})`);
+    })
+    .then((results) => {
+      const ingredientStrings = [];
+      for (let result of results) {
+        ingredientStrings.push(`${result.name}{ingredient_id: ${result.id}}`);
+      }
+      return logAction(req.payload.id, `Bulk import added the following ingredients: ${ingredientStrings.join(', ')}`);
     })
     .then(() => success(res))
     .catch((err) => {
-      handleError(err, res);
+      return handleError(err, res);
     });
 }
 

@@ -21,7 +21,7 @@ class BulkImport extends Component {
       alert('Successfully Imported!');
     })
     .catch(err => {
-      alert('Incorrect Format!');
+      alert(err.response.data);
     });
   }
 
