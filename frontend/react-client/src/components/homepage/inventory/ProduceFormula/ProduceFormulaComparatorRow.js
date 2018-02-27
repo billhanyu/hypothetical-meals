@@ -15,9 +15,9 @@ class ProduceFormulaComparatorRow extends Component {
     return (
       <tr>
         <td> {this.props.name} </td>
-        <td> {this.props.stock} </td>
-        <td> {this.props.amount} </td>
-        <td style={{color: leftoverAmount < 0 ? 'red' : 'green'}}> {leftoverAmount} </td>
+        <td> {this.props.stock.toFixed(2)} </td>
+        <td> {this.props.amount.toFixed(2)} </td>
+        <td style={{color: leftoverAmount < 0 ? 'red' : 'green'}}> {leftoverAmount.toFixed(2)} </td>
       </tr>
     );
   }
