@@ -37,7 +37,7 @@ class ProduceFormulaListNoob extends Component {
     if(isNaN(newValueNoNeg)) {
       return;
     }
-    const belowMinError = Number(newValueNoNeg) < this.props.num_product;
+    const belowMinError = (Number(newValueNoNeg) < this.props.num_product) && (Number(newValueNoNeg) != 0);
     this.setState({
       numFormula: Number(newValueNoNeg),
       belowMinError,
