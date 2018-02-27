@@ -75,8 +75,7 @@ class FormulaWindow extends Component {
     const newIngredientNameToQuantityMap = this.state.ingredientNameToQuantityMap;
     const newidToQuantityMap = this.state.idToQuantityMap;
     Object.keys(this.state.ingredientNameToQuantityMap).forEach(ingredientName => {
-      if(this.state.values.find(element => element == ingredientName) == null) {
-        console.log(ingredientName);
+      if(values.find(element => element == ingredientName) == null) {
         delete newIngredientNameToQuantityMap[ingredientName];
         let ingredientId = -1;
         Object.keys(this.props.newFormulaObject.ingredients).forEach(ingredient => {
