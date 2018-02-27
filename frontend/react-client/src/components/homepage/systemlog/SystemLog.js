@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import AddEditIngredient from '../ingredient/AddEditIngredient';
+import AddEditVendor from '../vendor/AddEditVendor';
 import SystemLogFilterBar from './SystemLogFilterBar';
 import PageBar from '../../GeneralComponents/PageBar';
 import axios from 'axios';
@@ -12,6 +13,8 @@ class SystemLog extends Component {
       logs: [],
       ingredient: null,
       viewIngredient: false,
+      vendor: null,
+      viewVendor: false,
       pages: 0,
     };
     this.changeName = this.changeName.bind(this);
@@ -59,6 +62,7 @@ class SystemLog extends Component {
   back() {
     this.setState({
       viewIngredient: false,
+      viewVendor: false,
     });
   }
 
@@ -114,10 +118,27 @@ class SystemLog extends Component {
         ingredient: response.data,
         viewIngredient: true,
       });
+      console.log(response.data);
     })
     .catch(err => {
       alert('Error retrieving ingredient data');
     });
+  }
+
+  viewVendor(id) {
+    axios.get(`/vendors/id/${id}`, {
+      headers: { Authorization: "Token " + global.token }
+    })
+      .then(response => {
+        this.setState({
+          vendor: response.data,
+          viewVendor: true,
+        });
+        console.log(response.data);
+      })
+      .catch(err => {
+        alert('Error retrieving vendor data');
+      });
   }
 
   display(description) {
@@ -126,16 +147,17 @@ class SystemLog extends Component {
     while (op.indexOf('{') > -1) {
       const indexBracket = op.indexOf('{');
       const indexClose = op.indexOf('}');
-      if (op.substring(indexBracket + 1, indexBracket + 2) == 'f') {
-        parts.push(<span>{op.substring(0, indexBracket)}</span>);
-        op = op.substring(indexClose+1);
-        continue;
+      parts.push(<span>{op.substring(0, indexBracket)}</span>);
+      const encoded = op.substring(indexBracket + 1, indexClose);
+      const arr = encoded.split('=');
+      const id = arr[2];
+      if (arr[1] == 'ingredient_id') {
+        parts.push(<a href="javascript:void(0)" onClick={e => this.viewIngredient(id)}>{arr[0]}</a>);
+      } else if (arr[1] == 'formula_id') {
+        parts.push(<span>{arr[0]}</span>);
+      } else if (arr[1] == 'vendor_id') {
+        parts.push(<a href="javascript:void(0)" onClick={e => this.viewVendor(id)}>{arr[0]}</a>);
       }
-      const indexSpace = op.substring(0, indexBracket).lastIndexOf(' ');
-      const withinBrackets = op.substring(indexBracket, indexClose);
-      const id = parseInt(withinBrackets.split(':')[1]);
-      parts.push(<span>{op.substring(0, indexSpace+1)}</span>);
-      parts.push(<a href="javascript:void(0)" onClick={e=>this.viewIngredient(id)}>{op.substring(indexSpace+1, indexBracket)}</a>);
       op = op.substring(indexClose+1);
     }
     parts.push(<span>{op}</span>);
@@ -147,6 +169,13 @@ class SystemLog extends Component {
       <AddEditIngredient
         mode="edit"
         ingredient={this.state.ingredient}
+        backToList={this.back}
+      />;
+    
+    const viewVendor =
+      <AddEditVendor
+        mode="edit"
+        vendor={this.state.vendor}
         backToList={this.back}
       />;
 
@@ -188,7 +217,13 @@ class SystemLog extends Component {
         </table>
         <PageBar pages={this.state.pages} selectPage={this.selectPage} />
       </div>;
-    return this.state.viewIngredient ? viewIng : systemlog;
+    if (this.state.viewIngredient) {
+      return viewIng;
+    } else if (this.state.viewVendor) {
+      return viewVendor;
+    } else {
+      return systemlog;
+    }
   }
 }
 
