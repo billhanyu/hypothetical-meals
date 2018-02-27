@@ -5,7 +5,7 @@ class ProduceFormulaListNoob extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      numFormula: props.num_product,
+      numProduct: 0,
       belowMinError: false,
     };
     props.handleNumChange(Number(props.num_product), props.id, Number(this.props.num_product), false);
@@ -39,10 +39,10 @@ class ProduceFormulaListNoob extends Component {
     }
     const belowMinError = (Number(newValueNoNeg) < this.props.num_product) && (Number(newValueNoNeg) != 0);
     this.setState({
-      numFormula: Number(newValueNoNeg),
+      numProduct: Number(newValueNoNeg),
       belowMinError,
     });
-    this.props.handleNumChange(newValueNoNeg, this.props.id, Number(event.target.value) * Number(this.props.num_product), belowMinError);
+    this.props.handleNumChange(Number(this.props.num_product), this.props.id, Number(newValueNoNeg), belowMinError);
   }
 
   render() {
@@ -51,7 +51,7 @@ class ProduceFormulaListNoob extends Component {
         <div className="ProduceFormulaListItemContainer">
           <div className="ProduceFormulaItemName">{this.props.name}</div>
           <div className="ProduceFormulaQuantity" style={{marginLeft:'12px'}}>Amount (packages):</div>
-          <input style={this.state.belowMinError ? {border:'1px solid red'} : null} value={this.state.numFormula} onChange={this.handleInputChange.bind(this)} />
+          <input style={this.state.belowMinError ? {border:'1px solid red'} : null} value={this.state.numProduct} onChange={this.handleInputChange.bind(this)} />
           {
             this.state.belowMinError ? <div style={{color:'red', marginLeft:'12px', float:'left'}}>Below min. package size</div> : null
           }
@@ -60,10 +60,11 @@ class ProduceFormulaListNoob extends Component {
         <div style={{maxHeight: '150px', overflow:'auto', width:'100%', float:'left', clear:'both'}}>
         {
           Object.keys(this.props.ingredients).map((elementKey, key) => {
-            return <ProduceFormulaListItemIngredient key={key}
-                      ingredient={this.props.ingredients[elementKey]}
-                      numFormula={this.state.numFormula}
-                    />;
+            return <ProduceFormulaListItemIngredient
+              key={key}
+              ingredient={this.props.ingredients[elementKey]}
+              numIngredients={this.state.numProduct / this.props.num_product * this.props.ingredients[elementKey].num_native_units}
+            />;
           })
         }
         </div>
