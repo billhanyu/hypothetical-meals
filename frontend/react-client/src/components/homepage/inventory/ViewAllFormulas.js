@@ -25,7 +25,9 @@ class ViewAllFormulas extends Component {
   render() {
     return (
       <div>
-        <ProduceFormulaHeader />
+      <div className="ProduceFormulaHeader">
+        All Formulas
+      </div>
         <div>
          {
            this.state.EditFormulaBoxes.map((element, key) => {
