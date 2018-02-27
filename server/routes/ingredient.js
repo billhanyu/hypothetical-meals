@@ -351,7 +351,7 @@ export function bulkImport(req, res, next) {
     .then((results) => {
       const ingredientStrings = [];
       for (let result of results) {
-        ingredientStrings.push(`${result.name}{ingredient_id: ${result.id}}`);
+        ingredientStrings.push(`{${result.name}=ingredient_id=${result.id}}`);
       }
       return logAction(req.payload.id, `Bulk import added the following ingredients: ${ingredientStrings.join(', ')}`);
     })
