@@ -79,7 +79,7 @@ function addIngredientHelper(ingredients, req, res, next) {
     .then((results) => {
       const nameStrings = [];
       results.forEach(x => {
-        nameStrings.push(`${x.name}{ingredient_id: ${x.id}}`);
+        nameStrings.push(`{${x.name}=ingredient_id=${x.id}}`);
       });
       return logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} added.`);
     })
@@ -166,7 +166,7 @@ function modifyIngredientHelper(items, req, res, next) {
     .then((results) => {
       const nameStrings = [];
       results.forEach(x => {
-        nameStrings.push(`${x.name}{ingredient_id: ${x.id}}`);
+        nameStrings.push(`{${x.name}=ingredient_id=${x.id}}`);
       });
       return logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} modified.`);
     })
@@ -237,7 +237,7 @@ function deleteIngredientHelper(items, req, res, next) {
   .then((results) => {
     const nameStrings = [];
     results.forEach(x => {
-      nameStrings.push(`${x.name}{ingredient_id: ${x.id}}`);
+      nameStrings.push(`{${x.name}=ingredient_id=${x.id}}`);
     });
     return logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} deleted.`);
   })
