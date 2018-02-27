@@ -44,6 +44,15 @@ function signupUser(req, res, next, userGroup) {
   });
 }
 
+/**
+ *
+ * @param {*} req
+ * req.body.user = {
+ *  'username': bleh,
+ * }
+ * @param {*} res
+ * @param {*} next
+ */
 export function deleteUser(req, res, next) {
   const user = req.body.user;
   let userId;
@@ -54,6 +63,9 @@ export function deleteUser(req, res, next) {
       }
       userId = results[0].id;
       return connection.query(`UPDATE Users SET removed = 1 WHERE id = ${userId}`);
+    })
+    .then(() => {
+      return logAction(req.payload.id, `Account deleted for user ${user.username}.`);
     })
     .catch((err) => {
       handleError(err, res);
