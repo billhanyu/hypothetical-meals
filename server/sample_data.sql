@@ -38,8 +38,8 @@ INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VAL
 INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (3, 1, 3, 2);
 INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (4, 2, 4, 2);
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (1, 5, 'User 5 did blah', '2018.01.01 00:00:01.000');
-INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (2, 5, 'User 5 added 5 boop{ingredient_id: 3}', '2018.01.02 12:00:00.000');
-INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (3, 6, 'User 6 added formula cake{formula_id: 3}', '2018.01.02 12:56:21.000');
+INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (2, 5, 'User 5 added 5 {boop=ingredient_id=3}', '2018.01.02 12:00:00.000');
+INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (3, 6, 'User 6 added formula {cake=formula_id=3}', '2018.01.02 12:56:21.000');
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (4, 6, 'User 6 did blah', '2018.01.02 23:11:02.000');
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (5, 6, 'User 6 did blah', '2018.01.03 13:11:02.000');
-INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (6, 4, 'User 4 added 1 boop{ingredient_id: 3}', '2018.01.03 12:00:00.000');
+INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (6, 4, 'User 4 added 1 {boop=ingredient_id=3}', '2018.01.03 12:00:00.000');
