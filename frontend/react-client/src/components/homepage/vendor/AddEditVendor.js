@@ -94,6 +94,10 @@ class EditVendor extends Component {
       <div>
         <h2>
           {'Vendor: ' + this.state.name}
+          {
+            this.state.removed == 1 &&
+            <span style={{ 'margin-left': '20px' }} className="badge badge-danger">Deleted</span>
+          }
         </h2>
         <button
           type="button"

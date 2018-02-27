@@ -255,7 +255,7 @@ class AddEditIngredient extends Component {
         <h2>
           {header}
           {
-            readOnly &&
+            this.state.removed == 1 &&
             <span style={{'margin-left':'20px'}} className="badge badge-danger">Deleted</span>
           }
         </h2>
