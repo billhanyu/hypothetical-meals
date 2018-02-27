@@ -140,12 +140,13 @@ export function modifyVendorIngredients(req, res, next) {
         AND VendorsIngredients.removed =  0`);
     })
     .then((results) => {
+      console.log(results);
       const vendorIngredientStrings = results.map(x => {
         return `ingredient ${x.ingredient_name}{ingredient_id: ${x.ingredient_id}} price for vendor ${x.vendor_name} to ${x.price} per package`;
       });
       return logAction(req.payload.id, `Changed ${vendorIngredientStrings.join(', ')}.`);
     })
-    .catch(err => handleError(err, res));
+    .catch(err => {console.log(err); handleError(err, res);});
 }
 
 /* Request body format
@@ -189,10 +190,11 @@ export function fakeDeleteMultipleVendorIngredients(ids) {
 }
 
 function getCases(olds, items) {
+  // console.log(items);
   const prices = [];
   for (let i = 0; i < olds.length; i++) {
     const old = olds[i];
-    const id = old['ingredient_id'];
+    const id = old['id'];
     const change = items[id];
     const price = change['price'];
     prices.push(`when id = ${id} then ${price}`);
