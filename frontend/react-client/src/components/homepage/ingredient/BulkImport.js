@@ -11,6 +11,7 @@ class BulkImport extends Component {
   submit(e) {
     if (!this.file) {
       alert('Please choose some file!');
+      return;
     }
     const data = new FormData();
     data.set('bulk', this.file);
@@ -21,7 +22,7 @@ class BulkImport extends Component {
       alert('Successfully Imported!');
     })
     .catch(err => {
-      alert('Incorrect Format!');
+      alert(err.response.data);
     });
   }
 
@@ -42,7 +43,7 @@ class BulkImport extends Component {
           </div>
         </div>
         <div className="row justify-content-md-center">
-          Ensure that the file is a CSV and follows the formatting as specified <a href="https://docs.google.com/document/d/1DqN-inj9gwBsP0KkM6SLA1_k99LFfSPNXxRe0fuBmhg/edit#"> here</a>.
+          Ensure that the file is a CSV and follows the formatting as specified&nbsp;<a href="https://docs.google.com/document/d/1DqN-inj9gwBsP0KkM6SLA1_k99LFfSPNXxRe0fuBmhg/edit#">here</a>.
         </div>
       </div>
     );
