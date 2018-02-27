@@ -79,13 +79,13 @@ export function modifyQuantities(req, res, next) {
   modifyInventoryQuantitiesPromise(req.body.changes)
     .then(() => success(res))
     .then(() => {
-      return connection.query(`SELECT Inventories.*, Ingredients.name 
+      return connection.query(`SELECT Inventories.*, Ingredients.name, Ingredients.num_native_units, Ingredients.native_unit 
           FROM Inventories JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id
           WHERE Inventories.id IN (${Object.keys(changes).join(', ')})`);
     })
     .then((results) => {
       let modified = results.map(x => {
-        return `${x.name}: ${x.num_packages}`;
+        return `${x.name}: ${x.num_packages * x.num_native_units} ${x.native_unit}`;
       });
       let nameStrings = results.map(x => {
         return `${x.name}{ingredient_id: ${x.ingredient_id}}`;
