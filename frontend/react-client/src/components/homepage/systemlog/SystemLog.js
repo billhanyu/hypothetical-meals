@@ -68,6 +68,7 @@ class SystemLog extends Component {
     this.setState({
       viewIngredient: false,
       viewVendor: false,
+      viewFormula: false,
     });
   }
 
@@ -152,11 +153,12 @@ class SystemLog extends Component {
     })
     .then(response => {
       this.setState({
-        formula: response.data,
+        formula: response.data[0],
         viewFormula: true,
       });
     })
     .catch(err => {
+      console.log(err);
       alert('Error retrieving formula data');
     });
   }
@@ -202,7 +204,6 @@ class SystemLog extends Component {
     const viewFormula =
       <FormulaWindow
         isEditing={true}
-        onFinish={e=>{}}
         BackButtonShown={true}
         onBackClick={this.back}
         newFormulaObject={this.state.formula}

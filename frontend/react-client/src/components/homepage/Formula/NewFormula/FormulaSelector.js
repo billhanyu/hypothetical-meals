@@ -95,6 +95,7 @@ class FormulaInput extends Component {
         </div>
 
         <SelectField
+           disabled={this.props.readOnly}
            multiple={true}
            hintText="Select Ingredients"
            value={this.state.values}
@@ -107,11 +108,12 @@ class FormulaInput extends Component {
          {
            this.state.values.map((elementName, key) => {
              return <FormulaIngredientItem
+             readOnly={this.props.readOnly}
              key={key}
              elementName={elementName}
              value={this.props.ingredientNameToQuantityMap[elementName]}
              onInputChange={this.handleInputChange.bind(this)}
-            />
+            />;
            })
          }
       </div>
