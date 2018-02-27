@@ -13,7 +13,7 @@ class ProduceFormulaListItemIngredient extends Component {
   render() {
     return (
       <div className="ProduceFormulaListItemIngredient">
-        <div className="Quantity"> {Number(this.props.ingredient.num_native_units) * Number(this.props.numFormula)} </div>
+        <div className="Quantity"> {(Number(this.props.ingredient.num_native_units) * Number(this.props.numFormula)).toFixed(2)} </div>
         <div className="IngredientName"> {this.props.ingredient.name} </div>
       </div>
     );
