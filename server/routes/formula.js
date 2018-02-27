@@ -105,7 +105,7 @@ export function add(req, res, next) {
         })
         .then((results) => {
             const formulaStrings = results.map(x => {
-                return `${x.name}{formula_id: ${x.id}}`;
+                return `{${x.name}=formula_id=${x.id}}`;
             });
             return logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} added.`);
         })
@@ -241,7 +241,7 @@ export function modify(req, res, next) {
         })
         .then((results) => {
             const formulaStrings = results.map(x => {
-                return `${x.name}{formula_id: ${x.id}}`;
+                return `{${x.name}=formula_id=${x.id}}`;
             });
             return logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} modified.`);
         })
@@ -276,7 +276,7 @@ export function deleteFormulas(req, res, next) {
         })
         .then(() => {
             const formulaStrings = oldFormulas.map(x => {
-                return `${x.name}{formula_id: ${x.id}}`;
+                return `{${x.name}=formula_id=${x.id}}`;
             });
             return logAction(req.payload.id, `Formula${formulaStrings.length > 1 ? 's' : ''} ${formulaStrings.join(', ')} deleted.`);
         })

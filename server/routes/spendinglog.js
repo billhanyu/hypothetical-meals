@@ -79,9 +79,11 @@ export function updateLogForIngredient(req) {
         for (let i = 0; i < newConsumed.length; i++) {
           newUpdate.push(`(${newIngredientIds[i]}, ${newIngredientTotals[i]}, ${newIngredientWeights[i]}, ${newConsumed[i]})`);
         }
-        return connection.query(`UPDATE SpendingLogs 
-      SET total = (case ${updateTotalCostCases.join(' ')} end), total_weight = (case ${updateTotalWeightCases.join(' ')} end)
-      WHERE id IN (${toUpdate['ids'].join(', ')})`);
+        if (toUpdate.ids.length > 0) {
+          return connection.query(`UPDATE SpendingLogs 
+        SET total = (case ${updateTotalCostCases.join(' ')} end), total_weight = (case ${updateTotalWeightCases.join(' ')} end)
+        WHERE id IN (${toUpdate['ids'].join(', ')})`);
+        }
       })
       .then(() => {
         if (newUpdate.length > 0) {

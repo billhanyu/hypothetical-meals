@@ -20,27 +20,55 @@ export function signupManager(req, res, next) {
 function signupUser(req, res, next, userGroup) {
   const error = checkParams.checkBlankParams(req.body.user, ['username', 'name', 'password']);
   if (error) return res.status(422).send(error);
-
+  
   let regex = new RegExp('^([ \u00c0-\u01ffa-zA-Z\'\-])+$');
   if (req.body.user.name && !regex.test(req.body.user.name)) return res.status(422).send('Invalid characters used in name');
-
+  
   let user = new User(req.body.user);
   user.setPassword(req.body.user.password);
-
+  
   connection.query(`INSERT INTO Users (username, name, hash, salt, user_group) VALUES ('${user.username}', '${user.name || ''}', '${user.hash}', '${user.salt}', '${userGroup}');`)
-    .then(() => connection.query(`SELECT id FROM Users WHERE username = '${user.username}';`))
+  .then(() => connection.query(`SELECT id FROM Users WHERE username = '${user.username}' AND removed = 0;`))
+  .then((results) => {
+    if (results.length == 0) return res.status(500).send('Database error');
+    user.id = results[0].id;
+    return res.status(200).json({ user: user.getBasicInfo() });
+  })
+  .then(() => {
+    return logAction(req.payload ? req.payload.id : user.id, `Account created for user ${user.username}.`);
+  })
+  .catch((error) => {
+    if (error.code == 'ER_DUP_ENTRY') return res.status(422).json('Username is already registered');
+    else if (error.code == 'ER_DATA_TOO_LONG') return res.status(422).json('Username or name is too long');
+    else console.log(error);
+  });
+}
+
+/**
+ *
+ * @param {*} req
+ * req.body.user = {
+ *  'username': bleh,
+ * }
+ * @param {*} res
+ * @param {*} next
+ */
+export function deleteUser(req, res, next) {
+  const user = req.body.user;
+  let userId;
+  connection.query(`SELECT * FROM Users WHERE username IN (${user.username}) AND removed = 0`)
     .then((results) => {
-      if (results.length == 0) return res.status(500).send('Database error');
-      user.id = results[0].id;
-      return res.status(200).json({ user: user.getBasicInfo() });
+      if (results.length != 1) {
+        throw createError('Trying to delete nonexistant user');
+      }
+      userId = results[0].id;
+      return connection.query(`UPDATE Users SET removed = 1 WHERE id = ${userId}`);
     })
     .then(() => {
-      return logAction(req.payload ? req.payload.id : user.id, `Account created for user ${user.username}.`);
+      return logAction(req.payload.id, `Account deleted for user ${user.username}.`);
     })
-    .catch((error) => {
-      if (error.code == 'ER_DUP_ENTRY') return res.status(422).json('Username is already registered');
-      else if (error.code == 'ER_DATA_TOO_LONG') return res.status(422).json('Username or name is too long');
-      else console.log(error);
+    .catch((err) => {
+      handleError(err, res);
     });
 }
 
@@ -59,14 +87,14 @@ export function loginOauth(req, res, next) {
   if (error) return res.status(400).send(error);
   const netid = req.body.info.netid;
   const name = req.body.info.name;
-  connection.query(`SELECT * FROM Users WHERE username = '${netid}' AND oauth = 1`)
+  connection.query(`SELECT * FROM Users WHERE username = '${netid}' AND oauth = 1 AND removed = 0`)
     .then(result => {
       if (result.length == 0) {
         connection.query(`INSERT INTO Users
           (username, name, oauth, user_group) VALUES
           ('${netid}', '${name}', 1, 'noob')`)
           .then(result => {
-            return connection.query(`SELECT * FROM Users WHERE username = '${netid}' AND oauth = 1`);
+            return connection.query(`SELECT * FROM Users WHERE username = '${netid}' AND oauth = 1 AND removed = 0`);
           })
           .then(result => tokenForOauth(result[0], res))
           .catch(err => {
@@ -98,13 +126,13 @@ export function changePermission(req, res, next) {
   if (validPermissions.indexOf(user.permission) < 0) {
     return res.status(400).send('Invalid New Permission.');
   }
-  connection.query(`SELECT * FROM Users WHERE username = '${user.username}' AND oauth = ${user.oauth}`)
+  connection.query(`SELECT * FROM Users WHERE username = '${user.username}' AND oauth = ${user.oauth} AND removed = 0`)
     .then(result => {
       if (result.length == 0) {
         throw createError('User does not exist.');
       }
       userId = result[0].id;
-      return connection.query(`UPDATE Users SET user_group = '${user.permission}' WHERE id = ${result[0].id}`);
+      return connection.query(`UPDATE Users SET user_group = '${user.permission}' WHERE id = ${result[0].id} AND removed = 0`);
     })
     .then(result => success(res))
     .then(() => {
@@ -112,3 +140,4 @@ export function changePermission(req, res, next) {
     })
     .catch(err => handleError(err, res));
 }
+
