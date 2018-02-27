@@ -150,7 +150,17 @@ export function modifyVendors(req, res, next) {
           WHERE id IN (${Object.keys(vendors).join(', ')})`);
     })
     .then(() => {
-      return logAction(req.payload.id, `Vendor${names.length > 1 ? 's' : ''} ${names.join(', ')} modified.`);
+      let stringNames = [];
+      names.forEach(x => {
+        stringNames.push(`'${x}'`);
+      })
+      return connection.query(`SELECT * FROM Vendors WHERE name IN (${stringNames.join(', ')})`);
+    })
+    .then((results) => {
+      let nameStrings = results.map(x => {
+        return `{${x.name}=vendor_id=${x.id}}`;
+      });
+      return logAction(req.payload.id, `Vendor${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} modified.`);
     })
     .then(() => success(res))
     .catch(err => {
