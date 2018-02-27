@@ -357,6 +357,7 @@ export function bulkImport(req, res, next) {
     })
     .then(() => success(res))
     .catch((err) => {
+      console.log(err);
       return handleError(err, res);
     });
 }
