@@ -125,6 +125,7 @@ app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
 app.put('/inventory', beManager, inventory.commitCart);
 
 app.get('/formulas', beNoob, formulas.viewAll);
+app.get('/formulas/id/:id', beNoob, formulas.viewAll);
 app.get('/formulas/pages', beNoob, formulas.pages);
 app.get('/formulas/page/:page_num', beNoob, formulas.view);
 app.put('/formulas', beAdmin, formulas.modify);
