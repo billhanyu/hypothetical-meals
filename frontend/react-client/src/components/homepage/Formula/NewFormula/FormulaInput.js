@@ -24,8 +24,6 @@ class FormulaInput extends Component {
     this.props.onChange(event.target.value, this.props.id);
   }
 
-
-
   render() {
     return (
       <div className="FormulaInputContainer">
