@@ -20,27 +20,43 @@ export function signupManager(req, res, next) {
 function signupUser(req, res, next, userGroup) {
   const error = checkParams.checkBlankParams(req.body.user, ['username', 'name', 'password']);
   if (error) return res.status(422).send(error);
-
+  
   let regex = new RegExp('^([ \u00c0-\u01ffa-zA-Z\'\-])+$');
   if (req.body.user.name && !regex.test(req.body.user.name)) return res.status(422).send('Invalid characters used in name');
-
+  
   let user = new User(req.body.user);
   user.setPassword(req.body.user.password);
-
+  
   connection.query(`INSERT INTO Users (username, name, hash, salt, user_group) VALUES ('${user.username}', '${user.name || ''}', '${user.hash}', '${user.salt}', '${userGroup}');`)
-    .then(() => connection.query(`SELECT id FROM Users WHERE username = '${user.username}';`))
+  .then(() => connection.query(`SELECT id FROM Users WHERE username = '${user.username}';`))
+  .then((results) => {
+    if (results.length == 0) return res.status(500).send('Database error');
+    user.id = results[0].id;
+    return res.status(200).json({ user: user.getBasicInfo() });
+  })
+  .then(() => {
+    return logAction(req.payload ? req.payload.id : user.id, `Account created for user ${user.username}.`);
+  })
+  .catch((error) => {
+    if (error.code == 'ER_DUP_ENTRY') return res.status(422).json('Username is already registered');
+    else if (error.code == 'ER_DATA_TOO_LONG') return res.status(422).json('Username or name is too long');
+    else console.log(error);
+  });
+}
+
+export function deleteUser(req, res, next) {
+  const user = req.body.user;
+  let userId;
+  connection.query(`SELECT * FROM Users WHERE username IN (${user.username})`)
     .then((results) => {
-      if (results.length == 0) return res.status(500).send('Database error');
-      user.id = results[0].id;
-      return res.status(200).json({ user: user.getBasicInfo() });
+      if (results.length != 1) {
+        throw createError('Trying to delete nonexistant user');
+      }
+      userId = results[0].id;
+      return connection.query(`UPDATE Users SET removed = 1 WHERE id = ${userId}`);
     })
-    .then(() => {
-      return logAction(req.payload ? req.payload.id : user.id, `Account created for user ${user.username}.`);
-    })
-    .catch((error) => {
-      if (error.code == 'ER_DUP_ENTRY') return res.status(422).json('Username is already registered');
-      else if (error.code == 'ER_DATA_TOO_LONG') return res.status(422).json('Username or name is too long');
-      else console.log(error);
+    .catch((err) => {
+      handleError(err, res);
     });
 }
 
@@ -112,3 +128,4 @@ export function changePermission(req, res, next) {
     })
     .catch(err => handleError(err, res));
 }
+

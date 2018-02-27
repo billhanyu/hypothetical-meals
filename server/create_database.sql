@@ -19,6 +19,7 @@ CREATE TABLE Users(
 	hash text(1024), 
 	salt character(32), 
 	user_group enum('admin', 'manager', 'noob') not null,
+	removed BIT DEFAULT 0,
 
 	PRIMARY KEY (id),
 	UNIQUE (username, oauth)
