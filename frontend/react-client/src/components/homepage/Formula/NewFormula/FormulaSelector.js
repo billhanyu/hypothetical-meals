@@ -36,7 +36,13 @@ class FormulaInput extends Component {
       headers: {Authorization: "Token " + global.token}
     })
     .then(response => {
-      const allIngredients = response.data.map(element => element.name);
+      const allIngredients = [];
+      response.data.forEach(element => {
+        if(element.removed.data[0] == 0) {
+          allIngredients.push(element.name);
+        }
+      });
+      
       this.setState({
         ingredientData: response.data,
         allIngredients,

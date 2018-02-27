@@ -46,7 +46,7 @@ class FormulaWindow extends Component {
 
   handleInputChange(newInput, id) {
     const newState = this.state;
-    newState[id] = newInput;
+    let newInputVal = newInput;
     let errorObj = {};
     if(id == 'name'){
       Object.assign(errorObj, {nameError: false,});
@@ -56,7 +56,10 @@ class FormulaWindow extends Component {
     }
     if (id == 'quantity'){
       Object.assign(errorObj, {quantityError: false,});
+      const replacedValue = Number(newInputVal.replace('.', '').replace('-', ''));
+      newInputVal = isNaN(replacedValue) ? newInputVal : replacedValue;
     }
+    newState[id] = newInputVal;
     Object.assign(newState, errorObj);
     this.setState(newState);
   }
@@ -98,7 +101,7 @@ class FormulaWindow extends Component {
         {
           this.props.BackButtonShown ? <i className="far fa-arrow-alt-circle-left fa-2x BackButtonFormulaContainer" onClick={this.props.onBackClick} ></i> : null
         }
-        <div className="NewFormulaHeader">New Formula</div>
+        <div className="NewFormulaHeader">{this.props.isEditing ? "Edit Formula" : "New Formula"}</div>
         <FormulaInput error={this.state.nameError} errorText="Invalid Name" value={this.state.name} id="name" onChange={this.handleInputChange} HeaderText="Unique Formula Name" ContentText="Name of the amalgamated entity" placeholder="Formula Name"/>
         <FormulaInput error={this.state.descError} errorText="Invalid Desc" value={this.state.desc} id="desc" onChange={this.handleInputChange} HeaderText="Formula Description" ContentText="Full description or important notes for this particular formula" useTextArea/>
         <FormulaSelector

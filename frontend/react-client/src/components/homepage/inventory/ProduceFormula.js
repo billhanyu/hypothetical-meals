@@ -5,6 +5,7 @@ import ProduceFormulaButton from './ProduceFormula/ProduceFormulaButton.js';
 import ProduceFormulaComparator from './ProduceFormula/ProduceFormulaComparator.js';
 import axios from 'axios';
 import qs from 'qs';
+import Snackbar from 'material-ui/Snackbar';
 
 class ProduceFormula extends Component {
   constructor(props) {
@@ -15,6 +16,8 @@ class ProduceFormula extends Component {
       formulaToFormulaAmountMap: {},
       formulaToFormulaAmountTotalMap: {},
       inventoryStock: [],
+      errorMap: {},
+      open: false,
     };
   }
 
@@ -30,6 +33,18 @@ class ProduceFormula extends Component {
   }
 
   handleProduceFormulaClick() {
+    let error = false;
+    Object.keys(this.state.errorMap).forEach(element => {
+      if(this.state.errorMap[element] == true) {
+        error = true;
+      }
+    });
+    if(error) {
+      return this.setState({
+        open: true,
+      });
+    }
+
     const inventoryIDs = new Set();
     this.state.EditFormulaBoxes.forEach(element => {
       Object.keys(element.ingredients).forEach(ingredientKey => {
@@ -48,17 +63,23 @@ class ProduceFormula extends Component {
         shouldShowSummaryTable: true,
         inventoryStock: response.data,
       });
+    })
+    .catch(error => {
+      console.log(error.response);
     });
   }
 
-  handleNumChange(newFormulaAmount, formulaId, totalFormulaUnitsCreated) {
+  handleNumChange(newFormulaAmount, formulaId, totalFormulaUnitsCreated, belowMinError) {
     const newFormulaToFormulaMap = this.state.formulaToFormulaAmountMap;
     newFormulaToFormulaMap[formulaId] = newFormulaAmount;
     const newFormulaToFormulaTotalMap = this.state.formulaToFormulaAmountTotalMap;
     newFormulaToFormulaTotalMap[formulaId] = totalFormulaUnitsCreated;
+    const errorMap = this.state.errorMap;
+    errorMap[formulaId] = belowMinError;
     this.setState({
       formulaToFormulaAmountMap: newFormulaToFormulaMap,
-      formulaToFormulaAmountTotalMap: newFormulaToFormulaTotalMap
+      formulaToFormulaAmountTotalMap: newFormulaToFormulaTotalMap,
+      errorMap,
     });
   }
 
@@ -68,9 +89,21 @@ class ProduceFormula extends Component {
     });
   }
 
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
+  }
+
   render() {
     return (
       <div>
+        <Snackbar
+          open={this.state.open}
+          message="Cannot proceed due to errors"
+          autoHideDuration={2000}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <ProduceFormulaHeader />
         {
           this.state.shouldShowSummaryTable ?

@@ -34,7 +34,7 @@ export function view(req, res, next) {
  * ]
  */
 export function getStock(req, res, next) {
-  const ids = req.query.ids;
+  let ids = req.query.ids;
   if (!ids || ids.length == 0) {
     return res.status(400).send('No ingredient queried');
   }
@@ -50,7 +50,6 @@ export function getStock(req, res, next) {
 
 function getStockPromise(ids) {
   return new Promise((resolve, reject) => {
-    const stock = {};
     connection.query(`${basicViewQueryString} WHERE Ingredients.id IN (${ids.join(', ')})`)
       .then(results => {
         for (let result of results) {
@@ -79,7 +78,7 @@ export function modifyQuantities(req, res, next) {
   modifyInventoryQuantitiesPromise(req.body.changes)
     .then(() => success(res))
     .then(() => {
-      return connection.query(`SELECT Inventories.*, Ingredients.name 
+      return connection.query(`SELECT Inventories.*, Ingredients.name
           FROM Inventories JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id
           WHERE Inventories.id IN (${Object.keys(changes).join(', ')})`);
     })
