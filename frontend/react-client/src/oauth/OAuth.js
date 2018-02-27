@@ -1,7 +1,6 @@
 import qs from 'querystring';
-import getConfig from '../../../../server/getConfig';
+const config = require('./config');
 import axios from 'axios';
-const config = getConfig();
 
 const AUTHORIZE_URL = 'https://oauth.oit.duke.edu/oauth/authorize.php';
 const IDENTITY_API_URL = 'https://api.colab.duke.edu/identity/v1/';
