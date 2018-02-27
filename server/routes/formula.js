@@ -342,12 +342,21 @@ export function bulkImport(req, res, next) {
             let formulaEntriesToAdd = '';
             for (let entry of entries) {
                 const formulaFromDb = formulas.find(formula => formula.name == entry.formula);
+                entry.id = formulaFromDb.id;
                 formulaEntriesToAdd += `(${entry.ingredientId}, ${entry.numNativeUnits}, ${formulaFromDb.id}),`;
             }
             return connection.query(`INSERT INTO FormulaEntries (ingredient_id, num_native_units, formula_id) VALUES ${formulaEntriesToAdd.slice(0, -1)}`);
         })
+        .then(() => {
+            let queryStrings = [];
+            for (let entry of entries) {
+                queryStrings.push(`{${entry.formula}=formula_id=${entry.id}}`);
+            }
+            return logAction(req.payload.id, `Bulk import added the following formulas: ${queryStrings.join(', ')}`);
+        })
         .then(() => res.sendStatus(200))
         .catch((err) => {
+            console.log(err);
             handleError(err, res);
         });
 }

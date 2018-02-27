@@ -42,7 +42,7 @@ class BulkImport extends Component {
           </div>
         </div>
         <div className="row justify-content-md-center">
-          Ensure that the file is a CSV and follows the formatting as specified <a href="https://docs.google.com/document/d/1DqN-inj9gwBsP0KkM6SLA1_k99LFfSPNXxRe0fuBmhg/edit#"> here</a>.
+          Ensure that the file is a CSV and follows the formatting as specified&nbsp;<a href="https://docs.google.com/document/d/1DqN-inj9gwBsP0KkM6SLA1_k99LFfSPNXxRe0fuBmhg/edit#">here</a>.
         </div>
       </div>
     );
