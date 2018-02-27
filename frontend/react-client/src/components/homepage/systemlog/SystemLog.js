@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import AddEditIngredient from '../ingredient/AddEditIngredient';
 import AddEditVendor from '../vendor/AddEditVendor';
+import FormulaWindow from '../Formula/FormulaWindow';
 import SystemLogFilterBar from './SystemLogFilterBar';
 import PageBar from '../../GeneralComponents/PageBar';
 import axios from 'axios';
@@ -15,6 +16,8 @@ class SystemLog extends Component {
       viewIngredient: false,
       vendor: null,
       viewVendor: false,
+      formula: null,
+      viewFormula: false,
       pages: 0,
     };
     this.changeName = this.changeName.bind(this);
@@ -23,6 +26,8 @@ class SystemLog extends Component {
     this.changeUser = this.changeUser.bind(this);
     this.search = this.search.bind(this);
     this.viewIngredient = this.viewIngredient.bind(this);
+    this.viewVendor = this.viewVendor.bind(this);
+    this.viewFormula = this.viewFormula.bind(this);
     this.back = this.back.bind(this);
     this.selectPage = this.selectPage.bind(this);
   }
@@ -63,6 +68,7 @@ class SystemLog extends Component {
     this.setState({
       viewIngredient: false,
       viewVendor: false,
+      viewFormula: false,
     });
   }
 
@@ -141,6 +147,22 @@ class SystemLog extends Component {
       });
   }
 
+  viewFormula(id) {
+    axios.get(`/formulas/id/${id}`, {
+      headers: { Authorization: "Token " + global.token }
+    })
+    .then(response => {
+      this.setState({
+        formula: response.data[0],
+        viewFormula: true,
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      alert('Error retrieving formula data');
+    });
+  }
+
   display(description) {
     const parts = [];
     let op = description;
@@ -154,7 +176,7 @@ class SystemLog extends Component {
       if (arr[1] == 'ingredient_id') {
         parts.push(<a href="javascript:void(0)" onClick={e => this.viewIngredient(id)}>{arr[0]}</a>);
       } else if (arr[1] == 'formula_id') {
-        parts.push(<span>{arr[0]}</span>);
+        parts.push(<a href="javascript:void(0)" onClick={e => this.viewFormula(id)}>{arr[0]}</a>);
       } else if (arr[1] == 'vendor_id') {
         parts.push(<a href="javascript:void(0)" onClick={e => this.viewVendor(id)}>{arr[0]}</a>);
       }
@@ -177,6 +199,15 @@ class SystemLog extends Component {
         mode="edit"
         vendor={this.state.vendor}
         backToList={this.back}
+      />;
+    
+    const viewFormula =
+      <FormulaWindow
+        isEditing={true}
+        BackButtonShown={true}
+        onBackClick={this.back}
+        newFormulaObject={this.state.formula}
+        activeId={this.state.formula ? this.state.formula.id : 1}
       />;
 
     const systemlog =
@@ -221,6 +252,8 @@ class SystemLog extends Component {
       return viewIng;
     } else if (this.state.viewVendor) {
       return viewVendor;
+    } else if (this.state.viewFormula) {
+      return viewFormula;
     } else {
       return systemlog;
     }

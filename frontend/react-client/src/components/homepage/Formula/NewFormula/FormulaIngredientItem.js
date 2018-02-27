@@ -22,7 +22,7 @@ class FormulaInput extends Component {
     return (
       <div className="FormulaIngredientItemContainer">
         <span>{this.props.elementName}</span>
-        <input value={this.props.value} placeholder="Quantity of Ingredient" onChange={this._handleChange.bind(this)} />
+        <input readOnly={this.props.readOnly} value={this.props.value} placeholder="Quantity of Ingredient" onChange={this._handleChange.bind(this)} />
       </div>
     );
   }
