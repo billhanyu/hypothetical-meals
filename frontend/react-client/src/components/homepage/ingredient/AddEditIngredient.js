@@ -72,18 +72,20 @@ class AddEditIngredient extends Component {
         alert('Error retrieving vendors for the ingredient');
       });
 
-    axios.get(`/systemlogs?ingredient_id=${this.state.id}`, {
-      headers: { Authorization: "Token " + global.token }
-    })
-    .then(response => {
-      this.setState({
-        logs: response.data,
+    if (global.user_group !== "noob") {
+      axios.get(`/systemlogs?ingredient_id=${this.state.id}`, {
+        headers: { Authorization: "Token " + global.token }
+      })
+      .then(response => {
+        this.setState({
+          logs: response.data,
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Error retrieving sytem logs related to this ingredient');
       });
-    })
-    .catch(err => {
-      console.error(err);
-      alert('Error retrieving sytem logs related to this ingredient');
-    });
+    }
   }
 
   deletevendoringredient(idx) {
