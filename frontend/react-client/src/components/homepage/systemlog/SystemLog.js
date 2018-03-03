@@ -19,6 +19,10 @@ class SystemLog extends Component {
       formula: null,
       viewFormula: false,
       pages: 0,
+      filterUser: '',
+      filterName: '',
+      filterStartTime: '',
+      filterEndTime: '',
     };
     this.changeName = this.changeName.bind(this);
     this.changeStartTime = this.changeStartTime.bind(this);
@@ -30,6 +34,7 @@ class SystemLog extends Component {
     this.viewFormula = this.viewFormula.bind(this);
     this.back = this.back.bind(this);
     this.selectPage = this.selectPage.bind(this);
+    this.clearFilter = this.clearFilter.bind(this);
   }
 
   componentDidMount() {
@@ -73,42 +78,55 @@ class SystemLog extends Component {
   }
 
   changeName(event) {
-    this.filterName = event.target.value;
-    this.search();
+    this.setState({
+      filterName: event.target.value,
+    }, () => this.search());
   }
 
   changeStartTime(event) {
-    this.filterStartTime = event.target.value;
-    this.search();
+    this.setState({
+      filterStartTime: event.target.value,
+    }, () => this.search());
   }
 
   changeEndTime(event) {
-    this.filterEndTime = event.target.value;
-    this.search();
+    this.setState({
+      filterEndTime: event.target.value,
+    }, () => this.search());
   }
 
   changeUser(event) {
-    this.filterUser = event.target.value;
-    this.search();
+    this.setState({
+      filterUser: event.target.value,
+    }, () => this.search());
+  }
+
+  clearFilter() {
+    this.setState({
+      filterName: '',
+      filterUser: '',
+      filterStartTime: '',
+      filterEndTime: '',
+    }, () => this.search());
   }
 
   search() {
     let newLogs = this.state.logs.slice();
-    if (this.filterName) {
+    if (this.state.filterName) {
       newLogs = newLogs.filter(log => {
         const lowerDescription = log.description.toLowerCase();
-        const lowerName = this.filterName.toLowerCase();
+        const lowerName = this.state.filterName.toLowerCase();
         return lowerDescription.indexOf(lowerName) > -1;
       });
     }
-    if (this.filterStartTime) {
-      newLogs = newLogs.filter(log => log.created_at.split('T')[0] >= this.filterStartTime);
+    if (this.state.filterStartTime) {
+      newLogs = newLogs.filter(log => log.created_at.split('T')[0] >= this.state.filterStartTime);
     }
-    if (this.filterEndTime) {
-      newLogs = newLogs.filter(log => log.created_at.split('T')[0] <= this.filterEndTime);
+    if (this.state.filterEndTime) {
+      newLogs = newLogs.filter(log => log.created_at.split('T')[0] <= this.state.filterEndTime);
     }
-    if (this.filterUser) {
-      newLogs = newLogs.filter(log => log.username.indexOf(this.filterUser) > -1);
+    if (this.state.filterUser) {
+      newLogs = newLogs.filter(log => log.username.indexOf(this.state.filterUser) > -1);
     }
     this.setState({
       filteredLogs: newLogs,
@@ -124,7 +142,6 @@ class SystemLog extends Component {
         ingredient: response.data,
         viewIngredient: true,
       });
-      console.log(response.data);
     })
     .catch(err => {
       alert('Error retrieving ingredient data');
@@ -214,15 +231,16 @@ class SystemLog extends Component {
       <div>
         <h2>System Log</h2>
         <SystemLogFilterBar
+          filterUser={this.state.filterUser}
           filterName={this.state.filterName}
           filterStartTime={this.state.filterStartTime}
           filterEndTime={this.state.filterEndTime}
-          filterUser={this.state.filterUser}
           changeName={this.changeName}
           changeStartTime={this.changeStartTime}
           changeEndTime={this.changeEndTime}
           changeUser={this.changeUser}
           search={this.search}
+          clearFilter={this.clearFilter}
         />
         <table className="table">
           <thead>
