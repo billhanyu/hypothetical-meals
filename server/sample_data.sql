@@ -21,10 +21,10 @@ INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (1, 
 INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (2, 2, 20, 1);
 INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (3, 3, 30, 1);
 INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (4, 4, 30, 2);
-INSERT INTO Inventories (id, ingredient_id, num_packages) VALUES(1, 1, 10);
-INSERT INTO Inventories (id, ingredient_id, num_packages) VALUES (2, 2, 20);
-INSERT INTO Inventories (id, ingredient_id, num_packages) VALUES (3, 3, 20);
-INSERT INTO Inventories (id, ingredient_id, num_packages) VALUES (4, 4, 20);
+INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot) VALUES(1, 1, 10, 1, 'ff');
+INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot) VALUES (2, 2, 20, 1, 'ff');
+INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot) VALUES (3, 3, 20, 1, 'ff');
+INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot) VALUES (4, 4, 20, 2, 'ff');
 INSERT INTO Logs (id, user_id, vendor_ingredient_id, quantity) VALUES (1, 1, 1, 18);
 INSERT INTO Logs (id, user_id, vendor_ingredient_id, quantity) VALUES (2, 1, 3, 5);
 INSERT INTO SpendingLogs (id, ingredient_id, total_weight, total, consumed) VALUES (1, 1, 500, 5000, 50);
