@@ -11,6 +11,14 @@ class PageBar extends Component {
     this.onClickNext = this.onClickNext.bind(this);
   }
 
+  componentWillReceiveProps(newProps) {
+    if (newProps.pages !== this.props.pages) {
+      this.setState({
+        currentPage: 1,
+      });
+    }
+  }
+
   onClickLink(idx) {
     this.props.selectPage(idx);
     this.setState({

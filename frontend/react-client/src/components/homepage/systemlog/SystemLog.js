@@ -4,19 +4,22 @@ import AddEditVendor from '../vendor/AddEditVendor';
 import SystemLogFilterBar from './SystemLogFilterBar';
 import PageBar from '../../GeneralComponents/PageBar';
 import axios from 'axios';
+import { COUNT_PER_PAGE } from '../../Constants/Pagination';
 
 class SystemLog extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filteredLogs: [],
+      pagedLogs: [],
       logs: [],
       ingredient: null,
       viewIngredient: false,
       vendor: null,
       viewVendor: false,
       pages: 0,
+      currentPage: 1,
     };
+    this.filteredLogs = [];
     this.changeName = this.changeName.bind(this);
     this.changeStartTime = this.changeStartTime.bind(this);
     this.changeEndTime = this.changeEndTime.bind(this);
@@ -28,35 +31,37 @@ class SystemLog extends Component {
   }
 
   componentDidMount() {
-    axios.get('/systemlogs/pages', {
+    axios.get('/systemlogs', {
       headers: { Authorization: "Token " + global.token }
     })
       .then(response => {
+        const pagedLogs = [];
+        for (let i = 0; i < COUNT_PER_PAGE && i < response.data.length; i++) {
+          pagedLogs.push(response.data[i]);
+        }
+        this.filteredLogs = response.data;
+        this.selectPage(1);
         this.setState({
-          pages: response.data.numPages,
+          logs: response.data,
+          pages: Math.ceil(response.data.length / COUNT_PER_PAGE),
         });
       })
       .catch(err => {
         console.error(err);
         alert('Error retrieving system logs');
       });
-    this.selectPage(1);
   }
 
   selectPage(idx) {
-    axios.get(`/systemlogs/page/${idx}`, {
-      headers: {Authorization: "Token " + global.token}
-    })
-    .then(response => {
-      this.setState({
-        logs: response.data,
-        filteredLogs: response.data,
-      });
-    })
-    .catch(err => {
-      console.error(err);
-      alert('Error retrieving system logs');
+    const pagedLogs = [];
+    for (let i = (idx-1) * COUNT_PER_PAGE; i < idx*COUNT_PER_PAGE && i < this.filteredLogs.length; i++) {
+      pagedLogs.push(this.filteredLogs[i]);
+    }
+    this.setState({
+      pagedLogs,
+      currentPage: idx,
     });
+    console.log(pagedLogs);
   }
 
   back() {
@@ -104,9 +109,12 @@ class SystemLog extends Component {
     if (this.filterUser) {
       newLogs = newLogs.filter(log => log.username.indexOf(this.filterUser) > -1);
     }
+    this.filteredLogs = newLogs;
+    const newPageNum = Math.ceil(this.filteredLogs.length / COUNT_PER_PAGE);
     this.setState({
-      filteredLogs: newLogs,
+      pages: newPageNum,
     });
+    this.selectPage(1);
   }
 
   viewIngredient(id) {
@@ -203,7 +211,7 @@ class SystemLog extends Component {
           </thead>
           <tbody>
             {
-              this.state.filteredLogs.map((log, idx) => {
+              this.state.pagedLogs.map((log, idx) => {
                 return (
                   <tr className="row" style={{ 'margin': 0 }} key={idx}>
                     <td className="col-md-3">{(new Date(log.created_at)).toString().split(' GMT')[0]}</td>
