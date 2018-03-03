@@ -46,7 +46,7 @@ export function changeStorage(req, res, next) {
   storageSumPromise(storageId)
   .then(sum => {
     if (newCapacity < sum) {
-      throw createError(`New capacity ${newCapacity} is smaller than current total storage weight ${sum}`);
+      throw createError(`New capacity ${newCapacity} sqft is smaller than current total storage space ${sum} sqft`);
     }
     return connection.query(`UPDATE Storages SET capacity = ${newCapacity} WHERE id = ${storageId}`);
   })
