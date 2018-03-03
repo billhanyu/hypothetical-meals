@@ -56,8 +56,8 @@ describe('Storage', () => {
     });
 
     it('should ignore truckload or railcar', (done) => {
-      alasql('INSERT INTO Inventories (ingredient_id, package_type, num_packages) VALUES (2, \'truckload\', 2)');
-      alasql('INSERT INTO Inventories (ingredient_id, package_type, num_packages) VALUES (2, \'railcar\', 2)');
+      alasql('INSERT INTO Inventories (ingredient_id, package_type, num_packages, lot, vendor_id) VALUES (2, \'truckload\', 2, \'ff\', 1)');
+      alasql('INSERT INTO Inventories (ingredient_id, package_type, num_packages, lot, vendor_id) VALUES (2, \'railcar\', 2, \'ff\', 1)');
       chai.request(server)
         .put('/storages')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
