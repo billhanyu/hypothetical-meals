@@ -11,7 +11,6 @@ class SystemLog extends Component {
     super(props);
     this.state = {
       pagedLogs: [],
-      logs: [],
       ingredient: null,
       viewIngredient: false,
       vendor: null,
@@ -35,14 +34,10 @@ class SystemLog extends Component {
       headers: { Authorization: "Token " + global.token }
     })
       .then(response => {
-        const pagedLogs = [];
-        for (let i = 0; i < COUNT_PER_PAGE && i < response.data.length; i++) {
-          pagedLogs.push(response.data[i]);
-        }
         this.filteredLogs = response.data;
+        this.logs = response.data;
         this.selectPage(1);
         this.setState({
-          logs: response.data,
           pages: Math.ceil(response.data.length / COUNT_PER_PAGE),
         });
       })
@@ -61,7 +56,6 @@ class SystemLog extends Component {
       pagedLogs,
       currentPage: idx,
     });
-    console.log(pagedLogs);
   }
 
   back() {
@@ -92,7 +86,7 @@ class SystemLog extends Component {
   }
 
   search() {
-    let newLogs = this.state.logs.slice();
+    let newLogs = this.logs.slice();
     if (this.filterName) {
       newLogs = newLogs.filter(log => {
         const lowerDescription = log.description.toLowerCase();
@@ -126,7 +120,6 @@ class SystemLog extends Component {
         ingredient: response.data,
         viewIngredient: true,
       });
-      console.log(response.data);
     })
     .catch(err => {
       alert('Error retrieving ingredient data');
@@ -142,7 +135,6 @@ class SystemLog extends Component {
           vendor: response.data,
           viewVendor: true,
         });
-        console.log(response.data);
       })
       .catch(err => {
         alert('Error retrieving vendor data');
@@ -223,7 +215,7 @@ class SystemLog extends Component {
             }
           </tbody>
         </table>
-        <PageBar pages={this.state.pages} selectPage={this.selectPage} />
+        <PageBar pages={this.state.pages} selectPage={this.selectPage} currentPage={this.state.currentPage} />
       </div>;
     if (this.state.viewIngredient) {
       return viewIng;
