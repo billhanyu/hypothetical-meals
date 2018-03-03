@@ -19,7 +19,7 @@ export function pages(req, res, next) {
 
 export function viewAll(req, res, next) {
   const queryParams = req.query;
-  connection.query(`${logQuery} ORDER BY SystemLogs.id`)
+  connection.query(`${logQuery} ORDER BY SystemLogs.id DESC`)
     .then((results) => {
       const filteredResults = ingredientFilter(queryParams, results);
       res.json(filteredResults);
