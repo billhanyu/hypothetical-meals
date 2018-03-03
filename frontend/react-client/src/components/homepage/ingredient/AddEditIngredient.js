@@ -29,8 +29,8 @@ class AddEditIngredient extends Component {
       id: 0,
     };
     const ingredient = props.ingredient || defaultIngredient;
-    this.id = ingredient.id;
     this.state = {
+      id: ingredient.id,
       name: ingredient.name,
       package_type: ingredient.package_type,
       native_unit: ingredient.native_unit,
@@ -57,7 +57,7 @@ class AddEditIngredient extends Component {
   }
 
   reloadData() {
-    axios.get(`/vendoringredients/${this.id}`, {
+    axios.get(`/vendoringredients/${this.state.id}`, {
       headers: { Authorization: "Token " + global.token }
     })
       .then(response => {
@@ -71,7 +71,7 @@ class AddEditIngredient extends Component {
       });
 
     if (global.user_group !== "noob") {
-      axios.get(`/systemlogs?ingredient_id=${this.id}`, {
+      axios.get(`/systemlogs?ingredient_id=${this.state.id}`, {
         headers: { Authorization: "Token " + global.token }
       })
       .then(response => {
@@ -189,7 +189,7 @@ class AddEditIngredient extends Component {
 
     if (this.state.mode == "edit") {
       const newIngredientObject = {};
-      newIngredientObject[this.id] = ingredient;
+      newIngredientObject[this.state.id] = ingredient;
       axios.put("/ingredients", {
         ingredients: newIngredientObject,
       }, {
@@ -214,9 +214,12 @@ class AddEditIngredient extends Component {
           headers: { Authorization: "Token " + global.token }
         })
         .then(response => {
-          this.id = response.data[0];
-          alert('added!');
-          this.reloadData();
+          this.setState({
+            id: response.data[0],
+          }, () => {
+            alert('added!');
+            this.reloadData();
+          });
         })
         .catch(error => {
           const msg = error.response.data;
@@ -239,7 +242,7 @@ class AddEditIngredient extends Component {
         const vendor_id = response.data.id;
         return axios.post('/vendoringredients', {
           vendoringredients: [{
-            ingredient_id: this.id,
+            ingredient_id: this.state.id,
             vendor_id,
             price: this.state.price,
           }]
