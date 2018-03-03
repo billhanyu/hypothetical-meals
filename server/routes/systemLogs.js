@@ -35,6 +35,7 @@ function ingredientFilter(queryParams, results) {
               filteredResults.push(x);
           }
       });
+      filteredResults.sort((a, b) => b.id - a.id);
       return filteredResults;
   } else {
       return results;

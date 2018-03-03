@@ -17,39 +17,37 @@ class AddEditIngredient extends Component {
     this.editvendor = this.editvendor.bind(this);
     this.cancelEdit = this.cancelEdit.bind(this);
     this.finishEdit = this.finishEdit.bind(this);
-    if (props.mode == "edit") {
-      this.state = {
-        name: props.ingredient.name,
-        package_type: props.ingredient.package_type,
-        native_unit: props.ingredient.native_unit,
-        num_native_units: props.ingredient.num_native_units,
-        removed: props.ingredient.removed.data[0],
-        storage_id: props.ingredient.storage_id,
-        storage: Storage2State[props.ingredient.storage_name],
-        id: props.ingredient.id,
-        vendoringredients: [],
-        deleting: -1,
-        adding: false,
-        mode: "edit",
-        logs: [],
-        vendor_code: '', // add
-        price: 1, // add
-        editing: false,
-        editIdx: -1,
-      };
-    } else {
-      this.state = {
-        name: '',
-        package_type: 'sack',
-        native_unit: '',
-        storage_id: 1,
-        num_native_units: '',
-        storage: 'Frozen',
-        vendoringredients: [],
-        adding: false,
-        mode: "add",
-      };
-    }
+    const defaultIngredient = {
+      name: '',
+      package_type: 'sack',
+      native_unit: '',
+      removed: {
+        data: [0],
+      },
+      storage_id: 1,
+      storage_name: 'freezer',
+      id: 0,
+    };
+    const ingredient = props.ingredient || defaultIngredient;
+    this.id = ingredient.id;
+    this.state = {
+      name: ingredient.name,
+      package_type: ingredient.package_type,
+      native_unit: ingredient.native_unit,
+      num_native_units: ingredient.num_native_units,
+      removed: ingredient.removed.data[0],
+      storage_id: ingredient.storage_id,
+      storage: Storage2State[ingredient.storage_name],
+      vendoringredients: [],
+      deleting: -1,
+      adding: false,
+      mode: props.mode,
+      logs: [],
+      vendor_code: '', // add
+      price: 1, // add
+      editing: false,
+      editIdx: -1,
+    };
   }
 
   componentDidMount() {
@@ -59,7 +57,7 @@ class AddEditIngredient extends Component {
   }
 
   reloadData() {
-    axios.get(`/vendoringredients/${this.state.id}`, {
+    axios.get(`/vendoringredients/${this.id}`, {
       headers: { Authorization: "Token " + global.token }
     })
       .then(response => {
@@ -73,7 +71,7 @@ class AddEditIngredient extends Component {
       });
 
     if (global.user_group !== "noob") {
-      axios.get(`/systemlogs?ingredient_id=${this.state.id}`, {
+      axios.get(`/systemlogs?ingredient_id=${this.id}`, {
         headers: { Authorization: "Token " + global.token }
       })
       .then(response => {
@@ -86,6 +84,10 @@ class AddEditIngredient extends Component {
         alert('Error retrieving sytem logs related to this ingredient');
       });
     }
+
+    this.setState({
+      mode: "edit",
+    });
   }
 
   deletevendoringredient(idx) {
@@ -187,7 +189,7 @@ class AddEditIngredient extends Component {
 
     if (this.state.mode == "edit") {
       const newIngredientObject = {};
-      newIngredientObject[this.state.id] = ingredient;
+      newIngredientObject[this.id] = ingredient;
       axios.put("/ingredients", {
         ingredients: newIngredientObject,
       }, {
@@ -212,8 +214,9 @@ class AddEditIngredient extends Component {
           headers: { Authorization: "Token " + global.token }
         })
         .then(response => {
+          this.id = response.data[0];
           alert('added!');
-          this.props.backToList();
+          this.reloadData();
         })
         .catch(error => {
           const msg = error.response.data;
@@ -236,7 +239,7 @@ class AddEditIngredient extends Component {
         const vendor_id = response.data.id;
         return axios.post('/vendoringredients', {
           vendoringredients: [{
-            ingredient_id: this.state.id,
+            ingredient_id: this.id,
             vendor_id,
             price: this.state.price,
           }]
@@ -308,7 +311,7 @@ class AddEditIngredient extends Component {
               <input type="text" className="form-control" id="native_unit" aria-describedby="unit" placeholder="Pounds" onChange={e => this.handleInputChange('native_unit', e)} value={this.state.native_unit} readOnly={readOnly}/>
               </div>
             <div className="form-group">
-              <label htmlFor="num_native_units">Size (in native unit above)</label>
+              <label htmlFor="num_native_units">Native Units per Package</label>
               <input type="text" className="form-control" id="num_native_units" aria-describedby="num_native_units" placeholder="1" onChange={e => this.handleInputChange('num_native_units', e)} value={this.state.num_native_units} readOnly={readOnly} />
               </div>
             {
@@ -318,7 +321,7 @@ class AddEditIngredient extends Component {
           </form>
         </div>
 
-        {this.state.mode == "edit" && !readOnly &&
+        {this.state.mode == "edit" &&
           <div>
             <h3>Vendors That Produce This Ingredient</h3>
             {!this.state.adding && global.user_group == "admin" &&
@@ -343,6 +346,7 @@ class AddEditIngredient extends Component {
                 </form>
               </div>
             }
+
             <table className="table">
               <tr>
                 <th className={columnClass}>Vendor</th>
@@ -407,31 +411,33 @@ class AddEditIngredient extends Component {
               }
             </table>
 
-            <div>
-              <h3>Actions On This Ingredient</h3>
-              <table className="table">
-                <thead>
-                  <tr className="row" style={{ 'margin': 0 }}>
-                    <th className="col-md-3">Time</th>
-                    <th className="col-md-3">Username</th>
-                    <th className="col-md-6">Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {
-                    this.state.logs.map((log, idx) => {
-                      return (
-                        <tr className="row" style={{ 'margin': 0 }} key={idx}>
-                          <td className="col-md-3">{(new Date(log.created_at)).toString().split(' GMT')[0]}</td>
-                          <td className="col-md-3">{log.username}</td>
-                          <td className="col-md-6">{this.display(log.description)}</td>
-                        </tr>
-                      );
-                    })
-                  }
-                </tbody>
-              </table>
-            </div>
+            {global.user_group !== "noob" &&
+              <div>
+                <h3>Actions On This Ingredient</h3>
+                <table className="table">
+                  <thead>
+                    <tr className="row" style={{ 'margin': 0 }}>
+                      <th className="col-md-3">Time</th>
+                      <th className="col-md-3">Username</th>
+                      <th className="col-md-6">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {
+                      this.state.logs.map((log, idx) => {
+                        return (
+                          <tr className="row" style={{ 'margin': 0 }} key={idx}>
+                            <td className="col-md-3">{(new Date(log.created_at)).toString().split(' GMT')[0]}</td>
+                            <td className="col-md-3">{log.username}</td>
+                            <td className="col-md-6">{this.display(log.description)}</td>
+                          </tr>
+                        );
+                      })
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
 
             <div className="modal fade" id="deleteVendorIngredientModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div className="modal-dialog" role="document">

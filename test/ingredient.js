@@ -86,7 +86,7 @@ describe('Ingredient', () => {
         });
     });
 
-    it('should add a new ingredient', (done) => {
+    it('should add new ingredients', (done) => {
       chai.request(server)
       .post('/ingredients')
       .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -110,6 +110,7 @@ describe('Ingredient', () => {
       })
       .end((err, res) => {
         res.should.have.status(200);
+        assert.strictEqual(res.body.length, 2, 'return added ids');
         const changed = alasql('SELECT * FROM Ingredients');
         assert.strictEqual(changed[4]['name'], 'turkey', 'Name for ingredient 4.');
         assert.strictEqual(changed[4]['package_type'], 'sail', 'Package type ingredient 4.');
