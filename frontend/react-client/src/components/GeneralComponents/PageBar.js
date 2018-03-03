@@ -3,9 +3,6 @@ import React, { Component } from 'react';
 class PageBar extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      currentPage: 1,
-    };
     this.onClickLink = this.onClickLink.bind(this);
     this.onClickPrevious = this.onClickPrevious.bind(this);
     this.onClickNext = this.onClickNext.bind(this);
@@ -13,32 +10,30 @@ class PageBar extends Component {
 
   onClickLink(idx) {
     this.props.selectPage(idx);
-    this.setState({
-      currentPage: idx,
-    });
   }
 
   onClickPrevious() {
-    this.props.selectPage(this.state.currentPage - 1);
+    this.props.selectPage(this.props.currentPage - 1);
     this.setState({
-      currentPage: this.state.currentPage - 1,
+      currentPage: this.props.currentPage - 1,
     });
   }
 
   onClickNext() {
-    this.props.selectPage(this.state.currentPage + 1);
+    this.props.selectPage(this.props.currentPage + 1);
     this.setState({
-      currentPage: this.state.currentPage + 1,
+      currentPage: this.props.currentPage + 1,
     });
   }
 
   render() {
+    console.log(this.props.currentPage);
     const links = [];
     for (let i = 0; i < this.props.pages; i++) {
       links.push(i+1);
     }
-    const disablePrev = this.state.currentPage == 1 ? "disabled" : "";
-    const disableNext = this.state.currentPage == this.props.pages ? "disabled" : "";
+    const disablePrev = this.props.currentPage == 1 ? "disabled" : "";
+    const disableNext = this.props.currentPage == this.props.pages ? "disabled" : "";
     return(
       <nav aria-label="...">
         <ul className="pagination justify-content-center">
@@ -47,7 +42,7 @@ class PageBar extends Component {
           </li>
           {
             links.map((pageNum, idx) => {
-              const active = pageNum == this.state.currentPage ? "active" : "";
+              const active = pageNum == this.props.currentPage ? "active" : "";
               return (
                 <li key={idx} className={"page-item " + active}>
                   <span className="page-link" onClick={e => this.onClickLink(pageNum)}>
