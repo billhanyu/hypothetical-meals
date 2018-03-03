@@ -120,6 +120,7 @@ export function updateCases(tableName, updateKeys, updates) {
     let updateString = createUpdateString(tableName, updateKeys, updates);
     return connection.query(`${updateString}`)
         .catch((err) => {
+            console.log(err);
             throw createError(`Cannot update database for ${tableName}`);
         });
 }

@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS ProductRunsEntries;
+DROP TABLE IF EXISTS ProductRuns;
 DROP TABLE IF EXISTS SystemLogs;
 DROP TABLE IF EXISTS ProductionLogs;
 DROP TABLE IF EXISTS FormulaEntries;
@@ -120,7 +122,6 @@ CREATE TABLE Formulas(
 	num_product int not null,
 	removed BIT DEFAULT 0,
 
-	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	PRIMARY KEY (id)
 );
 
