@@ -132,7 +132,6 @@ class VendorIngredientList extends Component {
 
   handleAddVendor(event) {
     event.preventDefault();
-    console.log(this.state.vendor_id);
     axios.post('/vendoringredients', {
       vendoringredients: [{
         ingredient_id: this.props.ingredientId,
