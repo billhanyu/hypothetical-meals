@@ -164,7 +164,7 @@ class VendorList extends Component {
             </div>
           </div>
         </div>
-        <PageBar pages={this.state.pages} selectPage={this.selectPage} />
+        <PageBar pages={this.state.pages} selectPage={this.selectPage} currentPage={this.state.page} />
       </div>;
     
     const edit =

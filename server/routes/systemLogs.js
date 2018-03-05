@@ -31,10 +31,11 @@ function ingredientFilter(queryParams, results) {
   let filteredResults = [];
   if ('ingredient_id' in queryParams) {
       results.forEach(x => {
-          if (x.description.indexOf(`ingredient_id=${queryParams['ingredient_id']}`) >= 0) {
+          if (x.description.indexOf(`ingredient_id=${queryParams['ingredient_id']}}`) >= 0) {
               filteredResults.push(x);
           }
       });
+      filteredResults.sort((a, b) => b.id - a.id);
       return filteredResults;
   } else {
       return results;

@@ -15,6 +15,7 @@ class ViewInventory extends Component {
       editQuantity: 0,
       editIdx: -1,
       pages: 0,
+      currentPage: 1,
     };
     this.filterIngredient = this.filterIngredient.bind(this);
     this.filterTemp = this.filterTemp.bind(this);
@@ -130,6 +131,9 @@ class ViewInventory extends Component {
   }
 
   selectPage(idx) {
+    this.setState({
+      currentPage: idx,
+    });
     const self = this;
     let allInventories;
     axios.get(`/inventory/page/${idx}`, {
@@ -212,6 +216,7 @@ class ViewInventory extends Component {
         <PageBar
           pages={this.state.pages}
           selectPage={this.selectPage}
+          currentPage={this.state.currentPage}
         />
       </div>
     );
