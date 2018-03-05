@@ -9,6 +9,7 @@ class SpendingLog extends Component {
     this.state = {
       pages: 0,
       entries: [],
+      currentPage: 1,
     };
     this.selectPage = this.selectPage.bind(this);
   }
@@ -26,6 +27,9 @@ class SpendingLog extends Component {
   }
 
   selectPage(idx) {
+    this.setState({
+      currentPage: idx,
+    });
     axios.get(`/spendinglogs/page/${idx}`, {
       headers: { Authorization: "Token " + global.token }
     })
@@ -63,6 +67,7 @@ class SpendingLog extends Component {
         <PageBar
           pages={this.state.pages}
           selectPage={this.selectPage}
+          currentPage={this.state.currentPage}
         />
       </div>
     );

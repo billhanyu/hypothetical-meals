@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 class PageBar extends Component {
   constructor(props) {
@@ -27,7 +28,6 @@ class PageBar extends Component {
   }
 
   render() {
-    console.log(this.props.currentPage);
     const links = [];
     for (let i = 0; i < this.props.pages; i++) {
       links.push(i+1);
@@ -62,5 +62,11 @@ class PageBar extends Component {
     );
   }
 }
+
+PageBar.propTypes = {
+  selectPage: PropTypes.func,
+  currentPage: PropTypes.number,
+  pages: PropTypes.number,
+};
 
 export default PageBar;
