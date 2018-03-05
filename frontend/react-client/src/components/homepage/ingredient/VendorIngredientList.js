@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import VendorSelector from './VendorSelector';
 
 class VendorIngredientList extends Component {
   constructor(props) {
     super(props);
     this.state = {
       adding: false,
-      vendor_code: '', // add
+      vendor_id: '', // add
       price: 1, // add
       editing: false,
       editIdx: -1,
@@ -23,6 +24,7 @@ class VendorIngredientList extends Component {
     this.finishEdit = this.finishEdit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.cancelAdd = this.cancelAdd.bind(this);
+    this.changeVendorId = this.changeVendorId.bind(this);
   }
 
   componentDidMount() {
@@ -83,6 +85,12 @@ class VendorIngredientList extends Component {
     });
   }
 
+  changeVendorId(vendorId) {
+    this.setState({
+      vendor_id: vendorId,
+    });
+  }
+
   editvendor(idx) {
     this.setState({
       editing: true,
@@ -124,21 +132,15 @@ class VendorIngredientList extends Component {
 
   handleAddVendor(event) {
     event.preventDefault();
-    axios.get('/vendors/code', {
-      params: { code: this.state.vendor_code },
-      headers: { Authorization: "Token " + global.token }
-    })
-      .then(response => {
-        const vendor_id = response.data.id;
-        return axios.post('/vendoringredients', {
-          vendoringredients: [{
-            ingredient_id: this.props.ingredientId,
-            vendor_id,
-            price: this.state.price,
-          }]
-        }, {
-            headers: { Authorization: "Token " + global.token }
-          });
+    console.log(this.state.vendor_id);
+    axios.post('/vendoringredients', {
+      vendoringredients: [{
+        ingredient_id: this.props.ingredientId,
+        vendor_id: this.state.vendor_id,
+        price: this.state.price,
+      }]
+    }, {
+        headers: { Authorization: "Token " + global.token }
       })
       .then(response => {
         alert('Added product!');
@@ -150,7 +152,7 @@ class VendorIngredientList extends Component {
       .catch(err => {
         const msg = err.response.data;
         if (msg == "ER_DUP_ENTRY") {
-          alert('A product with the same vendor code already exists.');
+          alert('A product with the same vendor already exists.');
         } else {
           alert(msg);
         }
@@ -159,7 +161,7 @@ class VendorIngredientList extends Component {
 
   render() {
     const columnClass = global.user_group == "admin" ? "OneThirdWidth" : "HalfWidth";
-    return(
+    return (
       <div>
         <h3>Vendors That Produce This Ingredient</h3>
         {!this.state.adding && global.user_group == "admin" &&
@@ -173,8 +175,8 @@ class VendorIngredientList extends Component {
           <div className="row justify-content-md-center">
             <form className="col-xl-6 col-lg-6 col-sm-8">
               <div className="form-group">
-                <label htmlFor="vendor_code">Vendor Code</label>
-                <input type="text" className="form-control" id="vendor_code" aria-describedby="vendor_code" placeholder="code" onChange={e => this.handleInputChange('vendor_code', e)} value={this.state.vendor_code} />
+                <label htmlFor="vendor">Vendor</label>
+                <VendorSelector changeVendorId={this.changeVendorId} />
               </div>
               <div className="form-group">
                 <label htmlFor="price">Price</label>
