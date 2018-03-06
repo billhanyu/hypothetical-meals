@@ -23,6 +23,12 @@ export function view(req, res, next) {
     });
 }
 
+export function viewAvailable(req, res, next) {
+  connection.query('SELECT * FROM Vendors WHERE removed = 0')
+    .then(results => res.json(results))
+    .catch(err => handleError(err, res));
+}
+
 export function viewWithId(req, res, next) {
   if (!req.params.id || !checkNumber.isPositiveInteger(req.params.id)) {
     return res.status(400).send('Invalid vendor id');
