@@ -20,7 +20,6 @@ class ViewInventory extends Component {
     this.filterIngredient = this.filterIngredient.bind(this);
     this.filterTemp = this.filterTemp.bind(this);
     this.filterPackage = this.filterPackage.bind(this);
-    this.selectInventoryItem = this.selectInventoryItem.bind(this);
     this.selectPage = this.selectPage.bind(this);
     this.edit = this.edit.bind(this);
     this.cancelEdit = this.cancelEdit.bind(this);
@@ -80,12 +79,6 @@ class ViewInventory extends Component {
     this.setState({
       inventories: filtered,
     });
-  }
-
-  selectInventoryItem(item) {
-    if (this.props.onClickInventoryItem) {
-      this.props.onClickInventoryItem(item);
-    }
   }
 
   edit(idx) {
@@ -194,24 +187,20 @@ class ViewInventory extends Component {
               }
             </tr>
           </thead>
-          <tbody>
-            {this.state.inventories.map((item, key) =>
-              <InventoryItem
-                mode={this.props.mode}
-                idx={key}
-                edit={this.edit}
-                editQuantity={this.state.editQuantity}
-                changeQuantity={this.changeQuantity}
-                cancelEdit={this.cancelEdit}
-                finishEdit={this.finishEdit}
-                editIdx={this.state.editIdx}
-                selectInventoryItem={this.selectInventoryItem}
-                key={key}
-                item={item}
-                storages={this.state.storages}
-              />
-            )}
-          </tbody>
+          {this.state.inventories.map((item, key) =>
+            <InventoryItem
+              idx={key}
+              edit={this.edit}
+              editQuantity={this.state.editQuantity}
+              changeQuantity={this.changeQuantity}
+              cancelEdit={this.cancelEdit}
+              finishEdit={this.finishEdit}
+              editIdx={this.state.editIdx}
+              key={key}
+              item={item}
+              storages={this.state.storages}
+            />
+          )}
         </table>
         <PageBar
           pages={this.state.pages}

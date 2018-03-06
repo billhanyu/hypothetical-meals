@@ -8,6 +8,7 @@ import packageTypes from '../../Constants/PackageTypes';
 import DeleteIngredientButton from './DeleteIngredientButton';
 import VendorIngredientList from './VendorIngredientList';
 import SystemLogList from './SystemLogList';
+import QuantityByLotTable from './onclickdetails/QuantityByLotTable';
 
 class AddEditIngredient extends Component {
   constructor(props) {
@@ -178,6 +179,10 @@ class AddEditIngredient extends Component {
           <div>
             <VendorIngredientList
               ingredientId={this.state.id}
+            />
+            <QuantityByLotTable
+              withTitle={true}
+              ingredient={{id: this.state.id, native_unit: this.state.native_unit}}
             />
             {global.user_group !== "noob" &&
               <SystemLogList
