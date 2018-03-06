@@ -160,10 +160,13 @@ CREATE TABLE SystemLogs(
 CREATE TABLE ProductRuns(
 	id int not null AUTO_INCREMENT,
 	formula_id int not null,
+	num_product int not null,
+	user_id int not null,
 	lot VARCHAR(100) not null,
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
+	FOREIGN KEY (user_id) REFERENCES Users(id),
 	PRIMARY KEY (id)
 );
 
