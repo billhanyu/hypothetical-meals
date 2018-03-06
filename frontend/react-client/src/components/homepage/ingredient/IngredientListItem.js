@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import Storage2State from '../../Constants/Storage2State';
 import axios from 'axios';
+import VendorIngredientsTable from './onclickdetails/VendorIngredientsTable';
+import QuantityByLotTable from './onclickdetails/QuantityByLotTable';
 
 let noCollapseButton = false;
 
@@ -83,22 +85,9 @@ class IngredientListItem extends Component {
         <td colSpan={2} className="hiddenRow"></td>
         <td colSpan={3} className="hiddenRow">
           <div id={`vendoringredient_${this.props.idx}`} className="accordian-body collapse">
-            <table className="table">
-            <tr>
-              <th>Sold By</th>
-              <th>Price</th>
-            </tr>
-            {
-              this.state.vendoringredients.map((vendoringredient, idx) => {
-                return (
-                  <tr key={idx}>
-                    <td>{vendoringredient.vendor_name}</td>
-                    <td>{vendoringredient.price}</td>
-                  </tr>
-                );
-              })
-            }
-            </table>
+            <VendorIngredientsTable vendoringredients={this.state.vendoringredients} />
+            <div style={{'height': '20px'}} />
+            <QuantityByLotTable ingredient={this.props.ingredient} />
           </div>
         </td>
         {global.user_group == "admin" && <td colSpan={1} className="hiddenRow"></td>}
