@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import ProductionRunIngredientTable from './ProductionRunIngredientTable';
 
 class ProductionRunItem extends Component {
   render() {
@@ -17,26 +18,7 @@ class ProductionRunItem extends Component {
           <td colSpan={1} className="hiddenRow"></td>
           <td colSpan={3} className="hiddenRow">
             <div id={`productionrun_${this.props.idx}`} className="accordian-body collapse">
-              <table className="table">
-                <thead>
-                  <th>Ingredient</th>
-                  <th>Quantity</th>
-                  <th>Lot Number</th>
-                </thead>
-                <tbody>
-                  {
-                    this.props.ingredients.map((ingredient, idx) => {
-                      return (
-                        <tr key={idx}>
-                          <td>{ingredient.ingredient_name}</td>
-                          <td>{ingredient.ingredient_num_native_units}</td>
-                          <td>{ingredient.ingredient_lot_number}</td>
-                        </tr>
-                      );
-                    })
-                  }
-                </tbody>
-              </table>
+              <ProductionRunIngredientTable ingredients={this.props.ingredients} />
             </div>
           </td>
         </tr>
