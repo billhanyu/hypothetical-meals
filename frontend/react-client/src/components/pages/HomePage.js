@@ -45,7 +45,7 @@ class HomePage extends Component {
   renderComponent() {
     const funcName = this.state.funcName;
     if (funcName == "viewInventory") {
-      return <ViewInventory mode="view" />;
+      return <ViewInventory />;
     }
     else if (funcName == "register") {
       return <Registration />;

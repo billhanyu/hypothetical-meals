@@ -27,13 +27,13 @@ class IngredientListItem extends Component {
       console.log(err);
       alert('Error getting product info for ingredient');
     });
-    $('.collapse').on('show.bs.collapse', function (e) {
+    $('.collapse').unbind().on('show.bs.collapse', function (e) {
       if (noCollapseButton) {
         e.preventDefault();
         noCollapseButton = false;
       }
     });
-    $('.no-collapse').on('click', function (e) {
+    $('.no-collapse').unbind().on('click', function (e) {
       noCollapseButton = true;
     });
   }
@@ -87,7 +87,9 @@ class IngredientListItem extends Component {
           <div id={`vendoringredient_${this.props.idx}`} className="accordian-body collapse">
             <VendorIngredientsTable vendoringredients={this.state.vendoringredients} />
             <div style={{'height': '20px'}} />
-            <QuantityByLotTable ingredient={this.props.ingredient} />
+            {!this.props.order &&
+              <QuantityByLotTable ingredient={this.props.ingredient} />
+            }
           </div>
         </td>
         {global.user_group == "admin" && <td colSpan={1} className="hiddenRow"></td>}
