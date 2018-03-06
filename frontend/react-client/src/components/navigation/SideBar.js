@@ -5,8 +5,8 @@ class SideBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeLinkKey: '',
-      activeCategoryKey: 0,
+      activeLink: '',
+      activeCategory: "ingredient",
     };
     this.setActive = this.setActive.bind(this);
     this.setActiveCategory = this.setActiveCategory.bind(this);
@@ -14,13 +14,13 @@ class SideBar extends Component {
 
   setActive(key) {
     this.setState({
-      activeLinkKey: key,
+      activeLink: key,
     });
   }
 
   setActiveCategory(key) {
     this.setState({
-      activeCategoryKey: key,
+      activeCategory: key,
     });
   }
 
@@ -35,13 +35,13 @@ class SideBar extends Component {
             <a
               href="javascript:void(0)"
               role="button"
-              className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 0 ? "-Active" : "")}
-              id="category0"
+              className={"nav-link PermissionCategory" + (this.state.activeCategory == "ingredient" ? "-Active" : "")}
+              id="ingredient"
               data-parent="#SideBar"
               onClick={e => {
                 this.props.link('viewIngredients');
-                this.setActiveCategory(0);
-                this.setActive(0);
+                this.setActiveCategory("ingredient");
+                this.setActive("");
               }}>
               Ingredient
             </a>
@@ -50,13 +50,13 @@ class SideBar extends Component {
             <a
               href="javascript:void(0)"
               role="button"
-              className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 1 ? "-Active" : "")}
-              id="category1"
+              className={"nav-link PermissionCategory" + (this.state.activeCategory == "vendor" ? "-Active" : "")}
+              id="vendor"
               data-parent="#SideBar"
               onClick={e => {
                 this.props.link('viewVendors');
-                this.setActiveCategory(1);
-                this.setActive(0);
+                this.setActiveCategory("vendor");
+                this.setActive("");
               }}>
               Vendor
             </a>
@@ -65,13 +65,13 @@ class SideBar extends Component {
             <a
               href="javascript:void(0)"
               role="button"
-              className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 2 ? "-Active" : "")}
-              id="category2"
+              className={"nav-link PermissionCategory" + (this.state.activeCategory == "storage" ? "-Active" : "")}
+              id="storage"
               data-parent="#SideBar"
               onClick={e => {
                 this.props.link('viewStorages');
-                this.setActiveCategory(2);
-                this.setActive(0);
+                this.setActiveCategory("storage");
+                this.setActive("");
               }}>
               Storage
             </a>
@@ -80,16 +80,16 @@ class SideBar extends Component {
             <a
               href="#nav-inventory"
               role="button"
-              className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 3 ? "-Active" : "")}
-              id="category3"
+              className={"nav-link PermissionCategory" + (this.state.activeCategory == "inventory" ? "-Active" : "")}
+              id="inventory"
               data-toggle="collapse"
               aria-expanded="false"
               aria-controls="nav-inventory"
               data-parent="#SideBar"
               onClick={e => {
                 this.props.link('viewInventory');
-                this.setActiveCategory(3);
-                this.setActive(0);
+                this.setActiveCategory("inventory");
+                this.setActive("");
               }}>
               Inventory&nbsp;&nbsp;
               {global.user_group !== 'noob' && <i className="fa fa-caret-down"></i>}
@@ -97,22 +97,22 @@ class SideBar extends Component {
             <div className="collapse" id="nav-inventory">
               <ul className="nav flex-column">
                 <PermissionLink
-                  linkKey={9}
+                  linkKey={"logOrder"}
                   setActive={this.setActive}
-                  activeKey={this.state.activeLinkKey}
+                  activeKey={this.state.activeLink}
                   action={e => {
                     this.props.link('logOrder');
-                    this.setActiveCategory(3);
+                    this.setActiveCategory("inventory");
                   }}
                   text="Order"
                   permission="manager" />
                 <PermissionLink
-                  linkKey={16}
+                  linkKey={"produceFormula"}
                   setActive={this.setActive}
-                  activeKey={this.state.activeLinkKey}
+                  activeKey={this.state.activeLink}
                   action={e => {
                     this.props.link('produceFormulas');
-                    this.setActiveCategory(3);
+                    this.setActiveCategory("inventory");
                   }}
                   text="Produce Formulas"
                   permission="manager" />
@@ -123,11 +123,11 @@ class SideBar extends Component {
             <a
               href="#nav-log"
               role="button"
-              className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 4 ? "-Active" : "")}
-              id="category4"
+              className={"nav-link PermissionCategory" + (this.state.activeCategory == "log" ? "-Active" : "")}
+              id="log"
               onClick={e=>{
-                this.setActiveCategory(4);
-                this.setActive(0);
+                this.setActiveCategory("log");
+                this.setActive("");
               }}
               data-toggle="collapse"
               aria-expanded="false"
@@ -140,32 +140,32 @@ class SideBar extends Component {
             <div className="collapse" id="nav-log">
               <ul className="nav flex-column">
                 <PermissionLink
-                  linkKey={11}
+                  linkKey={"spendingLog"}
                   setActive={this.setActive}
-                  activeKey={this.state.activeLinkKey}
+                  activeKey={this.state.activeLink}
                   action={e => {
                     this.props.link('spendingLog');
-                    this.setActiveCategory(4);
+                    this.setActiveCategory("log");
                   }}
                   text="Spending Log"
                   permission="noob" />
                 <PermissionLink
-                  linkKey={14}
+                  linkKey={"productionLog"}
                   setActive={this.setActive}
-                  activeKey={this.state.activeLinkKey}
+                  activeKey={this.state.activeLink}
                   action={e => {
                     this.props.link('productionLog');
-                    this.setActiveCategory(4);
+                    this.setActiveCategory("log");
                   }}
                   text="Production Log"
                   permission="noob" />
                 <PermissionLink
-                  linkKey={20}
+                  linkKey={"systemLog"}
                   setActive={this.setActive}
-                  activeKey={this.state.activeLinkKey}
+                  activeKey={this.state.activeLink}
                   action={e => {
                     this.props.link('systemLog');
-                    this.setActiveCategory(4);
+                    this.setActiveCategory("log");
                   }}
                   text="System Log"
                   permission="manager" />
@@ -178,11 +178,11 @@ class SideBar extends Component {
               <a
                 href="#nav-user"
                 role="button"
-                className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 5 ? "-Active" : "")}
-                id="category5"
+                className={"nav-link PermissionCategory" + (this.state.activeCategory == "user" ? "-Active" : "")}
+                id="user"
                 onClick={e=>{
-                  this.setActiveCategory(5);
-                  this.setActive(0);
+                  this.setActiveCategory("user");
+                  this.setActive("");
                 }}
                 data-toggle="collapse"
                 aria-expanded="false"
@@ -195,22 +195,22 @@ class SideBar extends Component {
               <div className="collapse" id="nav-user">
                 <ul className="nav flex-column">
                   <PermissionLink
-                    linkKey={12}
+                    linkKey={"register"}
                     setActive={this.setActive}
-                    activeKey={this.state.activeLinkKey}
+                    activeKey={this.state.activeLink}
                     action={e => {
                       this.props.link('register');
-                      this.setActiveCategory(5);
+                      this.setActiveCategory("user");
                     }}
                     text="Sign Up User"
                     permission="admin" />
                   <PermissionLink
-                    linkKey={13}
+                    linkKey={"changePermission"}
                     setActive={this.setActive}
-                    activeKey={this.state.activeLinkKey}
+                    activeKey={this.state.activeLink}
                     action={e => {
                       this.props.link('changePermission');
-                      this.setActiveCategory(5);
+                      this.setActiveCategory("user");
                     }}
                     text="Permission"
                     permission="admin" />
@@ -222,12 +222,12 @@ class SideBar extends Component {
             <a
               href="#nav-formula"
               role="button"
-              className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 6 ? "-Active" : "")}
-              id="category6"
+              className={"nav-link PermissionCategory" + (this.state.activeCategory == "formula" ? "-Active" : "")}
+              id="formula"
               onClick={e=>{
                 this.props.link('viewFormulas');
-                this.setActiveCategory(6);
-                this.setActive(0);
+                this.setActiveCategory("formula");
+                this.setActive("");
               }}
               data-toggle="collapse"
               aria-expanded="false"
@@ -247,22 +247,22 @@ class SideBar extends Component {
               <div className="collapse" id="nav-formula">
                 <ul className="nav flex-column">
                   <PermissionLink
-                    linkKey={17}
+                    linkKey="newFormula"
                     setActive={this.setActive}
-                    activeKey={this.state.activeLinkKey}
+                    activeKey={this.state.activeLink}
                     action={e => {
                       this.props.link('NewFormula');
-                      this.setActiveCategory(6);
+                      this.setActiveCategory("formula");
                     }}
                     text="New Formula"
                     permission="admin" />
                   <PermissionLink
-                    linkKey={15}
+                    linkKey="editFormula"
                     setActive={this.setActive}
-                    activeKey={this.state.activeLinkKey}
+                    activeKey={this.state.activeLink}
                     action={e => {
                       this.props.link('EditFormula');
-                      this.setActiveCategory(6);
+                      this.setActiveCategory("formula");
                     }}
                     text="Edit Existing Formula"
                     permission="admin" />
