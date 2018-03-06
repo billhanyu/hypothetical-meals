@@ -20,6 +20,7 @@ import ViewAllFormulas from '../homepage/inventory/ViewAllFormulas.js';
 import ProductionLog from '../homepage/productionlog/ProductionLog';
 import SystemLog from '../homepage/systemlog/SystemLog';
 import ProductionRun from '../homepage/productionrun/ProductionRun';
+import RecallReport from '../homepage/recallreport/RecallReport';
 
 class HomePage extends Component {
   constructor(props) {
@@ -68,6 +69,9 @@ class HomePage extends Component {
     }
     else if (funcName == "productionLog") {
       return <ProductionLog />;
+    }
+    else if (funcName == "recallReport") {
+      return <RecallReport />;
     }
     else if (funcName == "viewIngredients") {
       return <NewIngredientList />;

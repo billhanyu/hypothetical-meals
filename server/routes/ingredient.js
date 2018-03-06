@@ -31,6 +31,15 @@ export function view(req, res, next) {
     });
 }
 
+export function viewAll(req, res, next) {
+  connection.query('SELECT * FROM Ingredients')
+    .then(results => res.json(results))
+    .catch(err => {
+      console.error(err);
+      return res.status(500).send('Database error');
+    });
+}
+
 export function viewWithId(req, res, next) {
   if (!req.params.id || !checkNumber.isPositiveInteger(req.params.id)) {
     return res.status(400).send('Invalid ingredient id');
