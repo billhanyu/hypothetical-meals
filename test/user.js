@@ -408,5 +408,35 @@ describe('User', () => {
           done();
         });
     });
+
+    it('Reject noob trying to user delete', () => {
+      chai.request(server)
+        .post('/users/delete')
+        .send({
+          'user': {
+            'username': 'noob',
+          },
+        })
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('Reject manager trying to user delete', () => {
+      chai.request(server)
+        .post('/users/delete')
+        .send({
+          'user': {
+            'username': 'noob',
+          },
+        })
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
   });
 });
