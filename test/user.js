@@ -370,4 +370,43 @@ describe('User', () => {
         });
     });
   });
+
+  describe('#delete()', () => {
+    beforeEach(() => {
+      alasql('SOURCE "./server/create_database.sql"');
+      alasql('SOURCE "./server/sample_data.sql"');
+    });
+
+    it('User 4 is successfully deleted', () => {
+      chai.request(server)
+        .post('/users/delete')
+        .send({
+          'user': {
+            'username': 'noob',
+          },
+        })
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          const user = alasql(`SELECT * FROM Users WHERE username = 'noob'`);
+          assert.strictEqual(user.removed, 1, 'Is fake removed');
+          done();
+        });
+    });
+
+    it('Nonexistent user is unsuccessfully deleted', () => {
+      chai.request(server)
+        .post('/users/delete')
+        .send({
+          'user': {
+            'username': 'foobar',
+          },
+        })
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+  });
 });
