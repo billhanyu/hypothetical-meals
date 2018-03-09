@@ -4,6 +4,7 @@ import InventoryItem from './InventoryItem';
 import FilterBar from './FilterBar';
 import PageBar from '../../GeneralComponents/PageBar';
 import storage2State from '../../Constants/Storage2State';
+import AddEditIngredient from '../ingredient/AddEditIngredient';
 
 class ViewInventory extends Component {
   constructor(props) {
@@ -16,6 +17,7 @@ class ViewInventory extends Component {
       editIdx: -1,
       pages: 0,
       currentPage: 1,
+      viewingIdx: -1,
     };
     this.filterIngredient = this.filterIngredient.bind(this);
     this.filterTemp = this.filterTemp.bind(this);
@@ -25,6 +27,8 @@ class ViewInventory extends Component {
     this.cancelEdit = this.cancelEdit.bind(this);
     this.changeQuantity = this.changeQuantity.bind(this);
     this.finishEdit = this.finishEdit.bind(this);
+    this.viewIngredient = this.viewIngredient.bind(this);
+    this.backToList = this.backToList.bind(this);
   }
 
   componentDidMount() {
@@ -78,6 +82,18 @@ class ViewInventory extends Component {
     }
     this.setState({
       inventories: filtered,
+    });
+  }
+
+  viewIngredient(idx) {
+    this.setState({
+      viewingIdx: idx,
+    });
+  }
+
+  backToList() {
+    this.setState({
+      viewingIdx: -1,
     });
   }
 
@@ -166,7 +182,25 @@ class ViewInventory extends Component {
 
   render() {
     const columnClass = global.user_group == "admin" ? "OneFifthWidth" : "OneFourthWidth";
-    return (
+    
+    const view =
+      <AddEditIngredient
+        mode="edit"
+        ingredient={this.state.inventories[this.state.viewingIdx] ? {
+          id: this.state.inventories[this.state.viewingIdx].ingredient_id,
+          name: this.state.inventories[this.state.viewingIdx].ingredient_name,
+          native_unit: this.state.inventories[this.state.viewingIdx].ingredient_native_unit,
+          num_native_units: this.state.inventories[this.state.viewingIdx].ingredient_num_native_units,
+          package_type: this.state.inventories[this.state.viewingIdx].ingredient_package_type,
+          removed: {
+            data: [false]
+          },
+          storage_id: this.state.inventories[this.state.viewingIdx].ingredient_storage_id,
+          storage_name: this.state.inventories[this.state.viewingIdx].ingredient_storage_name
+        } : null}
+        backToList={this.backToList}
+      />;
+    const main = 
       <div>
         <h2>Inventory</h2>
         <FilterBar
@@ -180,6 +214,7 @@ class ViewInventory extends Component {
               <th className={columnClass}>Ingredient Name</th>
               <th className={columnClass}>Temperature State</th>
               <th className={columnClass}>Package Type</th>
+              <th className={columnClass}>Storage Space Taken</th>
               <th className={columnClass}>Quantity</th>
               {
                 global.user_group == "admin" &&
@@ -199,6 +234,7 @@ class ViewInventory extends Component {
               key={key}
               item={item}
               storages={this.state.storages}
+              viewIngredient={this.viewIngredient}
             />
           )}
         </table>
@@ -207,8 +243,13 @@ class ViewInventory extends Component {
           selectPage={this.selectPage}
           currentPage={this.state.currentPage}
         />
-      </div>
-    );
+      </div>;
+
+    if (this.state.viewingIdx > -1) {
+      return view;
+    } else {
+      return main;
+    }
   }
 }
 
