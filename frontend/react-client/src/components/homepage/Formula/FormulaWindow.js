@@ -6,7 +6,6 @@ import axios from 'axios';
 
 class FormulaWindow extends Component {
   constructor(props) {
-    console.log(props.newFormulaObject);
     super(props);
     this.handleInputChange = this.handleInputChange.bind(this);
     const name = props.newFormulaObject != null ? props.newFormulaObject.name : '';
@@ -100,13 +99,11 @@ class FormulaWindow extends Component {
 
   _onFinish() {
     const isNameEmpty = this.state.name == '' || this.state.name == null;
-    const isDescEmpty = this.state.desc == '' || this.state.desc == null;
     const isQuantityEmpty = this.state.quantity == '' || this.state.quantity == null || isNaN(Number(this.state.quantity)) || Number(this.state.quantity <= 0);
     const isIngredEmpty = this.state.values.length == 0;
-    if (isNameEmpty || isDescEmpty || isQuantityEmpty || isIngredEmpty) {
+    if (isNameEmpty || isQuantityEmpty || isIngredEmpty) {
       return this.setState({
         nameError: isNameEmpty,
-        descError: isDescEmpty,
         quantityError: isQuantityEmpty,
         ingredError: isIngredEmpty,
       });
@@ -126,7 +123,10 @@ class FormulaWindow extends Component {
       });
 
       const id = this.props.activeId;
-
+      console.log(id);
+      console.log(ingredients);
+      console.log(name);
+      console.log(description);
       axios.put(`/formulas`, {
         'formulas': [
           {
@@ -193,7 +193,7 @@ class FormulaWindow extends Component {
         <FormulaInput readOnly={readOnly} error={this.state.quantityError} errorText="Invalid Quantity" value={this.state.quantity} id="quantity" onChange={this.handleInputChange} HeaderText="Quantity Created" ContentText="Total quantity created per instance of formula recipe / ingredient usage" placeholder="Quantity Created" inputStyle={{ marginTop: '12px' }} />
         {
           global.user_group == "admin" &&
-          <FormulaButton text={this.props.isEditing ? "Edit Formula" : "Create New Formula"} onChange={this.handleInputChange} onClick={this._onFinish.bind(this)} />
+          <FormulaButton text={this.props.isEditing ? "Edit Formula" : "Create New Formula"} onClick={this._onFinish.bind(this)} />
         }
         <div style={{ clear: 'both' }}></div>
       </div>
