@@ -15,7 +15,7 @@ class BulkImport extends Component {
     }
     const data = new FormData();
     data.set('bulk', this.file);
-    axios.post('/ingredients/import', data, {
+    axios.post(this.props.endpoint, data, {
       headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
@@ -43,7 +43,7 @@ class BulkImport extends Component {
           </div>
         </div>
         <div className="row justify-content-md-center">
-          Ensure that the file is a CSV and follows the formatting as specified&nbsp;<a href="https://docs.google.com/document/d/1DqN-inj9gwBsP0KkM6SLA1_k99LFfSPNXxRe0fuBmhg/edit#">here</a>.
+          Ensure that the file is a CSV and follows the formatting as specified&nbsp;<a href="https://docs.google.com/document/d/16f1LWxIjfKP0TyBoFHA8kD1QVAxxAlrP-fcYXV0vW9M/edit#">here</a>.
         </div>
       </div>
     );

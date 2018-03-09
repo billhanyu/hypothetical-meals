@@ -83,7 +83,8 @@ function addIngredientHelper(ingredients, req, res, next) {
       });
       return logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} added.`);
     })
-    .then(() => success(res))
+    .then(() => connection.query(`SELECT id FROM Ingredients ORDER BY id DESC LIMIT ${ingredientsToAdd.length}`))
+    .then(results => res.json(results.map(entry => entry.id)))
     .catch(err => handleError(err, res));
 }
 

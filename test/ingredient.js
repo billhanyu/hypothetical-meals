@@ -86,7 +86,7 @@ describe('Ingredient', () => {
         });
     });
 
-    it('should add a new ingredient', (done) => {
+    it('should add new ingredients', (done) => {
       chai.request(server)
       .post('/ingredients')
       .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -110,6 +110,7 @@ describe('Ingredient', () => {
       })
       .end((err, res) => {
         res.should.have.status(200);
+        assert.strictEqual(res.body.length, 2, 'return added ids');
         const changed = alasql('SELECT * FROM Ingredients');
         assert.strictEqual(changed[4]['name'], 'turkey', 'Name for ingredient 4.');
         assert.strictEqual(changed[4]['package_type'], 'sail', 'Package type ingredient 4.');
@@ -453,12 +454,12 @@ describe('Ingredient', () => {
 
 
         const ingredients = alasql(`SELECT * FROM Ingredients`);
-        assert.strictEqual(ingredients.length, 4 + 5, 'Five of six ingredients added to ingredients table.');
+        assert.strictEqual(ingredients.length, 4 + 6, 'Sixc of six ingredients added to ingredients table.');
 
         const vendorsIngredients = alasql(`SELECT * FROM VendorsIngredients`);
         assert.strictEqual(vendorsIngredients.length, 4 + 6, 'Six of six vendor ingredients added to vendor ingredients table.');
 
-        const newVendorIngredient = vendorsIngredients.find(vendorsIngredient => vendorsIngredient.ingredient_id == 8 && vendorsIngredient.price == 32.1 && vendorsIngredient.vendor_id == 1);
+        const newVendorIngredient = vendorsIngredients.find(vendorsIngredient => vendorsIngredient.ingredient_id == 9 && vendorsIngredient.price == 32.1 && vendorsIngredient.vendor_id == 1);
         assert.notEqual(newVendorIngredient, null, 'Potatoes-drum ingredient added exactly once with correct price, vendor, and package type');
         newVendorIngredient.should.not.be.a('array');
 

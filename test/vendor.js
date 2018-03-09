@@ -31,6 +31,20 @@ describe('Vendor', () => {
     });
   });
 
+  describe('#viewAvailable()', () => {
+    it('should return all vendors', (done) => {
+      chai.request(server)
+        .get('/vendors-available')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(2);
+          done();
+        });
+    });
+  });
+
   describe('#viewWithId()', () => {
     it('should return vendor with id', (done) => {
       chai.request(server)

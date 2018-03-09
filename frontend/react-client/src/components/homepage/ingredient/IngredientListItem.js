@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import Storage2State from '../../Constants/Storage2State';
 import axios from 'axios';
+import VendorIngredientsTable from './onclickdetails/VendorIngredientsTable';
+import QuantityByLotTable from './onclickdetails/QuantityByLotTable';
 
 let noCollapseButton = false;
 
@@ -25,13 +27,13 @@ class IngredientListItem extends Component {
       console.log(err);
       alert('Error getting product info for ingredient');
     });
-    $('.collapse').on('show.bs.collapse', function (e) {
+    $('.collapse').unbind().on('show.bs.collapse', function (e) {
       if (noCollapseButton) {
         e.preventDefault();
         noCollapseButton = false;
       }
     });
-    $('.no-collapse').on('click', function (e) {
+    $('.no-collapse').unbind().on('click', function (e) {
       noCollapseButton = true;
     });
   }
@@ -83,22 +85,11 @@ class IngredientListItem extends Component {
         <td colSpan={2} className="hiddenRow"></td>
         <td colSpan={3} className="hiddenRow">
           <div id={`vendoringredient_${this.props.idx}`} className="accordian-body collapse">
-            <table className="table">
-            <tr>
-              <th>Sold By</th>
-              <th>Price</th>
-            </tr>
-            {
-              this.state.vendoringredients.map((vendoringredient, idx) => {
-                return (
-                  <tr key={idx}>
-                    <td>{vendoringredient.vendor_name}</td>
-                    <td>{vendoringredient.price}</td>
-                  </tr>
-                );
-              })
+            <VendorIngredientsTable vendoringredients={this.state.vendoringredients} />
+            <div style={{'height': '20px'}} />
+            {!this.props.order &&
+              <QuantityByLotTable ingredient={this.props.ingredient} />
             }
-            </table>
           </div>
         </td>
         {global.user_group == "admin" && <td colSpan={1} className="hiddenRow"></td>}

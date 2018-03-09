@@ -50,21 +50,6 @@ class SideBar extends Component {
             <a
               href="javascript:void(0)"
               role="button"
-              className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 7 ? "-Active" : "")}
-              id="category7"
-              data-parent="#SideBar"
-              onClick={e => {
-                this.props.link('viewFormulas');
-                this.setActiveCategory(7);
-                this.setActive(0);
-              }}>
-              View All Formulas
-            </a>
-          </li>
-          <li className="nav-item">
-            <a
-              href="javascript:void(0)"
-              role="button"
               className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 1 ? "-Active" : "")}
               id="category1"
               data-parent="#SideBar"
@@ -233,25 +218,31 @@ class SideBar extends Component {
               </div>
             </li>
           }
-          {
-            global.user_group == "admin" &&
-            <li className="nav-item">
-              <a
-                href="#nav-formula"
-                role="button"
-                className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 6 ? "-Active" : "")}
-                id="category6"
-                onClick={e=>{
-                  this.setActiveCategory(6);
-                  this.setActive(0);
-                }}
-                data-toggle="collapse"
-                aria-expanded="false"
-                aria-controls="nav-formula"
-                data-parent="#SideBar"
-              >
-                Formula&nbsp;&nbsp;
-            <i className="fa fa-caret-down"></i>
+          <li className="nav-item">
+            <a
+              href="#nav-formula"
+              role="button"
+              className={"nav-link PermissionCategory" + (this.state.activeCategoryKey == 6 ? "-Active" : "")}
+              id="category6"
+              onClick={e=>{
+                this.props.link('viewFormulas');
+                this.setActiveCategory(6);
+                this.setActive(0);
+              }}
+              data-toggle="collapse"
+              aria-expanded="false"
+              aria-controls="nav-formula"
+              data-parent="#SideBar"
+            >
+              Formula
+              {
+                global.user_group == "admin" &&
+                <span>&nbsp;&nbsp;</span>
+              }
+              {
+                global.user_group == "admin" &&
+                <i className="fa fa-caret-down"></i>
+              }
               </a>
               <div className="collapse" id="nav-formula">
                 <ul className="nav flex-column">
@@ -278,7 +269,6 @@ class SideBar extends Component {
                 </ul>
               </div>
             </li>
-          }
           <li className="nav-item">
             <a
               className="nav-link active PermissionCategory"
