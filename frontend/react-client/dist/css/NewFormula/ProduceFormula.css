@@ -18,6 +18,14 @@
   margin-bottom: 40px;
 }
 
+.ProduceFormulaListItemRow {
+  cursor: pointer;
+}
+
+.ProduceFormulaListItemRow:hover {
+  background-color:#EDEDED;
+}
+
 .ProduceFormulaListItem .ProduceFormulaListItemContainer {
   background-color: #FAFAFA;
   border-bottom: 1px solid #6B6B6B;
