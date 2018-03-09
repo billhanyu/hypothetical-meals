@@ -20,10 +20,10 @@ export function signupManager(req, res, next) {
 function signupUser(req, res, next, userGroup) {
   const error = checkParams.checkBlankParams(req.body.user, ['username', 'name', 'password']);
   if (error) return res.status(422).send(error);
-  
+
   let regex = new RegExp('^([ \u00c0-\u01ffa-zA-Z\'\-])+$');
   if (req.body.user.name && !regex.test(req.body.user.name)) return res.status(422).send('Invalid characters used in name');
-  
+
   let user = new User(req.body.user);
   user.setPassword(req.body.user.password);
   
@@ -40,7 +40,7 @@ function signupUser(req, res, next, userGroup) {
   .catch((error) => {
     if (error.code == 'ER_DUP_ENTRY') return res.status(422).json('Username is already registered');
     else if (error.code == 'ER_DATA_TOO_LONG') return res.status(422).json('Username or name is too long');
-    else console.log(error);
+    else handleError(error, res);
   });
 }
 

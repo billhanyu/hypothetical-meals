@@ -57,42 +57,19 @@ class EditFormula extends Component {
     });
   }
 
-  onUpdate(newFormulaObject, id){
-    const {name, desc, quantity, idToQuantityMap} = newFormulaObject;
-    //PUT REQUEST HERE
-    const ingredients = [];
-    const self = this;
-    Object.keys(idToQuantityMap).forEach(key => {
-      if(Number(idToQuantityMap[key]) > 0){
-        ingredients.push({
-          ingredient_id: key,
-          num_native_units: idToQuantityMap[key],
-        });
-      }
-    });
-
-    axios.put(`/formulas`, {'formulas':[
-      {
-          id,
-          name,
-          description: desc,
-          num_product: quantity,
-          ingredients,
-      }
-    ]}, {
+  onUpdate(){
+    axios.get(`/formulas`, {
       headers: {Authorization: "Token " + global.token}
-    }).then(response => {
-      axios.get(`/formulas`, {
-        headers: {Authorization: "Token " + global.token}
-      })
-      .then(response => {
-        self.setState({
-          open: true,
-          snackbarText: 'Finished Updating Formula',
-          EditFormulaBoxes: response.data,
-        });
+    })
+    .then(response => {
+      this.setState({
+        open: true,
+        snackbarText: 'Finished Updating Formula',
+        EditFormulaBoxes: response.data,
       });
-    }).catch(error => {
+    })
+    .catch(error => {
+      console.error(error);
       alert("Error updating Formula");
       console.log(error.response);
     });
@@ -133,7 +110,7 @@ class EditFormula extends Component {
           <div>
           {
             this.state.EditFormulaBoxes.map((element, key) => {
-              return <EditFormulaBox id={element.id} key={key} onClick={this.openEditWindow} onDelete={this.onDelete} FormulaPrefill={element} />
+              return <EditFormulaBox id={element.id} key={key} onClick={this.openEditWindow} onDelete={this.onDelete} FormulaPrefill={element} />;
             })
           }
           </div>

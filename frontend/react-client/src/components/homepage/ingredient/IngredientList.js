@@ -162,7 +162,7 @@ class IngredientList extends Component {
       />;
 
     const bulkImport =
-    <BulkImport backToList={this.backToList} />;
+    <BulkImport endpoint='/ingredients/import' backToList={this.backToList} />;
 
     const main =
     <div>
@@ -228,7 +228,7 @@ class IngredientList extends Component {
           </div>
         </div>
       </div>
-      <PageBar pages={this.state.pages} selectPage={this.selectPage} />
+      <PageBar pages={this.state.pages} selectPage={this.selectPage} currentPage={this.state.page} />
     </div>;
 
     const add =

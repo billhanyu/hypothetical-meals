@@ -19,11 +19,17 @@ No parameter required.
 {% endmethod %}
 
 {% method %}
-## GET '/vendors-available/page/:page_num'
+## GET '/vendors/id/:id'
 
-Get all available vendors (where removed == 0).
+Get vendor with id.
 
-No parameter required.
+{% endmethod %}
+
+{% method %}
+## GET '/vendors-available'
+
+Get all available vendors (removed = 0).
+
 {% endmethod %}
 
 {% method %}

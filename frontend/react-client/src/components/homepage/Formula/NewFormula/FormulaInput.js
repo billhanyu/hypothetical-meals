@@ -32,7 +32,9 @@ class FormulaInput extends Component {
           <div className="FormulaTextContent">{this.props.ContentText}</div>
         </div>
         {
-          this.props.useTextArea ? <textarea value={this.props.value != null ? this.props.value : null} onChange={this._handleChange.bind(this)}></textarea> : <input onChange={this._handleChange.bind(this)} value={this.props.value != null ? this.props.value : null} style={this.props.inputStyle} placeholder={this.props.placeholder}/>
+          this.props.useTextArea
+            ? <textarea readOnly={this.props.readOnly} value={this.props.value != null ? this.props.value : null} onChange={this._handleChange.bind(this)}></textarea>
+            : <input readOnly={this.props.readOnly} onChange={this._handleChange.bind(this)} value={this.props.value != null ? this.props.value : null} style={this.props.inputStyle} placeholder={this.props.placeholder}/>
         }
         {
           this.props.error ? <div className="FormulaTextError">

@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
 
 class SystemLogFilterBar extends Component {
+  constructor(props) {
+    super(props);
+  }
+
   render() {
     return (
       <form>
         <div className="row">
           <div className="col">
             <div className="form-group">
-              <label htmlFor="name">Ingredient Name</label>
+              <label htmlFor="name">Description</label>
               <input type="text" className="form-control" id="name" value={this.props.filterName} onChange={this.props.changeName} />
             </div>
           </div>
@@ -30,6 +34,7 @@ class SystemLogFilterBar extends Component {
             </div>
           </div>
         </div>
+        <button type="button" className="btn btn-secondary" onClick={this.props.clearFilter}>Clear</button>
       </form>
     );
   }

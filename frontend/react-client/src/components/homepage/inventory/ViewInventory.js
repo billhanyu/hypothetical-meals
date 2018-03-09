@@ -15,11 +15,11 @@ class ViewInventory extends Component {
       editQuantity: 0,
       editIdx: -1,
       pages: 0,
+      currentPage: 1,
     };
     this.filterIngredient = this.filterIngredient.bind(this);
     this.filterTemp = this.filterTemp.bind(this);
     this.filterPackage = this.filterPackage.bind(this);
-    this.selectInventoryItem = this.selectInventoryItem.bind(this);
     this.selectPage = this.selectPage.bind(this);
     this.edit = this.edit.bind(this);
     this.cancelEdit = this.cancelEdit.bind(this);
@@ -81,12 +81,6 @@ class ViewInventory extends Component {
     });
   }
 
-  selectInventoryItem(item) {
-    if (this.props.onClickInventoryItem) {
-      this.props.onClickInventoryItem(item);
-    }
-  }
-
   edit(idx) {
     this.setState({
       editIdx: idx,
@@ -130,6 +124,9 @@ class ViewInventory extends Component {
   }
 
   selectPage(idx) {
+    this.setState({
+      currentPage: idx,
+    });
     const self = this;
     let allInventories;
     axios.get(`/inventory/page/${idx}`, {
@@ -190,28 +187,25 @@ class ViewInventory extends Component {
               }
             </tr>
           </thead>
-          <tbody>
-            {this.state.inventories.map((item, key) =>
-              <InventoryItem
-                mode={this.props.mode}
-                idx={key}
-                edit={this.edit}
-                editQuantity={this.state.editQuantity}
-                changeQuantity={this.changeQuantity}
-                cancelEdit={this.cancelEdit}
-                finishEdit={this.finishEdit}
-                editIdx={this.state.editIdx}
-                selectInventoryItem={this.selectInventoryItem}
-                key={key}
-                item={item}
-                storages={this.state.storages}
-              />
-            )}
-          </tbody>
+          {this.state.inventories.map((item, key) =>
+            <InventoryItem
+              idx={key}
+              edit={this.edit}
+              editQuantity={this.state.editQuantity}
+              changeQuantity={this.changeQuantity}
+              cancelEdit={this.cancelEdit}
+              finishEdit={this.finishEdit}
+              editIdx={this.state.editIdx}
+              key={key}
+              item={item}
+              storages={this.state.storages}
+            />
+          )}
         </table>
         <PageBar
           pages={this.state.pages}
           selectPage={this.selectPage}
+          currentPage={this.state.currentPage}
         />
       </div>
     );

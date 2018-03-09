@@ -75,6 +75,7 @@ app.delete('/users/delete', beAdmin, user.deleteUser);
 
 app.get('/vendors/pages', beNoob, vendor.pages);
 app.get('/vendors/page/:page_num', beNoob, vendor.view);
+app.get('/vendors-available', beNoob, vendor.viewAvailable);
 app.get('/vendors/id/:id', beNoob, vendor.viewWithId);
 app.post('/vendors', beAdmin, vendor.addVendors);
 app.put('/vendors', beAdmin, vendor.modifyVendors);
@@ -125,6 +126,7 @@ app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
 app.put('/inventory', beManager, inventory.commitCart);
 
 app.get('/formulas', beNoob, formulas.viewAll);
+app.get('/formulas/id/:id', beNoob, formulas.viewAll);
 app.get('/formulas/pages', beNoob, formulas.pages);
 app.get('/formulas/page/:page_num', beNoob, formulas.view);
 app.put('/formulas', beAdmin, formulas.modify);
