@@ -123,10 +123,6 @@ class FormulaWindow extends Component {
       });
 
       const id = this.props.activeId;
-      console.log(id);
-      console.log(ingredients);
-      console.log(name);
-      console.log(description);
       axios.put(`/formulas`, {
         'formulas': [
           {
