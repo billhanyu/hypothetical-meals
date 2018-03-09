@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import QuantityByLotTable from '../ingredient/onclickdetails/QuantityByLotTable';
+import packageSpaceMap from '../../Constants/PackageSpaceMap';
 
 let noCollapseButton = false;
 
@@ -30,9 +31,11 @@ class InventoryItem extends Component {
     return (
       <tbody>
         <tr data-toggle="collapse" data-target={`#inventory_${this.props.idx}`} className="accordion-toggle tablerow-hover">
-          <td className={columnClass}>{ingredient_name}</td>
+          <td className={columnClass}><a href="javascript:void(0)" onClick={e=>this.props.viewIngredient(this.props.idx)}>{ingredient_name}</a></td>
           <td className={columnClass}>{ingredient_temperature_state}</td>
           <td className={columnClass}>{ingredient_package_type}</td>
+          <td className={columnClass}>{(packageSpaceMap[ingredient_package_type] * num_packages).toFixed(1) + ' sqft'}</td>
+
           <td className={columnClass}>{
             this.props.editIdx == this.props.idx
               ?
