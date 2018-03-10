@@ -96,10 +96,10 @@ export function modifyQuantities(req, res, next) {
     })
     .then((results) => {
       let modified = results.map(x => {
-        return `${x.name}: ${x.num_packages * x.num_native_units} ${x.native_unit}`;
+        return `${x.name}: ${x.num_packages * x.num_native_units} ${x.native_unit} in lot ${x.lot}`;
       });
       let nameStrings = results.map(x => {
-        return `${x.name}{ingredient_id: ${x.ingredient_id}}`;
+        return `{${x.name}=ingredient_id=${x.ingredient_id}}`;
       });
       logAction(req.payload.id, `CORRECTION: Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} modified. Inventory now has ${modified.join(', ')}.`);
     })
@@ -236,7 +236,7 @@ function checkChangesProperties(changes) {
     }
     const value = changes[id];
     if (!parseFloat(value) && parseFloat(value) !== 0 || parseFloat(value) < 0) {
-      throw createError(`new inventory quantity ${value} invalid.`);
+      throw createError(`new inventory quantity invalid.`);
     }
   }
 }
