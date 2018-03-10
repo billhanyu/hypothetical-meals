@@ -26,57 +26,26 @@ class InventoryItem extends Component {
       = this.props.item;
     const rawQuantity = num_packages * ingredient_num_native_units;
     const quantity = rawQuantity.toFixed(2);
-    const columnClass = global.user_group == "admin" ? "OneFifthWidth" : "OneFourthWidth";
+    const columnClass = "OneFourthWidth";
     return (
       <tbody>
         <tr data-toggle="collapse" data-target={`#inventory_${this.props.idx}`} className="accordion-toggle tablerow-hover">
           <td className={columnClass}>{ingredient_name}</td>
           <td className={columnClass}>{ingredient_temperature_state}</td>
           <td className={columnClass}>{ingredient_package_type}</td>
-          <td className={columnClass}>{
-            this.props.editIdx == this.props.idx
-              ?
-              <input type="number" onChange={this.props.changeQuantity} value={this.props.editQuantity} />
-              :
-              `${quantity}  ${ingredient_native_unit}`
-          }</td>
-          {
-            global.user_group == 'admin' && this.props.editIdx !== this.props.idx &&
-            <td className={columnClass}>
-              <button
-                type="button"
-                className="btn btn-secondary no-collapse"
-                onClick={e => this.props.edit(this.props.idx)}>
-                Edit
-              </button>
-            </td>
-          }
-          {
-            global.user_group == 'admin' && this.props.editIdx == this.props.idx &&
-            <td className={columnClass}>
-              <div className="btn-group" role="group" aria-label="Basic example">
-                <button
-                  type="button"
-                  className="btn btn-secondary no-collapse"
-                  onClick={this.props.cancelEdit}>
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary no-collapse"
-                  onClick={this.props.finishEdit}>
-                  Confirm
-                </button>
-              </div>
-            </td>
-          }
+          <td className={columnClass}>{quantity} {ingredient_native_unit}</td>
         </tr>
         <tr>
           <td colSpan={1} className="hiddenRow"></td>
           <td colSpan={3} className="hiddenRow">
             <div id={`inventory_${this.props.idx}`} className="accordian-body collapse">
               <QuantityByLotTable
-                ingredient={{id: this.props.item.ingredient_id, native_unit: ingredient_native_unit}}
+                ingredient={{
+                  id: this.props.item.ingredient_id,
+                  native_unit: ingredient_native_unit,
+                  num_native_units: ingredient_num_native_units,
+                }}
+                refreshInventories={this.props.reloadData}
               />
             </div>
           </td>
@@ -98,13 +67,8 @@ InventoryItem.propTypes = {
     ingredient_native_unit: PropTypes.string,
   }),
   mode: PropTypes.string,
-  editIdx: PropTypes.number,
-  idx: PropTypes.number,
-  cancelEdit: PropTypes.func,
-  finishEdit: PropTypes.func,
-  changeQuantity: PropTypes.func,
-  editQuantity: PropTypes.func,
-  edit: PropTypes.func,
+  idx: PropTypes.number.isRequired,
+  reloadData: PropTypes.func,
 };
 
 export default InventoryItem;
