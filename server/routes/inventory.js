@@ -198,6 +198,7 @@ export function modifyInventoryQuantitiesPromise(changes) {
       checkChangesProperties(changes);
     } catch (err) {
       reject(err);
+      return;
     }
     const ids = Object.keys(changes);
     const cases = [];
