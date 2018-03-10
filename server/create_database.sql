@@ -114,7 +114,7 @@ CREATE TABLE SpendingLogs(
 CREATE TABLE Formulas(
 	id int not null AUTO_INCREMENT,
 	intermediate BIT DEFAULT 0,
-	--below are not used for final products
+	-- below are not used for final products
 	ingredient_id int,
 	-- above are not used for final products
 	name varchar(70) not null UNIQUE,
