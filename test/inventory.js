@@ -90,6 +90,9 @@ describe('Inventory', () => {
           assert.strictEqual(lots[0].quantity, 100, 'lot ff quantity');
           assert.strictEqual(lots[1].quantity, 200, 'lot bb quantity');
           assert.strictEqual(lots[2].quantity, 300, 'lot cc quantity');
+          assert.strictEqual(lots[0].inventory_id, 1, 'lot ff inventory id');
+          assert.strictEqual(lots[1].inventory_id, 2, 'lot bb inventory id');
+          assert.strictEqual(lots[2].inventory_id, 3, 'lot cc inventory id');
           done();
         });
     });

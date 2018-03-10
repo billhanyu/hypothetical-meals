@@ -63,6 +63,7 @@ export function getLotQuantities(req, res, next) {
   .then(results => {
     const lots = results.map(entry => {
       return {
+        inventory_id: entry.id,
         lot: entry.lot,
         quantity: entry.num_native_units * entry.num_packages,
       };
