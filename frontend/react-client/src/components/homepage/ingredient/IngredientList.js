@@ -164,6 +164,8 @@ class IngredientList extends Component {
     const bulkImport =
     <BulkImport endpoint='/ingredients/import' backToList={this.backToList} />;
 
+    const columnClass = global.user_group == "admin" ? "OneFifthWidth" : "OneFourthWidth";
+
     const main =
     <div>
       {!this.props.order &&
@@ -176,18 +178,17 @@ class IngredientList extends Component {
       <table className="table">
         <thead>
           <tr>
-            <th>id</th>
-            <th>Name</th>
-            <th>Package Type</th>
-            <th>Storage</th>
-            <th>Size</th>
+            <th className={columnClass}>Name</th>
+            <th className={columnClass}>Package Type</th>
+            <th className={columnClass}>Storage</th>
+            <th className={columnClass}>Size</th>
             {
               global.user_group == 'admin' && !this.props.order &&
-              <th>Options</th>
+              <th className={columnClass}>Options</th>
             }
             {
               this.props.order &&
-              <th>Order</th>
+              <th className={columnClass}>Order</th>
             }
           </tr>
         </thead>
@@ -198,6 +199,7 @@ class IngredientList extends Component {
                 key={idx}
                 idx={idx}
                 onClick={this.props.onClickIngredient}
+                columnClass={columnClass}
                 order={this.props.order}
                 orderIngredient={this.orderIngredient}
                 viewIngredient={this.viewIngredient}

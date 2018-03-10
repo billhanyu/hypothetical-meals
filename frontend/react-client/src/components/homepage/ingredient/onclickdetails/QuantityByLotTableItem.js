@@ -12,7 +12,7 @@ class QuantityByLotTableItem extends Component {
         <td className={columnClass}>{
           this.props.editIdx == this.props.idx
             ?
-            <input type="number" onChange={this.props.changeQuantity} value={this.props.editQuantity} />
+            <input type="number" style={{ 'width': '100px' }} onChange={this.props.changeQuantity} value={this.props.editQuantity} />
             :
             `${quantity.toFixed(2)}  ${native_unit}`
         }</td>
