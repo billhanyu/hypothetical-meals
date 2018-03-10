@@ -120,8 +120,7 @@ app.get('/productionlogs/pages', beNoob, productionlog.pages);
 app.get('/productionlogs/page/:page_num', beNoob, productionlog.view);
 
 app.get('/inventory', beNoob, inventory.all);
-app.get('/inventory/pages', beNoob, inventory.pages);
-app.get('/inventory/page/:page_num', beNoob, inventory.view);
+app.get('/inventory/lot/:ingredient_id', beNoob, inventory.getLotQuantities);
 app.get('/inventory/stock', beManager, inventory.getStock);
 app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
 app.put('/inventory', beManager, inventory.commitCart);

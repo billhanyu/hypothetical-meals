@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
 class QuantityByLotTable extends Component {
   constructor(props) {
@@ -10,22 +11,15 @@ class QuantityByLotTable extends Component {
   }
 
   componentDidMount() {
-    this.setState({ // fake data
-      lots: [
-        {
-          name: 'shit',
-          quantity: 100,
-        },
-        {
-          name: 'fuck',
-          quantity: 200,
-        },
-        {
-          name: 'damn',
-          quantity: 111,
-        },
-      ]
-    });
+    axios.get(`/inventory/lot/${this.props.ingredient.id}`, {
+      headers: {Authorization: "Token " + global.token}
+    })
+    .then(response => {
+      this.setState({
+        lots: response.data
+      });
+    })
+    .catch(err => alert('Error retrieving lots info'));
   }
 
   render() {
@@ -44,8 +38,8 @@ class QuantityByLotTable extends Component {
           this.state.lots.map((lot, idx) => {
             return (
               <tr key={idx}>
-                <td className="HalfWidth">{lot.name}</td>
-                <td className="HalfWidth">{lot.quantity} {this.props.ingredient.native_unit}</td>
+                <td className="HalfWidth">{lot.lot}</td>
+                <td className="HalfWidth">{lot.quantity.toFixed(2)} {this.props.ingredient.native_unit}</td>
               </tr>
             );
           })
@@ -58,6 +52,7 @@ class QuantityByLotTable extends Component {
 
 QuantityByLotTable.propTypes = {
   ingredient: PropTypes.shape({
+    id: PropTypes.number.isRequired,
     native_unit: PropTypes.string.isRequired
   }).isRequired,
   withTitle: PropTypes.bool,
