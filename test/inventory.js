@@ -141,6 +141,27 @@ describe('Inventory', () => {
         });
     });
 
+    it('should fail invalid quantities', (done) => {
+      chai.request(server)
+        .put('/inventory/admin')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'changes': {
+            '1': -1,
+            '2': 17,
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          const changed = alasql('SELECT * FROM Inventories');
+          assert.strictEqual(changed[0].id, 1, 'Inventory item 1 left.');
+          assert.strictEqual(changed[0].num_packages, 10, 'Inventory item 1 number of packages unchanged.');
+          assert.strictEqual(changed[1].id, 2, 'Inventory item 2 left.');
+          assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 2 number of packages unchanged.');
+          done();
+        });
+    });
+
     it('should delete from inventory when quantity is zero', (done) => {
       chai.request(server)
         .put('/inventory/admin')
