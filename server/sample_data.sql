@@ -22,6 +22,8 @@ INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (2, 
 INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (3, 3, 30, 1);
 INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (4, 4, 30, 2);
 INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot) VALUES(1, 1, 10, 1, 'ff');
+INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot) VALUES(1, 1, 20, 1, 'bb');
+INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot) VALUES(1, 1, 30, 1, 'cc');
 INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot) VALUES (2, 2, 20, 1, 'ff');
 INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot) VALUES (3, 3, 20, 1, 'ff');
 INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot) VALUES (4, 4, 20, 2, 'ff');

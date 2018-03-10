@@ -25,7 +25,7 @@ class InventoryItem extends Component {
     const {num_packages, ingredient_num_native_units, ingredient_name, ingredient_temperature_state, ingredient_package_type, ingredient_native_unit}
       = this.props.item;
     const rawQuantity = num_packages * ingredient_num_native_units;
-    const quantity = Math.round(rawQuantity * 100) / 100;
+    const quantity = rawQuantity.toFixed(2);
     const columnClass = global.user_group == "admin" ? "OneFifthWidth" : "OneFourthWidth";
     return (
       <tbody>
@@ -75,7 +75,9 @@ class InventoryItem extends Component {
           <td colSpan={1} className="hiddenRow"></td>
           <td colSpan={3} className="hiddenRow">
             <div id={`inventory_${this.props.idx}`} className="accordian-body collapse">
-              <QuantityByLotTable ingredient={{id: this.props.item.ingredient_id, native_unit: ingredient_native_unit}} />
+              <QuantityByLotTable
+                ingredient={{id: this.props.item.ingredient_id, native_unit: ingredient_native_unit}}
+              />
             </div>
           </td>
           {global.user_group == "admin" && <td colSpan={1} className="hiddenRow"></td>}
