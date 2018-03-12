@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import COUNT_PER_PAGE from '../../Constants/Pagination';
+import { COUNT_PER_PAGE } from '../../Constants/Pagination';
 import PageBar from '../../GeneralComponents/PageBar';
 import ProductionRunFilterBar from './ProductionRunFilterBar';
 import ProductionRunItem from './ProductionRunItem';
+import axios from 'axios';
 
 class ProductionRun extends Component {
   constructor(props) {
@@ -25,10 +26,29 @@ class ProductionRun extends Component {
     this.clearFilter = this.clearFilter.bind(this);
   }
 
+  componentDidMount() {
+    axios.get('/productruns', {
+      headers: { Authorization: "Token " + global.token }
+    })
+    .then(response => {
+      this.runs = response.data;
+      this.filteredRuns = response.data;
+      const pages = Math.ceil(this.filteredRuns.length / COUNT_PER_PAGE);
+      this.setState({
+        pages,
+      });
+      this.selectPage(1);
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Error retrieving production run data');
+    });
+  }
+
   selectPage(idx) {
     const pagedRuns = [];
-    for (let i = (idx - 1) * COUNT_PER_PAGE; i < idx * COUNT_PER_PAGE && i < this.filteredLogs.length; i++) {
-      pagedRuns.push(this.filteredLogs[i]);
+    for (let i = (idx - 1) * COUNT_PER_PAGE; i < idx * COUNT_PER_PAGE && i < this.filteredRuns.length; i++) {
+      pagedRuns.push(this.filteredRuns[i]);
     }
     this.setState({
       pagedRuns,
@@ -66,7 +86,7 @@ class ProductionRun extends Component {
     let newRuns = this.runs.slice();
     if (this.state.filterName) {
       newRuns = newRuns.filter(run => {
-        const lowerRunName = run.formula_name.toLowerCase(); // assuming formula_name
+        const lowerRunName = run.name.toLowerCase(); // assuming formula_name
         const lowerName = this.state.filterName.toLowerCase();
         return lowerRunName.indexOf(lowerName) > -1;
       });
@@ -86,6 +106,7 @@ class ProductionRun extends Component {
   }
 
   render() {
+    const columnClass = "OneFourthWidth";
     return (
       <div>
         <h3>Production Runs</h3>
@@ -100,11 +121,11 @@ class ProductionRun extends Component {
         />
         <table className="table">
           <thead>
-            <tr className="row" style={{ 'margin': 0 }}>
-              <th className="col-md-3">Time</th>
-              <th className="col-md-3">User</th>
-              <th className="col-md-3">Number Produced</th>
-              <th className="col-md-3">Lot Number</th>
+            <tr style={{ 'margin': 0 }}>
+              <th className={columnClass}>Time</th>
+              <th className={columnClass}>User</th>
+              <th className={columnClass}>Number Produced</th>
+              <th className={columnClass}>Lot Number</th>
             </tr>
           </thead>
           {
