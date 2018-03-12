@@ -106,7 +106,7 @@ class ProductionRun extends Component {
   }
 
   render() {
-    const columnClass = "OneFourthWidth";
+    const columnClass = "OneFifthWidth";
     return (
       <div>
         <h3>Production Runs</h3>
@@ -124,6 +124,7 @@ class ProductionRun extends Component {
             <tr style={{ 'margin': 0 }}>
               <th className={columnClass}>Time</th>
               <th className={columnClass}>User</th>
+              <th className={columnClass}>Product</th>
               <th className={columnClass}>Number Produced</th>
               <th className={columnClass}>Lot Number</th>
             </tr>
