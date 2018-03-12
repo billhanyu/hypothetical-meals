@@ -19,6 +19,7 @@ import * as systemlogs from './routes/systemLogs';
 import * as order from './routes/order';
 import * as formulas from './routes/formula';
 import * as productionlog from './routes/productionlog';
+import * as productionrun from './routes/productrun';
 import { adminRequired, noobRequired, managerRequired } from './authMiddleware';
 
 import getConfig from './getConfig';
@@ -118,6 +119,8 @@ app.get('/systemlogs', beManager, systemlogs.viewAll);
 
 app.get('/productionlogs/pages', beNoob, productionlog.pages);
 app.get('/productionlogs/page/:page_num', beNoob, productionlog.view);
+
+app.get('/productruns', beNoob, productionrun.view);
 
 app.get('/inventory', beNoob, inventory.all);
 app.get('/inventory/lot/:ingredient_id', beNoob, inventory.getLotQuantities);
