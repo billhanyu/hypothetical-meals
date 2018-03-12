@@ -6,18 +6,19 @@ class ProductionRunItem extends Component {
   render() {
     const run = this.props.run;
     const idx = this.props.idx;
-    const columnClass = "OneFourthWidth";
+    const columnClass = "OneFifthWidth";
     return (
       <tbody>
         <tr style={{ 'margin': 0 }} data-toggle="collapse" data-target={`#productionrun_${idx}`} className="accordion-toggle tablerow-hover">
           <td className={columnClass}>{(new Date(run.created_at)).toString().split(' GMT')[0]}</td>
           <td className={columnClass}>{run.user_name}</td>
+          <td className={columnClass}>{run.name}</td>
           <td className={columnClass}>{run.num_product}</td>
           <td className={columnClass}>{run.lot}</td>
         </tr>
         <tr>
           <td colSpan={1} className="hiddenRow"></td>
-          <td colSpan={2} className="hiddenRow">
+          <td colSpan={3} className="hiddenRow">
             <div id={`productionrun_${this.props.idx}`} className="accordian-body collapse">
               <ProductionRunIngredientTable ingredients={run.ingredients} />
             </div>
