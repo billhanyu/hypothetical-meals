@@ -181,7 +181,7 @@ class ViewInventory extends Component {
   }
 
   render() {
-    const columnClass = global.user_group == "admin" ? "OneFifthWidth" : "OneFourthWidth";
+    const columnClass = global.user_group == "admin" ? "OneSixthWidth" : "OneFifthWidth";
     
     const view =
       <AddEditIngredient

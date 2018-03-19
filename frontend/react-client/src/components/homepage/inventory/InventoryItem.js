@@ -27,7 +27,7 @@ class InventoryItem extends Component {
       = this.props.item;
     const rawQuantity = num_packages * ingredient_num_native_units;
     const quantity = Math.round(rawQuantity * 100) / 100;
-    const columnClass = global.user_group == "admin" ? "OneFifthWidth" : "OneFourthWidth";
+    const columnClass = global.user_group == "admin" ? "OneSixthWidth" : "OneFifthWidth";
     return (
       <tbody>
         <tr data-toggle="collapse" data-target={`#inventory_${this.props.idx}`} className="accordion-toggle tablerow-hover">
