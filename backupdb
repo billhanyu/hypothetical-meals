@@ -1,0 +1,18 @@
+echo "Beginning backup at $(date +'%m/%d/%Y %H:%M:%S.%N')." | mail -s "[BEGIN] Database Backup for Kung Foods $(date +'%m-%d-%Y')" han.yu@duke.edu christine.zhou@duke.edu brian.zhou@duke.edu eric.s.song@duke.edu
+CURRENT_DATE_FILE="$(date +'%m-%d-%Y')-backup.sql"
+ssh vcm@vcm-3173.vm.duke.edu "mysqldump -u root -p'billsucks' meals" > "$CURRENT_DATE_FILE"
+echo "Backup Complete at $(date +'%m/%d/%Y %H:%M:%S.%N')." | mail -s "[COMPLETE] Database Backup for Kung Foods $(date +'%m-%d-%Y')" han.yu@duke.edu christine.zhou@duke.edu brian.zhou@duke.edu eric.s.song@duke.edu
+
+DAY_ONE_WEEK_AGO="$(date --date='1 week ago' +'%d')"
+DATE_ONE_WEEK_AGO_FILE="$(date --date='1 week ago' +'%m-%d-%Y')-backup.sql"
+if [[ ("$DAY_ONE_WEEK_AGO" != "1") && ("$DAY_ONE_WEEK_AGO" != "8") && ("$DAY_ONE_WEEK_AGO" != "15") && ("$DAY_ONE_WEEK_AGO" != "22") && ("$DAY_ONE_WEEK_AGO" != "29") ]]
+then
+        rm -f "/home/vcm/$DATE_ONE_WEEK_AGO_FILE"
+fi
+
+DAY_ONE_MONTH_AGO="$(date +'%d')"
+DATE_ONE_MONTH_AGO_FILE="$(date --date='1 month ago' +'%m-%d-%Y')-backup.sql"
+if [ "$DAY_ONE_MONTH_AGO" != "1" ]
+then
+        rm -f "/home/vcm/$DATE_ONE_MONTH_AGO_FILE"
+fi
