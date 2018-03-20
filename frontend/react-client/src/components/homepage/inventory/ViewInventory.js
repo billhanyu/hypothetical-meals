@@ -5,6 +5,7 @@ import FilterBar from './FilterBar';
 import PageBar from '../../GeneralComponents/PageBar';
 import TempStates from '../../Constants/TempStates';
 import { COUNT_PER_PAGE } from '../../Constants/Pagination';
+import AddEditIngredient from '../ingredient/AddEditIngredient';
 
 class ViewInventory extends Component {
   constructor(props) {
@@ -13,6 +14,7 @@ class ViewInventory extends Component {
       pagedEntries: [],
       pages: 0,
       currentPage: 1,
+      viewingIdx: -1,
     };
     this.entries = [];
     this.filteredEntries = [];
@@ -21,6 +23,8 @@ class ViewInventory extends Component {
     this.filterPackage = this.filterPackage.bind(this);
     this.selectPage = this.selectPage.bind(this);
     this.reloadData = this.reloadData.bind(this);
+    this.viewIngredient = this.viewIngredient.bind(this);
+    this.backToList = this.backToList.bind(this);
   }
 
   componentDidMount() {
@@ -93,6 +97,18 @@ class ViewInventory extends Component {
     this.selectPage(1);
   }
 
+  viewIngredient(idx) {
+    this.setState({
+      viewingIdx: idx,
+    });
+  }
+
+  backToList() {
+    this.setState({
+      viewingIdx: -1,
+    });
+  }
+
   selectPage(idx) {
     const pagedEntries = [];
     for (let i = (idx - 1) * COUNT_PER_PAGE; i < idx * COUNT_PER_PAGE && i < this.filteredEntries.length; i++) {
@@ -105,9 +121,28 @@ class ViewInventory extends Component {
   }
 
   render() {
-    console.log(this.state.pagedEntries);
-    const columnClass = "OneFourthWidth";
-    return (
+    const columnClass = global.user_group == "admin" ? "OneSixthWidth" : "OneFifthWidth";
+    
+    const ingredient = this.state.viewingIdx > -1 ? this.state.pagedEntries[this.state.viewingIdx] : null;
+
+    const view =
+      <AddEditIngredient
+        mode="edit"
+        ingredient={ingredient ? {
+          id: ingredient.ingredient_id,
+          name: ingredient.ingredient_name,
+          native_unit: ingredient.ingredient_native_unit,
+          num_native_units: ingredient.ingredient_num_native_units,
+          package_type: ingredient.ingredient_package_type,
+          removed: {
+            data: [false]
+          },
+          storage_id: ingredient.ingredient_storage_id,
+          storage_name: ingredient.ingredient_storage_name
+        } : null}
+        backToList={this.backToList}
+      />;
+    const main = 
       <div>
         <h2>Inventory</h2>
         <FilterBar
@@ -122,6 +157,7 @@ class ViewInventory extends Component {
               <th className={columnClass}>Temperature State</th>
               <th className={columnClass}>Package Type</th>
               <th className={columnClass}>Quantity</th>
+              <th className={columnClass}>Storage Space Taken</th>
             </tr>
           </thead>
           {this.state.pagedEntries.map((item, key) =>
@@ -131,6 +167,7 @@ class ViewInventory extends Component {
               idx={key}
               storages={this.state.storages}
               reloadData={this.reloadData}
+              viewIngredient={this.viewIngredient}
             />
           )}
         </table>
@@ -139,8 +176,13 @@ class ViewInventory extends Component {
           selectPage={this.selectPage}
           currentPage={this.state.currentPage}
         />
-      </div>
-    );
+      </div>;
+
+    if (this.state.viewingIdx > -1) {
+      return view;
+    } else {
+      return main;
+    }
   }
 }
 
