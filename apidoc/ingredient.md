@@ -21,6 +21,13 @@ everything in Ingredients table and storage_name, storage_capacity.
 {% endmethod %}
 
 {% method %}
+## GET '/ingredients' {#viewAll}
+
+Get all ingredients, regardless of deleted or not.
+
+{% endmethod %}
+
+{% method %}
 ## GET '/ingredients/page/:page_num' {#view}
 
 Get all ingredients in the `Ingredients` table, requires no parameter input.

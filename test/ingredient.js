@@ -34,6 +34,20 @@ describe('Ingredient', () => {
     });
   });
 
+  describe('#viewAll()', () => {
+    it('should return all ingredients', (done) => {
+      chai.request(server)
+        .get('/ingredients')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          assert.strictEqual(res.body.length, 4, 'total number of ingredients');
+          done();
+        });
+    });
+  });
+
   describe('#view()', () => {
     beforeEach(() => {
       alasql('SOURCE "./server/create_database.sql"');

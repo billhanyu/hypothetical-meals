@@ -1,7 +1,6 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import { getSpace } from './common/packageUtilies';
-import { getNumPages, queryWithPagination } from './common/pagination';
 import success from './common/success';
 import { updateConsumedSpendingLogForCart } from './spendinglog';
 import { logAction } from './systemLogs';
@@ -10,20 +9,6 @@ const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredie
 
 export function all(req, res, next) {
   connection.query(basicViewQueryString)
-    .then(results => res.status(200).send(results))
-    .catch(err => handleError(err, res));
-}
-
-export function pages(req, res, next) {
-  getNumPages('Inventories')
-    .then(results => res.status(200).send(results))
-    .catch(err => {
-      return res.status(500).send('Database error');
-    });
-}
-
-export function view(req, res, next) {
-  queryWithPagination(req.params.page_num, 'Inventories', basicViewQueryString)
     .then(results => res.status(200).send(results))
     .catch(err => handleError(err, res));
 }
@@ -57,12 +42,35 @@ function getStockPromise(ids) {
     connection.query(`${basicViewQueryString} WHERE Ingredients.id IN (${ids.join(', ')})`)
       .then(results => {
         for (let result of results) {
-          stock[result.id] = result;
+          if (stock[result.ingredient_id]) {
+            stock[result.ingredient_id].num_packages += result.num_packages;
+          } else {
+            stock[result.ingredient_id] = result;
+          }
         }
         resolve(stock);
       })
       .catch(err => reject(err));
   });
+}
+
+/* param: ingredient_id
+ * gets the lot distribution and quantities in those lots
+ */
+export function getLotQuantities(req, res, next) {
+  const ingredientId = req.params.ingredient_id;
+  connection.query(`SELECT Inventories.*, Ingredients.num_native_units FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id WHERE ingredient_id = ${ingredientId}`)
+  .then(results => {
+    const lots = results.map(entry => {
+      return {
+        inventory_id: entry.id,
+        lot: entry.lot,
+        quantity: entry.num_native_units * entry.num_packages,
+      };
+    });
+    return res.json(lots);
+  })
+  .catch(err => handleError(err, res));
 }
 
 /* request body format:
@@ -88,10 +96,10 @@ export function modifyQuantities(req, res, next) {
     })
     .then((results) => {
       let modified = results.map(x => {
-        return `${x.name}: ${x.num_packages * x.num_native_units} ${x.native_unit}`;
+        return `${x.name}: ${x.num_packages * x.num_native_units} ${x.native_unit} in lot ${x.lot}`;
       });
       let nameStrings = results.map(x => {
-        return `${x.name}{ingredient_id: ${x.ingredient_id}}`;
+        return `{${x.name}=ingredient_id=${x.ingredient_id}}`;
       });
       logAction(req.payload.id, `CORRECTION: Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} modified. Inventory now has ${modified.join(', ')}.`);
     })
@@ -190,6 +198,7 @@ export function modifyInventoryQuantitiesPromise(changes) {
       checkChangesProperties(changes);
     } catch (err) {
       reject(err);
+      return;
     }
     const ids = Object.keys(changes);
     const cases = [];
@@ -228,7 +237,7 @@ function checkChangesProperties(changes) {
     }
     const value = changes[id];
     if (!parseFloat(value) && parseFloat(value) !== 0 || parseFloat(value) < 0) {
-      throw createError(`new inventory quantity ${value} invalid.`);
+      throw createError(`new inventory quantity invalid.`);
     }
   }
 }
