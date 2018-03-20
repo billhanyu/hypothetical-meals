@@ -164,7 +164,7 @@ class IngredientList extends Component {
     const bulkImport =
     <BulkImport endpoint='/ingredients/import' backToList={this.backToList} />;
 
-    const columnClass = global.user_group == "admin" ? "OneFifthWidth" : "OneFourthWidth";
+    const columnClass = this.props.order || global.user_group == 'admin' ? 'OneFifthWidth' : 'OneFourthWidth';
 
     const main =
     <div>
