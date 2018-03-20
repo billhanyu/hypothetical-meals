@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import VendorSelector from './VendorSelector';
+import AvailableVendorSelector from '../../selector/AvailableVendorSelector';
 
 class VendorIngredientList extends Component {
   constructor(props) {
@@ -175,7 +175,7 @@ class VendorIngredientList extends Component {
             <form className="col-xl-6 col-lg-6 col-sm-8">
               <div className="form-group">
                 <label htmlFor="vendor">Vendor</label>
-                <VendorSelector changeVendorId={this.changeVendorId} />
+                <AvailableVendorSelector changeVendorId={this.changeVendorId} />
               </div>
               <div className="form-group">
                 <label htmlFor="price">Price</label>
