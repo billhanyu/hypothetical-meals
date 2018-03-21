@@ -26,7 +26,7 @@ function signupUser(req, res, next, userGroup) {
 
   let user = new User(req.body.user);
   user.setPassword(req.body.user.password);
-  
+
   connection.query(`INSERT INTO Users (username, name, hash, salt, user_group) VALUES ('${user.username}', '${user.name || ''}', '${user.hash}', '${user.salt}', '${userGroup}');`)
   .then(() => connection.query(`SELECT id FROM Users WHERE username = '${user.username}' AND removed = 0;`))
   .then((results) => {
