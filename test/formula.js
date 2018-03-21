@@ -67,6 +67,7 @@ describe('Formulas', () => {
           assert.strictEqual(formulas.length, 2, 'Number of formulas in database');
           assert.strictEqual(formulas[0].id, 1, 'Id of formula 1');
           assert.strictEqual(formulas[0].name, 'cake', 'Name of formula 1');
+          assert.strictEqual(formulas[0].intermediate, 0, 'Intermediate status');
           assert.strictEqual(formulas[0].description, 'A simple cake', 'Description for cake');
           assert.strictEqual(formulas[0].num_product, 1, 'Number of product produced by formula');
           const ingredient = formulas[0]['ingredients']['boop'];

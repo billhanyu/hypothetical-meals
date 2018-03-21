@@ -50,14 +50,17 @@ function getFormulas(queryString, req, res, next) {
   connection.query(`${queryString}`)
     .then((results) => {
       results.forEach(x => {
-        let formulaObject = {
-          'id': x.id,
-          'name': x.name,
-          'description': x.description,
-          'num_product': x.num_product,
-          'removed': x.removed,
-          'ingredients': {},
-        };
+        let formulaObject = x;
+        formulaObject['ingredients'] = {};
+        // let formulaObject = {
+        //   'id': x.id,
+        //   'name': x.name,
+        //   'description': x.description,
+        //   'num_product': x.num_product,
+        //   'intermediate': x.intermediate,
+        //   'removed': x.removed,
+        //   'ingredients': {},
+        // };
         myFormulas[`${x.id}`] = formulaObject;
       });
       return connection.query(`${formulaEntryQuery}, Ingredients.name, Ingredients.package_type, Ingredients.storage_id, Ingredients.native_unit, Ingredients.num_native_units as ingredient_num_native_units, Ingredients.removed FROM FormulaEntries
