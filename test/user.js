@@ -142,7 +142,7 @@ describe('User', () => {
           const users = alasql(`SELECT * FROM Users WHERE username = 'admin1'`);
           assert.strictEqual(users.length, 1, 'Number of rows with username.');
           const newAdmin = users[0];
-          assert.strictEqual(newAdmin.id, 7, 'New admin ID.');
+          assert.strictEqual(newAdmin.id, 8, 'New admin ID.');
           assert.strictEqual(newAdmin.username, 'admin1', 'New admin username.');
           assert.strictEqual(newAdmin.oauth, 0, 'Not OAuth user');
           assert.strictEqual(newAdmin.name, 'mike wazowski', 'New admin name.');
@@ -184,7 +184,7 @@ describe('User', () => {
           const users = alasql(`SELECT * FROM Users WHERE username = 'noob1'`);
           assert.strictEqual(users.length, 1, 'Number of rows with username.');
           const newNoob = users[0];
-          assert.strictEqual(newNoob.id, 7, 'New noob ID.');
+          assert.strictEqual(newNoob.id, 8, 'New noob ID.');
           assert.strictEqual(newNoob.username, 'noob1', 'New noob username.');
           assert.strictEqual(newNoob.oauth, 0, 'Not OAuth user');
           assert.strictEqual(newNoob.name, 'mike wazowski', 'New noob name.');
