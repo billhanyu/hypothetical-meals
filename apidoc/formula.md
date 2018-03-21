@@ -31,8 +31,10 @@ Returns
 res.body: [{
   'id': 'myId',
   'name': 'myName',
+  'intermediate': 0,
   'description': 'myDescription',
-  'num_product': 1
+  'num_product': 1,
+  'removed': 0,
   'ingredients': {
     'ingredient1_name': {
         'id': 3,
