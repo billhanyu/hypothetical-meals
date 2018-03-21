@@ -439,4 +439,43 @@ describe('User', () => {
         });
     });
   });
+
+  describe('#viewAll()', () => {
+    beforeEach(() => {
+      alasql('SOURCE "./server/create_database.sql"');
+      alasql('SOURCE "./server/sample_data.sql"');
+    });
+
+    it('should get all users that are not deleted', () => {
+      chai.request(server)
+        .get('/users')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(6);
+          done();
+        });
+    });
+
+    it('Reject noob trying to view users', () => {
+      chai.request(server)
+        .get('/users')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('Reject manager trying to view users', () => {
+      chai.request(server)
+        .get('/users')
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+  });
 });
