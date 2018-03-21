@@ -548,7 +548,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/badIngredientUnitsData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -558,7 +558,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/badProductUnitsData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -568,7 +568,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/extraArgumentData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -578,7 +578,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/invalidHeaderData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -588,7 +588,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/missingArgumentData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -598,7 +598,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/notConsecutiveFormulaEntriesData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -608,7 +608,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/duplicateFormulaData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -618,7 +618,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/missingIngredientsData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -633,7 +633,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/validData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(200);
 
           const formulas = alasql(`SELECT * FROM Formulas`);
