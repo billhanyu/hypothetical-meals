@@ -45,6 +45,22 @@ function signupUser(req, res, next, userGroup) {
 }
 
 /**
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * Gets all nondeleted users.
+ */
+export function viewAll(req, res, next) {
+  connection.query(`SELECT * FROM Users WHERE removed = 0`)
+    .then((results) => {
+      res.status(200).send(results);
+    })
+    .catch((err) => {
+      handleError(err, res);
+    });
+}
+
+/**
  *
  * @param {*} req
  * req.body.user = {
