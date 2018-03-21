@@ -44,7 +44,13 @@ class IngredientListItem extends Component {
     return (
       <tbody>
         <tr data-toggle="collapse" data-target={`#vendoringredient_${this.props.idx}`} className="accordion-toggle tablerow-hover">
-        <td className={columnClass}><a href="javascript:void(0)" onClick={e=>this.props.viewIngredient(this.props.idx)}>{ingredient.name}</a></td>
+        <td className={columnClass}>
+          <a href="javascript:void(0)" onClick={e=>this.props.viewIngredient(this.props.idx)}>{ingredient.name}</a>
+          {
+            ingredient.intermediate.data[0] == 1 &&
+            <span style={{ 'margin-left': '20px' }} className="badge badge-secondary">Intermediate</span>
+          }
+        </td>
         <td className={columnClass}>{ingredient.package_type}</td>
         <td className={columnClass}>{Storage2State[ingredient.storage_name]}</td>
         <td className={columnClass}>{ingredient.num_native_units+" "+ingredient.native_unit}</td>
@@ -85,7 +91,10 @@ class IngredientListItem extends Component {
         <td colSpan={1} className="hiddenRow"></td>
         <td colSpan={3} className="hiddenRow">
           <div id={`vendoringredient_${this.props.idx}`} className="accordian-body collapse">
-            <VendorIngredientsTable vendoringredients={this.state.vendoringredients} />
+            {
+              ingredient.intermediate.data[0] !== 1 &&
+              <VendorIngredientsTable vendoringredients={this.state.vendoringredients} />
+            }
             <div style={{'height': '20px'}} />
             {!this.props.order &&
               <QuantityByLotTable ingredient={this.props.ingredient} />
