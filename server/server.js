@@ -19,6 +19,7 @@ import * as systemlogs from './routes/systemLogs';
 import * as order from './routes/order';
 import * as formulas from './routes/formula';
 import * as productionlog from './routes/productionlog';
+import * as recallReport from './routes/recallReport';
 import { adminRequired, noobRequired, managerRequired } from './authMiddleware';
 
 import getConfig from './getConfig';
@@ -133,6 +134,8 @@ app.put('/formulas', beAdmin, formulas.modify);
 app.post('/formulas', beAdmin, formulas.add);
 app.delete('/formulas', beAdmin, formulas.deleteFormulas);
 app.post('/formulas/import', [auth.required, adminRequired, upload.single('bulk')], formulas.bulkImport);
+
+app.get('/recall', beManager, recallReport.getRecallForIngredient);
 
 const distDir = `${__dirname}/../frontend/react-client/dist`;
 app.use(express.static(distDir));
