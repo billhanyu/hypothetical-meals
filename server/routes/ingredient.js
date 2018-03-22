@@ -97,6 +97,20 @@ function addIngredientHelper(ingredients, req, res, next) {
     .catch(err => handleError(err, res));
 }
 
+/**
+ *
+ * @param {*} myObject
+ * @return {Boolean}
+ * Check contain keys 'name', 'storage_id', 'native_unit', 'num_native_units', 'package_type'
+ */
+export function checkIngredientProperties(myObject) {
+  if ('ingredient_name' in myObject && 'storage_id' in myObject &&
+    'native_unit' in myObject && 'num_native_units' in myObject && 'package_type' in myObject) {
+    return true;
+  }
+  return false;
+}
+
 /* request body format:
  * request.body.ingredients =
  *   {
