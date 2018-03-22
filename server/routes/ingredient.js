@@ -444,3 +444,40 @@ function checkForBulkImportFormattingErrors(data) {
     if (validStorageTypes.indexOf(data[i][7].toLowerCase()) < 0) return `Invalid package type: ${data[i][7]}`;
   }
 }
+
+export function freshness(req, res, next) {
+  connection.query(basicViewQueryString)
+    .then((results) => {
+      let worstDuration = 0;
+      let totalWeightedDuration = 0;
+      let totalNumNativeUnits = 0;
+      for (let ingredient of results) {
+        ingredient.worstDuration = ingredient.worst_duration == 0 ? null : msToTime(ingredient.worst_duration);
+        ingredient.averageDuration = ingredient.total_num_native_units == 0 ? null : msToTime(ingredient.total_weighted_duration / ingredient.total_num_native_units);
+
+        worstDuration = Math.max(worstDuration, ingredient.worst_duration);
+        totalWeightedDuration += ingredient.total_weighted_duration;
+        totalNumNativeUnits += ingredient.total_num_native_units;
+
+        delete ingredient.worst_duration;
+        delete ingredient.total_weighted_duration;
+        delete ingredient.total_num_native_units;
+      }
+      res.json({
+        freshnessData: {
+          worstDuration: worstDuration == 0 ? null : msToTime(worstDuration),
+          averageDuration: totalNumNativeUnits == 0 ? null : msToTime(totalWeightedDuration / totalNumNativeUnits),
+        },
+        ingredients: results,
+      });
+    });
+}
+
+function msToTime(duration) {
+  const seconds = parseInt((duration/1000)%60);
+  const minutes = parseInt((duration/(1000*60))%60);
+  const hours = parseInt((duration/(1000*60*60))%24);
+  const days = parseInt(duration/(1000*60*60*24));
+
+  return `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+}
