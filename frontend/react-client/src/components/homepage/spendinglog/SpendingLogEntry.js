@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 class SpendingLogEntry extends Component {
   constructor(props) {
@@ -6,15 +7,30 @@ class SpendingLogEntry extends Component {
   }
 
   render() {
+    const { ingredient_id, ingredient_name, total_weight, ingredient_native_unit, total, consumed } = this.props.item;
     return(
       <tr>
-        <td>{this.props.item.ingredient_name}</td>
-        <td>{`${this.props.item.total_weight}  ${this.props.item.ingredient_native_unit}`}</td>
-        <td>${Math.round(this.props.item.total * 100) / 100}</td>
-        <td>${Math.round(this.props.item.consumed * 100) / 100}</td>
+        <td>
+          <a href="javascript:void(0)" onClick={e => this.props.viewIngredient(ingredient_id)}>{ingredient_name}</a>
+        </td>
+        <td>{`${total_weight} ${ingredient_native_unit}`}</td>
+        <td>${total.toFixed(2)}</td>
+        <td>${consumed.toFixed(2)}</td>
       </tr>
     );
   }
 }
+
+SpendingLogEntry.propTypes = {
+  item: PropTypes.shape({
+    ingredient_id: PropTypes.number,
+    ingredient_name: PropTypes.string,
+    total_weight: PropTypes.number,
+    ingredient_native_unit: PropTypes.string,
+    total: PropTypes.number,
+    consumed: PropTypes.number,
+  }),
+  viewIngredient: PropTypes.func,
+};
 
 export default SpendingLogEntry;
