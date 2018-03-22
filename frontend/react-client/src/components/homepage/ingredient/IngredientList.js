@@ -4,6 +4,7 @@ import PageBar from '../../GeneralComponents/PageBar';
 import IngredientListItem from './IngredientListItem';
 import AddEditIngredient from './AddEditIngredient';
 import BulkImport from './BulkImport';
+import PropTypes from 'prop-types';
 import { COUNT_PER_PAGE } from '../../Constants/Pagination';
 
 class IngredientList extends Component {
@@ -136,8 +137,8 @@ class IngredientList extends Component {
     });
   }
 
-  orderIngredient(idx) {
-    this.props.orderIngredient(this.state.ingredients[idx]);
+  orderIngredient(idx, quantity) {
+    this.props.orderIngredient(this.state.ingredients[idx], quantity);
   }
 
   viewIngredient(idx) {
@@ -254,5 +255,11 @@ class IngredientList extends Component {
     }
   }
 }
+
+IngredientList.propTypes = {
+  orderIngredient: PropTypes.func,
+  onClickIngredient: PropTypes.func,
+  order: PropTypes.bool,
+};
 
 export default IngredientList;
