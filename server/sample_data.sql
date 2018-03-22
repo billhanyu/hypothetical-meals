@@ -19,6 +19,7 @@ INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_na
 INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units) VALUES (2, 'beans', 'truckload', 1, 'pounds', 15);
 INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units) VALUES (3, 'boop', 'pail', 1, 'kg', 20);
 INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units) VALUES (4, 'loop', 'sack', 2, 'g', 50);
+INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units, intermediate) VALUES (5, 'intermediate', 'sack', 2, 'g', 20, 1);
 INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (1, 1, 10, 1);
 INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (2, 2, 20, 1);
 INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (3, 3, 30, 1);

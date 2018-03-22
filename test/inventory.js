@@ -85,6 +85,7 @@ describe('Inventory', () => {
           res.body.length.should.be.eql(3);
           const lots = res.body;
           assert.strictEqual(lots[0].lot, 'ff', 'lot ff name');
+          assert.strictEqual(lots[0].vendor, 'Duke', 'item 1 vendor name');
           assert.strictEqual(lots[1].lot, 'bb', 'lot bb name');
           assert.strictEqual(lots[2].lot, 'cc', 'lot cc name');
           assert.strictEqual(lots[0].quantity, 100, 'lot ff quantity');
