@@ -59,12 +59,16 @@ function getStockPromise(ids) {
  */
 export function getLotQuantities(req, res, next) {
   const ingredientId = req.params.ingredient_id;
-  connection.query(`SELECT Inventories.*, Ingredients.num_native_units FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id WHERE ingredient_id = ${ingredientId}`)
+  connection.query(`SELECT Inventories.*, Ingredients.num_native_units, Vendors.name as vendor_name FROM Inventories
+    JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id
+    JOIN Vendors ON Inventories.vendor_id = Vendors.id
+    WHERE ingredient_id = ${ingredientId}`)
   .then(results => {
     const lots = results.map(entry => {
       return {
         inventory_id: entry.id,
         lot: entry.lot,
+        vendor: entry.vendor_name,
         quantity: entry.num_native_units * entry.num_packages,
       };
     });
