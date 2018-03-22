@@ -189,7 +189,6 @@ export function fakeDeleteMultipleVendorIngredients(ids) {
 }
 
 function getCases(olds, items) {
-  // console.log(items);
   const prices = [];
   for (let i = 0; i < olds.length; i++) {
     const old = olds[i];
