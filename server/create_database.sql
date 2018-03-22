@@ -173,6 +173,7 @@ CREATE TABLE ProductRunsEntries(
 	ingredient_id int not null,
 	vendor_id int not null,
 	lot VARCHAR(100) not null,
+	num_native_units double not null,
 
 	FOREIGN KEY (productrun_id) REFERENCES ProductRuns(id),
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
