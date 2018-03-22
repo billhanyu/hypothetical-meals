@@ -4,6 +4,8 @@ import success from './common/success';
 import { updateDatabaseHelper } from './common/updateUtilities';
 import { getPaginationQueryString, getNumPages } from './common/pagination';
 import { logAction } from './systemLogs';
+import { checkIngredientProperties } from './ingredient';
+import { create } from 'domain';
 
 const fs = require('fs');
 const Papa = require('papaparse');
@@ -50,14 +52,8 @@ function getFormulas(queryString, req, res, next) {
   connection.query(`${queryString}`)
     .then((results) => {
       results.forEach(x => {
-        let formulaObject = {
-          'id': x.id,
-          'name': x.name,
-          'description': x.description,
-          'num_product': x.num_product,
-          'removed': x.removed,
-          'ingredients': {},
-        };
+        let formulaObject = x;
+        formulaObject['ingredients'] = {};
         myFormulas[`${x.id}`] = formulaObject;
       });
       return connection.query(`${formulaEntryQuery}, Ingredients.name, Ingredients.package_type, Ingredients.storage_id, Ingredients.native_unit, Ingredients.num_native_units as ingredient_num_native_units, Ingredients.removed FROM FormulaEntries
@@ -80,7 +76,8 @@ function getFormulas(queryString, req, res, next) {
  * req.body.formulas: [{
  *      name: 'myName',
  *      description: 'myDescription',
- *      num_product: 1
+ *      num_product: 1,
+ *      intermediate: 1,
  *      ingredients: [{
  *          'ingredient_id': 1
  *          'num_native_units': 1,
@@ -93,17 +90,26 @@ function getFormulas(queryString, req, res, next) {
 export function add(req, res, next) {
   const formulas = req.body.formulas;
   let names = [];
-  let formulaCases = [];
   formulas.forEach(x => {
     names.push(`'${x.name}'`);
-    formulaCases.push(`('${x.name}', '${x.description}', ${x.num_product})`);
   });
   connection.query(`${dbFormulaNameCheck} (${names.join(', ')})`)
     .then((results) => {
       if (results.length > 0) {
         throw createError('Trying to add a formula that already exists in database');
       }
-      return connection.query(`INSERT INTO Formulas (name, description, num_product) VALUES ${formulaCases.join(', ')}`);
+      return addIntermediateProducts(formulas, req.payload.id);
+    })
+    .then((intermediates) => {
+      let intermediateMap = {};
+      let formulaCases = [];
+      intermediates.forEach(x => {
+        intermediateMap[x.name] = x;
+      });
+      formulas.forEach(x => {
+        formulaCases.push(`('${x.name}', '${x.description}', ${x.num_product}, ${x.intermediate}, ${x.ingredient_name ? intermediateMap[x.ingredient_name].id : 'NULL'})`);
+      });
+      return connection.query(`INSERT INTO Formulas (name, description, num_product, intermediate, ingredient_id) VALUES ${formulaCases.join(', ')}`);
     })
     .then(() => {
       return addFormulaEntries(formulas);
@@ -121,8 +127,57 @@ export function add(req, res, next) {
       success(res);
     })
     .catch((err) => {
+      console.log(err);
       handleError(err, res);
     });
+}
+
+/**
+ *
+ * @param {*} intermediateProducts - Object that contains all properties for ingredients
+ * @param {*} userId
+ * @return {Promise}
+ */
+function addIntermediateProducts(intermediateProducts, userId) {
+  let intermediateCases = [];
+  let intermediateNames = [];
+  intermediateProducts.forEach(x => {
+    if (x.intermediate) {
+      if (checkIngredientProperties(x)) {
+        intermediateNames.push(x.name);
+        intermediateCases.push(`('${x.ingredient_name}', '${x.package_type}', '${x.native_unit}', ${x.num_native_units}, ${x.storage_id}, ${x.intermediate})`);
+      } else {
+        throw createError('Does not contain all ingredient properties');
+      }
+    }
+  });
+  let newIntermediates = [];
+  const names = intermediateNames.map(x => `'${x}'`);
+  if (intermediateCases.length > 0) {
+    return connection.query(`SELECT * FROM Ingredients WHERE name IN (${names.join(', ')}) AND removed = 0`)
+      .then((duplicates) => {
+        if (duplicates.length > 0) {
+          throw createError('Formula for intermediate product has ingredient name already in database');
+        }
+        return connection.query(`INSERT INTO Ingredients (name, package_type, native_unit, num_native_units, storage_id, intermediate) VALUES ${intermediateCases.join(', ')}`)
+      })
+      .then(() => {
+        return connection.query(`SELECT * FROM Ingredients WHERE name IN (${names.join(', ')})`);
+      })
+      .then((results) => {
+        newIntermediates = results;
+        const nameStrings = results.map(x => `{${x.name}=ingredient_id=${x.id}}`);
+        return logAction(userId, `Intermediate product${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} added.`);
+      })
+      .then(() => {
+        return newIntermediates;
+      })
+      .catch((err) => {
+        throw err;
+      });
+  } else {
+    return [];
+  }
 }
 
 /**
