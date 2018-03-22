@@ -5,7 +5,7 @@ import success from './common/success';
 import { updateConsumedSpendingLogForCart } from './spendinglog';
 import { logAction } from './systemLogs';
 
-const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.num_native_units as ingredient_num_native_units, Ingredients.package_type as ingredient_package_type, Ingredients.storage_id as ingredient_storage_id, Ingredients.native_unit AS ingredient_native_unit, Ingredients.removed as ingredient_removed FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
+const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.num_native_units as ingredient_num_native_units, Ingredients.package_type as ingredient_package_type, Ingredients.storage_id as ingredient_storage_id, Ingredients.native_unit AS ingredient_native_unit, Ingredients.removed as ingredient_removed, Ingredients.intermediate as ingredient_intermediate FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
 
 export function all(req, res, next) {
   connection.query(basicViewQueryString)

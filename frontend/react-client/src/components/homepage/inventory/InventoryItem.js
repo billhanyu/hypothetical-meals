@@ -68,6 +68,7 @@ InventoryItem.propTypes = {
     ingredient_package_type: PropTypes.string,
     ingredient_native_unit: PropTypes.string,
   }),
+  viewIngredient: PropTypes.func.isRequired,
   mode: PropTypes.string,
   idx: PropTypes.number.isRequired,
   reloadData: PropTypes.func,
