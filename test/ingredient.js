@@ -468,7 +468,7 @@ describe('Ingredient', () => {
 
 
         const ingredients = alasql(`SELECT * FROM Ingredients`);
-        assert.strictEqual(ingredients.length, 4 + 6, 'Sixc of six ingredients added to ingredients table.');
+        assert.strictEqual(ingredients.length, 4 + 6, 'Six of six ingredients added to ingredients table.');
 
         const vendorsIngredients = alasql(`SELECT * FROM VendorsIngredients`);
         assert.strictEqual(vendorsIngredients.length, 4 + 6, 'Six of six vendor ingredients added to vendor ingredients table.');
@@ -480,6 +480,30 @@ describe('Ingredient', () => {
         res.should.have.status(200);
         done();
       });
+    });
+  });
+
+  describe('#freshness()', () => {
+    it('should successfully return freshness', (done) => {
+      chai.request(server)
+        .get('/ingredients/freshness')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          const response = res.body;
+          
+          assert.containsAllKeys(response, ['freshnessData', 'ingredients']);
+
+          assert.strictEqual(response.freshnessData.worstDuration, '1 days, 10 hours, 17 minutes, 36 seconds', 'Correct worst duration');
+          assert.strictEqual(response.freshnessData.averageDuration, '0 days, 16 hours, 20 minutes, 41 seconds', 'Correct average duration');
+          assert.strictEqual(response.ingredients[0].worstDuration, '1 days, 10 hours, 17 minutes, 36 seconds', 'Correct worst duration for ingredient id 1');
+          assert.strictEqual(response.ingredients[0].averageDuration, '1 days, 3 hours, 46 minutes, 40 seconds', 'Correct average duration for ingredient id 1');
+          assert.isNull(response.ingredients[1].worstDuration, 'Ingredient id 2 worst duration is null');
+          assert.isNull(response.ingredients[1].averageDuration, 'Ingredient id 2 average duration is null');
+          assert.strictEqual(response.ingredients[2].worstDuration, '0 days, 0 hours, 2 minutes, 3 seconds', 'Correct worst duration for ingredient id 3');
+          assert.strictEqual(response.ingredients[2].averageDuration, '0 days, 0 hours, 0 minutes, 42 seconds', 'Correct average duration for ingredient id 3');
+          done();
+        });
     });
   });
 });
