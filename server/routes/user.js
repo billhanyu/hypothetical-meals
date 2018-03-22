@@ -72,7 +72,7 @@ export function viewAll(req, res, next) {
 export function deleteUser(req, res, next) {
   const user = req.body.user;
   let userId;
-  connection.query(`SELECT * FROM Users WHERE username IN (${user.username}) AND removed = 0`)
+  connection.query(`SELECT * FROM Users WHERE username IN ('${user.username}') AND removed = 0`)
     .then((results) => {
       if (results.length != 1) {
         throw createError('Trying to delete nonexistant user');

@@ -377,64 +377,64 @@ describe('User', () => {
       alasql('SOURCE "./server/sample_data.sql"');
     });
 
-    it('User 4 is successfully deleted', () => {
+    it('User 4 is successfully deleted', (done) => {
       chai.request(server)
         .post('/users/delete')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'user': {
             'username': 'noob',
           },
         })
-        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
           const user = alasql(`SELECT * FROM Users WHERE username = 'noob'`);
-          assert.strictEqual(user.removed, 1, 'Is fake removed');
+          assert.strictEqual(user[0].removed, 1, 'Is fake removed');
           done();
         });
     });
 
-    it('Nonexistent user is unsuccessfully deleted', () => {
+    it('Nonexistent user is unsuccessfully deleted', (done) => {
       chai.request(server)
         .post('/users/delete')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
           'user': {
             'username': 'foobar',
           },
         })
-        .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .end((err, res) => {
           res.should.have.status(400);
           done();
         });
     });
 
-    it('Reject noob trying to user delete', () => {
+    it('Reject noob trying to user delete', (done) => {
       chai.request(server)
         .post('/users/delete')
-        .send({
-          'user': {
-            'username': 'noob',
-          },
-        })
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
-        .end((err, res) => {
-          res.should.have.status(400);
-          done();
-        });
-    });
-
-    it('Reject manager trying to user delete', () => {
-      chai.request(server)
-        .post('/users/delete')
         .send({
           'user': {
             'username': 'noob',
           },
         })
-        .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .end((err, res) => {
-          res.should.have.status(400);
+          res.should.have.status(401);
+          done();
+        });
+    });
+
+    it('Reject manager trying to user delete', (done) => {
+      chai.request(server)
+        .post('/users/delete')
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
+        .send({
+          'user': {
+            'username': 'noob',
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(401);
           done();
         });
     });
@@ -446,7 +446,7 @@ describe('User', () => {
       alasql('SOURCE "./server/sample_data.sql"');
     });
 
-    it('should get all users that are not deleted', () => {
+    it('should get all users that are not deleted', (done) => {
       chai.request(server)
         .get('/users')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -458,22 +458,22 @@ describe('User', () => {
         });
     });
 
-    it('Reject noob trying to view users', () => {
+    it('Reject noob trying to view users', (done) => {
       chai.request(server)
         .get('/users')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
-          res.should.have.status(400);
+          res.should.have.status(401);
           done();
         });
     });
 
-    it('Reject manager trying to view users', () => {
+    it('Reject manager trying to view users', (done) => {
       chai.request(server)
         .get('/users')
         .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .end((err, res) => {
-          res.should.have.status(400);
+          res.should.have.status(401);
           done();
         });
     });
