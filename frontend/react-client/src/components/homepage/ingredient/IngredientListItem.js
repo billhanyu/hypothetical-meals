@@ -11,7 +11,41 @@ class IngredientListItem extends Component {
     super(props);
     this.state = {
       vendoringredients: [],
+      ordering: false,
+      quantity: '',
     };
+    this.startOrder = this.startOrder.bind(this);
+    this.cancel = this.cancel.bind(this);
+    this.confirmOrder = this.confirmOrder.bind(this);
+    this.changeQuantity = this.changeQuantity.bind(this);
+  }
+
+  startOrder() {
+    this.setState({
+      ordering: true,
+    });
+  }
+
+  cancel() {
+    this.setState({
+      ordering: false,
+      quantity: '',
+    });
+  }
+
+  confirmOrder() {
+    if (this.state.quantity.isNaN || this.state.quantity < 0) {
+      alert('Invalid quantity!');
+      return;
+    }
+    this.props.orderIngredient(this.props.idx, this.state.quantity);
+    this.cancel();
+  }
+
+  changeQuantity(e) {
+    this.setState({
+      quantity: e.target.value,
+    });
   }
 
   componentDidMount() {
@@ -76,15 +110,35 @@ class IngredientListItem extends Component {
           </td>
         }
         {
-          this.props.order &&
+          this.props.order && !this.state.ordering &&
           <td className={columnClass}>
             <button
               type="button"
               className="btn btn-primary no-collapse"
-              onClick={e => {this.props.orderIngredient(this.props.idx);}}>
+              onClick={this.startOrder}>
               Add To Cart
             </button>
-            </td>
+          </td>
+        }
+        {
+          this.props.order && this.state.ordering &&
+          <td className={columnClass}>
+            <input type='number' value={this.state.quantity} onChange={this.changeQuantity} />
+            <div className="btn-group" role="group" aria-label="Basic example">
+              <button
+                type="button"
+                className="btn btn-secondary no-collapse"
+                onClick={this.cancel}>
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary no-collapse"
+                onClick={this.confirmOrder}>
+                Confirm
+              </button>
+            </div>
+          </td>
         }
       </tr>
       <tr>
