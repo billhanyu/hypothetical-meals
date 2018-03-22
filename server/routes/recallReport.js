@@ -2,7 +2,7 @@ import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import success from './common/success';
 
-const productionEntriesQuery = `SELECT ProductRunsEntries*`;
+const productionEntriesQuery = `SELECT ProductRunsEntries.*`;
 
 /**
  *
@@ -36,8 +36,9 @@ export function getRecallForIngredient(req, res, next) {
     });
 }
 
+/** get product run entries for each product run*/
 function queryProductRunInformation() {
-  return connection.query(`SELECT ProductRuns*, Formulas.name
+  return connection.query(`SELECT ProductRuns.*, Formulas.name
     FROM ProductRuns JOIN Formulas ON ProductRuns.formula_id = Formulas.id`);
 }
 
