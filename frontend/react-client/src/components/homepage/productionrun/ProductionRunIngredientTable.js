@@ -16,9 +16,13 @@ class ProductionRunIngredientTable extends Component {
             this.props.ingredients.map((ingredient, idx) => {
               return (
                 <tr key={idx}>
-                  <td>{ingredient.ingredient_name}</td>
+                  <td>
+                    <a href="javascript:void(0)" onClick={e => this.props.viewIngredient(ingredient.ingredient_id)}>{ingredient.ingredient_name}</a>
+                  </td>
                   <td>{ingredient.lot}</td>
-                  <td>{ingredient.vendor_name}</td>
+                  <td>
+                    <a href="javascript:void(0)" onClick={e => this.props.viewVendor(ingredient.vendor_id)}>{ingredient.vendor_name}</a>
+                  </td>
                   <td>{ingredient.num_native_units} {ingredient.ingredient_native_unit}</td>
                 </tr>
               );
@@ -32,6 +36,8 @@ class ProductionRunIngredientTable extends Component {
 
 ProductionRunIngredientTable.propTypes = {
   ingredients: PropTypes.array,
+  viewIngredient: PropTypes.func,
+  viewVendor: PropTypes.func,
 };
 
 export default ProductionRunIngredientTable;
