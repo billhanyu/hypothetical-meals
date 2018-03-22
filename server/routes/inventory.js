@@ -5,7 +5,7 @@ import success from './common/success';
 import { updateConsumedSpendingLogForCart } from './spendinglog';
 import { logAction } from './systemLogs';
 
-const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.num_native_units as ingredient_num_native_units, Ingredients.package_type as ingredient_package_type, Ingredients.storage_id as ingredient_storage_id, Ingredients.native_unit AS ingredient_native_unit, Ingredients.removed as ingredient_removed FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
+const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.num_native_units as ingredient_num_native_units, Ingredients.package_type as ingredient_package_type, Ingredients.storage_id as ingredient_storage_id, Ingredients.native_unit AS ingredient_native_unit, Ingredients.removed as ingredient_removed, Ingredients.intermediate as ingredient_intermediate FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
 
 export function all(req, res, next) {
   connection.query(basicViewQueryString)
@@ -59,12 +59,16 @@ function getStockPromise(ids) {
  */
 export function getLotQuantities(req, res, next) {
   const ingredientId = req.params.ingredient_id;
-  connection.query(`SELECT Inventories.*, Ingredients.num_native_units FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id WHERE ingredient_id = ${ingredientId}`)
+  connection.query(`SELECT Inventories.*, Ingredients.num_native_units, Vendors.name as vendor_name FROM Inventories
+    JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id
+    JOIN Vendors ON Inventories.vendor_id = Vendors.id
+    WHERE ingredient_id = ${ingredientId}`)
   .then(results => {
     const lots = results.map(entry => {
       return {
         inventory_id: entry.id,
         lot: entry.lot,
+        vendor: entry.vendor_name,
         quantity: entry.num_native_units * entry.num_packages,
       };
     });

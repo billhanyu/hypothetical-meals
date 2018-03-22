@@ -32,7 +32,7 @@ export function view(req, res, next) {
 }
 
 export function viewAll(req, res, next) {
-  connection.query('SELECT * FROM Ingredients')
+  connection.query(basicViewQueryString)
     .then(results => res.json(results))
     .catch(err => {
       console.error(err);
