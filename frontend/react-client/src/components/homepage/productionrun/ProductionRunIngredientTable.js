@@ -8,6 +8,8 @@ class ProductionRunIngredientTable extends Component {
         <thead>
           <th>Ingredient</th>
           <th>Lot Number</th>
+          <th>Vendor</th>
+          <th>Quantity</th>
         </thead>
         <tbody>
           {
@@ -16,6 +18,8 @@ class ProductionRunIngredientTable extends Component {
                 <tr key={idx}>
                   <td>{ingredient.ingredient_name}</td>
                   <td>{ingredient.lot}</td>
+                  <td>{ingredient.vendor_name}</td>
+                  <td>{ingredient.num_native_units} {ingredient.ingredient_native_unit}</td>
                 </tr>
               );
             })
