@@ -19,6 +19,7 @@ import * as systemlogs from './routes/systemLogs';
 import * as order from './routes/order';
 import * as formulas from './routes/formula';
 import * as productionlog from './routes/productionlog';
+import * as productionrun from './routes/productrun';
 import { adminRequired, noobRequired, managerRequired } from './authMiddleware';
 
 import getConfig from './getConfig';
@@ -71,7 +72,8 @@ app.post('/users/manager', beAdmin, user.signupManager);
 app.post('/users/login', user.login);
 app.post('/users/login/oauth', user.loginOauth);
 app.post('/users/permission', beAdmin, user.changePermission);
-app.delete('/users/delete', beAdmin, user.deleteUser);
+app.get('/users', beAdmin, user.viewAll);
+app.post('/users/delete', beAdmin, user.deleteUser);
 
 app.get('/vendors/pages', beNoob, vendor.pages);
 app.get('/vendors/page/:page_num', beNoob, vendor.view);
@@ -85,6 +87,7 @@ app.get('/vendors/code', beAdmin, vendor.getVendorWithCode);
 app.get('/ingredients/id/:id', beNoob, ingredient.viewWithId);
 app.get('/ingredients/pages', beNoob, ingredient.pages);
 app.get('/ingredients/page/:page_num', beNoob, ingredient.view);
+app.get('/ingredients', beNoob, ingredient.viewAll);
 app.post('/ingredients', beAdmin, ingredient.addIngredient);
 app.put('/ingredients', beAdmin, ingredient.modifyIngredient);
 app.delete('/ingredients', beAdmin, ingredient.deleteIngredient);
@@ -118,9 +121,10 @@ app.get('/systemlogs', beManager, systemlogs.viewAll);
 app.get('/productionlogs/pages', beNoob, productionlog.pages);
 app.get('/productionlogs/page/:page_num', beNoob, productionlog.view);
 
+app.get('/productruns', beNoob, productionrun.view);
+
 app.get('/inventory', beNoob, inventory.all);
-app.get('/inventory/pages', beNoob, inventory.pages);
-app.get('/inventory/page/:page_num', beNoob, inventory.view);
+app.get('/inventory/lot/:ingredient_id', beNoob, inventory.getLotQuantities);
 app.get('/inventory/stock', beManager, inventory.getStock);
 app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
 app.put('/inventory', beManager, inventory.commitCart);

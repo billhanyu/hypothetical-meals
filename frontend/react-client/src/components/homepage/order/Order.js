@@ -166,7 +166,7 @@ class Order extends Component {
                           {
                             vendoringredients.map((vendoringredient, idx) => {
                               const selectedClass = ingredient && ingredient.selected == vendoringredient.id ? "selected" : "";
-                              return <option selected={selectedClass} key={idx} value={vendoringredient.id}>{`${vendoringredient.vendor_name} - $${vendoringredient.price}`}</option>;
+                              return <option selected={selectedClass} key={idx} value={vendoringredient.id}>{`${vendoringredient.vendor_name} - $${vendoringredient.price} per ${vendoringredient.ingredient_package_type}`}</option>;
                             })
                           }
                         </select>
