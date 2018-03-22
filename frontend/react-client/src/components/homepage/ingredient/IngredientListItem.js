@@ -3,6 +3,7 @@ import Storage2State from '../../Constants/Storage2State';
 import axios from 'axios';
 import VendorIngredientsTable from './onclickdetails/VendorIngredientsTable';
 import QuantityByLotTable from './onclickdetails/QuantityByLotTable';
+import PropTypes from 'prop-types';
 
 let noCollapseButton = false;
 
@@ -61,6 +62,9 @@ class IngredientListItem extends Component {
       console.log(err);
       alert('Error getting product info for ingredient');
     });
+  }
+
+  componentDidUpdate() {
     $('.collapse').unbind().on('show.bs.collapse', function (e) {
       if (noCollapseButton) {
         e.preventDefault();
@@ -161,5 +165,18 @@ class IngredientListItem extends Component {
     );
   }
 }
+
+IngredientListItem.propTypes = {
+  orderIngredient: PropTypes.func,
+  ingredient: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+  }).isRequired,
+  columnClass: PropTypes.string,
+  idx: PropTypes.number.isRequired,
+  viewIngredient: PropTypes.func,
+  order: PropTypes.bool,
+  edit: PropTypes.func,
+  delete: PropTypes.func,
+};
 
 export default IngredientListItem;
