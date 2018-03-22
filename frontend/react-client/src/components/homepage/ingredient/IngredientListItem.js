@@ -40,17 +40,17 @@ class IngredientListItem extends Component {
   
   render() {
     const ingredient = this.props.ingredient;
+    const columnClass = this.props.columnClass;
     return (
       <tbody>
         <tr data-toggle="collapse" data-target={`#vendoringredient_${this.props.idx}`} className="accordion-toggle tablerow-hover">
-        <td>{ingredient.id}</td>
-        <td><a href="javascript:void(0)" onClick={e=>this.props.viewIngredient(this.props.idx)}>{ingredient.name}</a></td>
-        <td>{ingredient.package_type}</td>
-        <td>{Storage2State[ingredient.storage_name]}</td>
-        <td>{ingredient.num_native_units+" "+ingredient.native_unit}</td>
+        <td className={columnClass}><a href="javascript:void(0)" onClick={e=>this.props.viewIngredient(this.props.idx)}>{ingredient.name}</a></td>
+        <td className={columnClass}>{ingredient.package_type}</td>
+        <td className={columnClass}>{Storage2State[ingredient.storage_name]}</td>
+        <td className={columnClass}>{ingredient.num_native_units+" "+ingredient.native_unit}</td>
         {
           global.user_group == 'admin' && !this.props.order &&
-          <td>
+          <td className={columnClass}>
             <div className="btn-group" role="group" aria-label="Basic example">
               <button
                 type="button"
@@ -71,7 +71,7 @@ class IngredientListItem extends Component {
         }
         {
           this.props.order &&
-            <td>
+          <td className={columnClass}>
             <button
               type="button"
               className="btn btn-primary no-collapse"
@@ -82,7 +82,7 @@ class IngredientListItem extends Component {
         }
       </tr>
       <tr>
-        <td colSpan={2} className="hiddenRow"></td>
+        <td colSpan={1} className="hiddenRow"></td>
         <td colSpan={3} className="hiddenRow">
           <div id={`vendoringredient_${this.props.idx}`} className="accordian-body collapse">
             <VendorIngredientsTable vendoringredients={this.state.vendoringredients} />

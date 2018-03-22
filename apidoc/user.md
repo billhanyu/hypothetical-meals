@@ -109,6 +109,16 @@ request.body.user = 'user': {
 {% endmethod %}
 
 {% method %}
+## GET '/users' {#viewAll}
+
+Views all users that have not been removed, **requires admin permission level**.
+
+Return parameters:
+Everything in Users table.
+
+{% endmethod %}
+
+{% method %}
 ## DELETE '/users/delete' {#deleteUser}
 
 Deletes a user, **requires admin permission level**.

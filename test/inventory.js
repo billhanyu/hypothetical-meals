@@ -3,29 +3,15 @@ const assert = require('chai').assert;
 const testTokens = require('./testTokens');
 
 describe('Inventory', () => {
-  describe('#pages()', () => {
-    it('should return number of pages of data', (done) => {
-      chai.request(server)
-        .get('/inventory/pages')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.a('object');
-          assert.strictEqual(res.body['numPages'], 1, 'number of pages');
-          done();
-        });
-    });
-  });
-
   describe('#all()', () => {
-    it('should return inventory items', (done) => {
+    it('should return inventory items with total quantities', (done) => {
       chai.request(server)
         .get('/inventory')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(4);
+          res.body.length.should.be.eql(6);
           done();
         });
     });
@@ -80,7 +66,7 @@ describe('Inventory', () => {
           res.should.have.status(200);
           Object.keys(res.body).length.should.be.eql(3);
           const stock = res.body;
-          assert.strictEqual(stock['1'].num_packages, 10, 'ingredient 1 stock');
+          assert.strictEqual(stock['1'].num_packages, 60, 'ingredient 1 stock');
           assert.strictEqual(stock['2'].num_packages, 20, 'ingredient 2 stock');
           assert.strictEqual(stock['4'].num_packages, 20, 'ingredient 4 stock');
           done();
@@ -88,15 +74,25 @@ describe('Inventory', () => {
     });
   });
 
-  describe('#view()', () => {
-    it('should return inventory items', (done) => {
+  describe('#getLotQuantities()', () => {
+    it('should return lot quantities for ingredient 1', (done) => {
       chai.request(server)
-        .get('/inventory/page/1')
+        .get('/inventory/lot/1')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(4);
+          res.body.length.should.be.eql(3);
+          const lots = res.body;
+          assert.strictEqual(lots[0].lot, 'ff', 'lot ff name');
+          assert.strictEqual(lots[1].lot, 'bb', 'lot bb name');
+          assert.strictEqual(lots[2].lot, 'cc', 'lot cc name');
+          assert.strictEqual(lots[0].quantity, 100, 'lot ff quantity');
+          assert.strictEqual(lots[1].quantity, 200, 'lot bb quantity');
+          assert.strictEqual(lots[2].quantity, 300, 'lot cc quantity');
+          assert.strictEqual(lots[0].inventory_id, 1, 'lot ff inventory id');
+          assert.strictEqual(lots[1].inventory_id, 2, 'lot bb inventory id');
+          assert.strictEqual(lots[2].inventory_id, 3, 'lot cc inventory id');
           done();
         });
     });
@@ -145,6 +141,27 @@ describe('Inventory', () => {
         });
     });
 
+    it('should fail invalid quantities', (done) => {
+      chai.request(server)
+        .put('/inventory/admin')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'changes': {
+            '1': -1,
+            '2': 17,
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          const changed = alasql('SELECT * FROM Inventories');
+          assert.strictEqual(changed[0].id, 1, 'Inventory item 1 left.');
+          assert.strictEqual(changed[0].num_packages, 10, 'Inventory item 1 number of packages unchanged.');
+          assert.strictEqual(changed[1].id, 2, 'Inventory item 2 left.');
+          assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 2 number of packages unchanged.');
+          done();
+        });
+    });
+
     it('should delete from inventory when quantity is zero', (done) => {
       chai.request(server)
         .put('/inventory/admin')
@@ -158,11 +175,11 @@ describe('Inventory', () => {
         .end((err, res) => {
           res.should.have.status(200);
           const changed = alasql('SELECT * FROM Inventories');
-          changed.length.should.be.eql(3);
+          changed.length.should.be.eql(5);
           assert.strictEqual(changed[0].id, 2, 'Inventory item 2 left.');
           assert.strictEqual(changed[0].num_packages, 20, 'Inventory item 2 new number of packages.');
           assert.strictEqual(changed[1].id, 3, 'Inventory item 3 left.');
-          assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 3 new number of packages.');
+          assert.strictEqual(changed[1].num_packages, 30, 'Inventory item 3 new number of packages.');
           assert.strictEqual(changed[2].id, 4, 'Inventory item 4 left.');
           assert.strictEqual(changed[2].num_packages, 20, 'Inventory item 4 new number of packages.');
           done();
@@ -187,7 +204,7 @@ describe('Inventory', () => {
           assert.strictEqual(left[1].id, 2, 'Inventory item 2 left.');
           assert.strictEqual(left[1].num_packages, 20, 'Inventory item 2 number of packages.');
           assert.strictEqual(left[2].id, 3, 'Inventory item 3 left.');
-          assert.strictEqual(left[2].num_packages, 20, 'Inventory item 3 number of packages.');
+          assert.strictEqual(left[2].num_packages, 30, 'Inventory item 3 number of packages.');
           done();
         });
     });
@@ -261,9 +278,13 @@ describe('Inventory', () => {
           assert.strictEqual(changed[1].id, 2, 'Inventory item 2 left.');
           assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 2 new number of packages.');
           assert.strictEqual(changed[2].id, 3, 'Inventory item 3 left.');
-          assert.strictEqual(changed[2].num_packages, 19.95, 'Inventory item 3 new number of packages.');
+          assert.strictEqual(changed[2].num_packages, 30, 'Inventory item 3 new number of packages.');
           assert.strictEqual(changed[3].id, 4, 'Inventory item 4 left.');
-          assert.strictEqual(changed[3].num_packages, 19.96, 'Inventory item 4 new number of packages.');
+          assert.strictEqual(changed[3].num_packages, 20, 'Inventory item 4 new number of packages.');
+          assert.strictEqual(changed[4].id, 5, 'Inventory item 5 left.');
+          assert.strictEqual(changed[4].num_packages, 19.95, 'Inventory item 5 new number of packages.');
+          assert.strictEqual(changed[5].id, 6, 'Inventory item 6 left.');
+          assert.strictEqual(changed[5].num_packages, 19.96, 'Inventory item 6 new number of packages.');
           done();
         });
     });
@@ -298,13 +319,17 @@ describe('Inventory', () => {
         .end((err, res) => {
           res.should.have.status(200);
           const changed = alasql('SELECT * FROM Inventories');
-          changed.length.should.be.eql(3);
-          assert.strictEqual(changed[0].id, 1, 'Inventory item 2 left.');
+          changed.length.should.be.eql(5);
+          assert.strictEqual(changed[0].id, 1, 'Inventory item 1 left.');
           assert.strictEqual(changed[0].num_packages, 10, 'Inventory item 1 number packages left.');
-          assert.strictEqual(changed[1].id, 2, 'Inventory item 3 left.');
+          assert.strictEqual(changed[1].id, 2, 'Inventory item 2 left.');
           assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 2 number packages left.');
-          assert.strictEqual(changed[2].id, 4, 'Inventory item 4 left.');
-          assert.strictEqual(changed[2].num_packages, 4, 'Inventory item 4 number packages left.');
+          assert.strictEqual(changed[2].id, 3, 'Inventory item 3 left.');
+          assert.strictEqual(changed[2].num_packages, 30, 'Inventory item 3 number packages left.');
+          assert.strictEqual(changed[3].id, 4, 'Inventory item 4 left.');
+          assert.strictEqual(changed[3].num_packages, 20, 'Inventory item 4 number packages left.');
+          assert.strictEqual(changed[4].id, 6, 'Inventory item 6 left.');
+          assert.strictEqual(changed[4].num_packages, 4, 'Inventory item 6 number packages left.');
           done();
         });
     });

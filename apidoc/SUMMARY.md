@@ -6,6 +6,7 @@
 * [Ingredient](ingredient.md)
 * [Inventory](inventory.md)
 * [Log](log.md)
+* [Production Runs](productrun.md)
 * [SpendingLog](spendinglog.md)
 * [SystemLog](systemLogs.md)
 * [Storage](storage.md)
