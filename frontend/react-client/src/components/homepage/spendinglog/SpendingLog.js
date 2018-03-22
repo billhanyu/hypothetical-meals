@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PageBar from '../../GeneralComponents/PageBar';
 import axios from 'axios';
 import SpendingLogEntry from './SpendingLogEntry';
+import AddEditIngredient from '../ingredient/AddEditIngredient';
 
 class SpendingLog extends Component {
   constructor(props) {
@@ -10,8 +11,12 @@ class SpendingLog extends Component {
       pages: 0,
       entries: [],
       currentPage: 1,
+      ingredient: null,
+      viewIngredient: false,
     };
     this.selectPage = this.selectPage.bind(this);
+    this.viewIngredient = this.viewIngredient.bind(this);
+    this.back = this.back.bind(this);
   }
 
   componentDidMount() {
@@ -40,8 +45,36 @@ class SpendingLog extends Component {
     });
   }
 
+  viewIngredient(id) {
+    axios.get(`/ingredients/id/${id}`, {
+      headers: { Authorization: "Token " + global.token }
+    })
+      .then(response => {
+        this.setState({
+          ingredient: response.data,
+          viewIngredient: true,
+        });
+      })
+      .catch(err => {
+        alert('Error retrieving ingredient data');
+      });
+  }
+
+  back() {
+    this.setState({
+      viewIngredient: false,
+    });
+  }
+
   render() {
-    return (
+    const viewIngredient =
+      <AddEditIngredient
+        mode='edit'
+        backToList={this.back}
+        ingredient={this.state.ingredient}
+      />
+
+    const main =
       <div>
         <h2>Spending Log</h2>
         <table className="table">
@@ -59,6 +92,7 @@ class SpendingLog extends Component {
                 <SpendingLogEntry
                   item={entry}
                   key={key}
+                  viewIngredient={this.viewIngredient}
                 />
               )
             }
@@ -69,8 +103,9 @@ class SpendingLog extends Component {
           selectPage={this.selectPage}
           currentPage={this.state.currentPage}
         />
-      </div>
-    );
+      </div>;
+    
+    return this.state.viewIngredient ? viewIngredient : main;
   }
 }
 
