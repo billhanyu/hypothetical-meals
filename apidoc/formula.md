@@ -31,10 +31,14 @@ Returns
 res.body: [{
   'id': 'myId',
   'name': 'myName',
-  'intermediate': 0,
+  'intermediate': {
+      data: [0],
+  },
   'description': 'myDescription',
   'num_product': 1,
-  'removed': 0,
+  'removed': {
+      data: [0],
+  },
   'ingredients': {
     'ingredient1_name': {
         'id': 3,
@@ -69,6 +73,12 @@ This adds formulas to the database. Only admins can add.
                     'name': 'blob',
                     'description': 'A blob',
                     'num_product': 1,
+                    'intermediate': 1,
+                    'ingredient_name': 'blob',
+                    'package_type': 'pail',
+                    'storage_id': 1,
+                    'native_unit': 'kg',
+                    'num_native_units': 10,
                     'ingredients': [
                         {
                             'ingredient_id': 1,
@@ -80,6 +90,7 @@ This adds formulas to the database. Only admins can add.
                     'name': 'Bill',
                     'description': 'Fried up Bill',
                     'num_product': 1,
+                    'intermediate': 0,
                     'ingredients': [
                         {
                             'ingredient_id': 1,
@@ -93,6 +104,7 @@ This adds formulas to the database. Only admins can add.
                 },
             ]
 ```
+All formulas should specify whether or not it's an intermediate. Ingredient_name, package_type, storage_id, num_native_units, native_unit are not required and not used for formulas without an intermediate.
 
 
 {% endmethod %}
