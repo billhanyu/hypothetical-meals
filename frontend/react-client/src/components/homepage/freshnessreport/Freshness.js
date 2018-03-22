@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { COUNT_PER_PAGE } from '../../Constants/Pagination';
 import PageBar from '../../GeneralComponents/PageBar';
 import axios from 'axios';
+import FreshnessItem from './FreshnessItem';
+import AddEditIngredient from '../ingredient/AddEditIngredient';
 
 class Freshness extends Component {
   constructor(props) {
@@ -10,14 +12,39 @@ class Freshness extends Component {
       pagedFresh: [],
       pages: 0,
       currentPage: 1,
+      ingredient: null,
+      viewIngredient: false,
     };
     this.fresh = [];
     this.filteredFresh = [];
     this.selectPage = this.selectPage.bind(this);
+    this.viewIngredient = this.viewIngredient.bind(this);
+    this.back = this.back.bind(this);
   }
 
   componentDidMount() {
     axios.get('/ingredients/freshness');
+  }
+
+  viewIngredient(id) {
+    axios.get(`/ingredients/id/${id}`, {
+      headers: { Authorization: "Token " + global.token }
+    })
+      .then(response => {
+        this.setState({
+          ingredient: response.data,
+          viewIngredient: true,
+        });
+      })
+      .catch(err => {
+        alert('Error retrieving ingredient data');
+      });
+  }
+
+  back() {
+    this.setState({
+      viewIngredient: false,
+    });
   }
 
   selectPage(idx) {
@@ -32,7 +59,14 @@ class Freshness extends Component {
   }
 
   render() {
-    return (
+    const viewIngredient =
+      <AddEditIngredient
+        mode='edit'
+        backToList={this.back}
+        ingredient={this.state.ingredient}
+      />;
+
+    const main =
       <div>
         <h3>Freshness Report</h3>
         <table className='table'>
@@ -44,7 +78,15 @@ class Freshness extends Component {
             </tr>
           </thead>
           <tbody>
-
+            {
+              this.state.pagedFresh.map((data, idx) =>
+                <FreshnessItem
+                  data={data}
+                  key={idx}
+                  viewIngredient={this.viewIngredient}
+                />
+              )
+            }
           </tbody>
         </table>
         <PageBar
@@ -52,8 +94,9 @@ class Freshness extends Component {
           currentPage={this.state.currentPage}
           pages={this.state.pages}
         />
-      </div>
-    );
+      </div>;
+    
+    return this.state.viewIngredient ? viewIngredient : main;
   }
 }
 
