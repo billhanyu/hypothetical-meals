@@ -5,7 +5,6 @@ import { updateDatabaseHelper } from './common/updateUtilities';
 import { getPaginationQueryString, getNumPages } from './common/pagination';
 import { logAction } from './systemLogs';
 import { checkIngredientProperties } from './ingredient';
-import { create } from 'domain';
 
 const fs = require('fs');
 const Papa = require('papaparse');
@@ -127,7 +126,6 @@ export function add(req, res, next) {
       success(res);
     })
     .catch((err) => {
-      console.log(err);
       handleError(err, res);
     });
 }
@@ -159,7 +157,7 @@ function addIntermediateProducts(intermediateProducts, userId) {
         if (duplicates.length > 0) {
           throw createError('Formula for intermediate product has ingredient name already in database');
         }
-        return connection.query(`INSERT INTO Ingredients (name, package_type, native_unit, num_native_units, storage_id, intermediate) VALUES ${intermediateCases.join(', ')}`)
+        return connection.query(`INSERT INTO Ingredients (name, package_type, native_unit, num_native_units, storage_id, intermediate) VALUES ${intermediateCases.join(', ')}`);
       })
       .then(() => {
         return connection.query(`SELECT * FROM Ingredients WHERE name IN (${names.join(', ')})`);
@@ -176,7 +174,7 @@ function addIntermediateProducts(intermediateProducts, userId) {
         throw err;
       });
   } else {
-    return [];
+    return Promise.resolve([]);
   }
 }
 
@@ -245,35 +243,25 @@ export function modify(req, res, next) {
   let formulas = req.body.formulas;
   let formulaIds = [];
   let hasAllIds = true;
-  formulas.forEach(x => {
-    if ('id' in x) {
-      formulaIds.push(x.id);
-    } else {
-      hasAllIds = false;
-    }
-  });
+  hasAllIds = checkFormulaIds(formulas, formulaIds, hasAllIds);
   if (!hasAllIds) {
     handleError(createError('Did not specify id for formula'), res);
     return;
   }
 
   let formulaIngredients = formulas.map(x => x.ingredients);
-  let hasIngredientParams = true;
-  formulaIngredients.forEach(f => {
-    f.forEach((i) => {
-      if (!('ingredient_id' in i) || !('num_native_units' in i)) {
-        hasIngredientParams = false;
-      }
-    });
-  });
 
-  if (!hasIngredientParams) {
+  if (!checkFormulaIngredientParams(formulaIngredients)) {
     handleError(createError('Must give ingredient_id and num_native_units for ingredient'), res);
     return;
   }
 
+  let intermediateUpdates = [];
   let toUpdate = [];
-  connection.query(`${formulaQueryString} AND id IN (${formulaIds.join(', ')})`)
+  createIntermediateUpdates(formulas, intermediateUpdates)
+    .then(() => {
+      return connection.query(`${formulaQueryString} AND id IN (${formulaIds.join(', ')})`);
+    })
     .then((formulaResults) => {
       if (formulaResults.length != formulas.length) {
         throw createError('Trying to modify formula not in database');
@@ -286,11 +274,33 @@ export function modify(req, res, next) {
       formulas.forEach(x => {
         let newUpdate = Object.assign({}, x);
         delete newUpdate.ingredients;
+        if ('intermediate_properties' in newUpdate) {
+          delete newUpdate.intermediate_properties;
+        }
         newUpdate['name'] = x.name || oldIdNameTuple[x.id];
         x['name'] = x.name || oldIdNameTuple[x.id];
         toUpdate.push(newUpdate);
       });
       return updateDatabaseHelper('Formulas', toUpdate);
+    })
+    .then(() => {
+      if (intermediateUpdates.length > 0) {
+        return updateDatabaseHelper('Ingredients', intermediateUpdates);
+      }
+    })
+    .then(() => {
+      if (intermediateUpdates.length > 0) {
+        const ingredientIds = intermediateUpdates.map(x => x.id);
+        return connection.query(`SELECT id, name FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`);
+      } else {
+        return [];
+      }
+    })
+    .then((updatedIngredientNames) => {
+      if (updatedIngredientNames.length > 0) {
+        const nameStrings = updatedIngredientNames.map(x => `{${x.name}=ingredient_id=${x.id}}`);
+        return logAction(req.payload.id, `Intermediate product${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} modified.`);
+      }
     })
     .then(() => {
       return connection.query(`DELETE FROM FormulaEntries WHERE formula_id IN (${formulaIds.join(', ')})`);
@@ -314,6 +324,71 @@ export function modify(req, res, next) {
     .catch((err) => {
       handleError(err, res);
     });
+}
+
+function checkFormulaIds(formulas, formulaIds, hasAllIds) {
+  formulas.forEach(x => {
+    if ('id' in x) {
+      formulaIds.push(x.id);
+    } else {
+      hasAllIds = false;
+    }
+  });
+  return hasAllIds;
+}
+
+function checkFormulaIngredientParams(formulaIngredients) {
+  formulaIngredients.forEach(f => {
+    f.forEach((i) => {
+      if (!('ingredient_id' in i) || !('num_native_units' in i)) {
+        return false;
+      }
+    });
+  });
+  return true;
+}
+
+function createIntermediateUpdates(formulas, intermediateUpdates) {
+  let intermediateMap = {};
+  let allFormulasWithIntermediateProperty = [];
+  createIntermediateMapping(formulas, allFormulasWithIntermediateProperty, intermediateMap, intermediateUpdates);
+  return connection.query(`SELECT id, intermediate, ingredient_id FROM Formulas WHERE id IN (${allFormulasWithIntermediateProperty.join(', ')})`)
+  .then((results) => {
+    checkIntermediateValidity(results, intermediateMap);
+  })
+  .catch((err) => {
+    throw err;
+  });
+}
+
+function createIntermediateMapping(formulas, allFormulasWithIntermediateProperty, intermediateMap, intermediateUpdates) {
+  formulas.forEach(x => {
+    if ('intermediate' in x) {
+      allFormulasWithIntermediateProperty.push(x.id);
+    }
+    if ('intermediate' in x && x.intermediate) {
+      if ('intermediate_properties' in x && Object.keys(x.intermediate_properties).length > 0) {
+        intermediateMap[x.id] = x.intermediate_properties;
+        intermediateUpdates.push(x.intermediate_properties || {});
+      }
+    }
+  });
+}
+
+function checkIntermediateValidity(results, intermediateMap) {
+  results.forEach(x => {
+    if (x.intermediate) {
+      if (!(x.id in intermediateMap)) {
+        throw createError('Cannot change intermediate formula to final formula.');
+      } else if (Object.keys(intermediateMap[x.id]).length > 0) {
+          if (!('id' in intermediateMap[x.id])) {
+            throw createError('Trying to change intermediates without giving associated ingredient id');
+          } else if (intermediateMap[x.id].id != x.ingredient_id) {
+              throw createError('Cannot change associated ingredient id for intermediate');
+          }
+      }
+    }
+  });
 }
 
 /**

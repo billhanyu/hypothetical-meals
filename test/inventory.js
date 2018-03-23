@@ -357,7 +357,7 @@ describe('Inventory', () => {
         .put('/inventory')
         .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .send({
-          'formula_id': 3,
+          'formula_id': 10,
           'num_products': 1,
         })
         .end((err, res) => {
