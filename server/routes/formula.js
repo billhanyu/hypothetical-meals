@@ -272,6 +272,9 @@ export function modify(req, res, next) {
     return;
   }
 
+  let intermediateUpdates = [];
+  createIntermediateUpdates(formulas, intermediateUpdates);
+
   let toUpdate = [];
   connection.query(`${formulaQueryString} AND id IN (${formulaIds.join(', ')})`)
     .then((formulaResults) => {
@@ -286,11 +289,33 @@ export function modify(req, res, next) {
       formulas.forEach(x => {
         let newUpdate = Object.assign({}, x);
         delete newUpdate.ingredients;
+        if ('intermediate_properties' in newUpdate) {
+          delete newUpdate.intermediate_properties;
+        }
         newUpdate['name'] = x.name || oldIdNameTuple[x.id];
         x['name'] = x.name || oldIdNameTuple[x.id];
         toUpdate.push(newUpdate);
       });
       return updateDatabaseHelper('Formulas', toUpdate);
+    })
+    .then(() => {
+      if (intermediateUpdates.length > 0) {
+        return updateDatabaseHelper('Ingredients', intermediateUpdates);
+      }
+    })
+    .then(() => {
+      if (intermediateUpdates.length > 0) {
+        const ingredientIds = intermediateUpdates.map(x => x.id);
+        return connection.query(`SELECT id, name FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`);
+      } else {
+        return [];
+      }
+    })
+    .then((updatedIngredientNames) => {
+      if (updatedIngredientNames.length > 0) {
+        const nameStrings = updatedIngredientNames.map(x => `{${x.name}=ingredient_id=${x.id}}`);
+        return logAction(req.payload.id, `Intermediate product${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} modified.`);
+      }
     })
     .then(() => {
       return connection.query(`DELETE FROM FormulaEntries WHERE formula_id IN (${formulaIds.join(', ')})`);
@@ -314,6 +339,53 @@ export function modify(req, res, next) {
     .catch((err) => {
       handleError(err, res);
     });
+}
+
+function createIntermediateUpdates(formulas, intermediateUpdates) {
+  let intermediateMap = {};
+  let allFormulasWithIntermediateProperty = [];
+  createIntermediateMapping(formulas, allFormulasWithIntermediateProperty, intermediateMap, intermediateUpdates);
+  return connection.query(`SELECT id, intermediate, ingredient_id FROM Formulas WHERE id IN (${allFormulasWithIntermediateProperty.join(', ')})`)
+  .then((results) => {
+    checkIntermediateValidity(results, intermediateMap);
+  })
+  .catch((err) => {
+    throw err;
+  });
+}
+
+function createIntermediateMapping(formulas, allFormulasWithIntermediateProperty, intermediateMap, intermediateUpdates) {
+  formulas.forEach(x => {
+    if ('intermediate' in x) {
+      allFormulasWithIntermediateProperty.push(x.id);
+    }
+    if ('intermediate' in x && x.intermediate) {
+      if ('intermediate_properties' in x && Object.keys(x.intermediate_properties).length > 0) {
+        intermediateMap[x.id] = x.intermediate_properties;
+        intermediateUpdates.push(x.intermediate_properties || {});
+      }
+    }
+  });
+}
+
+function checkIntermediateValidity(results, intermediateMap) {
+  results.forEach(x => {
+    if (x.intermediate) {
+      if (!(x.id in intermediateMap)) {
+        throw createError('Cannot change intermediate formula to final formula.');
+      } else {
+        if (Object.keys(intermediateMap[x.id]).length > 0) {
+          if (!('id' in intermediateMap[x.id])) {
+            throw createError('Trying to change intermediates without giving associated ingredient id');
+          } else {
+            if (intermediateMap[x.id].id != x.ingredient_id) {
+              throw createError('Cannot change associated ingredient id for intermediate');
+            }
+          }
+        }
+      }
+    }
+  });
 }
 
 /**
