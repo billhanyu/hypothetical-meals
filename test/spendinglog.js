@@ -2,7 +2,7 @@ import { updateLogForIngredient } from '../server/routes/spendinglog';
 
 const assert = require('chai').assert;
 const alasql = require('alasql');
-const testTokens = require('./testTokens');
+const testTokens = require('./common/testTokens');
 
 describe('SpendingLog', () => {
   describe('#pages()', () => {

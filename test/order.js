@@ -1,6 +1,6 @@
 const alasql = require('alasql');
 const assert = require('chai').assert;
-const testTokens = require('./testTokens');
+const testTokens = require('./common/testTokens');
 
 describe('Order', () => {
   describe('#placeOrder()', () => {
