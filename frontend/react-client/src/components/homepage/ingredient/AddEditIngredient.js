@@ -23,6 +23,9 @@ class AddEditIngredient extends Component {
       removed: {
         data: [0],
       },
+      intermediate: {
+        data: [0],
+      },
       storage_id: 1,
       storage_name: 'freezer',
       id: 0,
@@ -35,6 +38,7 @@ class AddEditIngredient extends Component {
       native_unit: ingredient.native_unit,
       num_native_units: ingredient.num_native_units,
       removed: ingredient.removed.data[0],
+      intermediate: ingredient.intermediate.data[0],
       storage_id: ingredient.storage_id,
       storage: Storage2State[ingredient.storage_name],
       mode: props.mode,
@@ -160,6 +164,10 @@ class AddEditIngredient extends Component {
         />
         <h2>
           {header}
+          {
+            this.state.intermediate == 1 &&
+            <span style={{ 'margin-left': '20px' }} className="badge badge-secondary">Intermediate</span>
+          }
           {
             this.state.removed == 1 &&
             <span style={{'margin-left':'20px'}} className="badge badge-danger">Deleted</span>

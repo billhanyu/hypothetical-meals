@@ -29,7 +29,6 @@ const IngredientSelector = createClass({
       headers: { Authorization: "Token " + global.token }
     })
       .then(response => {
-        console.log(response.data);
         const ingredients = response.data.map(ingredient => {
           ingredient.value = ingredient.id;
           ingredient.label = ingredient.name;
