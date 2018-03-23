@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import Snackbar from 'material-ui/Snackbar';
 
 class StorageList extends Component {
   constructor(props) {
@@ -28,7 +29,12 @@ class StorageList extends Component {
           storages: response.data,
         });
       })
-      .catch(err => alert('error getting storages'));
+      .catch(err => {
+        this.setState({
+          open: true,
+          message: "Error getting storages",
+        });
+      });
   }
 
   edit(idx) {
@@ -60,13 +66,23 @@ class StorageList extends Component {
     .then(response => {
       this.setState({
         editIdx: -1,
+        open: true,
+        message: "Updated",
       });
-      alert('Updated!');
       this.reloadData();
     })
     .catch(err => {
       const message = err.response.data;
-      alert(message);
+      this.setState({
+        open: true,
+        message,
+      });
+    });
+  }
+
+  handleRequestClose() {
+    this.setState({
+      open: false,
     });
   }
 
@@ -75,6 +91,12 @@ class StorageList extends Component {
     return (
       <div>
         <h2>Storages</h2>
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <table className="table">
           <thead>
             <tr>

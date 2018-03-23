@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ComboBox from '../../GeneralComponents/ComboBox';
 import axios from 'axios';
+import Snackbar from 'material-ui/Snackbar';
 
 const PERMISSIONS = ['unprivileged', 'manager', 'admin'];
 
@@ -8,7 +9,6 @@ class ChangePermission extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: '',
       oauth: 0,
       permission: 'unprivileged',
     };
@@ -16,6 +16,11 @@ class ChangePermission extends Component {
     this.checkChange = this.checkChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
   }
+
+  /*** REQUIRED PROPS
+    1. username (String)
+    2. cancel (Func)
+  **/
 
   handleInputChange(field, event) {
     const newState = Object.assign({}, this.state);
@@ -37,31 +42,50 @@ class ChangePermission extends Component {
     event.preventDefault();
     axios.post('/users/permission', {
       user: {
-        username: this.state.username,
+        username: this.props.username,
         oauth: this.state.oauth,
         permission: this.state.permission,
       }
     }, {
         headers: { Authorization: "Token " + global.token }
-      })
+    })
       .then(response => {
-        alert('Success!');
+        this.setState({
+          open: true,
+          message: "Changed Permission",
+        });
+        this.props.cancel();
       })
       .catch(err => {
-        alert(err.response.data);
+        this.setState({
+          open: true,
+          message: err.response.data,
+        });
       });
+  }
+
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
   }
 
   render() {
     return (
       <div>
+      <Snackbar
+        open={this.state.open}
+        message={this.state.message}
+        autoHideDuration={2500}
+        onRequestClose={this.handleRequestClose.bind(this)}
+      />
       <h2>Change User Permission</h2>
       <div className="row justify-content-md-center">
-        
+
         <form className="col-xl-6 col-lg-6 col-sm-8">
           <div className="form-group">
             <label htmlFor="username">Username / netID</label>
-            <input type="text" className="form-control" id="username" aria-describedby="username" placeholder="username" onChange={e => this.handleInputChange('username', e)} value={this.state.username} required />
+            <input disabled type="text" className="form-control" id="username" aria-describedby="username" placeholder="Username" value={this.props.username} required />
           </div>
           <div className="form-group">
             <div className="form-check">
@@ -76,6 +100,7 @@ class ChangePermission extends Component {
             <ComboBox className="form-control" id="permission" Options={PERMISSIONS} onChange={this.handleInputChange} selected={this.state.permission} />
           </div>
           <button type="submit" className="btn btn-primary" onClick={this.handleSubmitButtonClick}>Submit</button>
+          <button style={{marginLeft:'8px'}} className="btn btn-primary" onClick={this.props.cancel}>Cancel</button>
         </form>
       </div>
       </div>

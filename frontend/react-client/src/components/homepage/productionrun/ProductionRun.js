@@ -4,6 +4,7 @@ import PageBar from '../../GeneralComponents/PageBar';
 import ProductionRunFilterBar from './ProductionRunFilterBar';
 import ProductionRunItem from './ProductionRunItem';
 import axios from 'axios';
+import Snackbar from 'material-ui/Snackbar';
 
 class ProductionRun extends Component {
   constructor(props) {
@@ -40,8 +41,10 @@ class ProductionRun extends Component {
       this.selectPage(1);
     })
     .catch(err => {
-      console.error(err);
-      alert('Error retrieving production run data');
+      this.setState({
+        open: true,
+        message: err.response.data
+      });
     });
   }
 
@@ -105,10 +108,22 @@ class ProductionRun extends Component {
     this.selectPage(1);
   }
 
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
+  }
+
   render() {
     const columnClass = "OneFifthWidth";
     return (
       <div>
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <h3>Production Runs</h3>
         <ProductionRunFilterBar
           filterName={this.state.filterName}

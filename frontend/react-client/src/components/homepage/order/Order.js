@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import IngredientList from '../ingredient/IngredientList';
 import Cart from './Cart';
 import axios from 'axios';
+import Snackbar from 'material-ui/Snackbar';
+import ChooseVendorItem from './ChooseVendorItem';
 
 class Order extends Component {
   constructor(props) {
@@ -9,6 +11,7 @@ class Order extends Component {
     this.state = {
       cart: [],
       chooseVendor: false,
+      lotNumberSet: {},
     };
     this.orderIngredient = this.orderIngredient.bind(this);
     this.setQuantity = this.setQuantity.bind(this);
@@ -77,11 +80,17 @@ class Order extends Component {
               cart
             });
           } else {
-            alert('There is no vendor for this ingredient!');
+            this.setState({
+              open: true,
+              message: 'There is no vendor for this ingredient!'
+            });
           }
         })
       .catch(err => {
-        alert('Error retrieving vendor information for ingredients');
+        this.setState({
+          open: true,
+          message: 'Error retrieving vendor information for ingredients'
+        });
       });
   }
 
@@ -125,21 +134,51 @@ class Order extends Component {
       headers: {Authorization: "Token " + global.token}
     })
     .then(response => {
-      alert('order completed!');
       this.setState({
         cart: [],
         chooseVendor: false,
+        open: true,
+        message: "Order completed"
       });
       global.cart = [];
     })
     .catch(err => {
-      alert(err.response.data);
+      this.setState({
+        open: true,
+        message: err.response.data
+      });
+    });
+  }
+
+  updateLotSet(lotNumberSet) {
+    this.setState({
+      lotNumberSet,
+    });
+  }
+
+  _updateLotSet(index, entries, fullyAllocated) {
+    const currentLotSet = this.state.lotNumberSet;
+    currentLotSet[index] = {
+      fullyAllocated,
+      entries,
+    };
+  }
+
+  handleRequestClose() {
+    this.setState({
+      open: false,
     });
   }
 
   render() {
     return (
       <div>
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         {
           !this.state.chooseVendor &&
           <div>
@@ -156,23 +195,7 @@ class Order extends Component {
               <form className="col-xl-6 col-lg-6 col-sm-8">
               {
                 this.state.cart.map((item, idx) => {
-                  const ingredient = this.state["ingredient" + item.id];
-                  let vendoringredients = ingredient ? ingredient.vendoringredients : ['N/A'];
-                  return (
-                    <div className="form-group" key={idx}>
-                      <label htmlFor="vendor">{item.name}</label>
-                      <div className="col-*-8">
-                        <select className="form-control" onChange={e=>this.handleInputChange(e, idx)}>
-                          {
-                            vendoringredients.map((vendoringredient, idx) => {
-                              const selectedClass = ingredient && ingredient.selected == vendoringredient.id ? "selected" : "";
-                              return <option selected={selectedClass} key={idx} value={vendoringredient.id}>{`${vendoringredient.vendor_name} - $${vendoringredient.price} per ${vendoringredient.ingredient_package_type}`}</option>;
-                            })
-                          }
-                        </select>
-                      </div>
-                    </div>
-                  );
+                  return <ChooseVendorItem lotNumberSet={this.state.lotNumberSet[idx] == null ? [] : this.state.lotNumberSet[idx].entries} updateLotSet={this._updateLotSet.bind(this)} item={item} key={idx} state={this.state} handleInputChange={this.handleInputChange} handleLotNumberChange={this.handleLotNumberChange}/>;
                 })
               }
               <button type="button" className="btn btn-secondary" onClick={this.backToCart}>Back</button>
