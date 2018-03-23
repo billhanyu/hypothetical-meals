@@ -174,7 +174,7 @@ function addIntermediateProducts(intermediateProducts, userId) {
         throw err;
       });
   } else {
-    return [];
+    return Promise.resolve([]);
   }
 }
 
@@ -338,15 +338,14 @@ function checkFormulaIds(formulas, formulaIds, hasAllIds) {
 }
 
 function checkFormulaIngredientParams(formulaIngredients) {
-  let hasIngredientParams = true;
   formulaIngredients.forEach(f => {
     f.forEach((i) => {
       if (!('ingredient_id' in i) || !('num_native_units' in i)) {
-        hasIngredientParams = false;
+        return false;
       }
     });
   });
-  return hasIngredientParams;
+  return true;
 }
 
 function createIntermediateUpdates(formulas, intermediateUpdates) {
@@ -381,16 +380,12 @@ function checkIntermediateValidity(results, intermediateMap) {
     if (x.intermediate) {
       if (!(x.id in intermediateMap)) {
         throw createError('Cannot change intermediate formula to final formula.');
-      } else {
-        if (Object.keys(intermediateMap[x.id]).length > 0) {
+      } else if (Object.keys(intermediateMap[x.id]).length > 0) {
           if (!('id' in intermediateMap[x.id])) {
             throw createError('Trying to change intermediates without giving associated ingredient id');
-          } else {
-            if (intermediateMap[x.id].id != x.ingredient_id) {
+          } else if (intermediateMap[x.id].id != x.ingredient_id) {
               throw createError('Cannot change associated ingredient id for intermediate');
-            }
           }
-        }
       }
     }
   });
