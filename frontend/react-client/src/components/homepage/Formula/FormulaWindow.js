@@ -3,6 +3,11 @@ import FormulaInput from './NewFormula/FormulaInput.js';
 import FormulaSelector from './NewFormula/FormulaSelector.js';
 import FormulaButton from './NewFormula/FormulaButton.js';
 import axios from 'axios';
+import Snackbar from 'material-ui/Snackbar';
+import Checkbox from 'material-ui/Checkbox';
+import ComboBox from '../../GeneralComponents/ComboBox';
+import Storage2State from '../../Constants/Storage2State';
+import packageTypes from '../../Constants/PackageTypes';
 
 class FormulaWindow extends Component {
   constructor(props) {
@@ -24,6 +29,14 @@ class FormulaWindow extends Component {
       });
     }
 
+    const defaultIngredient = {
+      package_type: 'sack',
+      native_unit: '',
+      storage_id: 1,
+      storage_name: 'freezer',
+    };
+    const ingredient = props.ingredientInfo || defaultIngredient;
+
     this.state = {
       name,
       desc,
@@ -32,6 +45,11 @@ class FormulaWindow extends Component {
       idToQuantityMap,
       values,
       ingredientNameToQuantityMap,
+      checked: false,
+      package_type: ingredient.package_type,
+      native_unit: ingredient.native_unit,
+      storage_id: ingredient.storage_id,
+      storage: Storage2State[ingredient.storage_name],
     };
   }
 
@@ -137,25 +155,47 @@ class FormulaWindow extends Component {
           headers: { Authorization: "Token " + global.token }
         })
         .then(response => {
+          this.setState({
+            open: true,
+            message: "Finished updating"
+          });
           if (this.props.onFinish) {
             this.props.onFinish();
-          } else {
-            alert('Updated!');
           }
         })
         .catch(err => {
-          console.error(err);
-          alert('Error updating');
+          this.setState({
+            open: true,
+            message: err.response.data,
+          });
         });
     } else {
       this.props.onFinish(this.state, this.props.activeId);
     }
   }
 
+  updateCheck() {
+    this.setState({
+      checked: !this.state.checked,
+    });
+  }
+
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
+  }
+
   render() {
     const readOnly = global.user_group !== "admin" || this.state.removed == 1;
     return (
       <div className="NewFormulaContainer borderAll">
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         {
           this.props.BackButtonShown ? <i className="far fa-arrow-alt-circle-left fa-2x BackButtonFormulaContainer" onClick={this.props.onBackClick} ></i> : null
         }
@@ -187,6 +227,29 @@ class FormulaWindow extends Component {
           errorText={this.state.ingredError ? "Select at least 1 ingredient" : null}
         />
         <FormulaInput readOnly={readOnly} error={this.state.quantityError} errorText="Invalid Quantity" value={this.state.quantity} id="quantity" onChange={this.handleInputChange} HeaderText="Quantity Created" ContentText="Total quantity created per instance of formula recipe / ingredient usage" placeholder="Quantity Created" inputStyle={{ marginTop: '12px' }} />
+        <Checkbox
+          label="Intermediate Product"
+          checked={this.state.checked}
+          onCheck={this.updateCheck.bind(this)}
+          style={{marginLeft:'10%'}}
+        />
+        {
+          this.state.checked ? <div style={{width:'80%', margin: '0 auto'}}>
+          <div className="form-group">
+            <label htmlFor="package_type">Package Type</label>
+            <ComboBox className="form-control" id="package_type" Options={packageTypes} onChange={this.handleInputChange} selected={this.state.package_type} readOnly={readOnly} />
+          </div>
+          <div className="form-group">
+            <label htmlFor="storage">Temperature State</label>
+            <ComboBox className="form-control" id="storage" Options={["Frozen", "Refrigerated", "Room Temperature"]} onChange={this.handleInputChange} selected={this.state.storage} readOnly={readOnly} />
+          </div>
+          <div className="form-group">
+            <label htmlFor="native_unit">Unit</label>
+            <input type="text" className="form-control" id="native_unit" aria-describedby="unit" placeholder="Pounds" onChange={e => this.handleInputChange('native_unit', e)} value={this.state.native_unit} readOnly={readOnly}/>
+          </div>
+          </div>: null
+        }
+
         {
           global.user_group == "admin" &&
           <FormulaButton text={this.props.isEditing ? "Edit Formula" : "Create New Formula"} onClick={this._onFinish.bind(this)} />

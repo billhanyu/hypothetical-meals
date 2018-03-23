@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import AvailableVendorSelector from '../../selector/AvailableVendorSelector';
+import Snackbar from 'material-ui/Snackbar';
 
 class VendorIngredientList extends Component {
   constructor(props) {
@@ -41,8 +42,10 @@ class VendorIngredientList extends Component {
         });
       })
       .catch(err => {
-        console.error(err);
-        alert('Error retrieving vendors for the ingredient');
+        this.setState({
+          open: true,
+          message:'Error retrieving vendors for the ingredient'
+        });
       });
   }
 
@@ -58,18 +61,29 @@ class VendorIngredientList extends Component {
     });
   }
 
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
+  }
+
   confirmDelete() {
     axios.delete('/vendoringredients', {
       data: { ids: [this.state.vendoringredients[this.state.deleting].id] },
       headers: { Authorization: "Token " + global.token }
     })
       .then(response => {
-        alert('Deleted!');
+        this.setState({
+          open: true,
+          message:"Deleted"
+        });
         this.reloadData();
       })
       .catch(err => {
-        console.error(err);
-        alert('Error deleting this product');
+        this.setState({
+          open: true,
+          message:'Error deleting this product'
+        });
       });
   }
 
@@ -118,15 +132,19 @@ class VendorIngredientList extends Component {
         headers: { Authorization: "Token " + global.token }
       })
       .then(response => {
-        alert('updated!');
         this.setState({
           editing: false,
           editIdx: -1,
+          open: true,
+          message: "Updated"
         });
         this.reloadData();
       })
       .catch(err => {
-        alert(err.response.data);
+        this.setState({
+          open: true,
+          message: err.response.data
+        });
       });
   }
 
@@ -142,7 +160,10 @@ class VendorIngredientList extends Component {
         headers: { Authorization: "Token " + global.token }
       })
       .then(response => {
-        alert('Added product!');
+        this.setState({
+          open: true,
+          message: "Added product"
+        });
         this.setState({
           adding: false,
         });
@@ -151,9 +172,15 @@ class VendorIngredientList extends Component {
       .catch(err => {
         const msg = err.response.data;
         if (msg == "ER_DUP_ENTRY") {
-          alert('A product with the same vendor already exists.');
+          this.setState({
+            open: true,
+            message: 'A product with the same vendor already exists.'
+          });
         } else {
-          alert(msg);
+          this.setState({
+            open: true,
+            message: err.response.data
+          });
         }
       });
   }
@@ -162,6 +189,12 @@ class VendorIngredientList extends Component {
     const columnClass = global.user_group == "admin" ? "OneThirdWidth" : "HalfWidth";
     return (
       <div>
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <h3>Vendors That Produce This Ingredient</h3>
         {!this.state.adding && global.user_group == "admin" &&
           <button

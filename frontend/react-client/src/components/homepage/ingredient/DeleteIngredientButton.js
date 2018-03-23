@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import Snackbar from 'material-ui/Snackbar';
 
 class DeleteIngredientButton extends Component {
   constructor(props) {
@@ -18,18 +19,36 @@ class DeleteIngredientButton extends Component {
       }
     })
       .then(response => {
-        alert('Deleted!');
+        this.setState({
+          open: true,
+          message: 'Deleted!',
+        });
         this.props.backToList();
       })
       .catch(err => {
-        alert(err.response.data);
+        this.setState({
+          open: true,
+          message: err.response.data,
+        });
       });
+  }
+
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
   }
 
   render() {
     return (
       <div>
         <div className="btn-group" role="group" aria-label="Basic example">
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <button
           type="button"
           className="btn btn-secondary"

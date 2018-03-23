@@ -42,9 +42,13 @@ class NewFormula extends Component {
     }).then(response => {
       self.setState({
         open: true,
+        message: 'New Formula Created'
       });
     }).catch(error => {
-      alert("Error creating new Formula");
+      self.setState({
+        open: true,
+        message: error.response.data,
+      });
     });
   }
 
@@ -54,7 +58,7 @@ class NewFormula extends Component {
         <FormulaWindow onFinish={this.onFinish.bind(this)}/>
         <Snackbar
           open={this.state.open}
-          message="New Formula Created"
+          message={this.state.message}
           autoHideDuration={2500}
           onRequestClose={this.handleRequestClose.bind(this)}
         />

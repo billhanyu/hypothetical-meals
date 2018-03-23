@@ -5,6 +5,7 @@ import Cookies from 'universal-cookie';
 import RegistrationHeader from './../Registration/RegistrationHeader.js';
 import RegistrationInput from './../Registration/RegistrationInput.js';
 import { getAuthorizeLink } from '../../oauth/OAuth';
+import Snackbar from 'material-ui/Snackbar';
 
 class LoginWindow extends Component {
   constructor(props){
@@ -61,7 +62,10 @@ class LoginWindow extends Component {
       }
     })
     .catch(error => {
-      alert('Wrong username or password!');
+      this.setState({
+        open: true,
+        message: "Wrong username or password",
+      });
     });
   }
 
@@ -69,9 +73,21 @@ class LoginWindow extends Component {
     window.location = getAuthorizeLink();
   }
 
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
+  }
+
   render() {
     return (
       <div className="LoginWindow borderAll">
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <RegistrationHeader HeaderText='Sign In' HeaderIcon='fas fa-user fa-2x'/>
         <RegistrationInput inputClass="RegistrationInput" placeholderText="Username" value={this.state.email} onChange={this.handleInputChange} onKeyPress={this.keyPress} id="email" />
         <RegistrationInput inputType="password" inputClass="RegistrationInput" placeholderText="Password" value={this.state.password} onChange={this.handleInputChange} onKeyPress={this.keyPress} id="password" />

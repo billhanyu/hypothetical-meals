@@ -6,6 +6,7 @@ import SystemLogFilterBar from './SystemLogFilterBar';
 import PageBar from '../../GeneralComponents/PageBar';
 import axios from 'axios';
 import { COUNT_PER_PAGE } from '../../Constants/Pagination';
+import Snackbar from 'material-ui/Snackbar';
 
 class SystemLog extends Component {
   constructor(props) {
@@ -211,14 +212,14 @@ class SystemLog extends Component {
         ingredient={this.state.ingredient}
         backToList={this.back}
       />;
-    
+
     const viewVendor =
       <AddEditVendor
         mode="edit"
         vendor={this.state.vendor}
         backToList={this.back}
       />;
-    
+
     const viewFormula =
       <FormulaWindow
         isEditing={true}
