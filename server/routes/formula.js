@@ -5,7 +5,6 @@ import { updateDatabaseHelper } from './common/updateUtilities';
 import { getPaginationQueryString, getNumPages } from './common/pagination';
 import { logAction } from './systemLogs';
 import { checkIngredientProperties } from './ingredient';
-import { create } from 'domain';
 
 const fs = require('fs');
 const Papa = require('papaparse');
@@ -127,7 +126,6 @@ export function add(req, res, next) {
       success(res);
     })
     .catch((err) => {
-      console.log(err);
       handleError(err, res);
     });
 }
@@ -159,7 +157,7 @@ function addIntermediateProducts(intermediateProducts, userId) {
         if (duplicates.length > 0) {
           throw createError('Formula for intermediate product has ingredient name already in database');
         }
-        return connection.query(`INSERT INTO Ingredients (name, package_type, native_unit, num_native_units, storage_id, intermediate) VALUES ${intermediateCases.join(', ')}`)
+        return connection.query(`INSERT INTO Ingredients (name, package_type, native_unit, num_native_units, storage_id, intermediate) VALUES ${intermediateCases.join(', ')}`);
       })
       .then(() => {
         return connection.query(`SELECT * FROM Ingredients WHERE name IN (${names.join(', ')})`);
@@ -245,38 +243,25 @@ export function modify(req, res, next) {
   let formulas = req.body.formulas;
   let formulaIds = [];
   let hasAllIds = true;
-  formulas.forEach(x => {
-    if ('id' in x) {
-      formulaIds.push(x.id);
-    } else {
-      hasAllIds = false;
-    }
-  });
+  hasAllIds = checkFormulaIds(formulas, formulaIds, hasAllIds);
   if (!hasAllIds) {
     handleError(createError('Did not specify id for formula'), res);
     return;
   }
 
   let formulaIngredients = formulas.map(x => x.ingredients);
-  let hasIngredientParams = true;
-  formulaIngredients.forEach(f => {
-    f.forEach((i) => {
-      if (!('ingredient_id' in i) || !('num_native_units' in i)) {
-        hasIngredientParams = false;
-      }
-    });
-  });
 
-  if (!hasIngredientParams) {
+  if (!checkFormulaIngredientParams(formulaIngredients)) {
     handleError(createError('Must give ingredient_id and num_native_units for ingredient'), res);
     return;
   }
 
   let intermediateUpdates = [];
-  createIntermediateUpdates(formulas, intermediateUpdates);
-
   let toUpdate = [];
-  connection.query(`${formulaQueryString} AND id IN (${formulaIds.join(', ')})`)
+  createIntermediateUpdates(formulas, intermediateUpdates)
+    .then(() => {
+      return connection.query(`${formulaQueryString} AND id IN (${formulaIds.join(', ')})`);
+    })
     .then((formulaResults) => {
       if (formulaResults.length != formulas.length) {
         throw createError('Trying to modify formula not in database');
@@ -339,6 +324,29 @@ export function modify(req, res, next) {
     .catch((err) => {
       handleError(err, res);
     });
+}
+
+function checkFormulaIds(formulas, formulaIds, hasAllIds) {
+  formulas.forEach(x => {
+    if ('id' in x) {
+      formulaIds.push(x.id);
+    } else {
+      hasAllIds = false;
+    }
+  });
+  return hasAllIds;
+}
+
+function checkFormulaIngredientParams(formulaIngredients) {
+  let hasIngredientParams = true;
+  formulaIngredients.forEach(f => {
+    f.forEach((i) => {
+      if (!('ingredient_id' in i) || !('num_native_units' in i)) {
+        hasIngredientParams = false;
+      }
+    });
+  });
+  return hasIngredientParams;
 }
 
 function createIntermediateUpdates(formulas, intermediateUpdates) {

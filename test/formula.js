@@ -513,6 +513,7 @@ describe('Formulas', () => {
     it('should modify an intermediate formula correctly', (done) => {
       const formulaResult = alasql(`SELECT COUNT(1) FROM Formulas`);
       const numFormulas = formulaResult[0]['COUNT(1)'];
+      const intermediateId = 6;
       chai.request(server)
         .put('/formulas')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -524,7 +525,7 @@ describe('Formulas', () => {
               'num_product': 1,
               'intermediate': 1,
               'intermediate_properties': {
-                'id': 5,
+                'id': intermediateId,
                 'package_type': 'railcar',
               },
               'ingredients': [
@@ -547,7 +548,7 @@ describe('Formulas', () => {
           assert.strictEqual(formulaIngredients1.length, 1, 'Number of ingredients in formula 3');
           assert.strictEqual(formulaIngredients1[0].ingredient_id, 1, 'Ingredient id in formula 1');
           assert.strictEqual(formulaIngredients1[0].num_native_units, 2, 'Ingredient native units formula 1');
-          const intermediateIngredient = alasql(`SELECT * FROM Ingredients WHERE id = 5`);
+          const intermediateIngredient = alasql(`SELECT * FROM Ingredients WHERE id = ${intermediateId}`);
           assert.strictEqual(intermediateIngredient[0].name, 'booploop meow', 'Name of intermediate ingredient');
           assert.strictEqual(intermediateIngredient[0].package_type, 'railcar', 'Modified package type for intermediate product');
           assert.strictEqual(intermediateIngredient[0].storage_id, 2, 'Storage id for intermediate product');
@@ -784,7 +785,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/badIngredientUnitsData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -794,7 +795,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/badProductUnitsData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -804,7 +805,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/extraArgumentData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -814,7 +815,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/invalidHeaderData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -824,7 +825,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/missingArgumentData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -834,7 +835,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/notConsecutiveFormulaEntriesData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -844,7 +845,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/duplicateFormulaData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -854,7 +855,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/missingIngredientsData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -869,7 +870,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/validData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(200);
 
           const formulas = alasql(`SELECT * FROM Formulas`);
