@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 
 class QuantityByLotTableItem extends Component {
   render() {
-    const { lot, quantity } = this.props.lot;
+    const { lot, vendor, quantity } = this.props.lot;
     const { native_unit } = this.props.ingredient;
     const columnClass = this.props.columnClass;
     return (
       <tr>
         <td className={columnClass}>{lot}</td>
+        <td className={columnClass}>{vendor}</td>
         <td className={columnClass}>{
           this.props.editIdx == this.props.idx
             ?
@@ -54,6 +55,7 @@ class QuantityByLotTableItem extends Component {
 QuantityByLotTableItem.propTypes = {
   lot: PropTypes.shape({
     lot: PropTypes.string.isRequired,
+    vendor: PropTypes.string.isRequired,
     quantity: PropTypes.number.isRequired,
   }),
   ingredient: PropTypes.shape({

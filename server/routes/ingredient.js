@@ -32,7 +32,7 @@ export function view(req, res, next) {
 }
 
 export function viewAll(req, res, next) {
-  connection.query('SELECT * FROM Ingredients')
+  connection.query(basicViewQueryString)
     .then(results => res.json(results))
     .catch(err => {
       console.error(err);
@@ -95,6 +95,20 @@ function addIngredientHelper(ingredients, req, res, next) {
     .then(() => connection.query(`SELECT id FROM Ingredients ORDER BY id DESC LIMIT ${ingredientsToAdd.length}`))
     .then(results => res.json(results.map(entry => entry.id)))
     .catch(err => handleError(err, res));
+}
+
+/**
+ *
+ * @param {*} myObject
+ * @return {Boolean}
+ * Check contain keys 'name', 'storage_id', 'native_unit', 'num_native_units', 'package_type'
+ */
+export function checkIngredientProperties(myObject) {
+  if ('ingredient_name' in myObject && 'storage_id' in myObject &&
+    'native_unit' in myObject && 'num_native_units' in myObject && 'package_type' in myObject) {
+    return true;
+  }
+  return false;
 }
 
 /* request body format:
