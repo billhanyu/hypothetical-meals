@@ -9,6 +9,7 @@ class AddEditIngredient extends Component {
 
   _handleAmountChange(event, objectKey, index) {
     const entries = this.props.lotNumberSet;
+    //This is an array
     entries[index][objectKey] = event.target.value;
     let count = 0;
     entries.forEach(element => {
@@ -18,7 +19,7 @@ class AddEditIngredient extends Component {
     if(this.props.item.quantity - count == 0) {
       fullyAllocated = true;
     }
-    this.props.updateLotSet(this.props.key, entries, fullyAllocated);
+    this.props.updateLotSet(this.props.idx, entries, fullyAllocated);
   }
 
   _createAdditionalLot() {
@@ -27,10 +28,19 @@ class AddEditIngredient extends Component {
       quantity: 0,
       lotNumber: '',
     });
-    this.props.updateLotSet(this.props.key, entries);
+    let count = 0;
+    entries.forEach(element => {
+      count += element.quantity;
+    });
+    let fullyAllocated = false;
+    if(this.props.item.quantity - count == 0) {
+      fullyAllocated = true;
+    }
+    this.props.updateLotSet(this.props.idx, entries, fullyAllocated);
   }
 
   render() {
+    console.log(this.props);
     const {state, lotNumberSet} = this.props;
     let count = 0;
     lotNumberSet.forEach(element => {
@@ -42,14 +52,14 @@ class AddEditIngredient extends Component {
     let vendoringredients = ingredient ? ingredient.vendoringredients : ['N/A'];
     return (
       <div className="form-group" style={{border: '1px solid black', padding:'8px'}}>
-        <label htmlFor="vendor">{this.props.item.name} --- {leftoverAllocation == 0 ? '' : `${leftoverAllocation} unallocated`}</label>
+        <label htmlFor="vendor">{this.props.item.name} --- <span style={{color: 'red'}}>{leftoverAllocation == 0 ? '' : `${leftoverAllocation} unallocated`}</span></label>
         {
           this.props.lotNumberSet.map((element, key) => {
             return <div key={key}>
-                <div className="ChooseVendorHeader" style={{display:'inline-block', marginLeft:'12px'}}>Amount:
+                <div className="ChooseVendorHeader" style={{display:'inline-block', margin:'12px'}}>Amount:
                   <input placeholder="Amount" value={element.quantity} onChange={(e) => {this._handleAmountChange(e, 'quantity', key);}}/>
                 </div>
-                <div className="ChooseVendorHeader" style={{display:'inline-block', marginLeft:'12px'}}>Lot Number:
+                <div className="ChooseVendorHeader" style={{display:'inline-block', margin:'12px'}}>Lot Number:
                   <input placeholder="Lot Number" value={element.lotNumber} onChange={(e) => {this._handleAmountChange(e, 'lotNumber', key);}}/>
                 </div>
             </div>;
@@ -57,7 +67,7 @@ class AddEditIngredient extends Component {
         }
         <div className="ChooseVendorItemButton" onClick={this._createAdditionalLot.bind(this)}>Add Set of Lot Numbers</div>
         <div className="col-*-8">
-          <select className="form-control" onChange={e=>this.props.handleInputChange(e, this.props.key)}>
+          <select className="form-control" onChange={e=>this.props.handleInputChange(e, this.props.idx)}>
             {
               vendoringredients.map((vendoringredient, idx) => {
                 const selectedClass = ingredient && ingredient.selected == vendoringredient.id ? "selected" : "";
@@ -73,7 +83,7 @@ class AddEditIngredient extends Component {
 
 AddEditIngredient.propTypes = {
   item: PropTypes.object,
-  key: PropTypes.number,
+  idx: PropTypes.number,
   state: PropTypes.object,
   handleInputChange: PropTypes.func,
   handleLotNumberChange: PropTypes.func,

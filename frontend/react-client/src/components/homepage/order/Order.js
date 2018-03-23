@@ -150,18 +150,15 @@ class Order extends Component {
     });
   }
 
-  updateLotSet(lotNumberSet) {
-    this.setState({
-      lotNumberSet,
-    });
-  }
-
   _updateLotSet(index, entries, fullyAllocated) {
     const currentLotSet = this.state.lotNumberSet;
     currentLotSet[index] = {
       fullyAllocated,
       entries,
     };
+    this.setState({
+      lotNumberSet: currentLotSet,
+    });
   }
 
   handleRequestClose() {
@@ -195,7 +192,7 @@ class Order extends Component {
               <form className="col-xl-6 col-lg-6 col-sm-8">
               {
                 this.state.cart.map((item, idx) => {
-                  return <ChooseVendorItem lotNumberSet={this.state.lotNumberSet[idx] == null ? [] : this.state.lotNumberSet[idx].entries} updateLotSet={this._updateLotSet.bind(this)} item={item} key={idx} state={this.state} handleInputChange={this.handleInputChange} handleLotNumberChange={this.handleLotNumberChange}/>;
+                  return <ChooseVendorItem lotNumberSet={this.state.lotNumberSet[idx] == null ? [] : this.state.lotNumberSet[idx].entries} updateLotSet={this._updateLotSet.bind(this)} item={item} idx={idx} key={idx} state={this.state} handleInputChange={this.handleInputChange} handleLotNumberChange={this.handleLotNumberChange}/>;
                 })
               }
               <button type="button" className="btn btn-secondary" onClick={this.backToCart}>Back</button>
