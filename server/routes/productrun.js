@@ -12,9 +12,10 @@ export function view(req, res, next) {
         productruns[run.id] = run;
       });
       return connection.query(`
-        SELECT ProductRunsEntries.*, Ingredients.id AS ingredient_id, Ingredients.name AS ingredient_name \
+        SELECT ProductRunsEntries.*, Vendors.name AS vendor_name, Ingredients.id AS ingredient_id, Ingredients.name AS ingredient_name, Ingredients.native_unit AS ingredient_native_unit
         FROM ProductRunsEntries
-        INNER JOIN Ingredients ON ProductRunsEntries.ingredient_id = Ingredients.id`);
+        JOIN Ingredients ON ProductRunsEntries.ingredient_id = Ingredients.id
+        JOIN Vendors ON ProductRunsEntries.vendor_id = Vendors.id`);
     })
     .then(results => {
       results.forEach(entry => {

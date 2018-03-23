@@ -79,7 +79,7 @@ class QuantityByLotTable extends Component {
   }
 
   render() {
-    const columnClass = global.user_group == "admin" ? "OneThirdWidth" : "HalfWidth";
+    const columnClass = global.user_group == "admin" ? "OneFourthWidth" : "OneThirdWidth";
     return (
       <div>
         {
@@ -89,6 +89,7 @@ class QuantityByLotTable extends Component {
       <table className="table">
         <thead>
           <th className={columnClass}>Lot Number</th>
+          <th className={columnClass}>Vendor</th>
           <th className={columnClass}>Quantity</th>
           {
             global.user_group == "admin" &&
