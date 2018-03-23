@@ -3,11 +3,8 @@ import Storage2State from '../../Constants/Storage2State';
 import axios from 'axios';
 import VendorIngredientsTable from './onclickdetails/VendorIngredientsTable';
 import QuantityByLotTable from './onclickdetails/QuantityByLotTable';
-<<<<<<< HEAD
 import Snackbar from 'material-ui/Snackbar';
-=======
 import PropTypes from 'prop-types';
->>>>>>> 185d214a137fafcb79a059c16f4bad653b4e735c
 
 let noCollapseButton = false;
 
