@@ -2,7 +2,7 @@ import server from '../server/server';
 
 const alasql = require('alasql');
 const assert = require('chai').assert;
-const testTokens = require('./testTokens');
+const testTokens = require('./common/testTokens');
 const supertest = require('supertest');
 
 describe('Formulas', () => {

@@ -2,7 +2,7 @@ import { logAction } from '../server/routes/systemLogs';
 
 const alasql = require('alasql');
 const assert = require('chai').assert;
-const testTokens = require('./testTokens');
+const testTokens = require('./common/testTokens');
 
 describe('SystemLogs', () => {
   describe('#pages()', () => {
