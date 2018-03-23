@@ -145,8 +145,9 @@ class ViewInventory extends Component {
           num_native_units: ingredient.ingredient_num_native_units,
           package_type: ingredient.ingredient_package_type,
           removed: {
-            data: [false]
+            data: [false],
           },
+          intermediate: ingredient.ingredient_intermediate,
           storage_id: ingredient.ingredient_storage_id,
           storage_name: ingredient.ingredient_storage_name
         } : null}

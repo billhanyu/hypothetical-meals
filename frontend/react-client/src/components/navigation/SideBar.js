@@ -189,6 +189,16 @@ class SideBar extends Component {
                   }}
                   text="Recall Report"
                   permission="noob" />
+                <PermissionLink
+                  linkKey={"freshnessReport"}
+                  setActive={this.setActive}
+                  activeKey={this.state.activeLink}
+                  action={e => {
+                    this.props.link('freshnessReport');
+                    this.setActiveCategory("log");
+                  }}
+                  text="Freshness Report"
+                  permission="noob" />
               </ul>
             </div>
           </li>

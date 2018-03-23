@@ -3,6 +3,9 @@ import { COUNT_PER_PAGE } from '../../Constants/Pagination';
 import PageBar from '../../GeneralComponents/PageBar';
 import ProductionRunFilterBar from './ProductionRunFilterBar';
 import ProductionRunItem from './ProductionRunItem';
+import AddEditIngredient from '../ingredient/AddEditIngredient';
+import AddEditVendor from '../vendor/AddEditVendor';
+import FormulaWindow from '../Formula/FormulaWindow';
 import axios from 'axios';
 import Snackbar from 'material-ui/Snackbar';
 
@@ -16,6 +19,10 @@ class ProductionRun extends Component {
       filterStartTime: '',
       filterEndTime: '',
       filterName: '',
+      ingredient: null,
+      viewIngredient: false,
+      viewVendor: false,
+      viewFormula: false,
     };
     this.runs = [];
     this.filteredRuns = [];
@@ -25,6 +32,10 @@ class ProductionRun extends Component {
     this.changeStartTime = this.changeStartTime.bind(this);
     this.changeEndTime = this.changeEndTime.bind(this);
     this.clearFilter = this.clearFilter.bind(this);
+    this.back = this.back.bind(this);
+    this.viewIngredient = this.viewIngredient.bind(this);
+    this.viewFormula = this.viewFormula.bind(this);
+    this.viewVendor = this.viewVendor.bind(this);
   }
 
   componentDidMount() {
@@ -45,6 +56,60 @@ class ProductionRun extends Component {
         open: true,
         message: err.response.data
       });
+    });
+  }
+
+  viewIngredient(id) {
+    axios.get(`/ingredients/id/${id}`, {
+      headers: { Authorization: "Token " + global.token }
+    })
+      .then(response => {
+        this.setState({
+          ingredient: response.data,
+          viewIngredient: true,
+        });
+      })
+      .catch(err => {
+        alert('Error retrieving ingredient data');
+      });
+  }
+
+  viewVendor(id) {
+    axios.get(`/vendors/id/${id}`, {
+      headers: { Authorization: "Token " + global.token }
+    })
+      .then(response => {
+        this.setState({
+          vendor: response.data,
+          viewVendor: true,
+        });
+      })
+      .catch(err => {
+        alert('Error retrieving vendor data');
+      });
+  }
+
+  viewFormula(id) {
+    axios.get(`/formulas/id/${id}`, {
+      headers: { Authorization: "Token " + global.token }
+    })
+      .then(response => {
+        this.setState({
+          formula: response.data[0],
+          viewFormula: true,
+        });
+      })
+      .catch(err => {
+        console.log(err);
+        alert('Error retrieving formula data');
+      });
+  }
+
+  back() {
+    this.setState({
+      viewIngredient: false,
+      viewVendor: false,
+      viewFormula: false,
     });
   }
 
@@ -116,7 +181,31 @@ class ProductionRun extends Component {
 
   render() {
     const columnClass = "OneFifthWidth";
-    return (
+
+    const ingredient =
+      <AddEditIngredient
+        mode='edit'
+        backToList={this.back}
+        ingredient={this.state.ingredient}
+      />;
+
+    const viewVendor =
+      <AddEditVendor
+        mode="edit"
+        vendor={this.state.vendor}
+        backToList={this.back}
+      />;
+
+    const viewFormula =
+      <FormulaWindow
+        isEditing={true}
+        BackButtonShown={true}
+        onBackClick={this.back}
+        newFormulaObject={this.state.formula}
+        activeId={this.state.formula ? this.state.formula.id : 1}
+      />;
+
+    const main =
       <div>
         <Snackbar
           open={this.state.open}
@@ -146,7 +235,14 @@ class ProductionRun extends Component {
           </thead>
           {
             this.state.pagedRuns.map((run, idx) => {
-              return <ProductionRunItem key={idx} run={run} idx={idx} />;
+              return <ProductionRunItem
+                key={idx}
+                run={run}
+                idx={idx}
+                viewIngredient={this.viewIngredient}
+                viewFormula={this.viewFormula}
+                viewVendor={this.viewVendor}
+              />;
             })
           }
         </table>
@@ -155,8 +251,17 @@ class ProductionRun extends Component {
           pages={this.state.pages}
           currentPage={this.state.currentPage}
         />
-      </div>
-    );
+      </div>;
+    
+    if (this.state.viewIngredient) {
+      return ingredient;
+    } else if (this.state.viewVendor) {
+      return viewVendor;
+    } else if (this.state.viewFormula) {
+      return viewFormula;
+    } else {
+      return main;
+    }
   }
 }
 

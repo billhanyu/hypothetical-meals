@@ -15,10 +15,11 @@ INSERT INTO Vendors (id, name, contact, code) VALUES (2, 'UNC', 'contact', 'code
 INSERT INTO Storages (id, name, capacity) VALUES (1, 'freezer', 2000);
 INSERT INTO Storages (id, name, capacity) VALUES (2, 'refrigerator', 20);
 INSERT INTO Storages (id, name, capacity) VALUES (3, 'warehouse', 500);
-INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units) VALUES (1, 'poop', 'sack', 1, 'pounds', 10);
+INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units, worst_duration, total_weighted_duration, total_num_native_units) VALUES (1, 'poop', 'sack', 1, 'pounds', 10, 123456789, 1000000000, 10);
 INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units) VALUES (2, 'beans', 'truckload', 1, 'pounds', 15);
-INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units) VALUES (3, 'boop', 'pail', 1, 'kg', 20);
+INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units, worst_duration, total_weighted_duration, total_num_native_units) VALUES (3, 'boop', 'pail', 1, 'kg', 20, 123456, 300000, 7);
 INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units) VALUES (4, 'loop', 'sack', 2, 'g', 50);
+INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units, intermediate) VALUES (5, 'intermediate', 'sack', 2, 'g', 20, 1);
 INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (1, 1, 10, 1);
 INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (2, 2, 20, 1);
 INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (3, 3, 30, 1);

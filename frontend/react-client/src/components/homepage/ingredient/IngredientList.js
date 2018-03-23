@@ -4,13 +4,15 @@ import PageBar from '../../GeneralComponents/PageBar';
 import IngredientListItem from './IngredientListItem';
 import AddEditIngredient from './AddEditIngredient';
 import BulkImport from './BulkImport';
+import PropTypes from 'prop-types';
+import { COUNT_PER_PAGE } from '../../Constants/Pagination';
 import Snackbar from 'material-ui/Snackbar';
 
 class IngredientList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ingredients: [],
+      ingredients: [], // paged
       pages: 1,
       page: 1,
       toDelete: 0,
@@ -21,6 +23,7 @@ class IngredientList extends Component {
       bulkImport: false,
       editingIdx: 0,
     };
+    this.allIngredients = []; // all
     this.selectPage = this.selectPage.bind(this);
     this.edit = this.edit.bind(this);
     this.delete = this.delete.bind(this);
@@ -35,40 +38,22 @@ class IngredientList extends Component {
   }
 
   componentDidMount() {
-    this.getPageNum();
-    this.selectPage(1);
-  }
-
-  getPageNum() {
-    axios.get('/ingredients/pages', {
-      headers: { Authorization: "Token " + global.token }
-    })
-      .then(response => {
-        this.setState({
-          pages: response.data.numPages,
-        });
-      })
-      .catch(err => {
-        this.setState({
-          open: true,
-          message: 'Data Retrieval Error',
-        });
-      });
-  }
-
-  selectPage(page) {
-    this.setState({
-      editing: false,
-      page,
-    });
-    axios.get(`/ingredients/page/${page}`, {
+    axios.get('/ingredients', {
       headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
       const ingredients = response.data;
       ingredients.sort((a, b) => a.id - b.id);
+      const filtered = [];
+      ingredients.forEach(ingredient => {
+        if (!(this.props.order && ingredient.intermediate.data[0])) {
+          filtered.push(ingredient);
+        }
+      });
+      this.allIngredients = filtered;
+      this.selectPage(1);
       this.setState({
-        ingredients,
+        pages: Math.ceil(filtered.length / COUNT_PER_PAGE),
       });
     })
     .catch(err => {
@@ -76,6 +61,18 @@ class IngredientList extends Component {
         open: true,
         message: 'Data Retrieval Error',
       });
+    });
+  }
+
+  selectPage(idx) {
+    const ingredients = [];
+    for (let i = (idx - 1) * COUNT_PER_PAGE; i < idx * COUNT_PER_PAGE && i < this.allIngredients.length; i++) {
+      ingredients.push(this.allIngredients[i]);
+    }
+    this.setState({
+      editing: false,
+      ingredients,
+      page: idx,
     });
   }
 
@@ -152,8 +149,8 @@ class IngredientList extends Component {
     });
   }
 
-  orderIngredient(idx) {
-    this.props.orderIngredient(this.state.ingredients[idx]);
+  orderIngredient(idx, quantity) {
+    this.props.orderIngredient(this.state.ingredients[idx], quantity);
   }
 
   viewIngredient(idx) {
@@ -282,5 +279,11 @@ class IngredientList extends Component {
     }
   }
 }
+
+IngredientList.propTypes = {
+  orderIngredient: PropTypes.func,
+  onClickIngredient: PropTypes.func,
+  order: PropTypes.bool,
+};
 
 export default IngredientList;
