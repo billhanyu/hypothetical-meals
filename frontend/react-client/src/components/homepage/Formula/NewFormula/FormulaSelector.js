@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import AutoComplete from 'material-ui/AutoComplete';
 import FormulaIngredientItem from './FormulaIngredientItem.js';
 import axios from 'axios';
 
 class FormulaInput extends Component {
   constructor(props) {
     super(props);
-    this.handleChange = this.handleChange.bind(this);
     this.state = {
       values: props.values != null ? props.values : [],
       allIngredients: [],
@@ -50,23 +48,6 @@ class FormulaInput extends Component {
     });
   }
 
-  handleChange(event, index, values) {
-    this.setState({values});
-    this.props.onValueChange(values);
-  }
-
-  menuItems(values) {
-    return this.state.allIngredients.map((name) => (
-      <MenuItem
-        key={name}
-        insetChildren={true}
-        checked={values && values.indexOf(name) > -1}
-        value={name}
-        primaryText={name}
-      />
-    ));
-  }
-
   handleInputChange(elementName, newQuantity) {
     const newQuantityMap = this.props.nameToQuantityMap;
     const newIngredientNameToQuantityMap = this.props.ingredientNameToQuantityMap;
@@ -86,6 +67,15 @@ class FormulaInput extends Component {
     this.props.onChange(newQuantityMap, newIngredientNameToQuantityMap);
   }
 
+  handleNewRequest(chosenRequest, index) {
+    const array = this.state.values.slice();
+    array.push(chosenRequest);
+    this.setState({
+      values: array,
+    });
+    this.props.onValueChange(array);
+  }
+
   render() {
     return (
       <div className="FormulaInputContainer">
@@ -93,18 +83,15 @@ class FormulaInput extends Component {
           <div className="FormulaTextHeader">{this.props.HeaderText}</div>
           <div className="FormulaTextContent">{this.props.ContentText}</div>
         </div>
-
-        <SelectField
-           disabled={this.props.readOnly}
-           multiple={true}
-           hintText="Select Ingredients"
-           value={this.state.values}
-           onChange={this.handleChange}
-           errorText={this.props.errorText}
-           listStyle={{color: '#31749d', padding: '0px !important', paddingTop: '0px !important', paddingBottom: '0px !important',}}
-         >
-           {this.menuItems(this.state.values)}
-         </SelectField>
+        <AutoComplete
+          hintText="Select Ingredients"
+          dataSource={this.state.allIngredients}
+          disabled={this.props.readOnly}
+          filter={AutoComplete.caseInsensitiveFilter}
+          listStyle={{color: '#31749d'}}
+          onNewRequest={this.handleNewRequest.bind(this)}
+          openOnFocus={true}
+        />
          {
            this.state.values.map((elementName, key) => {
              return <FormulaIngredientItem

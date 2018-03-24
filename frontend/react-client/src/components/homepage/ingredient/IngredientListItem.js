@@ -3,6 +3,7 @@ import Storage2State from '../../Constants/Storage2State';
 import axios from 'axios';
 import VendorIngredientsTable from './onclickdetails/VendorIngredientsTable';
 import QuantityByLotTable from './onclickdetails/QuantityByLotTable';
+import Snackbar from 'material-ui/Snackbar';
 import PropTypes from 'prop-types';
 
 let noCollapseButton = false;
@@ -59,8 +60,10 @@ class IngredientListItem extends Component {
       });
     })
     .catch(err => {
-      console.log(err);
-      alert('Error getting product info for ingredient');
+      this.setState({
+        open: true,
+        message: 'Error getting product info for ingredient',
+      })
     });
   }
 
@@ -75,12 +78,24 @@ class IngredientListItem extends Component {
       noCollapseButton = true;
     });
   }
-  
+
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
+  }
+
   render() {
     const ingredient = this.props.ingredient;
     const columnClass = this.props.columnClass;
     return (
       <tbody>
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <tr data-toggle="collapse" data-target={`#vendoringredient_${this.props.idx}`} className="accordion-toggle tablerow-hover">
         <td className={columnClass}>
           <a href="javascript:void(0)" onClick={e=>this.props.viewIngredient(this.props.idx)}>{ingredient.name}</a>

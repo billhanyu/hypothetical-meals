@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import Snackbar from 'material-ui/Snackbar';
 
 class BulkImport extends Component {
   constructor(props) {
@@ -10,7 +11,10 @@ class BulkImport extends Component {
 
   submit(e) {
     if (!this.file) {
-      alert('Please choose some file!');
+      this.setState({
+        open: true,
+        message: 'Please Choose a File.',
+      });
       return;
     }
     const data = new FormData();
@@ -19,10 +23,16 @@ class BulkImport extends Component {
       headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
-      alert('Successfully Imported!');
+      this.setState({
+        open: true,
+        message: 'Successfully Imported!',
+      });
     })
     .catch(err => {
-      alert(err.response.data);
+      this.setState({
+        open: true,
+        message: err.response.data,
+      });
     });
   }
 
@@ -30,9 +40,21 @@ class BulkImport extends Component {
     this.file = e.target.files[0];
   }
 
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
+  }
+
   render() {
     return (
       <div>
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <div className="row justify-content-md-center" style={{'margin-top': '20px'}}>
           <input className="col-*-auto BulkImportFile" type="file" name="bulk" onChange={this.changeFile} />
         </div>
