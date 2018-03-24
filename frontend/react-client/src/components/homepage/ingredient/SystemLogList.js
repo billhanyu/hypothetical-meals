@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import Snackbar from 'material-ui/Snackbar';
 
 class SystemLogList extends Component {
   constructor(props) {
@@ -20,9 +21,17 @@ class SystemLogList extends Component {
         });
       })
       .catch(err => {
-        console.error(err);
-        alert('Error retrieving sytem logs related to this ingredient');
+        this.setState({
+          open: true,
+          message: 'Error retrieving sytem logs related to this ingredient'
+        });
       });
+  }
+
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
   }
 
   display(description) {
@@ -37,6 +46,12 @@ class SystemLogList extends Component {
     return(
       <div>
         <h3>Actions On This Ingredient</h3>
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <table className="table">
           <thead>
             <tr className="row" style={{ 'margin': 0 }}>

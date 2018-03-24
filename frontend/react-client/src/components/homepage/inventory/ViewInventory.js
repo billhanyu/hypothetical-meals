@@ -6,6 +6,7 @@ import PageBar from '../../GeneralComponents/PageBar';
 import TempStates from '../../Constants/TempStates';
 import { COUNT_PER_PAGE } from '../../Constants/Pagination';
 import AddEditIngredient from '../ingredient/AddEditIngredient';
+import Snackbar from 'material-ui/Snackbar';
 
 class ViewInventory extends Component {
   constructor(props) {
@@ -55,7 +56,10 @@ class ViewInventory extends Component {
       this.selectPage(this.state.currentPage);
     })
     .catch(error => {
-      alert('Data loading error');
+      this.setState({
+        open: true,
+        message: error.response.data
+      });
     });
   }
 
@@ -120,9 +124,15 @@ class ViewInventory extends Component {
     });
   }
 
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
+  }
+
   render() {
     const columnClass = global.user_group == "admin" ? "OneSixthWidth" : "OneFifthWidth";
-    
+
     const ingredient = this.state.viewingIdx > -1 ? this.state.pagedEntries[this.state.viewingIdx] : null;
 
     const view =
@@ -143,8 +153,14 @@ class ViewInventory extends Component {
         } : null}
         backToList={this.backToList}
       />;
-    const main = 
+    const main =
       <div>
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <h2>Inventory</h2>
         <FilterBar
           filterIngredient={this.filterIngredient}
