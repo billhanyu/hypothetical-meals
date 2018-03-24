@@ -518,11 +518,11 @@ describe('Ingredient', () => {
     });
 
     xit('should pass valid data', (done) => {
-      const IngredientResult = alasql(`SELECT COUNT(1) FROM Ingredients`);
+      // const IngredientResult = alasql(`SELECT COUNT(1) FROM Ingredients`);
       const numIngredients = IngredientResult[0]['COUNT(1)'];
       // const vendorsIngredientResult = alasql(`SELECT COUNT(1) FROM VendorsIngredients`);
       // const numVendorIngredients = vendorsIngredientResult[0]['COUNT(1)'];
-      alasql('UPDATE Storages SET capacity = 1000000');
+      // alasql('UPDATE Storages SET capacity = 1000000');
       supertest(server).post('/ingredients/import')
       .set('Authorization', `Token ${testTokens.adminTestToken}`)
       .attach('bulk', './test/bulk_import/ingredients/validData.csv')
@@ -530,10 +530,10 @@ describe('Ingredient', () => {
         res.should.have.status(200);
 
 
-        const ingredients = alasql(`SELECT * FROM Ingredients`);
+        // const ingredients = alasql(`SELECT * FROM Ingredients`);
         assert.strictEqual(ingredients.length, numIngredients + 6, 'Six of six ingredients added to ingredients table.');
 
-        const vendorsIngredients = alasql(`SELECT * FROM VendorsIngredients`);
+        // const vendorsIngredients = alasql(`SELECT * FROM VendorsIngredients`);
         assert.strictEqual(vendorsIngredients.length, numVendorIngredients + 6, 'Six of six vendor ingredients added to vendor ingredients table.');
 
         const newVendorIngredient = vendorsIngredients.find(vendorsIngredient => vendorsIngredient.ingredient_id == 9 && vendorsIngredient.price == 32.1 && vendorsIngredient.vendor_id == 1);

@@ -33,7 +33,7 @@ describe('VendorIngredient', () => {
 
   describe('#viewAvailable()', () => {
     xit('should return all available vendorsingredients', (done) => {
-      alasql('UPDATE VendorsIngredients SET removed = 1 WHERE id = 1');
+      // alasql('UPDATE VendorsIngredients SET removed = 1 WHERE id = 1');
       chai.request(server)
         .get('/vendoringredients-available')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
@@ -64,7 +64,7 @@ describe('VendorIngredient', () => {
     });
 
     xit('should return only available vendors for an ingredient', (done) => {
-      alasql('UPDATE VendorsIngredients SET removed = 1 WHERE ingredient_id = 1');
+      // alasql('UPDATE VendorsIngredients SET removed = 1 WHERE ingredient_id = 1');
       chai.request(server)
         .get('/vendoringredients/1')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)

@@ -1,6 +1,5 @@
 const express = require('express');
 const mysql = require('mysql');
-const alasql = require('alasql');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const multer = require('multer');

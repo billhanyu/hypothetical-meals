@@ -21,9 +21,9 @@ describe('Order', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const inventory = alasql('SELECT * FROM Inventories');
-          const logs = alasql('SELECT * FROM Logs');
-          const spendingLogs = alasql('SELECT * FROM SpendingLogs');
+          // const inventory = alasql('SELECT * FROM Inventories');
+          // const logs = alasql('SELECT * FROM Logs');
+          // const spendingLogs = alasql('SELECT * FROM SpendingLogs');
           assert.strictEqual(inventory.length, 4, 'Number of things in inventory');
           assert.strictEqual(inventory[0].id, 1, 'Id for inventory 1');
           assert.strictEqual(inventory[0].ingredient_id, 1, 'Ingredient for inventory 1');
