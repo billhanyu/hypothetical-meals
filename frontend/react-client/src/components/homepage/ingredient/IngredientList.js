@@ -6,6 +6,7 @@ import AddEditIngredient from './AddEditIngredient';
 import BulkImport from './BulkImport';
 import PropTypes from 'prop-types';
 import { COUNT_PER_PAGE } from '../../Constants/Pagination';
+import Snackbar from 'material-ui/Snackbar';
 
 class IngredientList extends Component {
   constructor(props) {
@@ -55,7 +56,12 @@ class IngredientList extends Component {
         pages: Math.ceil(filtered.length / COUNT_PER_PAGE),
       });
     })
-    .catch(err => alert('Retrieving data error'));
+    .catch(err => {
+      this.setState({
+        open: true,
+        message: 'Data Retrieval Error',
+      });
+    });
   }
 
   selectPage(idx) {
@@ -130,10 +136,16 @@ class IngredientList extends Component {
     })
     .then(response => {
       this.selectPage(1);
-      alert('Deleted!');
+      this.setState({
+        open: true,
+        message: 'Deleted!',
+      });
     })
     .catch(err => {
-      alert(err.response.data);
+      this.setState({
+        open: true,
+        message: err.response.data,
+      });
     });
   }
 
@@ -144,6 +156,12 @@ class IngredientList extends Component {
   viewIngredient(idx) {
     this.setState({
       viewingIdx: idx,
+    });
+  }
+
+  handleRequestClose() {
+    this.setState({
+      open: false,
     });
   }
 
@@ -170,6 +188,12 @@ class IngredientList extends Component {
 
     const main =
     <div>
+      <Snackbar
+        open={this.state.open}
+        message={this.state.message}
+        autoHideDuration={2500}
+        onRequestClose={this.handleRequestClose.bind(this)}
+      />
       {!this.props.order &&
       <div>
       <h2>Ingredients</h2>
