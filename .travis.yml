@@ -1,3 +1,8 @@
 language: node_js
 node_js:
 - '8'
+services:
+  - mysql
+before_script:
+  - yes | cp -rf ./server/config.travis.js ./server/config.js
+  - mysql -u root -e "CREATE DATABASE meals_test"
