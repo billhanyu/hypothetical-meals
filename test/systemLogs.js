@@ -1,6 +1,6 @@
 import { logAction } from '../server/routes/systemLogs';
 
-const alasql = require('alasql');
+const dbSetup = require('./common/dbSetup');
 const assert = require('chai').assert;
 const testTokens = require('./common/testTokens');
 
@@ -21,8 +21,7 @@ describe('SystemLogs', () => {
 
   describe('#view()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should return all system logs', (done) => {
@@ -38,10 +37,13 @@ describe('SystemLogs', () => {
     });
 
     it('should only return one page of system logs', (done) => {
+      const systemLogs = [];
       for (let i = 0; i < 52; i++) {
-        alasql(`INSERT INTO SystemLogs (user_id, description) VALUES (5, 'test${i}')`);
+        systemLogs.push([5, `test${i}`]);
       }
-      chai.request(server)
+      connection.query(`INSERT INTO SystemLogs (user_id, description) VALUES ?`, [systemLogs])
+      .then(() => {
+        chai.request(server)
         .get('/systemlogs/page/1')
         .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .end((err, res) => {
@@ -50,32 +52,35 @@ describe('SystemLogs', () => {
           res.body.length.should.be.eql(50);
           done();
         });
+      })
+      .catch((error) => console.log(error));
     });
   });
 
   describe('#logAction()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('Should insert user id and description into the database', done => {
       const testString = 'Testing proper insert into database';
       logAction(5, testString)
         .then(() => {
-          const systemLogs = alasql('SELECT * FROM SystemLogs');
-          const lastLog = systemLogs[systemLogs.length - 1];
-          assert.strictEqual(lastLog.user_id, 5, 'User id of log');
-          assert.strictEqual(lastLog.description, testString, 'Description of test string');
-          done();
+          connection.query('SELECT * FROM SystemLogs')
+          .then((systemLogs) => {
+            const lastLog = systemLogs[systemLogs.length - 1];
+            assert.strictEqual(lastLog.user_id, 5, 'User id of log');
+            assert.strictEqual(lastLog.description, testString, 'Description of test string');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
   });
 
   describe('#viewAll()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('Should return all system logs', (done) => {

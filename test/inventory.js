@@ -1,4 +1,4 @@
-const alasql = require('alasql');
+const dbSetup = require('./common/dbSetup');
 const assert = require('chai').assert;
 const testTokens = require('./common/testTokens');
 
@@ -101,8 +101,7 @@ describe('Inventory', () => {
 
   describe('#modifyQuantities()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should fail modify inventory quantity as noob', (done) => {
@@ -133,12 +132,15 @@ describe('Inventory', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const changed = alasql('SELECT * FROM Inventories');
-          assert.strictEqual(changed[0].id, 1, 'Inventory item 1 left.');
-          assert.strictEqual(changed[0].num_packages, 7, 'Inventory item 1 new number of packages.');
-          assert.strictEqual(changed[1].id, 2, 'Inventory item 2 left.');
-          assert.strictEqual(changed[1].num_packages, 17, 'Inventory item 2 new number of packages.');
-          done();
+          connection.query('SELECT * FROM Inventories')
+          .then((changed) => {
+            assert.strictEqual(changed[0].id, 1, 'Inventory item 1 left.');
+            assert.strictEqual(changed[0].num_packages, 7, 'Inventory item 1 new number of packages.');
+            assert.strictEqual(changed[1].id, 2, 'Inventory item 2 left.');
+            assert.strictEqual(changed[1].num_packages, 17, 'Inventory item 2 new number of packages.');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -154,12 +156,15 @@ describe('Inventory', () => {
         })
         .end((err, res) => {
           res.should.have.status(400);
-          const changed = alasql('SELECT * FROM Inventories');
-          assert.strictEqual(changed[0].id, 1, 'Inventory item 1 left.');
-          assert.strictEqual(changed[0].num_packages, 10, 'Inventory item 1 number of packages unchanged.');
-          assert.strictEqual(changed[1].id, 2, 'Inventory item 2 left.');
-          assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 2 number of packages unchanged.');
-          done();
+          connection.query('SELECT * FROM Inventories')
+          .then((changed) => {
+            assert.strictEqual(changed[0].id, 1, 'Inventory item 1 left.');
+            assert.strictEqual(changed[0].num_packages, 10, 'Inventory item 1 number of packages unchanged.');
+            assert.strictEqual(changed[1].id, 2, 'Inventory item 2 left.');
+            assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 2 number of packages unchanged.');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -175,15 +180,18 @@ describe('Inventory', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const changed = alasql('SELECT * FROM Inventories');
-          changed.length.should.be.eql(5);
-          assert.strictEqual(changed[0].id, 2, 'Inventory item 2 left.');
-          assert.strictEqual(changed[0].num_packages, 20, 'Inventory item 2 new number of packages.');
-          assert.strictEqual(changed[1].id, 3, 'Inventory item 3 left.');
-          assert.strictEqual(changed[1].num_packages, 30, 'Inventory item 3 new number of packages.');
-          assert.strictEqual(changed[2].id, 4, 'Inventory item 4 left.');
-          assert.strictEqual(changed[2].num_packages, 20, 'Inventory item 4 new number of packages.');
-          done();
+          connection.query('SELECT * FROM Inventories')
+          .then((changed) => {
+            changed.length.should.be.eql(5);
+            assert.strictEqual(changed[0].id, 2, 'Inventory item 2 left.');
+            assert.strictEqual(changed[0].num_packages, 20, 'Inventory item 2 new number of packages.');
+            assert.strictEqual(changed[1].id, 3, 'Inventory item 3 left.');
+            assert.strictEqual(changed[1].num_packages, 30, 'Inventory item 3 new number of packages.');
+            assert.strictEqual(changed[2].id, 4, 'Inventory item 4 left.');
+            assert.strictEqual(changed[2].num_packages, 20, 'Inventory item 4 new number of packages.');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -199,14 +207,17 @@ describe('Inventory', () => {
         })
         .end((err, res) => {
           res.should.have.status(400);
-          const left = alasql('SELECT * FROM Inventories');
-          assert.strictEqual(left[0].id, 1, 'Inventory item 1 left.');
-          assert.strictEqual(left[0].num_packages, 10, 'Inventory item 1 number of packages.');
-          assert.strictEqual(left[1].id, 2, 'Inventory item 2 left.');
-          assert.strictEqual(left[1].num_packages, 20, 'Inventory item 2 number of packages.');
-          assert.strictEqual(left[2].id, 3, 'Inventory item 3 left.');
-          assert.strictEqual(left[2].num_packages, 30, 'Inventory item 3 number of packages.');
-          done();
+          connection.query('SELECT * FROM Inventories')
+          .then((left) => {
+            assert.strictEqual(left[0].id, 1, 'Inventory item 1 left.');
+            assert.strictEqual(left[0].num_packages, 10, 'Inventory item 1 number of packages.');
+            assert.strictEqual(left[1].id, 2, 'Inventory item 2 left.');
+            assert.strictEqual(left[1].num_packages, 20, 'Inventory item 2 number of packages.');
+            assert.strictEqual(left[2].id, 3, 'Inventory item 3 left.');
+            assert.strictEqual(left[2].num_packages, 30, 'Inventory item 3 number of packages.');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -259,8 +270,7 @@ describe('Inventory', () => {
 
   describe('#commitCart()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should reduce inventory quantities with valid request', (done) => {
@@ -273,20 +283,23 @@ describe('Inventory', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const changed = alasql('SELECT * FROM Inventories');
-          assert.strictEqual(changed[0].id, 1, 'Inventory item 1 left.');
-          assert.strictEqual(changed[0].num_packages, 10, 'Inventory item 1 new number of packages.');
-          assert.strictEqual(changed[1].id, 2, 'Inventory item 2 left.');
-          assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 2 new number of packages.');
-          assert.strictEqual(changed[2].id, 3, 'Inventory item 3 left.');
-          assert.strictEqual(changed[2].num_packages, 30, 'Inventory item 3 new number of packages.');
-          assert.strictEqual(changed[3].id, 4, 'Inventory item 4 left.');
-          assert.strictEqual(changed[3].num_packages, 20, 'Inventory item 4 new number of packages.');
-          assert.strictEqual(changed[4].id, 5, 'Inventory item 5 left.');
-          assert.strictEqual(changed[4].num_packages, 19.95, 'Inventory item 5 new number of packages.');
-          assert.strictEqual(changed[5].id, 6, 'Inventory item 6 left.');
-          assert.strictEqual(changed[5].num_packages, 19.96, 'Inventory item 6 new number of packages.');
-          done();
+          connection.query('SELECT * FROM Inventories')
+          .then((changed) => {
+            assert.strictEqual(changed[0].id, 1, 'Inventory item 1 left.');
+            assert.strictEqual(changed[0].num_packages, 10, 'Inventory item 1 new number of packages.');
+            assert.strictEqual(changed[1].id, 2, 'Inventory item 2 left.');
+            assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 2 new number of packages.');
+            assert.strictEqual(changed[2].id, 3, 'Inventory item 3 left.');
+            assert.strictEqual(changed[2].num_packages, 30, 'Inventory item 3 new number of packages.');
+            assert.strictEqual(changed[3].id, 4, 'Inventory item 4 left.');
+            assert.strictEqual(changed[3].num_packages, 20, 'Inventory item 4 new number of packages.');
+            assert.strictEqual(changed[4].id, 5, 'Inventory item 5 left.');
+            assert.strictEqual(changed[4].num_packages, 19.95, 'Inventory item 5 new number of packages.');
+            assert.strictEqual(changed[5].id, 6, 'Inventory item 6 left.');
+            assert.strictEqual(changed[5].num_packages, 19.96, 'Inventory item 6 new number of packages.');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -300,12 +313,15 @@ describe('Inventory', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const spending = alasql('SELECT * FROM SpendingLogs WHERE id IN (3, 4)');
-          assert.strictEqual(spending[0].id, 3, 'spendinglog for ingredient 3');
-          assert.strictEqual(spending[0].consumed, 60, 'spendinglog 3 consumed cost');
-          assert.strictEqual(spending[1].id, 4, 'spendinglog for ingredient 3');
-          assert.strictEqual(spending[1].consumed, 70, 'spendinglog 4 consumed cost');
-          done();
+          connection.query('SELECT * FROM SpendingLogs WHERE id IN (3, 4)')
+          .then((spending) => {
+            assert.strictEqual(spending[0].id, 3, 'spendinglog for ingredient 3');
+            assert.strictEqual(spending[0].consumed, 60, 'spendinglog 3 consumed cost');
+            assert.strictEqual(spending[1].id, 4, 'spendinglog for ingredient 3');
+            assert.strictEqual(spending[1].consumed, 70, 'spendinglog 4 consumed cost');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -319,19 +335,22 @@ describe('Inventory', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const changed = alasql('SELECT * FROM Inventories');
-          changed.length.should.be.eql(5);
-          assert.strictEqual(changed[0].id, 1, 'Inventory item 1 left.');
-          assert.strictEqual(changed[0].num_packages, 10, 'Inventory item 1 number packages left.');
-          assert.strictEqual(changed[1].id, 2, 'Inventory item 2 left.');
-          assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 2 number packages left.');
-          assert.strictEqual(changed[2].id, 3, 'Inventory item 3 left.');
-          assert.strictEqual(changed[2].num_packages, 30, 'Inventory item 3 number packages left.');
-          assert.strictEqual(changed[3].id, 4, 'Inventory item 4 left.');
-          assert.strictEqual(changed[3].num_packages, 20, 'Inventory item 4 number packages left.');
-          assert.strictEqual(changed[4].id, 6, 'Inventory item 6 left.');
-          assert.strictEqual(changed[4].num_packages, 4, 'Inventory item 6 number packages left.');
-          done();
+          connection.query('SELECT * FROM Inventories')
+          .then((changed) => {
+            changed.length.should.be.eql(5);
+            assert.strictEqual(changed[0].id, 1, 'Inventory item 1 left.');
+            assert.strictEqual(changed[0].num_packages, 10, 'Inventory item 1 number packages left.');
+            assert.strictEqual(changed[1].id, 2, 'Inventory item 2 left.');
+            assert.strictEqual(changed[1].num_packages, 20, 'Inventory item 2 number packages left.');
+            assert.strictEqual(changed[2].id, 3, 'Inventory item 3 left.');
+            assert.strictEqual(changed[2].num_packages, 30, 'Inventory item 3 number packages left.');
+            assert.strictEqual(changed[3].id, 4, 'Inventory item 4 left.');
+            assert.strictEqual(changed[3].num_packages, 20, 'Inventory item 4 number packages left.');
+            assert.strictEqual(changed[4].id, 6, 'Inventory item 6 left.');
+            assert.strictEqual(changed[4].num_packages, 4, 'Inventory item 6 number packages left.');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -350,10 +369,11 @@ describe('Inventory', () => {
     });
 
     it('should decline item not in inventory', (done) => {
-      alasql('INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units) VALUES (5, "eric\'s dick", "sack", 2, "g", 50)');
-      alasql('INSERT INTO Formulas (id, name, description, num_product) VALUES (3, "eric\'s shit", "just shit", 10)');
-      alasql('INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (1, 5, 1, 3)');
-      chai.request(server)
+      connection.query('INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units) VALUES (7, "eric\'s dick", "sack", 2, "g", 50)')
+      .then(() => connection.query('INSERT INTO Formulas (id, name, description, num_product) VALUES (4, "eric\'s shit", "just shit", 10)'))
+      .then(() => connection.query('INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (7, 7, 1, 4)'))
+      .then(() => {
+        chai.request(server)
         .put('/inventory')
         .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .send({
@@ -364,6 +384,8 @@ describe('Inventory', () => {
           res.should.have.status(400);
           done();
         });
+      })
+      .catch((error) => console.log(error));
     });
 
     it('should decline invalid numbers', (done) => {

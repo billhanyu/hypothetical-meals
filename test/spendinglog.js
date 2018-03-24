@@ -1,7 +1,6 @@
 import { updateLogForIngredient } from '../server/routes/spendinglog';
 
 const assert = require('chai').assert;
-const alasql = require('alasql');
 const testTokens = require('./common/testTokens');
 
 describe('SpendingLog', () => {
@@ -51,30 +50,36 @@ describe('SpendingLog', () => {
 
   describe('#updateLogForIngredient()', () => {
     it('should update the spending log for ingredients', done => {
-      alasql('DELETE FROM SpendingLogs WHERE id = 2');
-      const request = {
-        '1': {
-          'total_weight': 100,
-          'cost': 10,
-          },
-        '2': {
-          'total_weight': 50,
-          'cost': 30,
-          },
-      };
-      updateLogForIngredient(request)
+      connection.query('DELETE FROM SpendingLogs WHERE id = 2')
       .then(() => {
-        const spendingLogs = alasql('SELECT * FROM SpendingLogs');
-        assert.strictEqual(spendingLogs.length, 4, 'New length of spending logs');
-        assert.strictEqual(spendingLogs[0]['total'], 5010, 'Total spent on ingredient with id 1.');
-        assert.strictEqual(spendingLogs[0]['total_weight'], 600, 'Total weight for ingredient 1.');
-        assert.strictEqual(spendingLogs[3]['total'], 30, 'Total spent on ingredient with id 2.');
-        assert.strictEqual(spendingLogs[3]['total_weight'], 50, 'Total weight for ingredient 2.');
-        done();
+        const request = {
+          '1': {
+            'total_weight': 100,
+            'cost': 10,
+            },
+          '2': {
+            'total_weight': 50,
+            'cost': 30,
+            },
+        };
+        updateLogForIngredient(request)
+        .then(() => {
+          connection.query('SELECT * FROM SpendingLogs')
+          .then((spendingLogs) => {
+            assert.strictEqual(spendingLogs.length, 4, 'New length of spending logs');
+            assert.strictEqual(spendingLogs[0]['total'], 5010, 'Total spent on ingredient with id 1.');
+            assert.strictEqual(spendingLogs[0]['total_weight'], 600, 'Total weight for ingredient 1.');
+            assert.strictEqual(spendingLogs[3]['total'], 30, 'Total spent on ingredient with id 2.');
+            assert.strictEqual(spendingLogs[3]['total_weight'], 50, 'Total weight for ingredient 2.');
+            done();
+          })
+          .catch((error) => console.log(error));
+        })
+        .catch(err => {
+          throw err;
+        });
       })
-      .catch(err => {
-        throw err;
-      });
+      .catch((error) => console.log(error));
     });
   });
 });

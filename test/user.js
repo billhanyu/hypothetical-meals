@@ -1,12 +1,11 @@
-const alasql = require('alasql');
+const dbSetup = require('./common/dbSetup');
 const assert = require('chai').assert;
 const testTokens = require('./common/testTokens');
 
 describe('User', () => {
   describe('#loginOauth()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should deny invalid input object', (done) => {
@@ -39,8 +38,9 @@ describe('User', () => {
     });
 
     it('should add new netid users to table', (done) => {
-      const oldLength = alasql('SELECT id FROM Users').length;
-      chai.request(server)
+      connection.query('SELECT id FROM Users')
+      .then((oldLength) => {
+        chai.request(server)
         .post('/users/login/oauth')
         .send({
           'info': {
@@ -50,19 +50,29 @@ describe('User', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const newLength = alasql('SELECT id FROM Users').length;
-          assert.strictEqual(oldLength + 1, newLength, 'Add new user to table');
-          const addedUser = alasql('SELECT * FROM Users WHERE username = "hy103"');
-          assert.strictEqual(addedUser[0].name, 'Bill Yu', 'Bill Yu registered to database');
-          assert.strictEqual(addedUser[0].oauth, 1, 'User is oauth');
-          assert.strictEqual(addedUser[0].user_group, 'noob', 'Default to noob user');
-          done();
+          Promise.all([
+            connection.query('SELECT id FROM Users'),
+            connection.query('SELECT * FROM Users WHERE username = "hy103"'),
+          ])
+          .then((results) => {
+            const [newLength, addedUser] = results;
+            assert.strictEqual(oldLength.length + 1, newLength.length, 'Add new user to table');
+
+            assert.strictEqual(addedUser[0].name, 'Bill Yu', 'Bill Yu registered to database');
+            assert.strictEqual(addedUser[0].oauth, 1, 'User is oauth');
+            assert.strictEqual(addedUser[0].user_group, 'noob', 'Default to noob user');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
+      })
+      .catch((error) => console.log(error));
     });
 
     it('should not add existing netid user to table', (done) => {
-      const oldLength = alasql('SELECT id FROM Users').length;
-      chai.request(server)
+      connection.query('SELECT id FROM Users')
+      .then((oldLength) => {
+        chai.request(server)
         .post('/users/login/oauth')
         .send({
           'info': {
@@ -72,10 +82,15 @@ describe('User', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const newLength = alasql('SELECT id FROM Users').length;
-          assert.strictEqual(oldLength, newLength, 'Eric existing, so no new user');
-          done();
+          connection.query('SELECT id FROM Users')
+          .then((newLength) => {
+            assert.strictEqual(oldLength.length, newLength.length, 'Eric existing, so no new user');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
+      })
+      .catch((error) => console.log(error));
     });
 
     it('should return info and token for oauth new user log in', (done) => {
@@ -123,8 +138,7 @@ describe('User', () => {
 
   describe('#modifyUsers()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should add admin user', (done) => {
@@ -139,15 +153,18 @@ describe('User', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const users = alasql(`SELECT * FROM Users WHERE username = 'admin1'`);
-          assert.strictEqual(users.length, 1, 'Number of rows with username.');
-          const newAdmin = users[0];
-          assert.strictEqual(newAdmin.id, 8, 'New admin ID.');
-          assert.strictEqual(newAdmin.username, 'admin1', 'New admin username.');
-          assert.strictEqual(newAdmin.oauth, 0, 'Not OAuth user');
-          assert.strictEqual(newAdmin.name, 'mike wazowski', 'New admin name.');
-          assert.strictEqual(newAdmin.user_group, 'admin', 'New admin user group.');
-          done();
+          connection.query(`SELECT * FROM Users WHERE username = 'admin1'`)
+          .then((users) => {
+            assert.strictEqual(users.length, 1, 'Number of rows with username.');
+            const newAdmin = users[0];
+            assert.strictEqual(newAdmin.id, 8, 'New admin ID.');
+            assert.strictEqual(newAdmin.username, 'admin1', 'New admin username.');
+            assert.strictEqual(newAdmin.oauth, 0, 'Not OAuth user');
+            assert.strictEqual(newAdmin.name, 'mike wazowski', 'New admin name.');
+            assert.strictEqual(newAdmin.user_group, 'admin', 'New admin user group.');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -181,15 +198,18 @@ describe('User', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const users = alasql(`SELECT * FROM Users WHERE username = 'noob1'`);
-          assert.strictEqual(users.length, 1, 'Number of rows with username.');
-          const newNoob = users[0];
-          assert.strictEqual(newNoob.id, 8, 'New noob ID.');
-          assert.strictEqual(newNoob.username, 'noob1', 'New noob username.');
-          assert.strictEqual(newNoob.oauth, 0, 'Not OAuth user');
-          assert.strictEqual(newNoob.name, 'mike wazowski', 'New noob name.');
-          assert.strictEqual(newNoob.user_group, 'noob', 'New noob user group.');
-          done();
+          connection.query(`SELECT * FROM Users WHERE username = 'noob1'`)
+          .then((users) => {
+            assert.strictEqual(users.length, 1, 'Number of rows with username.');
+            const newNoob = users[0];
+            assert.strictEqual(newNoob.id, 8, 'New noob ID.');
+            assert.strictEqual(newNoob.username, 'noob1', 'New noob username.');
+            assert.strictEqual(newNoob.oauth, 0, 'Not OAuth user');
+            assert.strictEqual(newNoob.name, 'mike wazowski', 'New noob name.');
+            assert.strictEqual(newNoob.user_group, 'noob', 'New noob user group.');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
   });
@@ -364,17 +384,19 @@ describe('User', () => {
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
-          const eric = alasql('SELECT * FROM Users WHERE username = "eri101" and oauth = 1')[0];
-          assert.strictEqual(eric.user_group, 'manager', 'Eric should become a manager now.');
-          done();
+          connection.query('SELECT * FROM Users WHERE username = "eri101" and oauth = 1')
+          .then((results) => {
+            assert.strictEqual(results[0].user_group, 'manager', 'Eric should become a manager now.');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
   });
 
   describe('#delete()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('User 4 is successfully deleted', (done) => {
@@ -388,9 +410,12 @@ describe('User', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const user = alasql(`SELECT * FROM Users WHERE username = 'noob'`);
-          assert.strictEqual(user[0].removed, 1, 'Is fake removed');
-          done();
+          connection.query(`SELECT * FROM Users WHERE username = 'noob'`)
+          .then((results) => {
+            assert.strictEqual(results[0].removed, 1, 'Is fake removed');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -442,8 +467,7 @@ describe('User', () => {
 
   describe('#viewAll()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should get all users that are not deleted', (done) => {
