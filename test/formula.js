@@ -1,9 +1,9 @@
 import server from '../server/server';
 
-const alasql = require('alasql');
 const assert = require('chai').assert;
-const testTokens = require('./testTokens');
+const testTokens = require('./common/testTokens');
 const supertest = require('supertest');
+const dbSetup = require('./common/dbSetup');
 
 describe('Formulas', () => {
   describe('#pages()', () => {
@@ -22,8 +22,7 @@ describe('Formulas', () => {
 
   describe('#view()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should return all formulas', (done) => {
@@ -39,11 +38,13 @@ describe('Formulas', () => {
     });
 
     it('should only return one page of formulas', (done) => {
+      const formulas = [];
       for (let i = 0; i < 52; i++) {
-        alasql(`INSERT INTO Formulas (name, description, num_product) VALUES ('bleh${i}', 'bleh', 15)`);
+        formulas.push([`bleh${i}`, 'bleh', 15]);
       }
-
-      chai.request(server)
+      connection.query(`INSERT INTO Formulas (name, description, num_product) VALUES ?`, [formulas])
+      .then(() => {
+        chai.request(server)
         .get('/formulas/page/1')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
@@ -52,36 +53,45 @@ describe('Formulas', () => {
           res.body.length.should.be.eql(50);
           done();
         });
+      })
+      .catch((error) => console.log(error));
     });
   });
 
   describe('#viewAll()', () => {
+    beforeEach(() => {
+      return dbSetup.setupTestDatabase();
+    });
+
     it('should return all formulas', (done) => {
-      const formulaResult = alasql(`SELECT COUNT(1) FROM Formulas`);
-      const numFormulas = formulaResult[0]['COUNT(1)'];
-      chai.request(server)
-        .get('/formulas')
-        .set('Authorization', `Token ${testTokens.managerTestToken}`)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.a('array');
-          const formulas = res.body;
-          assert.strictEqual(formulas.length, numFormulas, 'Number of formulas in database');
-          assert.strictEqual(formulas[0].id, 1, 'Id of formula 1');
-          assert.strictEqual(formulas[0].name, 'cake', 'Name of formula 1');
-          assert.strictEqual(formulas[0].intermediate, 0, 'Intermediate status');
-          assert.strictEqual(formulas[0].description, 'A simple cake', 'Description for cake');
-          assert.strictEqual(formulas[0].num_product, 1, 'Number of product produced by formula');
-          const ingredient = formulas[0]['ingredients']['boop'];
-          assert.strictEqual(Object.keys(ingredient).length, 10, 'Properties in ingredient');
-          assert.strictEqual(ingredient['ingredient_id'], 3, 'Id of ingredient in formula');
-          assert.strictEqual(ingredient['num_native_units'], 1, 'Number of native units of boop');
-          assert.strictEqual(ingredient['native_unit'], 'kg', 'Native unit of boop');
-          assert.strictEqual(ingredient['formula_id'], 1, 'Formula id boop is part of');
-          assert.strictEqual(ingredient['storage_id'], 1, 'Storage id of boop');
-          assert.strictEqual(ingredient['removed'], 0, 'Removal status of boop');
-          done();
-        });
+      connection.query(`SELECT COUNT(1) FROM Formulas`)
+      .then((formulaResult) => {
+        const numFormulas = formulaResult[0]['COUNT(1)'];
+        chai.request(server)
+          .get('/formulas')
+          .set('Authorization', `Token ${testTokens.managerTestToken}`)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.be.a('array');
+            const formulas = res.body;
+            assert.strictEqual(formulas.length, numFormulas, 'Number of formulas in database');
+            assert.strictEqual(formulas[0].id, 1, 'Id of formula 1');
+            assert.strictEqual(formulas[0].name, 'cake', 'Name of formula 1');
+            assert.strictEqual(formulas[0].intermediate, 0, 'Intermediate status');
+            assert.strictEqual(formulas[0].description, 'A simple cake', 'Description for cake');
+            assert.strictEqual(formulas[0].num_product, 1, 'Number of product produced by formula');
+            const ingredient = formulas[0]['ingredients']['boop'];
+            assert.strictEqual(Object.keys(ingredient).length, 10, 'Properties in ingredient');
+            assert.strictEqual(ingredient['ingredient_id'], 3, 'Id of ingredient in formula');
+            assert.strictEqual(ingredient['num_native_units'], 1, 'Number of native units of boop');
+            assert.strictEqual(ingredient['native_unit'], 'kg', 'Native unit of boop');
+            assert.strictEqual(ingredient['formula_id'], 1, 'Formula id boop is part of');
+            assert.strictEqual(ingredient['storage_id'], 1, 'Storage id of boop');
+            assert.strictEqual(ingredient['removed'], 0, 'Removal status of boop');
+            done();
+          });
+      })
+      .catch((error) => console.log(error));
     });
 
     it('should let noobs view', (done) => {
@@ -97,63 +107,70 @@ describe('Formulas', () => {
 
   describe('#add()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should add two formulas to the database', (done) => {
-      const formulaResult = alasql(`SELECT COUNT(1) FROM Formulas`);
-      const numFormulas = formulaResult[0]['COUNT(1)'];
-      chai.request(server)
-        .post('/formulas')
-        .set('Authorization', `Token ${testTokens.adminTestToken}`)
-        .send({
-          'formulas': [
-            {
-              'name': 'blob',
-              'description': 'A blob',
-              'num_product': 1,
-              'intermediate': 0,
-              'ingredients': [
-                {
-                  'ingredient_id': 1,
-                  'num_native_units': 2,
-                },
-              ],
-            },
-            {
-              'name': 'Bill',
-              'description': 'Fried up Bill',
-              'num_product': 1,
-              'intermediate': 0,
-              'ingredients': [
-                {
-                  'ingredient_id': 1,
-                  'num_native_units': 0.5,
-                },
-                {
-                  'ingredient_id': 2,
-                  'num_native_units': 2,
-                },
-              ],
-            },
-          ],
-        })
-        .end((err, res) => {
-          res.should.have.status(200);
-          const formulas = alasql(`SELECT * FROM Formulas WHERE removed = 0`);
-          assert.strictEqual(formulas.length, numFormulas+2, 'Number of formulas in database');
-          const lastIndex = formulas.length-1;
-          assert.strictEqual(formulas[lastIndex].name, 'Bill', 'Name for formula 3');
-          assert.strictEqual(formulas[lastIndex].description, 'Fried up Bill', 'Description for formula 3');
-          assert.strictEqual(formulas[lastIndex].num_product, 1, 'Number of products for formula 3');
-          assert.strictEqual(formulas[lastIndex].intermediate, 0, 'Intermediate status of formula 3');
-          const formulaIngredients = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[lastIndex].id}`);
-          assert.strictEqual(formulaIngredients.length, 2, 'Number of ingredients in formula 3');
-          assert.strictEqual(formulaIngredients[0].ingredient_id, 1, 'First ingredient id in formula 3');
-          assert.strictEqual(formulaIngredients[0].num_native_units, 0.5, 'First ingredient native units formula 3');
-          done();
-        });
+      connection.query(`SELECT COUNT(1) FROM Formulas`)
+      .then((formulaResult) => {
+        const numFormulas = formulaResult[0]['COUNT(1)'];
+        chai.request(server)
+          .post('/formulas')
+          .set('Authorization', `Token ${testTokens.adminTestToken}`)
+          .send({
+            'formulas': [
+              {
+                'name': 'blob',
+                'description': 'A blob',
+                'num_product': 1,
+                'intermediate': 0,
+                'ingredients': [
+                  {
+                    'ingredient_id': 1,
+                    'num_native_units': 2,
+                  },
+                ],
+              },
+              {
+                'name': 'Bill',
+                'description': 'Fried up Bill',
+                'num_product': 1,
+                'intermediate': 0,
+                'ingredients': [
+                  {
+                    'ingredient_id': 1,
+                    'num_native_units': 0.5,
+                  },
+                  {
+                    'ingredient_id': 2,
+                    'num_native_units': 2,
+                  },
+                ],
+              },
+            ],
+          })
+          .end((err, res) => {
+            res.should.have.status(200);
+            connection.query(`SELECT * FROM Formulas WHERE removed = 0`)
+            .then((formulas) => {
+              assert.strictEqual(formulas.length, numFormulas+2, 'Number of formulas in database');
+              const lastIndex = formulas.length-1;
+              assert.strictEqual(formulas[lastIndex].name, 'Bill', 'Name for formula 3');
+              assert.strictEqual(formulas[lastIndex].description, 'Fried up Bill', 'Description for formula 3');
+              assert.strictEqual(formulas[lastIndex].num_product, 1, 'Number of products for formula 3');
+              assert.strictEqual(formulas[lastIndex].intermediate, 0, 'Intermediate status of formula 3');
+              return connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[lastIndex].id}`);
+            })
+            .then((formulaIngredients) => {
+              assert.strictEqual(formulaIngredients.length, 2, 'Number of ingredients in formula 3');
+              assert.strictEqual(formulaIngredients[0].ingredient_id, 1, 'First ingredient id in formula 3');
+              assert.strictEqual(formulaIngredients[0].num_native_units, 0.5, 'First ingredient native units formula 3');
+              done();
+            })
+            .catch((error) => console.log(error));
+          });
+      })
+      .catch((error) => console.log(error));
     });
 
     it('should add request for intermediate product formula', (done) => {
@@ -183,24 +200,28 @@ describe('Formulas', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const formulas = alasql('SELECT * FROM Formulas WHERE removed = 0');
-          const lastFormulaIndex = formulas.length - 1;
-          assert.strictEqual(formulas[lastFormulaIndex].name, 'blob', 'Name for formula');
-          assert.strictEqual(formulas[lastFormulaIndex].description, 'A blob', 'Description for formula');
-          assert.strictEqual(formulas[lastFormulaIndex].num_product, 1, 'Number of products for formula');
-          assert.strictEqual(formulas[lastFormulaIndex].intermediate, 1, 'Intermediate status of formula');
-          const ingredients = alasql('SELECT * FROM Ingredients WHERE removed = 0');
-          const lastIngredientIndex = ingredients.length - 1;
-          assert.strictEqual(ingredients[lastIngredientIndex].name, 'blob', 'Name for intermediate');
-          assert.strictEqual(ingredients[lastIngredientIndex].package_type, 'pail', 'Package type of intermediate');
-          assert.strictEqual(ingredients[lastIngredientIndex].storage_id, 1, 'Intermediate storage id');
-          assert.strictEqual(ingredients[lastIngredientIndex].native_unit, 'kg', 'Intermediate native unit');
-          assert.strictEqual(ingredients[lastIngredientIndex].num_native_units, 10, 'Intermediate num_native_units');
 
-          // const systemLogs = alasql('SELECT * FROM SystemLogs');
-          // console.log(systemLogs[systemLogs.length-1]);
-          // console.log(systemLogs[systemLogs.length-2]);
-          done();
+          Promise.all([
+            connection.query('SELECT * FROM Formulas WHERE removed = 0'),
+            connection.query('SELECT * FROM Ingredients WHERE removed = 0'),
+          ])
+          .then((results) => {
+            const [formulas, ingredients] = results;
+            const lastFormulaIndex = formulas.length - 1;
+            assert.strictEqual(formulas[lastFormulaIndex].name, 'blob', 'Name for formula');
+            assert.strictEqual(formulas[lastFormulaIndex].description, 'A blob', 'Description for formula');
+            assert.strictEqual(formulas[lastFormulaIndex].num_product, 1, 'Number of products for formula');
+            assert.strictEqual(formulas[lastFormulaIndex].intermediate, 1, 'Intermediate status of formula');
+
+            const lastIngredientIndex = ingredients.length - 1;
+            assert.strictEqual(ingredients[lastIngredientIndex].name, 'blob', 'Name for intermediate');
+            assert.strictEqual(ingredients[lastIngredientIndex].package_type, 'pail', 'Package type of intermediate');
+            assert.strictEqual(ingredients[lastIngredientIndex].storage_id, 1, 'Intermediate storage id');
+            assert.strictEqual(ingredients[lastIngredientIndex].native_unit, 'kg', 'Intermediate native unit');
+            assert.strictEqual(ingredients[lastIngredientIndex].num_native_units, 10, 'Intermediate num_native_units');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -247,32 +268,39 @@ describe('Formulas', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const formulas = alasql('SELECT * FROM Formulas WHERE removed = 0');
-          const lastFormulaIndex = formulas.length - 1;
-          assert.strictEqual(formulas[lastFormulaIndex].name, 'blob', 'Name for formula');
-          assert.strictEqual(formulas[lastFormulaIndex].description, 'A blob', 'Description for formula');
-          assert.strictEqual(formulas[lastFormulaIndex].num_product, 1, 'Number of products for formula');
-          assert.strictEqual(formulas[lastFormulaIndex].intermediate, 1, 'Intermediate status of formula');
-          const ingredients = alasql('SELECT * FROM Ingredients WHERE removed = 0');
-          const lastIngredientIndex = ingredients.length - 1;
-          assert.strictEqual(ingredients[lastIngredientIndex].name, 'blob', 'Name for intermediate');
-          assert.strictEqual(ingredients[lastIngredientIndex].package_type, 'pail', 'Package type of intermediate');
-          assert.strictEqual(ingredients[lastIngredientIndex].storage_id, 1, 'Intermediate storage id');
-          assert.strictEqual(ingredients[lastIngredientIndex].native_unit, 'kg', 'Intermediate native unit');
-          assert.strictEqual(ingredients[lastIngredientIndex].num_native_units, 10, 'Intermediate num_native_units');
+          
+          Promise.all([
+            connection.query('SELECT * FROM Formulas WHERE removed = 0'),
+            connection.query('SELECT * FROM Ingredients WHERE removed = 0'),
+          ])
+          .then((results) => {
+            const [formulas, ingredients] = results;
+            const lastFormulaIndex = formulas.length - 1;
+            assert.strictEqual(formulas[lastFormulaIndex].name, 'blob', 'Name for formula');
+            assert.strictEqual(formulas[lastFormulaIndex].description, 'A blob', 'Description for formula');
+            assert.strictEqual(formulas[lastFormulaIndex].num_product, 1, 'Number of products for formula');
+            assert.strictEqual(formulas[lastFormulaIndex].intermediate, 1, 'Intermediate status of formula');
 
-          assert.strictEqual(formulas[lastFormulaIndex-1].name, 'Bill', 'Name for formula 3');
-          assert.strictEqual(formulas[lastFormulaIndex-1].description, 'Fried up Bill', 'Description for formula 3');
-          assert.strictEqual(formulas[lastFormulaIndex-1].num_product, 1, 'Number of products for formula 3');
-          assert.strictEqual(formulas[lastFormulaIndex-1].intermediate, 0, 'Intermediate status of formula 3');
-          const formulaIngredients = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[lastFormulaIndex-1].id}`);
-          assert.strictEqual(formulaIngredients.length, 2, 'Number of ingredients in formula 3');
-          assert.strictEqual(formulaIngredients[0].ingredient_id, 1, 'First ingredient id in formula 3');
-          assert.strictEqual(formulaIngredients[0].num_native_units, 0.5, 'First ingredient native units formula 3');
+            const lastIngredientIndex = ingredients.length - 1;
+            assert.strictEqual(ingredients[lastIngredientIndex].name, 'blob', 'Name for intermediate');
+            assert.strictEqual(ingredients[lastIngredientIndex].package_type, 'pail', 'Package type of intermediate');
+            assert.strictEqual(ingredients[lastIngredientIndex].storage_id, 1, 'Intermediate storage id');
+            assert.strictEqual(ingredients[lastIngredientIndex].native_unit, 'kg', 'Intermediate native unit');
+            assert.strictEqual(ingredients[lastIngredientIndex].num_native_units, 10, 'Intermediate num_native_units');
 
-          // const systemLogs = alasql('SELECT * FROM SystemLogs');
-          // console.log(systemLogs);
-          done();
+            assert.strictEqual(formulas[lastFormulaIndex-1].name, 'Bill', 'Name for formula 3');
+            assert.strictEqual(formulas[lastFormulaIndex-1].description, 'Fried up Bill', 'Description for formula 3');
+            assert.strictEqual(formulas[lastFormulaIndex-1].num_product, 1, 'Number of products for formula 3');
+            assert.strictEqual(formulas[lastFormulaIndex-1].intermediate, 0, 'Intermediate status of formula 3');
+            return connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[lastFormulaIndex-1].id}`);
+          })
+          .then((formulaIngredients) => {
+            assert.strictEqual(formulaIngredients.length, 2, 'Number of ingredients in formula 3');
+            assert.strictEqual(formulaIngredients[0].ingredient_id, 1, 'First ingredient id in formula 3');
+            assert.strictEqual(formulaIngredients[0].num_native_units, 0.5, 'First ingredient native units formula 3');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -329,8 +357,7 @@ describe('Formulas', () => {
 
   describe('#modify()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should modify two of the formulas in the database', (done) => {
@@ -371,25 +398,34 @@ describe('Formulas', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const formulas = alasql(`SELECT * FROM Formulas WHERE removed = 0`);
-          assert.strictEqual(formulas.length, 3, 'Number of formulas in database');
-          assert.strictEqual(formulas[0].name, 'cake', 'Name for formula 1');
-          assert.strictEqual(formulas[0].description, 'A blob', 'Description for formula 3');
-          assert.strictEqual(formulas[0].num_product, 1, 'Number of products for formula 3');
-          assert.strictEqual(formulas[1].name, 'Bill', 'Name for formula 1');
-          assert.strictEqual(formulas[1].description, 'Chinaman', 'Description for formula 3');
-          assert.strictEqual(formulas[1].num_product, 1, 'Number of products for formula 3');
-          const formulaIngredients1 = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[0].id}`);
-          assert.strictEqual(formulaIngredients1.length, 1, 'Number of ingredients in formula 3');
-          assert.strictEqual(formulaIngredients1[0].ingredient_id, 1, 'Ingredient id in formula 1');
-          assert.strictEqual(formulaIngredients1[0].num_native_units, 2, 'Ingredient native units formula 1');
-          const formulaIngredients2 = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[1].id}`);
-          assert.strictEqual(formulaIngredients2.length, 2, 'Number of ingredients in formula 2');
-          assert.strictEqual(formulaIngredients2[0].ingredient_id, 1, 'Ingredient id in formula 2');
-          assert.strictEqual(formulaIngredients2[0].num_native_units, 10, 'Ingredient native units formula 2');
-          assert.strictEqual(formulaIngredients2[1].ingredient_id, 2, 'Ingredient id in formula 2');
-          assert.strictEqual(formulaIngredients2[1].num_native_units, 2, 'Ingredient native units formula 2');
-          done();
+          connection.query(`SELECT * FROM Formulas WHERE removed = 0`)
+          .then((formulas) => {
+            assert.strictEqual(formulas.length, 3, 'Number of formulas in database');
+            assert.strictEqual(formulas[0].name, 'cake', 'Name for formula 1');
+            assert.strictEqual(formulas[0].description, 'A blob', 'Description for formula 3');
+            assert.strictEqual(formulas[0].num_product, 1, 'Number of products for formula 3');
+            assert.strictEqual(formulas[1].name, 'Bill', 'Name for formula 1');
+            assert.strictEqual(formulas[1].description, 'Chinaman', 'Description for formula 3');
+            assert.strictEqual(formulas[1].num_product, 1, 'Number of products for formula 3');
+            return Promise.all([
+              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[0].id}`),
+              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[1].id}`),
+            ]);
+          })
+          .then((results) => {
+            const [formulaIngredients1, formulaIngredients2] = results;
+            assert.strictEqual(formulaIngredients1.length, 1, 'Number of ingredients in formula 3');
+            assert.strictEqual(formulaIngredients1[0].ingredient_id, 1, 'Ingredient id in formula 1');
+            assert.strictEqual(formulaIngredients1[0].num_native_units, 2, 'Ingredient native units formula 1');
+
+            assert.strictEqual(formulaIngredients2.length, 2, 'Number of ingredients in formula 2');
+            assert.strictEqual(formulaIngredients2[0].ingredient_id, 1, 'Ingredient id in formula 2');
+            assert.strictEqual(formulaIngredients2[0].num_native_units, 10, 'Ingredient native units formula 2');
+            assert.strictEqual(formulaIngredients2[1].ingredient_id, 2, 'Ingredient id in formula 2');
+            assert.strictEqual(formulaIngredients2[1].num_native_units, 2, 'Ingredient native units formula 2');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -431,25 +467,35 @@ describe('Formulas', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const formulas = alasql(`SELECT * FROM Formulas WHERE removed = 0`);
-          assert.strictEqual(formulas.length, 3, 'Number of formulas in database');
-          assert.strictEqual(formulas[0].name, 'cake', 'Name for formula 1');
-          assert.strictEqual(formulas[0].description, 'A blob', 'Description for formula 3');
-          assert.strictEqual(formulas[0].num_product, 1, 'Number of products for formula 3');
-          assert.strictEqual(formulas[1].name, 'Bill', 'Name for formula 1');
-          assert.strictEqual(formulas[1].description, 'Chinaman', 'Description for formula 3');
-          assert.strictEqual(formulas[1].num_product, 1, 'Number of products for formula 3');
-          const formulaIngredients1 = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[0].id}`);
-          assert.strictEqual(formulaIngredients1.length, 1, 'Number of ingredients in formula 3');
-          assert.strictEqual(formulaIngredients1[0].ingredient_id, 1, 'Ingredient id in formula 1');
-          assert.strictEqual(formulaIngredients1[0].num_native_units, 2, 'Ingredient native units formula 1');
-          const formulaIngredients2 = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[1].id}`);
-          assert.strictEqual(formulaIngredients2.length, 2, 'Number of ingredients in formula 2');
-          assert.strictEqual(formulaIngredients2[0].ingredient_id, 1, 'Ingredient id in formula 2');
-          assert.strictEqual(formulaIngredients2[0].num_native_units, 10, 'Ingredient native units formula 2');
-          assert.strictEqual(formulaIngredients2[1].ingredient_id, 2, 'Ingredient id in formula 2');
-          assert.strictEqual(formulaIngredients2[1].num_native_units, 2, 'Ingredient native units formula 2');
-          done();
+
+          connection.query(`SELECT * FROM Formulas WHERE removed = 0`)
+          .then((formulas) => {
+            assert.strictEqual(formulas.length, 3, 'Number of formulas in database');
+            assert.strictEqual(formulas[0].name, 'cake', 'Name for formula 1');
+            assert.strictEqual(formulas[0].description, 'A blob', 'Description for formula 3');
+            assert.strictEqual(formulas[0].num_product, 1, 'Number of products for formula 3');
+            assert.strictEqual(formulas[1].name, 'Bill', 'Name for formula 1');
+            assert.strictEqual(formulas[1].description, 'Chinaman', 'Description for formula 3');
+            assert.strictEqual(formulas[1].num_product, 1, 'Number of products for formula 3');
+            return Promise.all([
+              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[0].id}`),
+              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[1].id}`),
+            ]);
+          })
+          .then((results) => {
+            const [formulaIngredients1, formulaIngredients2] = results;
+            assert.strictEqual(formulaIngredients1.length, 1, 'Number of ingredients in formula 3');
+            assert.strictEqual(formulaIngredients1[0].ingredient_id, 1, 'Ingredient id in formula 1');
+            assert.strictEqual(formulaIngredients1[0].num_native_units, 2, 'Ingredient native units formula 1');
+
+            assert.strictEqual(formulaIngredients2.length, 2, 'Number of ingredients in formula 2');
+            assert.strictEqual(formulaIngredients2[0].ingredient_id, 1, 'Ingredient id in formula 2');
+            assert.strictEqual(formulaIngredients2[0].num_native_units, 10, 'Ingredient native units formula 2');
+            assert.strictEqual(formulaIngredients2[1].ingredient_id, 2, 'Ingredient id in formula 2');
+            assert.strictEqual(formulaIngredients2[1].num_native_units, 2, 'Ingredient native units formula 2');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -488,30 +534,40 @@ describe('Formulas', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const formulas = alasql(`SELECT * FROM Formulas WHERE removed = 0`);
-          assert.strictEqual(formulas.length, 3, 'Number of formulas in database');
-          assert.strictEqual(formulas[0].name, 'yellow cake', 'Name for formula 1');
-          assert.strictEqual(formulas[0].description, 'A simple cake', 'Description for formula 3');
-          assert.strictEqual(formulas[0].num_product, 1, 'Number of products for formula 3');
-          assert.strictEqual(formulas[1].name, 'shit', 'Name for formula 1');
-          assert.strictEqual(formulas[1].description, 'same as the name', 'Description for formula 3');
-          assert.strictEqual(formulas[1].num_product, 10, 'Number of products for formula 3');
-          const formulaIngredients1 = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[0].id}`);
-          assert.strictEqual(formulaIngredients1.length, 1, 'Number of ingredients in formula 3');
-          assert.strictEqual(formulaIngredients1[0].ingredient_id, 1, 'Ingredient id in formula 1');
-          assert.strictEqual(formulaIngredients1[0].num_native_units, 2, 'Ingredient native units formula 1');
-          const formulaIngredients2 = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[1].id}`);
-          assert.strictEqual(formulaIngredients2.length, 2, 'Number of ingredients in formula 2');
-          assert.strictEqual(formulaIngredients2[0].ingredient_id, 1, 'Ingredient id in formula 2');
-          assert.strictEqual(formulaIngredients2[0].num_native_units, 10, 'Ingredient native units formula 2');
-          assert.strictEqual(formulaIngredients2[1].ingredient_id, 2, 'Ingredient id in formula 2');
-          assert.strictEqual(formulaIngredients2[1].num_native_units, 2, 'Ingredient native units formula 2');
-          done();
+
+          connection.query(`SELECT * FROM Formulas WHERE removed = 0`)
+          .then((formulas) => {
+            assert.strictEqual(formulas.length, 3, 'Number of formulas in database');
+            assert.strictEqual(formulas[0].name, 'yellow cake', 'Name for formula 1');
+            assert.strictEqual(formulas[0].description, 'A simple cake', 'Description for formula 3');
+            assert.strictEqual(formulas[0].num_product, 1, 'Number of products for formula 3');
+            assert.strictEqual(formulas[1].name, 'shit', 'Name for formula 1');
+            assert.strictEqual(formulas[1].description, 'same as the name', 'Description for formula 3');
+            assert.strictEqual(formulas[1].num_product, 10, 'Number of products for formula 3');
+            return Promise.all([
+              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[0].id}`),
+              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[1].id}`),
+            ]);
+          })
+          .then((results) => {
+            const [formulaIngredients1, formulaIngredients2] = results;
+            assert.strictEqual(formulaIngredients1.length, 1, 'Number of ingredients in formula 3');
+            assert.strictEqual(formulaIngredients1[0].ingredient_id, 1, 'Ingredient id in formula 1');
+            assert.strictEqual(formulaIngredients1[0].num_native_units, 2, 'Ingredient native units formula 1');
+            assert.strictEqual(formulaIngredients2.length, 2, 'Number of ingredients in formula 2');
+            assert.strictEqual(formulaIngredients2[0].ingredient_id, 1, 'Ingredient id in formula 2');
+            assert.strictEqual(formulaIngredients2[0].num_native_units, 10, 'Ingredient native units formula 2');
+            assert.strictEqual(formulaIngredients2[1].ingredient_id, 2, 'Ingredient id in formula 2');
+            assert.strictEqual(formulaIngredients2[1].num_native_units, 2, 'Ingredient native units formula 2');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
     it('should modify an intermediate formula correctly', (done) => {
-      const formulaResult = alasql(`SELECT COUNT(1) FROM Formulas`);
+      connection.query(`SELECT COUNT(1) FROM Formulas`)
+      .then((formulaResult) => {
       const numFormulas = formulaResult[0]['COUNT(1)'];
       const intermediateId = 6;
       chai.request(server)
@@ -539,23 +595,35 @@ describe('Formulas', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const formulas = alasql(`SELECT * FROM Formulas WHERE removed = 0`);
-          assert.strictEqual(formulas.length, numFormulas, 'Number of formulas in database');
-          assert.strictEqual(formulas[2].name, 'bleb', 'Name for formula 1');
-          assert.strictEqual(formulas[2].description, 'hehe', 'Description for formula 3');
-          assert.strictEqual(formulas[2].num_product, 1, 'Number of products for formula 3');
-          const formulaIngredients1 = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[2].id}`);
-          assert.strictEqual(formulaIngredients1.length, 1, 'Number of ingredients in formula 3');
-          assert.strictEqual(formulaIngredients1[0].ingredient_id, 1, 'Ingredient id in formula 1');
-          assert.strictEqual(formulaIngredients1[0].num_native_units, 2, 'Ingredient native units formula 1');
-          const intermediateIngredient = alasql(`SELECT * FROM Ingredients WHERE id = ${intermediateId}`);
-          assert.strictEqual(intermediateIngredient[0].name, 'booploop meow', 'Name of intermediate ingredient');
-          assert.strictEqual(intermediateIngredient[0].package_type, 'railcar', 'Modified package type for intermediate product');
-          assert.strictEqual(intermediateIngredient[0].storage_id, 2, 'Storage id for intermediate product');
-          assert.strictEqual(intermediateIngredient[0].native_unit, 'kg', 'Native unit for intermediate product');
-          assert.strictEqual(intermediateIngredient[0].num_native_units, 30, 'Num native units for intermediate produt');
-          done();
+
+          connection.query(`SELECT * FROM Formulas WHERE removed = 0`)
+          .then((formulas) => {
+            assert.strictEqual(formulas.length, numFormulas, 'Number of formulas in database');
+            assert.strictEqual(formulas[2].name, 'bleb', 'Name for formula 1');
+            assert.strictEqual(formulas[2].description, 'hehe', 'Description for formula 3');
+            assert.strictEqual(formulas[2].num_product, 1, 'Number of products for formula 3');
+            return Promise.all([
+              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[2].id}`),
+              connection.query(`SELECT * FROM Ingredients WHERE id = ${intermediateId}`),
+            ]);
+          })
+          .then((results) => {
+            const [formulaIngredients1, intermediateIngredient] = results;
+            assert.strictEqual(formulaIngredients1.length, 1, 'Number of ingredients in formula 3');
+            assert.strictEqual(formulaIngredients1[0].ingredient_id, 1, 'Ingredient id in formula 1');
+            assert.strictEqual(formulaIngredients1[0].num_native_units, 2, 'Ingredient native units formula 1');
+
+            assert.strictEqual(intermediateIngredient[0].name, 'booploop meow', 'Name of intermediate ingredient');
+            assert.strictEqual(intermediateIngredient[0].package_type, 'railcar', 'Modified package type for intermediate product');
+            assert.strictEqual(intermediateIngredient[0].storage_id, 2, 'Storage id for intermediate product');
+            assert.strictEqual(intermediateIngredient[0].native_unit, 'kg', 'Native unit for intermediate product');
+            assert.strictEqual(intermediateIngredient[0].num_native_units, 30, 'Num native units for intermediate produt');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
+      })
+      .catch((error) => console.log(error));
     });
 
     it('should reject modify if trying to modify nonexistent formula', (done) => {
@@ -688,8 +756,7 @@ describe('Formulas', () => {
 
   describe('#deleteFormulas()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should fake delete two formulas', (done) => {
@@ -699,15 +766,22 @@ describe('Formulas', () => {
         .set('formulaid', '1, 2')
         .end((err, res) => {
           res.should.have.status(200);
-          const formulas = alasql(`SELECT * FROM Formulas`);
-          const formulasRemoved = alasql(`SELECT * FROM Formulas WHERE removed = 1`);
-          assert.strictEqual(formulasRemoved.length, 2, 'Should have marked as removed');
-          assert.strictEqual(formulas.length, 3, 'Should have not actually removed all formulas');
-          assert.strictEqual(formulas[0].removed, 1, 'Formula 1 marked at removed');
-          assert.strictEqual(formulas[1].removed, 1, 'Formula 2 marked as removed');
-          const formulaEntries = alasql(`SELECT * FROM FormulaEntries`);
-          assert.strictEqual(formulaEntries.length, 2, 'Should have deleted all formula entries');
-          done();
+
+          Promise.all([
+            connection.query(`SELECT * FROM Formulas`),
+            connection.query(`SELECT * FROM Formulas WHERE removed = 1`),
+            connection.query(`SELECT * FROM FormulaEntries`),
+          ])
+          .then((results) => {
+            const [formulas, formulasRemoved, formulaEntries] = results;
+            assert.strictEqual(formulasRemoved.length, 2, 'Should have marked as removed');
+            assert.strictEqual(formulas.length, 3, 'Should have not actually removed all formulas');
+            assert.strictEqual(formulas[0].removed, 1, 'Formula 1 marked at removed');
+            assert.strictEqual(formulas[1].removed, 1, 'Formula 2 marked as removed');
+            assert.strictEqual(formulaEntries.length, 2, 'Should have deleted all formula entries');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -718,16 +792,23 @@ describe('Formulas', () => {
         .set('formulaid', '1')
         .end((err, res) => {
           res.should.have.status(200);
-          const formulas = alasql(`SELECT * FROM Formulas`);
-          assert.strictEqual(formulas.length, 3, 'Should have fake deleted one formula');
-          const formula1 = alasql(`SELECT * FROM Formulas WHERE id = 1`);
-          assert.strictEqual(formula1[0].removed, 1, 'Formula 1 marked as removed');
-          const formulaEntries = alasql(`SELECT * FROM FormulaEntries`);
-          assert.strictEqual(formulaEntries.length, 4, 'Should have deleted all formula entries');
-          formulaEntries.forEach(element => {
-            assert.notEqual(element.formula_id, 1, 'Should not be equal to deleted formula id');
-          });
-          done();
+
+          Promise.all([
+            connection.query(`SELECT * FROM Formulas`),
+            connection.query(`SELECT * FROM Formulas WHERE id = 1`),
+            connection.query(`SELECT * FROM FormulaEntries`),
+          ])
+          .then((results) => {
+            const [formulas, formula1, formulaEntries] = results;
+            assert.strictEqual(formulas.length, 3, 'Should have fake deleted one formula');
+            assert.strictEqual(formula1[0].removed, 1, 'Formula 1 marked as removed');
+            assert.strictEqual(formulaEntries.length, 4, 'Should have deleted all formula entries');
+            formulaEntries.forEach(element => {
+              assert.notEqual(element.formula_id, 1, 'Should not be equal to deleted formula id');
+            });
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -767,8 +848,7 @@ describe('Formulas', () => {
 
   describe('#bulkImport()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should fail bulk import as noob', (done) => {
@@ -862,50 +942,61 @@ describe('Formulas', () => {
     });
 
     it('should pass valid data', (done) => {
-      const formulaResult = alasql(`SELECT COUNT(1) FROM Formulas`);
-      const numFormulas = formulaResult[0]['COUNT(1)'];
-      const formulaEntryResult = alasql(`SELECT COUNT(1) FROM FormulaEntries`);
-      const numFormulaEntries = formulaEntryResult[0]['COUNT(1)'];
-      alasql('UPDATE Storages SET capacity = 1000000');
-      supertest(server).post('/formulas/import')
-        .set('Authorization', `Token ${testTokens.adminTestToken}`)
-        .attach('bulk', './test/bulk_import/formulas/validData.csv')
-        .end(function(err, res) {
-          res.should.have.status(200);
+      Promise.all([
+        connection.query(`SELECT COUNT(1) FROM Formulas`),
+        connection.query(`SELECT COUNT(1) FROM FormulaEntries`),
+        connection.query('UPDATE Storages SET capacity = 1000000'),
+      ])
+      .then((results) => {
+        const [formulaResult, formulaEntryResult] = results;
+        const numFormulas = formulaResult[0]['COUNT(1)'];
+        const numFormulaEntries = formulaEntryResult[0]['COUNT(1)'];
+        supertest(server).post('/formulas/import')
+          .set('Authorization', `Token ${testTokens.adminTestToken}`)
+          .attach('bulk', './test/bulk_import/formulas/validData.csv')
+          .end(function(err, res) {
+            res.should.have.status(200);
 
-          const formulas = alasql(`SELECT * FROM Formulas`);
-          const formulaEntries = alasql(`SELECT * FROM FormulaEntries`);
+            Promise.all([
+              connection.query(`SELECT * FROM Formulas`),
+              connection.query(`SELECT * FROM FormulaEntries`),
+            ])
+            .then((results) => {
+              const [formulas, formulaEntries] = results;
+              assert.strictEqual(formulas.length, numFormulas + 2, 'Two formulas added to formulas table.');
+              const chocolateCake = formulas[numFormulas];
+              assert.strictEqual(chocolateCake.name, 'Chocolate Cake', 'Name of chocolate cake');
+              assert.strictEqual(chocolateCake.description, 'This is a chocolate cake', 'Description of chocolate cake');
+              assert.strictEqual(chocolateCake.num_product, 1, 'Amount of chocolate cake');
+              assert.strictEqual(chocolateCake.removed, 0, 'Removed status of chocolate cake');
+              const soup = formulas[numFormulas + 1];
+              assert.strictEqual(soup.name, 'Soup', 'Name of soup');
+              assert.strictEqual(soup.description, 'This is soup', 'Description of soup');
+              assert.strictEqual(soup.num_product, 2, 'Amount of soup');
+              assert.strictEqual(soup.removed, 0, 'Removed status of soup');
 
-          assert.strictEqual(formulas.length, numFormulas + 2, 'Two formulas added to formulas table.');
-          const chocolateCake = formulas[numFormulas];
-          assert.strictEqual(chocolateCake.name, 'Chocolate Cake', 'Name of chocolate cake');
-          assert.strictEqual(chocolateCake.description, 'This is a chocolate cake', 'Description of chocolate cake');
-          assert.strictEqual(chocolateCake.num_product, 1, 'Amount of chocolate cake');
-          assert.strictEqual(chocolateCake.removed, 0, 'Removed status of chocolate cake');
-          const soup = formulas[numFormulas + 1];
-          assert.strictEqual(soup.name, 'Soup', 'Name of soup');
-          assert.strictEqual(soup.description, 'This is soup', 'Description of soup');
-          assert.strictEqual(soup.num_product, 2, 'Amount of soup');
-          assert.strictEqual(soup.removed, 0, 'Removed status of soup');
-
-          assert.strictEqual(formulaEntries.length, numFormulaEntries + 5, 'Five formula entries added to formula entries table.');
-          assert.strictEqual(formulaEntries[numFormulaEntries].ingredient_id, 1, 'Ingredient ID is correct');
-          assert.strictEqual(formulaEntries[numFormulaEntries].num_native_units, 2, 'Number of native units is correct');
-          assert.strictEqual(formulaEntries[numFormulaEntries].formula_id, numFormulas + 1, 'Formula ID is correct');
-          assert.strictEqual(formulaEntries[numFormulaEntries+1].ingredient_id, 2, 'Ingredient ID is correct');
-          assert.strictEqual(formulaEntries[numFormulaEntries+1].num_native_units, 1, 'Number of native units is correct');
-          assert.strictEqual(formulaEntries[numFormulaEntries+1].formula_id, numFormulas + 1, 'Formula ID is correct');
-          assert.strictEqual(formulaEntries[numFormulaEntries+2].ingredient_id, 3, 'Ingredient ID is correct');
-          assert.strictEqual(formulaEntries[numFormulaEntries+2].num_native_units, 400, 'Number of native units is correct');
-          assert.strictEqual(formulaEntries[numFormulaEntries+2].formula_id, numFormulas + 1, 'Formula ID is correct');
-          assert.strictEqual(formulaEntries[numFormulaEntries+3].ingredient_id, 4, 'Ingredient ID is correct');
-          assert.strictEqual(formulaEntries[numFormulaEntries+3].num_native_units, 4, 'Number of native units is correct');
-          assert.strictEqual(formulaEntries[numFormulaEntries+3].formula_id, numFormulas + 2, 'Formula ID is correct');
-          assert.strictEqual(formulaEntries[numFormulaEntries+4].ingredient_id, 1, 'Ingredient ID is correct');
-          assert.strictEqual(formulaEntries[numFormulaEntries+4].num_native_units, 1, 'Number of native units is correct');
-          assert.strictEqual(formulaEntries[numFormulaEntries+4].formula_id, numFormulas + 2, 'Formula ID is correct');
-          done();
-        });
+              assert.strictEqual(formulaEntries.length, numFormulaEntries + 5, 'Five formula entries added to formula entries table.');
+              assert.strictEqual(formulaEntries[numFormulaEntries].ingredient_id, 1, 'Ingredient ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries].num_native_units, 2, 'Number of native units is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries].formula_id, numFormulas + 1, 'Formula ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+1].ingredient_id, 2, 'Ingredient ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+1].num_native_units, 1, 'Number of native units is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+1].formula_id, numFormulas + 1, 'Formula ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+2].ingredient_id, 3, 'Ingredient ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+2].num_native_units, 400, 'Number of native units is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+2].formula_id, numFormulas + 1, 'Formula ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+3].ingredient_id, 4, 'Ingredient ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+3].num_native_units, 4, 'Number of native units is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+3].formula_id, numFormulas + 2, 'Formula ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+4].ingredient_id, 1, 'Ingredient ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+4].num_native_units, 1, 'Number of native units is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+4].formula_id, numFormulas + 2, 'Formula ID is correct');
+              done();
+            })
+            .catch((error) => console.log(error));
+          });
+      })
+      .catch((error) => console.log(error));
     });
   });
 });

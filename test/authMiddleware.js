@@ -1,5 +1,5 @@
 const assert = require('chai').assert;
-const testTokens = require('./testTokens');
+const testTokens = require('./common/testTokens');
 import { adminRequired, managerRequired, noobRequired } from '../server/authMiddleware';
 import server from '../server/server';
 
