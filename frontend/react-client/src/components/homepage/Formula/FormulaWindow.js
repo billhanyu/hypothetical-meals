@@ -36,7 +36,6 @@ class FormulaWindow extends Component {
       storage_name: 'freezer',
     };
     const ingredient = props.ingredientInfo || defaultIngredient;
-
     this.state = {
       name,
       desc,
@@ -45,7 +44,7 @@ class FormulaWindow extends Component {
       idToQuantityMap,
       values,
       ingredientNameToQuantityMap,
-      checked: false,
+      isIntermediate: props.newFormulaObject == null ? false : props.newFormulaObject.intermediate.data[0],
       package_type: ingredient.package_type,
       native_unit: ingredient.native_unit,
       storage_id: ingredient.storage_id,
@@ -176,7 +175,7 @@ class FormulaWindow extends Component {
 
   updateCheck() {
     this.setState({
-      checked: !this.state.checked,
+      isIntermediate: !this.state.isIntermediate,
     });
   }
 
@@ -229,23 +228,28 @@ class FormulaWindow extends Component {
         <FormulaInput readOnly={readOnly} error={this.state.quantityError} errorText="Invalid Quantity" value={this.state.quantity} id="quantity" onChange={this.handleInputChange} HeaderText="Quantity Created" ContentText="Total quantity created per instance of formula recipe / ingredient usage" placeholder="Quantity Created" inputStyle={{ marginTop: '12px' }} />
         <Checkbox
           label="Intermediate Product"
-          checked={this.state.checked}
+          checked={this.state.isIntermediate}
           onCheck={this.updateCheck.bind(this)}
           style={{marginLeft:'10%'}}
+          disabled={this.props.isEditing}
         />
         {
-          this.state.checked ? <div style={{width:'80%', margin: '0 auto'}}>
+          this.state.isIntermediate && !this.props.isEditing ? <div style={{width:'80%', margin: '0 auto'}}>
           <div className="form-group">
             <label htmlFor="package_type">Package Type</label>
-            <ComboBox className="form-control" id="package_type" Options={packageTypes} onChange={this.handleInputChange} selected={this.state.package_type} readOnly={readOnly} />
+            <ComboBox className="form-control" id="package_type" Options={packageTypes} onChange={this.handleInputChange} selected={this.state.package_type} />
           </div>
           <div className="form-group">
             <label htmlFor="storage">Temperature State</label>
-            <ComboBox className="form-control" id="storage" Options={["Frozen", "Refrigerated", "Room Temperature"]} onChange={this.handleInputChange} selected={this.state.storage} readOnly={readOnly} />
+            <ComboBox className="form-control" id="storage" Options={["freezer", "refrigerator", "warehouse"]} onChange={this.handleInputChange} selected={this.state.storage} />
           </div>
           <div className="form-group">
             <label htmlFor="native_unit">Unit</label>
-            <input type="text" className="form-control" id="native_unit" aria-describedby="unit" placeholder="Pounds" onChange={e => this.handleInputChange('native_unit', e)} value={this.state.native_unit} readOnly={readOnly}/>
+            <input type="text" className="form-control" id="native_unit" aria-describedby="unit" placeholder="Pounds" onChange={e => this.handleInputChange(e.target.value, 'native_unit')} value={this.state.native_unit}/>
+          </div>
+          <div className="form-group">
+            <label htmlFor="num_native_units">Number of Native Units</label>
+            <input type="text" className="form-control" id="num_native_units" aria-describedby="unit" placeholder="Native Units Amt" onChange={e => this.handleInputChange(e.target.value, 'num_native_units')} value={this.state.num_native_units}/>
           </div>
           </div>: null
         }
