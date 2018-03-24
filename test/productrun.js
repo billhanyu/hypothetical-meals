@@ -1,4 +1,3 @@
-const alasql = require('alasql');
 const assert = require('chai').assert;
 const testTokens = require('./common/testTokens');
 require('./test');
