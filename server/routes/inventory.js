@@ -1,29 +1,14 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
 import { getSpace } from './common/packageUtilies';
-import { getNumPages, queryWithPagination } from './common/pagination';
 import success from './common/success';
 import { updateConsumedSpendingLogForCart } from './spendinglog';
 import { logAction } from './systemLogs';
 
-const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.num_native_units as ingredient_num_native_units, Ingredients.package_type as ingredient_package_type, Ingredients.storage_id as ingredient_storage_id, Ingredients.native_unit AS ingredient_native_unit, Ingredients.removed as ingredient_removed FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
+const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.num_native_units as ingredient_num_native_units, Ingredients.package_type as ingredient_package_type, Ingredients.storage_id as ingredient_storage_id, Ingredients.native_unit AS ingredient_native_unit, Ingredients.removed as ingredient_removed, Ingredients.intermediate as ingredient_intermediate FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
 
 export function all(req, res, next) {
   connection.query(basicViewQueryString)
-    .then(results => res.status(200).send(results))
-    .catch(err => handleError(err, res));
-}
-
-export function pages(req, res, next) {
-  getNumPages('Inventories')
-    .then(results => res.status(200).send(results))
-    .catch(err => {
-      return res.status(500).send('Database error');
-    });
-}
-
-export function view(req, res, next) {
-  queryWithPagination(req.params.page_num, 'Inventories', basicViewQueryString)
     .then(results => res.status(200).send(results))
     .catch(err => handleError(err, res));
 }
@@ -57,12 +42,48 @@ function getStockPromise(ids) {
     connection.query(`${basicViewQueryString} WHERE Ingredients.id IN (${ids.join(', ')})`)
       .then(results => {
         for (let result of results) {
-          stock[result.id] = result;
+          if (stock[result.ingredient_id]) {
+            stock[result.ingredient_id].num_packages += result.num_packages;
+          } else {
+            // Clone
+            stock[result.ingredient_id] = JSON.parse(JSON.stringify(result));
+            delete stock[result.ingredient_id].worst_duration;
+            delete stock[result.ingredient_id].total_weighted_duration;
+            delete stock[result.ingredient_id].total_num_native_units;
+          }
+          stock[result.ingredient_id].freshnessData = [{
+            inventoryId: result.id,
+            numPackages: result.num_packages,
+            createdAt: result.created_at,
+          }];
         }
         resolve(stock);
       })
       .catch(err => reject(err));
   });
+}
+
+/* param: ingredient_id
+ * gets the lot distribution and quantities in those lots
+ */
+export function getLotQuantities(req, res, next) {
+  const ingredientId = req.params.ingredient_id;
+  connection.query(`SELECT Inventories.*, Ingredients.num_native_units, Vendors.name as vendor_name FROM Inventories
+    JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id
+    JOIN Vendors ON Inventories.vendor_id = Vendors.id
+    WHERE ingredient_id = ${ingredientId}`)
+  .then(results => {
+    const lots = results.map(entry => {
+      return {
+        inventory_id: entry.id,
+        lot: entry.lot,
+        vendor: entry.vendor_name,
+        quantity: entry.num_native_units * entry.num_packages,
+      };
+    });
+    return res.json(lots);
+  })
+  .catch(err => handleError(err, res));
 }
 
 /* request body format:
@@ -88,10 +109,10 @@ export function modifyQuantities(req, res, next) {
     })
     .then((results) => {
       let modified = results.map(x => {
-        return `${x.name}: ${x.num_packages * x.num_native_units} ${x.native_unit}`;
+        return `${x.name}: ${x.num_packages * x.num_native_units} ${x.native_unit} in lot ${x.lot}`;
       });
       let nameStrings = results.map(x => {
-        return `${x.name}{ingredient_id: ${x.ingredient_id}}`;
+        return `{${x.name}=ingredient_id=${x.ingredient_id}}`;
       });
       logAction(req.payload.id, `CORRECTION: Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} modified. Inventory now has ${modified.join(', ')}.`);
     })
@@ -118,6 +139,8 @@ export function commitCart(req, res, next) {
   let formula;
   let formulaEntries;
   const cartItems = [];
+  const ingredientIds = [];
+  const freshness = [];
 
   if (!checkNumber.isPositiveInteger(formulaId)) {
     return res.status(400).send('Invalid formula id');
@@ -136,7 +159,6 @@ export function commitCart(req, res, next) {
     .then((results) => {
       if (results.length == 0) throw createError('Invalid formula id');
       formulaEntries = results;
-      const ingredientIds = [];
       for (let formulaEntry of formulaEntries) {
         ingredientIds.push(formulaEntry.ingredient_id);
       }
@@ -144,20 +166,46 @@ export function commitCart(req, res, next) {
     })
     .then((inventories) => {
       const changes = {};
-      for (let inventory of Object.values(inventories)) {
-        const formulaEntrySearch = formulaEntries.find((formulaEntry) => inventory.ingredient_id == formulaEntry.ingredient_id);
+      for (let ingredientId of ingredientIds) {
+        const inventory = inventories[ingredientId];
+        if (!inventory) throw createError(`Inventory missing ingredient`);
+        inventory.freshnessData.sort((a, b) => a.created_at - b.created_at);
+
+        const formulaEntrySearch = formulaEntries.find((formulaEntry) => ingredientId == formulaEntry.ingredient_id);
+
         const reqNumPackages = formulaEntrySearch.num_native_units / inventory.ingredient_num_native_units * numProducts / formula.num_product;
-        changes[inventory.id] = inventory.num_packages - reqNumPackages;
-        cartItems.push({
-          id: inventory.id,
-          ingredient_id: inventory.ingredient_id,
-          ingredient_num_native_units: inventory.ingredient_num_native_units,
-          num_packages: reqNumPackages,
-        });
+        
+        let numPackagesLeft = reqNumPackages;
+        let worstDuration = 0;
+        let totalWeightedDuration = 0;
+        for (let freshnessEntry of inventory.freshnessData) {
+          if (numPackagesLeft <= 0) break;
+          const numPackagesConsumed = numPackagesLeft > freshnessEntry.numPackages ? 0 : numPackagesLeft;
+          changes[freshnessEntry.inventoryId] = freshnessEntry.numPackages - numPackagesConsumed;
+          numPackagesLeft = numPackagesLeft - numPackagesConsumed;
+          const timeSinceCreation = new Date() - freshnessEntry.createdAt;
+          worstDuration = Math.max(worstDuration, timeSinceCreation);
+          totalWeightedDuration += timeSinceCreation * numPackagesConsumed * inventory.ingredient_num_native_units;
+          cartItems.push({
+            id: freshnessEntry.inventoryId,
+            ingredient_id: ingredientId,
+            ingredient_num_native_units: inventory.ingredient_num_native_units,
+            num_packages: numPackagesConsumed,
+          });
+        }
+        // {ingredient id, worst duration, total duration, total num native units consumed}
+        freshness.push([ingredientId, worstDuration, totalWeightedDuration, reqNumPackages * inventory.ingredient_num_native_units]);
+        if (numPackagesLeft > 0) throw createError(`Inventory missing ingredient`);
       }
+
       return modifyInventoryQuantitiesPromise(changes);
     })
     .then(() => updateConsumedSpendingLogForCart(cartItems, formulaId, numProducts))
+    .then(() => (process.env.NODE_ENV === 'test' ? Promise.resolve() : connection.query(`INSERT INTO Ingredients (id, worst_duration, total_weighted_duration, total_num_native_units) VALUES ?
+     ON DUPLICATE KEY UPDATE 
+     worst_duration = GREATEST(worst_duration,VALUES(fruit)), 
+     total_weighted_duration = total_weighted_duration + VALUES(total_weighted_duration),
+     total_num_native_units = total_num_native_units + VALUES(total_num_native_units),`, [freshness])))
     .then(() => {
       return connection.query(`SELECT FormulaEntries.ingredient_id, FormulaEntries.num_native_units,
         Formulas.name as formula_name, Ingredients.name as ingredient_name 
@@ -190,6 +238,7 @@ export function modifyInventoryQuantitiesPromise(changes) {
       checkChangesProperties(changes);
     } catch (err) {
       reject(err);
+      return;
     }
     const ids = Object.keys(changes);
     const cases = [];
@@ -228,7 +277,7 @@ function checkChangesProperties(changes) {
     }
     const value = changes[id];
     if (!parseFloat(value) && parseFloat(value) !== 0 || parseFloat(value) < 0) {
-      throw createError(`new inventory quantity ${value} invalid.`);
+      throw createError(`new inventory quantity invalid.`);
     }
   }
 }

@@ -13,7 +13,7 @@ describe('Storage', () => {
           res.body.should.be.a('array');
           res.body.length.should.be.eql(3);
           const storages = res.body;
-          assert.strictEqual(storages[0].used, 25, 'storage 1 used');
+          assert.strictEqual(storages[0].used, 50, 'storage 1 used');
           assert.strictEqual(storages[1].used, 10, 'storage 2 used');
           assert.strictEqual(storages[2].used, 0, 'storage 3 used');
           done();

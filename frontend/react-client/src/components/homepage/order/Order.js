@@ -42,7 +42,7 @@ class Order extends Component {
     });
   }
 
-  orderIngredient(item) {
+  orderIngredient(item, quantity) {
     axios.get(`/vendoringredients/${item.id}`, {
       headers: { Authorization: "Token " + global.token }
     })
@@ -67,11 +67,11 @@ class Order extends Component {
             const itemInCart = cart.filter(s => s.id === item.id);
             if (itemInCart.length == 0) {
               const newItem = Object.assign(item);
-              newItem.quantity = item.quantity || 1;
+              newItem.quantity = quantity || 1;
               cart.push(newItem);
             } else {
               const newItem = itemInCart[0];
-              newItem.quantity += 1;
+              newItem.quantity += quantity || 1;
             }
             this.setState({
               cart
@@ -166,7 +166,7 @@ class Order extends Component {
                           {
                             vendoringredients.map((vendoringredient, idx) => {
                               const selectedClass = ingredient && ingredient.selected == vendoringredient.id ? "selected" : "";
-                              return <option selected={selectedClass} key={idx} value={vendoringredient.id}>{`${vendoringredient.vendor_name} - $${vendoringredient.price}`}</option>;
+                              return <option selected={selectedClass} key={idx} value={vendoringredient.id}>{`${vendoringredient.vendor_name} - $${vendoringredient.price} per ${vendoringredient.ingredient_package_type}`}</option>;
                             })
                           }
                         </select>

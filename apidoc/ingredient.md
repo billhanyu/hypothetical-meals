@@ -21,6 +21,13 @@ everything in Ingredients table and storage_name, storage_capacity.
 {% endmethod %}
 
 {% method %}
+## GET '/ingredients' {#viewAll}
+
+Get all ingredients, regardless of deleted or not.
+
+{% endmethod %}
+
+{% method %}
 ## GET '/ingredients/page/:page_num' {#view}
 
 Get all ingredients in the `Ingredients` table, requires no parameter input.
@@ -43,6 +50,72 @@ Return parameters:
 All columns in Ingredients table AND
 - Storages.name as storage_name
 - Storages.capacity as storage_capacity
+
+{% endmethod %}
+
+{% method %}
+## GET '/ingredients/freshness' {#freshness}
+
+Get all ingredients with freshness data.
+
+Returns
+
+{% sample lang="js" %}
+```js
+res.body:
+{ freshnessData:
+   { worstDuration: '1 days, 10 hours, 17 minutes, 36 seconds',
+     averageDuration: '0 days, 16 hours, 20 minutes, 41 seconds' },
+  ingredients:
+   [ { id: 1,
+       name: 'poop',
+       package_type: 'sack',
+       storage_id: 1,
+       native_unit: 'pounds',
+       num_native_units: 10,
+       intermediate: 0,
+       removed: 0,
+       storage_name: 'freezer',
+       storage_capacity: 2000,
+       worstDuration: '1 days, 10 hours, 17 minutes, 36 seconds',
+       averageDuration: '1 days, 3 hours, 46 minutes, 40 seconds' },
+     { id: 2,
+       name: 'beans',
+       package_type: 'truckload',
+       storage_id: 1,
+       native_unit: 'pounds',
+       num_native_units: 15,
+       intermediate: 0,
+       removed: 0,
+       storage_name: 'freezer',
+       storage_capacity: 2000,
+       worstDuration: null,
+       averageDuration: null },
+     { id: 3,
+       name: 'boop',
+       package_type: 'pail',
+       storage_id: 1,
+       native_unit: 'kg',
+       num_native_units: 20,
+       intermediate: 0,
+       removed: 0,
+       storage_name: 'freezer',
+       storage_capacity: 2000,
+       worstDuration: '0 days, 0 hours, 2 minutes, 3 seconds',
+       averageDuration: '0 days, 0 hours, 0 minutes, 42 seconds' },
+     { id: 4,
+       name: 'loop',
+       package_type: 'sack',
+       storage_id: 2,
+       native_unit: 'g',
+       num_native_units: 50,
+       intermediate: 0,
+       removed: 0,
+       storage_name: 'refrigerator',
+       storage_capacity: 20,
+       worstDuration: null,
+       averageDuration: null } ] }
+```
 
 {% endmethod %}
 
