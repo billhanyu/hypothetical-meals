@@ -33,7 +33,7 @@ describe('Formulas', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(2);
+          res.body.length.should.be.eql(3);
           done();
         });
     });
@@ -57,6 +57,8 @@ describe('Formulas', () => {
 
   describe('#viewAll()', () => {
     it('should return all formulas', (done) => {
+      const formulaResult = alasql(`SELECT COUNT(1) FROM Formulas`);
+      const numFormulas = formulaResult[0]['COUNT(1)'];
       chai.request(server)
         .get('/formulas')
         .set('Authorization', `Token ${testTokens.managerTestToken}`)
@@ -64,7 +66,7 @@ describe('Formulas', () => {
           res.should.have.status(200);
           res.body.should.be.a('array');
           const formulas = res.body;
-          assert.strictEqual(formulas.length, 2, 'Number of formulas in database');
+          assert.strictEqual(formulas.length, numFormulas, 'Number of formulas in database');
           assert.strictEqual(formulas[0].id, 1, 'Id of formula 1');
           assert.strictEqual(formulas[0].name, 'cake', 'Name of formula 1');
           assert.strictEqual(formulas[0].intermediate, 0, 'Intermediate status');
@@ -100,6 +102,8 @@ describe('Formulas', () => {
     });
 
     it('should add two formulas to the database', (done) => {
+      const formulaResult = alasql(`SELECT COUNT(1) FROM Formulas`);
+      const numFormulas = formulaResult[0]['COUNT(1)'];
       chai.request(server)
         .post('/formulas')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
@@ -138,7 +142,7 @@ describe('Formulas', () => {
         .end((err, res) => {
           res.should.have.status(200);
           const formulas = alasql(`SELECT * FROM Formulas WHERE removed = 0`);
-          assert.strictEqual(formulas.length, 4, 'Number of formulas in database');
+          assert.strictEqual(formulas.length, numFormulas+2, 'Number of formulas in database');
           const lastIndex = formulas.length-1;
           assert.strictEqual(formulas[lastIndex].name, 'Bill', 'Name for formula 3');
           assert.strictEqual(formulas[lastIndex].description, 'Fried up Bill', 'Description for formula 3');
@@ -368,7 +372,67 @@ describe('Formulas', () => {
         .end((err, res) => {
           res.should.have.status(200);
           const formulas = alasql(`SELECT * FROM Formulas WHERE removed = 0`);
-          assert.strictEqual(formulas.length, 2, 'Number of formulas in database');
+          assert.strictEqual(formulas.length, 3, 'Number of formulas in database');
+          assert.strictEqual(formulas[0].name, 'cake', 'Name for formula 1');
+          assert.strictEqual(formulas[0].description, 'A blob', 'Description for formula 3');
+          assert.strictEqual(formulas[0].num_product, 1, 'Number of products for formula 3');
+          assert.strictEqual(formulas[1].name, 'Bill', 'Name for formula 1');
+          assert.strictEqual(formulas[1].description, 'Chinaman', 'Description for formula 3');
+          assert.strictEqual(formulas[1].num_product, 1, 'Number of products for formula 3');
+          const formulaIngredients1 = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[0].id}`);
+          assert.strictEqual(formulaIngredients1.length, 1, 'Number of ingredients in formula 3');
+          assert.strictEqual(formulaIngredients1[0].ingredient_id, 1, 'Ingredient id in formula 1');
+          assert.strictEqual(formulaIngredients1[0].num_native_units, 2, 'Ingredient native units formula 1');
+          const formulaIngredients2 = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[1].id}`);
+          assert.strictEqual(formulaIngredients2.length, 2, 'Number of ingredients in formula 2');
+          assert.strictEqual(formulaIngredients2[0].ingredient_id, 1, 'Ingredient id in formula 2');
+          assert.strictEqual(formulaIngredients2[0].num_native_units, 10, 'Ingredient native units formula 2');
+          assert.strictEqual(formulaIngredients2[1].ingredient_id, 2, 'Ingredient id in formula 2');
+          assert.strictEqual(formulaIngredients2[1].num_native_units, 2, 'Ingredient native units formula 2');
+          done();
+        });
+    });
+
+    it('should modify one normal formula and one intermediate formula', (done) => {
+      chai.request(server)
+        .put('/formulas')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'formulas': [
+            {
+              'id': 1,
+              'name': 'cake',
+              'description': 'A blob',
+              'num_product': 1,
+              'ingredients': [
+                {
+                  'ingredient_id': 1,
+                  'num_native_units': 2,
+                },
+              ],
+            },
+            {
+              'id': 2,
+              'name': 'Bill',
+              'description': 'Chinaman',
+              'num_product': 1,
+              'ingredients': [
+                {
+                  'ingredient_id': 1,
+                  'num_native_units': 10,
+                },
+                {
+                  'ingredient_id': 2,
+                  'num_native_units': 2,
+                },
+              ],
+            },
+          ],
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const formulas = alasql(`SELECT * FROM Formulas WHERE removed = 0`);
+          assert.strictEqual(formulas.length, 3, 'Number of formulas in database');
           assert.strictEqual(formulas[0].name, 'cake', 'Name for formula 1');
           assert.strictEqual(formulas[0].description, 'A blob', 'Description for formula 3');
           assert.strictEqual(formulas[0].num_product, 1, 'Number of products for formula 3');
@@ -425,7 +489,7 @@ describe('Formulas', () => {
         .end((err, res) => {
           res.should.have.status(200);
           const formulas = alasql(`SELECT * FROM Formulas WHERE removed = 0`);
-          assert.strictEqual(formulas.length, 2, 'Number of formulas in database');
+          assert.strictEqual(formulas.length, 3, 'Number of formulas in database');
           assert.strictEqual(formulas[0].name, 'yellow cake', 'Name for formula 1');
           assert.strictEqual(formulas[0].description, 'A simple cake', 'Description for formula 3');
           assert.strictEqual(formulas[0].num_product, 1, 'Number of products for formula 3');
@@ -442,6 +506,54 @@ describe('Formulas', () => {
           assert.strictEqual(formulaIngredients2[0].num_native_units, 10, 'Ingredient native units formula 2');
           assert.strictEqual(formulaIngredients2[1].ingredient_id, 2, 'Ingredient id in formula 2');
           assert.strictEqual(formulaIngredients2[1].num_native_units, 2, 'Ingredient native units formula 2');
+          done();
+        });
+    });
+
+    it('should modify an intermediate formula correctly', (done) => {
+      const formulaResult = alasql(`SELECT COUNT(1) FROM Formulas`);
+      const numFormulas = formulaResult[0]['COUNT(1)'];
+      const intermediateId = 6;
+      chai.request(server)
+        .put('/formulas')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'formulas': [
+            {
+              'id': 3,
+              'name': 'bleb',
+              'num_product': 1,
+              'intermediate': 1,
+              'intermediate_properties': {
+                'id': intermediateId,
+                'package_type': 'railcar',
+              },
+              'ingredients': [
+                {
+                  'ingredient_id': 1,
+                  'num_native_units': 2,
+                },
+              ],
+            },
+          ],
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const formulas = alasql(`SELECT * FROM Formulas WHERE removed = 0`);
+          assert.strictEqual(formulas.length, numFormulas, 'Number of formulas in database');
+          assert.strictEqual(formulas[2].name, 'bleb', 'Name for formula 1');
+          assert.strictEqual(formulas[2].description, 'hehe', 'Description for formula 3');
+          assert.strictEqual(formulas[2].num_product, 1, 'Number of products for formula 3');
+          const formulaIngredients1 = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[2].id}`);
+          assert.strictEqual(formulaIngredients1.length, 1, 'Number of ingredients in formula 3');
+          assert.strictEqual(formulaIngredients1[0].ingredient_id, 1, 'Ingredient id in formula 1');
+          assert.strictEqual(formulaIngredients1[0].num_native_units, 2, 'Ingredient native units formula 1');
+          const intermediateIngredient = alasql(`SELECT * FROM Ingredients WHERE id = ${intermediateId}`);
+          assert.strictEqual(intermediateIngredient[0].name, 'booploop meow', 'Name of intermediate ingredient');
+          assert.strictEqual(intermediateIngredient[0].package_type, 'railcar', 'Modified package type for intermediate product');
+          assert.strictEqual(intermediateIngredient[0].storage_id, 2, 'Storage id for intermediate product');
+          assert.strictEqual(intermediateIngredient[0].native_unit, 'kg', 'Native unit for intermediate product');
+          assert.strictEqual(intermediateIngredient[0].num_native_units, 30, 'Num native units for intermediate produt');
           done();
         });
     });
@@ -590,11 +702,11 @@ describe('Formulas', () => {
           const formulas = alasql(`SELECT * FROM Formulas`);
           const formulasRemoved = alasql(`SELECT * FROM Formulas WHERE removed = 1`);
           assert.strictEqual(formulasRemoved.length, 2, 'Should have marked as removed');
-          assert.strictEqual(formulas.length, 2, 'Should have not actually removed all formulas');
+          assert.strictEqual(formulas.length, 3, 'Should have not actually removed all formulas');
           assert.strictEqual(formulas[0].removed, 1, 'Formula 1 marked at removed');
           assert.strictEqual(formulas[1].removed, 1, 'Formula 2 marked as removed');
           const formulaEntries = alasql(`SELECT * FROM FormulaEntries`);
-          assert.strictEqual(formulaEntries.length, 0, 'Should have deleted all formula entries');
+          assert.strictEqual(formulaEntries.length, 2, 'Should have deleted all formula entries');
           done();
         });
     });
@@ -607,13 +719,13 @@ describe('Formulas', () => {
         .end((err, res) => {
           res.should.have.status(200);
           const formulas = alasql(`SELECT * FROM Formulas`);
-          assert.strictEqual(formulas.length, 2, 'Should have fake deleted one formula');
+          assert.strictEqual(formulas.length, 3, 'Should have fake deleted one formula');
           const formula1 = alasql(`SELECT * FROM Formulas WHERE id = 1`);
           assert.strictEqual(formula1[0].removed, 1, 'Formula 1 marked as removed');
           const formulaEntries = alasql(`SELECT * FROM FormulaEntries`);
-          assert.strictEqual(formulaEntries.length, 2, 'Should have deleted all formula entries');
+          assert.strictEqual(formulaEntries.length, 4, 'Should have deleted all formula entries');
           formulaEntries.forEach(element => {
-            assert.strictEqual(element.formula_id, 2, 'Should not be equal to deleted formula id');
+            assert.notEqual(element.formula_id, 1, 'Should not be equal to deleted formula id');
           });
           done();
         });
@@ -777,21 +889,21 @@ describe('Formulas', () => {
           assert.strictEqual(soup.removed, 0, 'Removed status of soup');
 
           assert.strictEqual(formulaEntries.length, numFormulaEntries + 5, 'Five formula entries added to formula entries table.');
-          assert.strictEqual(formulaEntries[4].ingredient_id, 1, 'Ingredient ID is correct');
-          assert.strictEqual(formulaEntries[4].num_native_units, 2, 'Number of native units is correct');
-          assert.strictEqual(formulaEntries[4].formula_id, 3, 'Formula ID is correct');
-          assert.strictEqual(formulaEntries[5].ingredient_id, 2, 'Ingredient ID is correct');
-          assert.strictEqual(formulaEntries[5].num_native_units, 1, 'Number of native units is correct');
-          assert.strictEqual(formulaEntries[5].formula_id, 3, 'Formula ID is correct');
-          assert.strictEqual(formulaEntries[6].ingredient_id, 3, 'Ingredient ID is correct');
-          assert.strictEqual(formulaEntries[6].num_native_units, 400, 'Number of native units is correct');
-          assert.strictEqual(formulaEntries[6].formula_id, 3, 'Formula ID is correct');
-          assert.strictEqual(formulaEntries[7].ingredient_id, 4, 'Ingredient ID is correct');
-          assert.strictEqual(formulaEntries[7].num_native_units, 4, 'Number of native units is correct');
-          assert.strictEqual(formulaEntries[7].formula_id, 4, 'Formula ID is correct');
-          assert.strictEqual(formulaEntries[8].ingredient_id, 1, 'Ingredient ID is correct');
-          assert.strictEqual(formulaEntries[8].num_native_units, 1, 'Number of native units is correct');
-          assert.strictEqual(formulaEntries[8].formula_id, 4, 'Formula ID is correct');
+          assert.strictEqual(formulaEntries[numFormulaEntries].ingredient_id, 1, 'Ingredient ID is correct');
+          assert.strictEqual(formulaEntries[numFormulaEntries].num_native_units, 2, 'Number of native units is correct');
+          assert.strictEqual(formulaEntries[numFormulaEntries].formula_id, numFormulas + 1, 'Formula ID is correct');
+          assert.strictEqual(formulaEntries[numFormulaEntries+1].ingredient_id, 2, 'Ingredient ID is correct');
+          assert.strictEqual(formulaEntries[numFormulaEntries+1].num_native_units, 1, 'Number of native units is correct');
+          assert.strictEqual(formulaEntries[numFormulaEntries+1].formula_id, numFormulas + 1, 'Formula ID is correct');
+          assert.strictEqual(formulaEntries[numFormulaEntries+2].ingredient_id, 3, 'Ingredient ID is correct');
+          assert.strictEqual(formulaEntries[numFormulaEntries+2].num_native_units, 400, 'Number of native units is correct');
+          assert.strictEqual(formulaEntries[numFormulaEntries+2].formula_id, numFormulas + 1, 'Formula ID is correct');
+          assert.strictEqual(formulaEntries[numFormulaEntries+3].ingredient_id, 4, 'Ingredient ID is correct');
+          assert.strictEqual(formulaEntries[numFormulaEntries+3].num_native_units, 4, 'Number of native units is correct');
+          assert.strictEqual(formulaEntries[numFormulaEntries+3].formula_id, numFormulas + 2, 'Formula ID is correct');
+          assert.strictEqual(formulaEntries[numFormulaEntries+4].ingredient_id, 1, 'Ingredient ID is correct');
+          assert.strictEqual(formulaEntries[numFormulaEntries+4].num_native_units, 1, 'Number of native units is correct');
+          assert.strictEqual(formulaEntries[numFormulaEntries+4].formula_id, numFormulas + 2, 'Formula ID is correct');
           done();
         });
     });
