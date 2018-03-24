@@ -352,7 +352,7 @@ function createIntermediateUpdates(formulas, intermediateUpdates) {
   let intermediateMap = {};
   let allFormulasWithIntermediateProperty = [];
   createIntermediateMapping(formulas, allFormulasWithIntermediateProperty, intermediateMap, intermediateUpdates);
-  return connection.query(`SELECT id, intermediate, ingredient_id FROM Formulas WHERE id IN (${allFormulasWithIntermediateProperty.join(', ')})`)
+  return (allFormulasWithIntermediateProperty.length == 0 ? Promise.resolve([]) : connection.query(`SELECT id, intermediate, ingredient_id FROM Formulas WHERE id IN (${allFormulasWithIntermediateProperty.join(', ')})`))
   .then((results) => {
     checkIntermediateValidity(results, intermediateMap);
   })

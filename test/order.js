@@ -1,12 +1,11 @@
-const alasql = require('alasql');
+const dbSetup = require('./common/dbSetup');
 const assert = require('chai').assert;
 const testTokens = require('./common/testTokens');
 
 describe('Order', () => {
   describe('#placeOrder()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     // add back when lot assignment is complete

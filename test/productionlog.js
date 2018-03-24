@@ -1,12 +1,12 @@
 const assert = require('chai').assert;
-const alasql = require('alasql');
 const testTokens = require('./common/testTokens');
 
-describe('SpendingLog', () => {
+describe('ProductionLog', () => {
   describe('#pages()', () => {
     it('should return number of pages of data', (done) => {
-      alasql('INSERT INTO ProductionLogs (formula_id, num_product, total_cost) VALUES (1, 2, 3)');
-      chai.request(server)
+      connection.query('INSERT INTO ProductionLogs (formula_id, num_product, total_cost) VALUES (1, 2, 3)')
+      .then(() => {
+        chai.request(server)
         .get('/productionlogs/pages')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
@@ -15,13 +15,16 @@ describe('SpendingLog', () => {
           assert.strictEqual(res.body['numPages'], 1, 'number of pages');
           done();
         });
+      })
+      .catch((error) => console.log(error));
     });
   });
 
   describe('#view()', () => {
     it('should return all production logs for page 1', (done) => {
-      alasql('INSERT INTO ProductionLogs (formula_id, num_product, total_cost) VALUES (1, 2, 3)');
-      chai.request(server)
+      connection.query('INSERT INTO ProductionLogs (formula_id, num_product, total_cost) VALUES (1, 2, 3)')
+      .then(() => {
+        chai.request(server)
         .get('/productionlogs/page/1')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .end((err, res) => {
@@ -30,6 +33,8 @@ describe('SpendingLog', () => {
           res.body.length.should.be.eql(1);
           done();
         });
+      })
+      .catch((error) => console.log(error));
     });
   });
 });

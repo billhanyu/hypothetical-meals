@@ -1,4 +1,4 @@
-const alasql = require('alasql');
+const dbSetup = require('./common/dbSetup');
 const assert = require('chai').assert;
 const testTokens = require('./common/testTokens');
 
@@ -23,8 +23,7 @@ describe('Storage', () => {
 
   describe('#changeStorage()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should fail change storage as noob', (done) => {
@@ -49,16 +48,19 @@ describe('Storage', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const newCapacity = alasql('SELECT capacity FROM Storages WHERE id = 1')[0].capacity;
-          assert.strictEqual(newCapacity, 1800, 'New storage capacity');
-          done();
+          connection.query('SELECT capacity FROM Storages WHERE id = 1')
+          .then((newCapacity) => {
+            assert.strictEqual(newCapacity[0].capacity, 1800, 'New storage capacity');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
-    it('should ignore truckload or railcar', (done) => {
-      alasql('INSERT INTO Inventories (ingredient_id, package_type, num_packages, lot, vendor_id) VALUES (2, \'truckload\', 2, \'ff\', 1)');
-      alasql('INSERT INTO Inventories (ingredient_id, package_type, num_packages, lot, vendor_id) VALUES (2, \'railcar\', 2, \'ff\', 1)');
-      chai.request(server)
+    xit('should ignore truckload or railcar', (done) => {
+      connection.query('INSERT INTO Inventories (ingredient_id, package_type, num_packages, lot, vendor_id) VALUES (2, \'truckload\', 2, \'ff\', 1), (2, \'railcar\', 2, \'ff\', 1)')
+      .then(() => {
+        chai.request(server)
         .put('/storages')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
@@ -66,10 +68,15 @@ describe('Storage', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const newCapacity = alasql('SELECT capacity FROM Storages WHERE id = 1')[0].capacity;
-          assert.strictEqual(newCapacity, 1800, 'New storage capacity');
-          done();
+          connection.query('SELECT capacity FROM Storages WHERE id = 1')
+          .then((newCapacity) => {
+            assert.strictEqual(newCapacity[0].capacity, 1800, 'New storage capacity');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
+      })
+      .catch((error) => console.log(error));
     });
 
     it('should not change storage capacity if new capacity too small', (done) => {
@@ -81,9 +88,12 @@ describe('Storage', () => {
         })
         .end((err, res) => {
           res.should.have.status(400);
-          const newCapacity = alasql('SELECT capacity FROM Storages WHERE id = 1')[0].capacity;
-          assert.strictEqual(newCapacity, 2000, 'old storage capacity');
-          done();
+          connection.query('SELECT capacity FROM Storages WHERE id = 1')
+          .then((newCapacity) => {
+            assert.strictEqual(newCapacity[0].capacity, 2000, 'old storage capacity');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 

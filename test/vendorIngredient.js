@@ -1,4 +1,4 @@
-const alasql = require('alasql');
+const dbSetup = require('./common/dbSetup');
 const assert = require('chai').assert;
 const testTokens = require('./common/testTokens');
 
@@ -48,8 +48,7 @@ describe('VendorIngredient', () => {
 
   describe('#getVendorsForIngredient()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     xit('should return all vendors for an ingredient', (done) => {
@@ -80,8 +79,7 @@ describe('VendorIngredient', () => {
 
   describe('#addVendorIngredients()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should reject request body without a vendoringredients object', (done) => {
@@ -109,7 +107,7 @@ describe('VendorIngredient', () => {
           ],
         })
         .end((err, res) => {
-          res.should.have.status(500); // check error code
+          res.should.have.status(400);
           done();
         });
     });
@@ -177,18 +175,20 @@ describe('VendorIngredient', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const newItems = alasql('SELECT * FROM VendorsIngredients');
-          newItems.should.be.a('array');
-          assert.strictEqual(newItems.length, 6, 'new number of vendoringredients');
-          done();
+          connection.query('SELECT * FROM VendorsIngredients')
+          .then((newItems) => {
+            newItems.should.be.a('array');
+            assert.strictEqual(newItems.length, 6, 'new number of vendoringredients');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
   });
 
   describe('#modifyVendorIngredients()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should reject request body without a vendoringredients object', (done) => {
@@ -312,18 +312,20 @@ describe('VendorIngredient', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const changed = alasql('SELECT * FROM VendorsIngredients WHERE id IN (1, 2, 3)');
-          assert.equal(changed[0]['price'], 999, 'price for id 1');
-          assert.equal(changed[1]['price'], 99, 'price for id 2');
-          done();
+          connection.query('SELECT * FROM VendorsIngredients WHERE id IN (1, 2, 3)')
+          .then((changed) => {
+            assert.equal(changed[0]['price'], 999, 'price for id 1');
+            assert.equal(changed[1]['price'], 99, 'price for id 2');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
   });
 
   describe('#deleteVendorIngredients()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should reject request body without an ids object', (done) => {
@@ -372,12 +374,15 @@ describe('VendorIngredient', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const left = alasql('SELECT removed FROM VendorsIngredients WHERE id IN (1, 2, 3)');
-          assert.strictEqual(left.length, 3, 'fake delete 3 stuff');
-          assert.strictEqual(left[0].removed, 1, 'fake delete 1');
-          assert.strictEqual(left[1].removed, 1, 'fake delete 2');
-          assert.strictEqual(left[2].removed, 0, 'not fake delete 3');
-          done();
+          connection.query('SELECT removed FROM VendorsIngredients WHERE id IN (1, 2, 3)')
+          .then((left) => {
+            assert.strictEqual(left.length, 3, 'fake delete 3 stuff');
+            assert.strictEqual(left[0].removed, 1, 'fake delete 1');
+            assert.strictEqual(left[1].removed, 1, 'fake delete 2');
+            assert.strictEqual(left[2].removed, 0, 'not fake delete 3');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
   });
