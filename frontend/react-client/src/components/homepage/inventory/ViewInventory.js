@@ -3,28 +3,28 @@ import axios from 'axios';
 import InventoryItem from './InventoryItem';
 import FilterBar from './FilterBar';
 import PageBar from '../../GeneralComponents/PageBar';
-import storage2State from '../../Constants/Storage2State';
+import TempStates from '../../Constants/TempStates';
+import { COUNT_PER_PAGE } from '../../Constants/Pagination';
+import AddEditIngredient from '../ingredient/AddEditIngredient';
 
 class ViewInventory extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      allInventories: [],
-      inventories: [],
-      storages: [],
-      editQuantity: 0,
-      editIdx: -1,
+      pagedEntries: [],
       pages: 0,
       currentPage: 1,
+      viewingIdx: -1,
     };
+    this.entries = [];
+    this.filteredEntries = [];
     this.filterIngredient = this.filterIngredient.bind(this);
     this.filterTemp = this.filterTemp.bind(this);
     this.filterPackage = this.filterPackage.bind(this);
     this.selectPage = this.selectPage.bind(this);
-    this.edit = this.edit.bind(this);
-    this.cancelEdit = this.cancelEdit.bind(this);
-    this.changeQuantity = this.changeQuantity.bind(this);
-    this.finishEdit = this.finishEdit.bind(this);
+    this.reloadData = this.reloadData.bind(this);
+    this.viewIngredient = this.viewIngredient.bind(this);
+    this.backToList = this.backToList.bind(this);
   }
 
   componentDidMount() {
@@ -32,14 +32,27 @@ class ViewInventory extends Component {
   }
 
   reloadData() {
-    axios.get('/inventory/pages', {
+    axios.get('/inventory', {
         headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
-      this.setState({
-        pages: response.data.numPages
+      const entries = response.data;
+      const grouped = [];
+      entries.forEach(entry => {
+        entry.ingredient_temperature_state = TempStates[entry.ingredient_storage_id];
+        const existing = grouped.filter(item => item.ingredient_id == entry.ingredient_id);
+        if (existing.length) {
+          existing[0].num_packages += entry.num_packages;
+        } else {
+          grouped.push(entry);
+        }
       });
-      this.selectPage(1);
+      this.filteredEntries = grouped;
+      this.entries = grouped;
+      this.setState({
+        pages: Math.ceil(grouped.length / COUNT_PER_PAGE),
+      });
+      this.selectPage(this.state.currentPage);
     })
     .catch(error => {
       alert('Data loading error');
@@ -62,7 +75,7 @@ class ViewInventory extends Component {
   }
 
   filterInventories() {
-    let filtered = this.state.allInventories.slice();
+    let filtered = this.entries.slice();
     if (this.ingredientSearch) {
       filtered = filtered.filter(item => {
         return item.ingredient_name.indexOf(this.ingredientSearch) > -1;
@@ -76,97 +89,61 @@ class ViewInventory extends Component {
     if (this.packageSearch && this.packageSearch !== 'All') {
       filtered = filtered.filter(item => item.ingredient_package_type == this.packageSearch);
     }
+    this.filteredEntries = filtered;
+    const newPageNum = Math.ceil(this.filteredEntries.length / COUNT_PER_PAGE);
     this.setState({
-      inventories: filtered,
+      pages: newPageNum,
+    });
+    this.selectPage(1);
+  }
+
+  viewIngredient(idx) {
+    this.setState({
+      viewingIdx: idx,
     });
   }
 
-  edit(idx) {
+  backToList() {
     this.setState({
-      editIdx: idx,
-      editQuantity: this.state.inventories[idx].num_packages * this.state.inventories[idx].ingredient_num_native_units,
+      viewingIdx: -1,
     });
-  }
-
-  changeQuantity(event) {
-    this.setState({
-      editQuantity: event.target.value,
-    });
-  }
-
-  cancelEdit() {
-    this.setState({
-      editIdx: -1,
-    });
-  }
-
-  finishEdit() {
-    const putObj = {};
-    const id = this.state.inventories[this.state.editIdx].id;
-    const newQuantity = this.state.editQuantity / this.state.inventories[this.state.editIdx].ingredient_num_native_units;
-    putObj[id] = newQuantity;
-    axios.put('/inventory/admin', {
-      changes: putObj
-    }, {
-      headers: { Authorization: "Token " + global.token }
-    })
-      .then(response => {
-        this.setState({
-          editIdx: -1,
-        });
-        alert('Updated!');
-        this.reloadData();
-      })
-      .catch(err => {
-        const message = err.response.data;
-        alert(message);
-      });
   }
 
   selectPage(idx) {
+    const pagedEntries = [];
+    for (let i = (idx - 1) * COUNT_PER_PAGE; i < idx * COUNT_PER_PAGE && i < this.filteredEntries.length; i++) {
+      pagedEntries.push(this.filteredEntries[i]);
+    }
     this.setState({
+      pagedEntries,
       currentPage: idx,
     });
-    const self = this;
-    let allInventories;
-    axios.get(`/inventory/page/${idx}`, {
-      headers: { Authorization: "Token " + global.token }
-    })
-      .then(response => {
-        allInventories = response.data;
-        self.setState({
-          allInventories,
-          inventories: response.data,
-        });
-        return axios.get('/storages', {
-          headers: { Authorization: "Token " + global.token }
-        });
-      })
-      .then(response => {
-        const storages = response.data;
-        const newInventories = allInventories.map(a => Object.assign({}, a));
-        for (let item of newInventories) {
-          for (let storage of storages) {
-            if (item.ingredient_storage_id == storage.id) {
-              item.ingredient_storage_name = storage.name;
-              item.ingredient_temperature_state = storage2State[storage.name];
-            }
-          }
-        }
-        self.setState({
-          allInventories: newInventories,
-          inventories: newInventories,
-          storages,
-        });
-      })
-      .catch(err => {
-        alert('Data retrieval error');
-      });
   }
 
   render() {
-    const columnClass = global.user_group == "admin" ? "OneFifthWidth" : "OneFourthWidth";
-    return (
+    const columnClass = global.user_group == "admin" ? "OneSixthWidth" : "OneFifthWidth";
+    
+    const ingredient = this.state.viewingIdx > -1 ? this.state.pagedEntries[this.state.viewingIdx] : null;
+
+    const view =
+      <AddEditIngredient
+        mode="edit"
+        ingredient={ingredient ? {
+          id: ingredient.ingredient_id,
+          name: ingredient.ingredient_name,
+          native_unit: ingredient.ingredient_native_unit,
+          num_native_units: ingredient.ingredient_num_native_units,
+          package_type: ingredient.ingredient_package_type,
+          removed: {
+            data: [false],
+          },
+          intermediate: ingredient.ingredient_intermediate,
+          storage_id: ingredient.ingredient_storage_id,
+          storage_name: ingredient.ingredient_storage_name
+        } : null}
+        backToList={this.backToList}
+      />;
+    const main = 
       <div>
         <h2>Inventory</h2>
         <FilterBar
@@ -181,24 +158,17 @@ class ViewInventory extends Component {
               <th className={columnClass}>Temperature State</th>
               <th className={columnClass}>Package Type</th>
               <th className={columnClass}>Quantity</th>
-              {
-                global.user_group == "admin" &&
-                <th className={columnClass}>Options</th>
-              }
+              <th className={columnClass}>Storage Space Taken</th>
             </tr>
           </thead>
-          {this.state.inventories.map((item, key) =>
+          {this.state.pagedEntries.map((item, key) =>
             <InventoryItem
-              idx={key}
-              edit={this.edit}
-              editQuantity={this.state.editQuantity}
-              changeQuantity={this.changeQuantity}
-              cancelEdit={this.cancelEdit}
-              finishEdit={this.finishEdit}
-              editIdx={this.state.editIdx}
               key={key}
               item={item}
+              idx={key}
               storages={this.state.storages}
+              reloadData={this.reloadData}
+              viewIngredient={this.viewIngredient}
             />
           )}
         </table>
@@ -207,8 +177,13 @@ class ViewInventory extends Component {
           selectPage={this.selectPage}
           currentPage={this.state.currentPage}
         />
-      </div>
-    );
+      </div>;
+
+    if (this.state.viewingIdx > -1) {
+      return view;
+    } else {
+      return main;
+    }
   }
 }
 

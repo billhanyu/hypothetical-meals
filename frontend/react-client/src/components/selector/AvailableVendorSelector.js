@@ -4,17 +4,22 @@ import axios from 'axios';
 import Select from 'react-select';
 import '!style-loader!css-loader!react-select/dist/react-select.css';
 
-const VendorSelector = createClass({
+/*
+ * selects a vendor with removed = 0
+ * props.changeVendorId(newValue): changes the id selected
+*/
+
+const AvailableVendorSelector = createClass({
   displayName: 'Vendor',
 
   getInitialState() {
     return {
-      country: 'AU',
       disabled: false,
       searchable: this.props.searchable,
-      selectValue: 'new-south-wales',
+      selectValue: '',
       clearable: true,
       rtl: false,
+      vendors: [],
     };
   },
 
@@ -42,29 +47,11 @@ const VendorSelector = createClass({
     this.select.setInputValue('');
   },
 
-  switchCountry(e) {
-    var newCountry = e.target.value;
-    this.setState({
-      country: newCountry,
-      selectValue: null,
-    });
-  },
-
   updateValue(newValue) {
     this.props.changeVendorId(newValue);
     this.setState({
       selectValue: newValue,
     });
-  },
-
-  focusStateSelect() {
-    this.refs.stateSelect.focus();
-  },
-
-  toggleCheckbox(e) {
-    let newState = {};
-    newState[e.target.name] = e.target.checked;
-    this.setState(newState);
   },
 
   render() {
@@ -93,4 +80,4 @@ const VendorSelector = createClass({
   }
 });
 
-export default VendorSelector;
+export default AvailableVendorSelector;

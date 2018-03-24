@@ -26,7 +26,7 @@ function signupUser(req, res, next, userGroup) {
 
   let user = new User(req.body.user);
   user.setPassword(req.body.user.password);
-  
+
   connection.query(`INSERT INTO Users (username, name, hash, salt, user_group) VALUES ('${user.username}', '${user.name || ''}', '${user.hash}', '${user.salt}', '${userGroup}');`)
   .then(() => connection.query(`SELECT id FROM Users WHERE username = '${user.username}' AND removed = 0;`))
   .then((results) => {
@@ -45,6 +45,22 @@ function signupUser(req, res, next, userGroup) {
 }
 
 /**
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * Gets all nondeleted users.
+ */
+export function viewAll(req, res, next) {
+  connection.query(`SELECT * FROM Users WHERE removed = 0`)
+    .then((results) => {
+      res.status(200).send(results);
+    })
+    .catch((err) => {
+      handleError(err, res);
+    });
+}
+
+/**
  *
  * @param {*} req
  * req.body.user = {
@@ -56,7 +72,7 @@ function signupUser(req, res, next, userGroup) {
 export function deleteUser(req, res, next) {
   const user = req.body.user;
   let userId;
-  connection.query(`SELECT * FROM Users WHERE username IN (${user.username}) AND removed = 0`)
+  connection.query(`SELECT * FROM Users WHERE username IN ('${user.username}') AND removed = 0`)
     .then((results) => {
       if (results.length != 1) {
         throw createError('Trying to delete nonexistant user');

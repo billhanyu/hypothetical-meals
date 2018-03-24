@@ -10,7 +10,6 @@ class FilterBar extends Component {
   render() {
     return (
       <div className="FilterBar">
-        <p>Filter By:</p>
         <span>Ingredient:</span>
         <input className="FilterItem" onChange={e => this.props.filterIngredient(e)}/>
         <span>Temperature:</span>

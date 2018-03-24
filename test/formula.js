@@ -67,6 +67,7 @@ describe('Formulas', () => {
           assert.strictEqual(formulas.length, 2, 'Number of formulas in database');
           assert.strictEqual(formulas[0].id, 1, 'Id of formula 1');
           assert.strictEqual(formulas[0].name, 'cake', 'Name of formula 1');
+          assert.strictEqual(formulas[0].intermediate, 0, 'Intermediate status');
           assert.strictEqual(formulas[0].description, 'A simple cake', 'Description for cake');
           assert.strictEqual(formulas[0].num_product, 1, 'Number of product produced by formula');
           const ingredient = formulas[0]['ingredients']['boop'];
@@ -108,6 +109,7 @@ describe('Formulas', () => {
               'name': 'blob',
               'description': 'A blob',
               'num_product': 1,
+              'intermediate': 0,
               'ingredients': [
                 {
                   'ingredient_id': 1,
@@ -119,6 +121,7 @@ describe('Formulas', () => {
               'name': 'Bill',
               'description': 'Fried up Bill',
               'num_product': 1,
+              'intermediate': 0,
               'ingredients': [
                 {
                   'ingredient_id': 1,
@@ -136,13 +139,135 @@ describe('Formulas', () => {
           res.should.have.status(200);
           const formulas = alasql(`SELECT * FROM Formulas WHERE removed = 0`);
           assert.strictEqual(formulas.length, 4, 'Number of formulas in database');
-          assert.strictEqual(formulas[3].name, 'Bill', 'Name for formula 3');
-          assert.strictEqual(formulas[3].description, 'Fried up Bill', 'Description for formula 3');
-          assert.strictEqual(formulas[3].num_product, 1, 'Number of products for formula 3');
-          const formulaIngredients = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[3].id}`);
+          const lastIndex = formulas.length-1;
+          assert.strictEqual(formulas[lastIndex].name, 'Bill', 'Name for formula 3');
+          assert.strictEqual(formulas[lastIndex].description, 'Fried up Bill', 'Description for formula 3');
+          assert.strictEqual(formulas[lastIndex].num_product, 1, 'Number of products for formula 3');
+          assert.strictEqual(formulas[lastIndex].intermediate, 0, 'Intermediate status of formula 3');
+          const formulaIngredients = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[lastIndex].id}`);
           assert.strictEqual(formulaIngredients.length, 2, 'Number of ingredients in formula 3');
           assert.strictEqual(formulaIngredients[0].ingredient_id, 1, 'First ingredient id in formula 3');
           assert.strictEqual(formulaIngredients[0].num_native_units, 0.5, 'First ingredient native units formula 3');
+          done();
+        });
+    });
+
+    it('should add request for intermediate product formula', (done) => {
+      chai.request(server)
+        .post('/formulas')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'formulas': [
+            {
+              'name': 'blob',
+              'description': 'A blob',
+              'num_product': 1,
+              'intermediate': 1,
+              'ingredient_name': 'blob',
+              'package_type': 'pail',
+              'storage_id': 1,
+              'native_unit': 'kg',
+              'num_native_units': 10,
+              'ingredients': [
+                {
+                  'ingredient_id': 1,
+                  'num_native_units': 2,
+                },
+              ],
+            },
+          ],
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const formulas = alasql('SELECT * FROM Formulas WHERE removed = 0');
+          const lastFormulaIndex = formulas.length - 1;
+          assert.strictEqual(formulas[lastFormulaIndex].name, 'blob', 'Name for formula');
+          assert.strictEqual(formulas[lastFormulaIndex].description, 'A blob', 'Description for formula');
+          assert.strictEqual(formulas[lastFormulaIndex].num_product, 1, 'Number of products for formula');
+          assert.strictEqual(formulas[lastFormulaIndex].intermediate, 1, 'Intermediate status of formula');
+          const ingredients = alasql('SELECT * FROM Ingredients WHERE removed = 0');
+          const lastIngredientIndex = ingredients.length - 1;
+          assert.strictEqual(ingredients[lastIngredientIndex].name, 'blob', 'Name for intermediate');
+          assert.strictEqual(ingredients[lastIngredientIndex].package_type, 'pail', 'Package type of intermediate');
+          assert.strictEqual(ingredients[lastIngredientIndex].storage_id, 1, 'Intermediate storage id');
+          assert.strictEqual(ingredients[lastIngredientIndex].native_unit, 'kg', 'Intermediate native unit');
+          assert.strictEqual(ingredients[lastIngredientIndex].num_native_units, 10, 'Intermediate num_native_units');
+
+          // const systemLogs = alasql('SELECT * FROM SystemLogs');
+          // console.log(systemLogs[systemLogs.length-1]);
+          // console.log(systemLogs[systemLogs.length-2]);
+          done();
+        });
+    });
+
+    it('should add request for intermediate product formula and a normal formula', (done) => {
+      chai.request(server)
+      .post('/formulas')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'formulas': [
+            {
+              'name': 'Bill',
+              'description': 'Fried up Bill',
+              'num_product': 1,
+              'intermediate': 0,
+              'ingredients': [
+                {
+                  'ingredient_id': 1,
+                  'num_native_units': 0.5,
+                },
+                {
+                  'ingredient_id': 2,
+                  'num_native_units': 2,
+                },
+              ],
+            },
+            {
+              'name': 'blob',
+              'description': 'A blob',
+              'num_product': 1,
+              'intermediate': 1,
+              'ingredient_name': 'blob',
+              'package_type': 'pail',
+              'storage_id': 1,
+              'native_unit': 'kg',
+              'num_native_units': 10,
+              'ingredients': [
+                {
+                  'ingredient_id': 1,
+                  'num_native_units': 2,
+                },
+              ],
+            },
+          ],
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          const formulas = alasql('SELECT * FROM Formulas WHERE removed = 0');
+          const lastFormulaIndex = formulas.length - 1;
+          assert.strictEqual(formulas[lastFormulaIndex].name, 'blob', 'Name for formula');
+          assert.strictEqual(formulas[lastFormulaIndex].description, 'A blob', 'Description for formula');
+          assert.strictEqual(formulas[lastFormulaIndex].num_product, 1, 'Number of products for formula');
+          assert.strictEqual(formulas[lastFormulaIndex].intermediate, 1, 'Intermediate status of formula');
+          const ingredients = alasql('SELECT * FROM Ingredients WHERE removed = 0');
+          const lastIngredientIndex = ingredients.length - 1;
+          assert.strictEqual(ingredients[lastIngredientIndex].name, 'blob', 'Name for intermediate');
+          assert.strictEqual(ingredients[lastIngredientIndex].package_type, 'pail', 'Package type of intermediate');
+          assert.strictEqual(ingredients[lastIngredientIndex].storage_id, 1, 'Intermediate storage id');
+          assert.strictEqual(ingredients[lastIngredientIndex].native_unit, 'kg', 'Intermediate native unit');
+          assert.strictEqual(ingredients[lastIngredientIndex].num_native_units, 10, 'Intermediate num_native_units');
+
+          assert.strictEqual(formulas[lastFormulaIndex-1].name, 'Bill', 'Name for formula 3');
+          assert.strictEqual(formulas[lastFormulaIndex-1].description, 'Fried up Bill', 'Description for formula 3');
+          assert.strictEqual(formulas[lastFormulaIndex-1].num_product, 1, 'Number of products for formula 3');
+          assert.strictEqual(formulas[lastFormulaIndex-1].intermediate, 0, 'Intermediate status of formula 3');
+          const formulaIngredients = alasql(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[lastFormulaIndex-1].id}`);
+          assert.strictEqual(formulaIngredients.length, 2, 'Number of ingredients in formula 3');
+          assert.strictEqual(formulaIngredients[0].ingredient_id, 1, 'First ingredient id in formula 3');
+          assert.strictEqual(formulaIngredients[0].num_native_units, 0.5, 'First ingredient native units formula 3');
+
+          // const systemLogs = alasql('SELECT * FROM SystemLogs');
+          // console.log(systemLogs);
           done();
         });
     });
@@ -548,7 +673,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/badIngredientUnitsData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -558,7 +683,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/badProductUnitsData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -568,7 +693,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/extraArgumentData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -578,7 +703,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/invalidHeaderData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -588,7 +713,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/missingArgumentData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -598,7 +723,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/notConsecutiveFormulaEntriesData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -608,7 +733,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/duplicateFormulaData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -618,7 +743,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/missingIngredientsData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(400);
           done();
         });
@@ -633,7 +758,7 @@ describe('Formulas', () => {
       supertest(server).post('/formulas/import')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/validData.csv')
-        .end(function (err, res) {
+        .end(function(err, res) {
           res.should.have.status(200);
 
           const formulas = alasql(`SELECT * FROM Formulas`);

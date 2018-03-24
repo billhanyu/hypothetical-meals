@@ -19,6 +19,9 @@ import ProduceFormula from '../homepage/inventory/ProduceFormula.js';
 import ViewAllFormulas from '../homepage/inventory/ViewAllFormulas.js';
 import ProductionLog from '../homepage/productionlog/ProductionLog';
 import SystemLog from '../homepage/systemlog/SystemLog';
+import ProductionRun from '../homepage/productionrun/ProductionRun';
+import RecallReport from '../homepage/recallreport/RecallReport';
+import Freshness from '../homepage/freshnessreport/Freshness';
 
 class HomePage extends Component {
   constructor(props) {
@@ -50,6 +53,9 @@ class HomePage extends Component {
     else if (funcName == "register") {
       return <Registration />;
     }
+    else if (funcName == "productionRun") {
+      return <ProductionRun />;
+    }
     else if (funcName == "changePermission") {
       return <ChangePermission />;
     }
@@ -62,8 +68,14 @@ class HomePage extends Component {
     else if (funcName == "spendingLog") {
       return <SpendingLog />;
     }
+    else if (funcName == "freshnessReport") {
+      return <Freshness />;
+    }
     else if (funcName == "productionLog") {
       return <ProductionLog />;
+    }
+    else if (funcName == "recallReport") {
+      return <RecallReport />;
     }
     else if (funcName == "viewIngredients") {
       return <NewIngredientList />;
