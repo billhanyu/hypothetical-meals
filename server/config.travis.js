@@ -5,6 +5,7 @@ const config = {
     user: 'travis',
     database: 'meals',
   },
+  secret: 'secret',
 };
 
 module.exports = config;
