@@ -112,15 +112,20 @@ All formulas should specify whether or not it's an intermediate. Ingredient_name
 {% method %}
 ## PUT '/formulas'
 
-Modifies formulas. Request must contain for each formula every formula entry (every single ingredient id and number of native unit pairing). Ids are required, all other formula parameters such as name, description, and num_product are optional.
+Modifies formulas. Request must contain for each formula every formula entry (every single ingredient id and number of native unit pairing). Ids are required, all other formula parameters such as name, description, and num_product are optional. For intermediate product formulas, the intermediate must be specified as 1 and any updates for ingredient fields should be in intermediate_properties. You can not change an final formula to intermediate and vice versa.
 
 ```js
 'formulas': [
                 {
-                    'id': 1,
+                    'id': 1, // formula id
                     'name': 'blob',
                     'description': 'A blob',
                     'num_product': 1,
+                    'intermediate': 1, // must inculde if modifying intermediate properties
+                    'intermediate_properties': {
+                        'id': 10, // corresponds with ingredient_id...mandatory if editing intermediates
+                        'package_type': 'sack',
+                    },
                     'ingredients': [
                         {
                             'ingredient_id': 1,

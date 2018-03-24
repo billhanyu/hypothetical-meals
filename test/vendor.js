@@ -1,5 +1,5 @@
-const testTokens = require('./testTokens');
-const alasql = require('alasql');
+const testTokens = require('./common/testTokens');
+const dbSetup = require('./common/dbSetup');
 const assert = require('chai').assert;
 
 describe('Vendor', () => {
@@ -86,8 +86,7 @@ describe('Vendor', () => {
 
   describe('#addVendors()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should fail add vendor as noob', (done) => {
@@ -155,9 +154,12 @@ describe('Vendor', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const changed = alasql('SELECT id FROM Vendors');
-          assert.strictEqual(changed.length, 4, 'new number of vendors');
-          done();
+          connection.query('SELECT id FROM Vendors')
+          .then((changed) => {
+            assert.strictEqual(changed.length, 4, 'new number of vendors');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -181,23 +183,25 @@ describe('Vendor', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const changed = alasql('SELECT * FROM Vendors');
-          assert.strictEqual(changed.length, 4, 'Number of rows in Vendor table.');
-          assert.strictEqual(changed[2]['name'], 'hi', 'Name for vendor 3.');
-          assert.strictEqual(changed[2]['contact'], 'hi@duke.edu', 'Contact for vendor 3.');
-          assert.strictEqual(changed[2]['code'], 'codehi', 'Code for vendor 3.');
-          assert.strictEqual(changed[3]['name'], 'bleh', 'Name for vendor 4.');
-          assert.strictEqual(changed[3]['contact'], 'bleh@unc.edu', 'Contact for vendor 4.');
-          assert.strictEqual(changed[3]['code'], 'codebleh', 'Code for vendor 4.');
-          done();
+          connection.query('SELECT * FROM Vendors')
+          .then((changed) => {
+            assert.strictEqual(changed.length, 4, 'Number of rows in Vendor table.');
+            assert.strictEqual(changed[2]['name'], 'hi', 'Name for vendor 3.');
+            assert.strictEqual(changed[2]['contact'], 'hi@duke.edu', 'Contact for vendor 3.');
+            assert.strictEqual(changed[2]['code'], 'codehi', 'Code for vendor 3.');
+            assert.strictEqual(changed[3]['name'], 'bleh', 'Name for vendor 4.');
+            assert.strictEqual(changed[3]['contact'], 'bleh@unc.edu', 'Contact for vendor 4.');
+            assert.strictEqual(changed[3]['code'], 'codebleh', 'Code for vendor 4.');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
   });
 
   describe('#modifyVendors()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should fail modify vendor as noob', (done) => {
@@ -256,19 +260,21 @@ describe('Vendor', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const changed = alasql('SELECT * FROM Vendors WHERE id IN (1, 2)');
-          assert.strictEqual(changed[0]['name'], 'duke1', 'duke new name');
-          assert.strictEqual(changed[1]['contact', 'mcd@mcd.com', 'unc new contact']);
-          assert.strictEqual(changed[1]['code'], 'mcd', 'unc new code');
-          done();
+          connection.query('SELECT * FROM Vendors WHERE id IN (1, 2)')
+          .then((changed) => {
+            assert.strictEqual(changed[0]['name'], 'duke1', 'duke new name');
+            assert.strictEqual(changed[1]['contact', 'mcd@mcd.com', 'unc new contact']);
+            assert.strictEqual(changed[1]['code'], 'mcd', 'unc new code');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
   });
 
   describe('#deleteVendors()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should fail delete vendor as noob', (done) => {
@@ -319,10 +325,13 @@ describe('Vendor', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const left = alasql('SELECT removed FROM Vendors');
-          assert.strictEqual(left[0].removed, 1, 'vendor 1 deleted');
-          assert.strictEqual(left[1].removed, 1, 'vendor 2 deleted');
-          done();
+          connection.query('SELECT removed FROM Vendors')
+          .then((left) => {
+            assert.strictEqual(left[0].removed, 1, 'vendor 1 deleted');
+            assert.strictEqual(left[1].removed, 1, 'vendor 2 deleted');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -337,11 +346,14 @@ describe('Vendor', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const left = alasql('SELECT removed FROM VendorsIngredients');
-          assert.strictEqual(left[0].removed, 1, 'vendoringredient 1 deleted');
-          assert.strictEqual(left[1].removed, 1, 'vendoringredient 2 deleted');
-          assert.strictEqual(left[2].removed, 1, 'vendoringredient 3 deleted');
-          done();
+          connection.query('SELECT removed FROM VendorsIngredients')
+          .then((left) => {
+            assert.strictEqual(left[0].removed, 1, 'vendoringredient 1 deleted');
+            assert.strictEqual(left[1].removed, 1, 'vendoringredient 2 deleted');
+            assert.strictEqual(left[2].removed, 1, 'vendoringredient 3 deleted');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
 
@@ -356,11 +368,14 @@ describe('Vendor', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          const left = alasql('SELECT removed FROM VendorsIngredients');
-          assert.strictEqual(left[0].removed, 0, 'vendoringredient 1 still there');
-          assert.strictEqual(left[1].removed, 0, 'vendoringredient 2 still there');
-          assert.strictEqual(left[2].removed, 0, 'vendoringredient 2 still there');
-          done();
+          connection.query('SELECT removed FROM VendorsIngredients')
+          .then((left) => {
+            assert.strictEqual(left[0].removed, 0, 'vendoringredient 1 still there');
+            assert.strictEqual(left[1].removed, 0, 'vendoringredient 2 still there');
+            assert.strictEqual(left[2].removed, 0, 'vendoringredient 2 still there');
+            done();
+          })
+          .catch((error) => console.log(error));
         });
     });
   });
