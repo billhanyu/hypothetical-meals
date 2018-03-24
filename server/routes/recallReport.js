@@ -63,7 +63,7 @@ function getProducts(params) {
     .catch(err => {
       throw err;
     });
-    return myProductIds;
+  return myProductIds;
 }
 
 function createParamObject(x) {
@@ -105,15 +105,13 @@ function makeConditionString(params) {
 function checkRecallParams(recallParams) {
   if (!('ingredient_id' in recallParams)) {
     throw createError('No ingredient_id specified');
-  } else if (!('vendor_id' in recallParams)) {
-    throw createError('No vendor_id specified');
   } else if (!('lot' in recallParams)) {
     throw createError('No lot specified');
   }
   // check for positive int for ingredient_id and vendor_id
   if (!checkNumber.isPositiveInteger(recallParams.ingredient_id)) {
     throw createError('Invalid ingredient_id');
-  } else if (!checkNumber.isPositiveInteger(recallParams.vendor_id)) {
+  } else if ('vendor_id' in recallParams && !checkNumber.isPositiveInteger(recallParams.vendor_id)) {
     throw createError('Invalid vendor id');
   }
 }
