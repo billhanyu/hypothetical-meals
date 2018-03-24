@@ -1,8 +1,8 @@
 import { addEntry } from '../server/routes/log';
 
-const alasql = require('alasql');
+const dbSetup = require('./common/dbSetup');
 const assert = require('chai').assert;
-const testTokens = require('./testTokens');
+const testTokens = require('./common/testTokens');
 
 
 describe('Log', () => {
@@ -36,8 +36,7 @@ describe('Log', () => {
 
   describe('#viewLogForIngredient()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     it('should return all logs for a vendor ingredient', (done) => {
@@ -73,8 +72,7 @@ describe('Log', () => {
 
   describe('#addEntry()', () => {
     beforeEach(() => {
-      alasql('SOURCE "./server/create_database.sql"');
-      alasql('SOURCE "./server/sample_data.sql"');
+      return dbSetup.setupTestDatabase();
     });
 
     const req = [
@@ -112,26 +110,32 @@ describe('Log', () => {
     it('should add two entries for a vendor ingredient', done => {
       addEntry(validReq, 4)
       .then(() => {
-        const newLogs = alasql('SELECT * FROM Logs');
-        assert.strictEqual(newLogs[2]['user_id'], 4, 'User id for log 3.');
-        assert.strictEqual(newLogs[2]['vendor_ingredient_id'], 1, 'Vendor id for log 3.');
-        assert.strictEqual(newLogs[2]['quantity'], 100, 'Quantity for log 3.');
-        assert.strictEqual(newLogs[3]['user_id'], 4, 'User id for log 4.');
-        assert.strictEqual(newLogs[3]['vendor_ingredient_id'], 2, 'Vendor id for log 4.');
-        assert.strictEqual(newLogs[3]['quantity'], 150, 'Quantity for log 4.');
-        assert.strictEqual(newLogs.length, 4, 'Length of logs.');
+        Promise.all([
+          connection.query('SELECT * FROM Logs'),
+          connection.query('SELECT * FROM SpendingLogs'),
+        ])
+        .then((results) => {
+          const [newLogs, newSpendingLogs] = results;
+          assert.strictEqual(newLogs[2]['user_id'], 4, 'User id for log 3.');
+          assert.strictEqual(newLogs[2]['vendor_ingredient_id'], 1, 'Vendor id for log 3.');
+          assert.strictEqual(newLogs[2]['quantity'], 100, 'Quantity for log 3.');
+          assert.strictEqual(newLogs[3]['user_id'], 4, 'User id for log 4.');
+          assert.strictEqual(newLogs[3]['vendor_ingredient_id'], 2, 'Vendor id for log 4.');
+          assert.strictEqual(newLogs[3]['quantity'], 150, 'Quantity for log 4.');
+          assert.strictEqual(newLogs.length, 4, 'Length of logs.');
 
-        const newSpendingLogs = alasql('SELECT * FROM SpendingLogs');
-        assert.strictEqual(newSpendingLogs[0]['total'], 5100, 'Total spent for ingredient 1.');
-        assert.strictEqual(newSpendingLogs[0]['total_weight'], 600, 'Total weight for ingredient 1.');
-        assert.strictEqual(newSpendingLogs[0]['ingredient_id'], 1, 'Ingredient id for spending log 1.');
-        assert.strictEqual(newSpendingLogs[0]['consumed'], 50, 'Quantity consumed for ingredient 1.');
-        assert.strictEqual(newSpendingLogs[1]['total'], 5200, 'Total spent for ingredient 2.');
-        assert.strictEqual(newSpendingLogs[1]['total_weight'], 650, 'Total weight for ingredient 2.');
-        assert.strictEqual(newSpendingLogs[1]['ingredient_id'], 2, 'Vendor id for log 4.');
-        assert.strictEqual(newSpendingLogs[1]['consumed'], 50, 'Quantity consumed for ingredient 2.');
-        assert.strictEqual(newSpendingLogs.length, 4, 'Length of spending logs.');
-        done();
+          assert.strictEqual(newSpendingLogs[0]['total'], 5100, 'Total spent for ingredient 1.');
+          assert.strictEqual(newSpendingLogs[0]['total_weight'], 600, 'Total weight for ingredient 1.');
+          assert.strictEqual(newSpendingLogs[0]['ingredient_id'], 1, 'Ingredient id for spending log 1.');
+          assert.strictEqual(newSpendingLogs[0]['consumed'], 50, 'Quantity consumed for ingredient 1.');
+          assert.strictEqual(newSpendingLogs[1]['total'], 5200, 'Total spent for ingredient 2.');
+          assert.strictEqual(newSpendingLogs[1]['total_weight'], 650, 'Total weight for ingredient 2.');
+          assert.strictEqual(newSpendingLogs[1]['ingredient_id'], 2, 'Vendor id for log 4.');
+          assert.strictEqual(newSpendingLogs[1]['consumed'], 50, 'Quantity consumed for ingredient 2.');
+          assert.strictEqual(newSpendingLogs.length, 4, 'Length of spending logs.');
+          done();
+        })
+        .catch((error) => console.log(error));
       });
     });
   });
