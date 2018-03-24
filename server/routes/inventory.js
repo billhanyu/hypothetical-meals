@@ -174,7 +174,7 @@ export function commitCart(req, res, next) {
         const formulaEntrySearch = formulaEntries.find((formulaEntry) => ingredientId == formulaEntry.ingredient_id);
 
         const reqNumPackages = formulaEntrySearch.num_native_units / inventory.ingredient_num_native_units * numProducts / formula.num_product;
-        
+
         let numPackagesLeft = reqNumPackages;
         let worstDuration = 0;
         let totalWeightedDuration = 0;
@@ -203,7 +203,7 @@ export function commitCart(req, res, next) {
     .then(() => updateConsumedSpendingLogForCart(cartItems, formulaId, numProducts))
     .then(() => (process.env.NODE_ENV === 'test' ? Promise.resolve() : connection.query(`INSERT INTO Ingredients (id, worst_duration, total_weighted_duration, total_num_native_units) VALUES ?
      ON DUPLICATE KEY UPDATE 
-     worst_duration = GREATEST(worst_duration,VALUES(fruit)), 
+     worst_duration = GREATEST(worst_duration,VALUES(worst_duration)), 
      total_weighted_duration = total_weighted_duration + VALUES(total_weighted_duration),
      total_num_native_units = total_num_native_units + VALUES(total_num_native_units),`, [freshness])))
     .then(() => {
