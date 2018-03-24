@@ -4,6 +4,7 @@ import { withRouter } from 'react-router';
 import RegistrationHeader from './RegistrationHeader';
 import RegistrationInput from './RegistrationInput';
 import PasswordStrengthContainer from './PasswordStrengthContainer';
+import Snackbar from 'material-ui/Snackbar';
 
 import axios from 'axios';
 
@@ -45,10 +46,16 @@ class RegistrationContainer extends Component {
         headers: { Authorization: "Token " + global.token }
       })
       .then(response => {
-        alert('Success!');
+        this.setState({
+          open: true,
+          message: "Success!"
+        });
       })
       .catch(error => {
-        alert(error.response.data);
+        this.setState({
+          open: true,
+          message: error.response.data
+        });
       });
   }
 
@@ -58,9 +65,21 @@ class RegistrationContainer extends Component {
     }
   }
 
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
+  }
+
   render() {
     return (
       <div className="RegistrationContainer">
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <RegistrationHeader HeaderText='Account Creation' HeaderIcon='fas fa-user fa-2x' />
 
         <RegistrationInput inputClass="RegistrationInput" placeholderText="Full Name" onKeyPress={this.keyPress} onChange={this.handleInputChange} id="name" />
@@ -70,7 +89,7 @@ class RegistrationContainer extends Component {
         <RegistrationInput inputType="password" inputClass="RegistrationInput" placeholderText="Password" onChange={this.handleInputChange} onKeyPress={this.keyPress} id="password" />
 
         <PasswordStrengthContainer passwordText={this.state.password} />
-        
+
         <div className="groupRadios">
           <label className="radio-inline groupRadio">
             <input className="groupRadioInput" type="radio" name="groupRadio" value="noob" checked={this.state.selectedGroup === "noob"} onChange={this.handleOptionChange} />

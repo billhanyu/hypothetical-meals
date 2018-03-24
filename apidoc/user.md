@@ -119,7 +119,7 @@ Everything in Users table.
 {% endmethod %}
 
 {% method %}
-## DELETE '/users/delete' {#deleteUser}
+## POST '/users/delete' {#deleteUser}
 
 Deletes a user, **requires admin permission level**.
 

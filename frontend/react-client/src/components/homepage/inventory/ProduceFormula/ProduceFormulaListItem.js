@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import ProduceFormulaListItemIngredient from './ProduceFormulaListItemIngredient.js';
 
-class ProduceFormulaListNoob extends Component {
+class ProduceFormulaListItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      numProduct: 0,
+      numProduct: props.num_product,
       belowMinError: false,
     };
     props.handleNumChange(Number(props.num_product), props.id, Number(this.props.num_product), false);
@@ -73,4 +73,4 @@ class ProduceFormulaListNoob extends Component {
   }
 }
 
-export default ProduceFormulaListNoob;
+export default ProduceFormulaListItem;

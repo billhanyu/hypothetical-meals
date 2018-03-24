@@ -9,6 +9,7 @@ import DeleteIngredientButton from './DeleteIngredientButton';
 import VendorIngredientList from './VendorIngredientList';
 import SystemLogList from './SystemLogList';
 import QuantityByLotTable from './onclickdetails/QuantityByLotTable';
+import Snackbar from 'material-ui/Snackbar';
 
 class AddEditIngredient extends Component {
   constructor(props) {
@@ -55,7 +56,10 @@ class AddEditIngredient extends Component {
     event.preventDefault();
 
     if (!this.state.name || !this.state.native_unit || !this.state.num_native_units) {
-      alert('Please fill out the name, unit, and size');
+      this.setState({
+        open: true,
+        message: 'Please fill out the name, unit, and size',
+      });
       return;
     }
 
@@ -86,14 +90,23 @@ class AddEditIngredient extends Component {
           headers: { Authorization: "Token " + global.token }
         })
         .then(response => {
-          alert('updated!');
+          this.setState({
+            open: true,
+            message: 'Updated',
+          });
         })
         .catch(error => {
           const msg = error.response.data;
           if (msg.indexOf('ER_DUP_ENTRY') > -1) {
-            alert('Name Exists');
+            this.setState({
+              open: true,
+              message: "Name already exists",
+            });
           } else {
-            alert(msg);
+            this.setState({
+              open: true,
+              message: msg,
+            });
           }
         });
     } else {
@@ -106,7 +119,10 @@ class AddEditIngredient extends Component {
           this.setState({
             id: response.data[0],
           }, () => {
-            alert('added!');
+            this.setState({
+              open: true,
+              message: "Added",
+            });
             this.setState({
               mode: "edit",
             });
@@ -115,12 +131,24 @@ class AddEditIngredient extends Component {
         .catch(error => {
           const msg = error.response.data;
           if (msg.indexOf('ER_DUP_ENTRY') > -1) {
-            alert('Name Exists');
+            this.setState({
+              open: true,
+              message: "Name Exists",
+            });
           } else {
-            alert(msg);
+            this.setState({
+              open: true,
+              message: msg,
+            });
           }
         });
     }
+  }
+
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
   }
 
   render() {
@@ -128,6 +156,12 @@ class AddEditIngredient extends Component {
     const readOnly = (global.user_group !== "admin") || (this.state.removed == 1);
     return (
       <div>
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <h2>
           {header}
           {
@@ -171,7 +205,7 @@ class AddEditIngredient extends Component {
             <div className="form-group">
               <label htmlFor="native_unit">Unit</label>
               <input type="text" className="form-control" id="native_unit" aria-describedby="unit" placeholder="Pounds" onChange={e => this.handleInputChange('native_unit', e)} value={this.state.native_unit} readOnly={readOnly}/>
-              </div>
+            </div>
             <div className="form-group">
               <label htmlFor="num_native_units">Native Units per Package</label>
               <input type="text" className="form-control" id="num_native_units" aria-describedby="num_native_units" placeholder="1" onChange={e => this.handleInputChange('num_native_units', e)} value={this.state.num_native_units} readOnly={readOnly} />
