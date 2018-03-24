@@ -38,7 +38,7 @@ class UserTable extends Component {
   }
 
   _handleDelete(username) {
-    axios.delete('/users/delete', {
+    axios.post('/users/delete', {
       data: { user: {username,} },
       headers: { Authorization: "Token " + global.token }
     })
