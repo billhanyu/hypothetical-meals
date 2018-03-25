@@ -3,6 +3,7 @@ import axios from 'axios';
 import PageBar from '../../GeneralComponents/PageBar';
 import VendorListItem from './VendorListItem';
 import AddEditVendor from './AddEditVendor';
+import Snackbar from 'material-ui/Snackbar';
 
 class VendorList extends Component {
   constructor(props) {
@@ -37,7 +38,7 @@ class VendorList extends Component {
       editing: false,
     });
   }
-  
+
   add() {
     this.setState({
       adding: true,
@@ -74,7 +75,12 @@ class VendorList extends Component {
           pages: response.data.numPages,
         });
       })
-      .catch(err => alert('Some error occurred'));
+      .catch(err => {
+        this.setState({
+          open: true,
+          message: err.response.data
+        });
+      });
   }
 
   selectPage(page) {
@@ -92,7 +98,12 @@ class VendorList extends Component {
           vendors,
         });
       })
-      .catch(err => alert('Some error occurred'));
+      .catch(err => {
+        this.setState({
+          open: true,
+          message: err.response.data
+        });
+      });
   }
 
   delete(idx) {
@@ -110,14 +121,34 @@ class VendorList extends Component {
     })
     .then(response => {
       this.selectPage(1);
-      alert('Deleted!');
+      this.setState({
+        open: true,
+        message: "Deleted"
+      });
     })
-    .catch(err => alert('Some error occurred'));
+    .catch(err => {
+      this.setState({
+        open: true,
+        message: err.response.data
+      });
+    });
+  }
+
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
   }
 
   render() {
     const main =
       <div>
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <h2>Vendors</h2>
         {global.user_group == "admin" && <button type="button" className="btn btn-primary" onClick={this.add}>Add Vendor</button>}
         <table className="table">
@@ -166,7 +197,7 @@ class VendorList extends Component {
         </div>
         <PageBar pages={this.state.pages} selectPage={this.selectPage} currentPage={this.state.page} />
       </div>;
-    
+
     const edit =
     <AddEditVendor mode="edit" backToList={this.backToList} vendor={this.state.vendors[this.state.editingIdx]} finishEdit={this.finishEdit} />;
 

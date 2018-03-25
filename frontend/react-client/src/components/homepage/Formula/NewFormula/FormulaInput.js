@@ -20,7 +20,7 @@ class FormulaInput extends Component {
     5. errorText (String)
   */
 
-  _handleChange(e) {
+  _handleChange(event) {
     this.props.onChange(event.target.value, this.props.id);
   }
 

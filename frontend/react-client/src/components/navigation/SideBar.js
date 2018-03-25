@@ -235,14 +235,14 @@ class SideBar extends Component {
                     text="Sign Up User"
                     permission="admin" />
                   <PermissionLink
-                    linkKey={"changePermission"}
+                    linkKey={"userTable"}
                     setActive={this.setActive}
                     activeKey={this.state.activeLink}
                     action={e => {
-                      this.props.link('changePermission');
+                      this.props.link('userTable');
                       this.setActiveCategory("user");
                     }}
-                    text="Permission"
+                    text="Modify User"
                     permission="admin" />
                 </ul>
               </div>
