@@ -15,6 +15,8 @@ class IngredientListItem extends Component {
       vendoringredients: [],
       ordering: false,
       quantity: '',
+      open: false,
+      message: '',
     };
     this.startOrder = this.startOrder.bind(this);
     this.cancel = this.cancel.bind(this);
@@ -63,7 +65,7 @@ class IngredientListItem extends Component {
       this.setState({
         open: true,
         message: 'Error getting product info for ingredient',
-      })
+      });
     });
   }
 
