@@ -36,6 +36,7 @@ class ViewAllFormulas extends Component {
       headers: { Authorization: "Token " + global.token }
     })
       .then(response => {
+        console.log(response);
         this.setState({
           EditFormulaBoxes: response.data
         });
