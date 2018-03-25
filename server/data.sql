@@ -1,13 +1,5 @@
 INSERT INTO Users (id, username, oauth, name, hash, salt, user_group) VALUES (1, 'admin', 0, 'Administrator', '9317a720e045fb39bfe530b698ca6f861cf0499c48606deb4490a1a3e6eb412b3081826c1fa7a262921a1fd13c956423f5924221e72e4b37ee652d7ab7fc743e533ee96f0f8a11c23f043d8732854825bcbcd619fd9bdc7a1f9594868a4dae1b771e13f5156ad5ec5efc70273c8d401f6cea180b63e07ba777f7be6436925be59a43fd9c98e55a75766d3801d2659dcdd4ed6d03b3c7d883756178655783c43024c6d3d74f0da21b082068b7ca9cfd9450630ee737076a80f4b3b399e461a95d9b1d79a8df7020daf9c6ef7be1655b1ef02bff84144064c085b02068a5370564383a06d268cf08b986b83e627ee46d40fdb5e6f680265401c1dccf2f4525e373452bc5f26b5ddb58208503bc0e445a554ccdb9d3145db50ce03a9caa1dc95d973ba856c424d57be5226b824baaeca007afe21a4ecbdc1bdbefbe50aa0677e0f7464d348202bba248311d8445f2433cdae3ec740763dc26ef9f4732fdea7ebfcf53451bc6d82b1e9ad2289d59a5639be282e9c35d99802bd934540b6ed499f44e2920b947ea4c381b5fefeb73eb27e3522ddc78d34fa0eca91c026729b3333ddc8ba05337707155ea90151aa3d0996945178c5e6982d98e25072a9aa39abe42728d107777913bd5be0e8f8fb3f2788ed9eb13c8e46a32de3b6f1c8102cc2e3ad5316ee5a37e9514916435568eca3b403067e2107459fe64c986eca34a38ff48fe', '138af8edecc78710b040658d90332108', 'admin');
-INSERT INTO Vendors (id, name, contact, code) VALUES (1, 'Duke', 'contact', 'code_duke');
-INSERT INTO Vendors (id, name, contact, code) VALUES (2, 'UNC', 'contact', 'code_unc');
+INSERT INTO Vendors (id, name, contact, code) VALUES (1, 'Self-produced', 'N/A', 'N/A');
 INSERT INTO Storages (id, name, capacity) VALUES (1, 'freezer', 1000000);
 INSERT INTO Storages (id, name, capacity) VALUES (2, 'refrigerator', 1000000);
 INSERT INTO Storages (id, name, capacity) VALUES (3, 'warehouse', 1000000);
-INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units) VALUES (1, 'Egg', 'sack', 2, 'pounds', 10);
-INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units) VALUES (2, 'Beans', 'truckload', 3, 'pounds', 15);
-INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units) VALUES (3, 'Milk', 'pail', 2, 'oz', 20);
-INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (1, 1, 10, 1);
-INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (2, 2, 20, 1);
-INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (3, 1, 30, 2);
-INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (4, 2, 40, 2);
