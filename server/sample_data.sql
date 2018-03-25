@@ -39,12 +39,15 @@ INSERT INTO SpendingLogs (id, ingredient_id, total_weight, total, consumed) VALU
 INSERT INTO Formulas (id, name, description, num_product) VALUES (1, 'cake', 'A simple cake', 1);
 INSERT INTO Formulas (id, name, description, num_product) VALUES (2, 'shit', 'just shit', 10);
 INSERT INTO Formulas (id, name, description, num_product, intermediate, ingredient_id) VALUES (3, 'booploop', 'hehe', 2, 1, 6);
+INSERT INTO Formulas (id, name, description, num_product) VALUES (4, 'booploop final shit', 'hehe blah', 6);
 INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (1, 3, 1, 1);
 INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (2, 4, 2, 1);
 INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (3, 1, 3, 2);
 INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (4, 2, 4, 2);
 INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (5, 3, 2, 3);
 INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (6, 4, 3, 3);
+INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (7, 5, 2, 4);
+INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (8, 1, 2, 4);
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (1, 5, 'User 5 did blah', '2018.01.01 00:00:01.000');
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (2, 5, 'User 5 added 5 {boop=ingredient_id=3}', '2018.01.02 12:00:00.000');
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (3, 6, 'User 6 added formula {cake=formula_id=3}', '2018.01.02 12:56:21.000');
