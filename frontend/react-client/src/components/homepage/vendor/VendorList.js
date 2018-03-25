@@ -92,7 +92,7 @@ class VendorList extends Component {
     })
       .then(response => {
         const vendors = response.data.filter(vendor => {
-          return vendor.removed.data[0] == 0;
+          return vendor.removed.data[0] == 0 && vendor.id != 1;
         });
         this.setState({
           vendors,
@@ -154,7 +154,6 @@ class VendorList extends Component {
         <table className="table">
           <thead>
             <tr>
-              <th>id</th>
               <th>Name</th>
               <th>Code</th>
               <th>Contact</th>
