@@ -7,10 +7,6 @@ import success from './common/success';
 import { logAction } from './systemLogs';
 
 /* request body format:
- * request.body.order = {
- *   "vendor_ingredient_id1": quantity_1,
- *   "vendor_ingredien_id": quantity_2
- * }
  * example:
  * {
  *   '1': {
