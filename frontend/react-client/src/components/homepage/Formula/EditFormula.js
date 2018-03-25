@@ -52,8 +52,10 @@ class EditFormula extends Component {
         });
       });
     }).catch(error => {
-      alert("Error deleting Formula");
-      console.log(error.response);
+      self.setState({
+        open: true,
+        snackbarText: 'Error deleting Formula',
+      });
     });
   }
 
@@ -69,9 +71,10 @@ class EditFormula extends Component {
       });
     })
     .catch(error => {
-      console.error(error);
-      alert("Error updating Formula");
-      console.log(error.response);
+      this.setState({
+        open: true,
+        snackbarText: 'Error Updating Formula',
+      });
     });
   }
 

@@ -28,6 +28,19 @@
   background-color: #BCC9D0;
 }
 
+/*** STUFF FOR CHOOSE VENDOR ITEM *****/
+.ChooseVendorItemButton {
+  margin: 0 auto;
+  width: 200px;
+  text-align: center;
+  padding: 8px;
+  background-color: #4e7ef7;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  color: #FFF;
+}
+
 /** ADD VENDOR WINDOW **/
 .EditContainer {
   width: 500px;

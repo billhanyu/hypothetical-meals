@@ -3,6 +3,7 @@ import createClass from 'create-react-class';
 import axios from 'axios';
 import Select from 'react-select';
 import '!style-loader!css-loader!react-select/dist/react-select.css';
+import Snackbar from 'material-ui/Snackbar';
 
 /*
  * selects a vendor with removed = 0
@@ -38,8 +39,10 @@ const AvailableVendorSelector = createClass({
         });
       })
       .catch(err => {
-        console.error(err);
-        alert('Error retrieving vendors');
+        this.setState({
+          open: true,
+          message: "Error retrieving Vendors",
+        });
       });
   },
 
@@ -54,10 +57,22 @@ const AvailableVendorSelector = createClass({
     });
   },
 
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
+  },
+
   render() {
     var options = this.state.vendors;
     return (
       <div className="section">
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <Select
           id="state-select"
           placeholder="Select Vendor..."

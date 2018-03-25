@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import Snackbar from 'material-ui/Snackbar';
 
 class EditVendor extends Component {
   constructor(props) {
@@ -40,7 +41,10 @@ class EditVendor extends Component {
     e.preventDefault();
     const self = this;
     if (!this.state.name || !this.state.code || !this.state.contact) {
-      alert('Please fill in all of the fields');
+      this.setState({
+        open: true,
+        message: "Please fill in all of the fields",
+      });
       return;
     }
     if (this.props.mode == "edit") {
@@ -67,7 +71,10 @@ class EditVendor extends Component {
           self.setState({
             errorMessage: error.response.data
           });
-          alert(error.response.data);
+          self.setState({
+            open: true,
+            message: error.response.data
+          });
         });
     } else {
       axios.post("/vendors", {
@@ -83,15 +90,30 @@ class EditVendor extends Component {
           self.props.finishAdd();
         })
         .catch(error => {
-          alert(error.response.data);
+          this.setState({
+            open: true,
+            message: error.response.data
+          });
         });
     }
+  }
+
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
   }
 
   render() {
     const readOnly = (global.user_group !== "admin") || (this.state.removed);
     return (
       <div>
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <h2>
           {'Vendor: ' + this.state.name}
           {

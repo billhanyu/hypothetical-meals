@@ -3,6 +3,7 @@ import createClass from 'create-react-class';
 import axios from 'axios';
 import Select from 'react-select';
 import '!style-loader!css-loader!react-select/dist/react-select.css';
+import Snackbar from 'material-ui/Snackbar';
 
 /*
  * selects an ingredient regardless of removed status (all ingredients)
@@ -38,8 +39,10 @@ const IngredientSelector = createClass({
         });
       })
       .catch(err => {
-        console.error(err);
-        alert('Error retrieving ingredients');
+        this.setState({
+          open: true,
+          message: "Error retrieving ingredients",
+        });
       });
   },
 
@@ -54,10 +57,22 @@ const IngredientSelector = createClass({
     });
   },
 
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
+  },
+
   render() {
     var options = this.state.ingredients;
     return (
       <div className="section" style={{'width': '400px'}}>
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <Select
           id="state-select"
           placeholder="Select Ingredient..."
