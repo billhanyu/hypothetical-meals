@@ -1,5 +1,4 @@
 import * as checkNumber from './common/checkNumber';
-import { modifyInventoryQuantitiesPromise } from './inventory';
 import { addEntry } from './log';
 import { createError, handleError } from './common/customError';
 import { getSpace } from './common/packageUtilies';
