@@ -258,13 +258,13 @@ export function commitCart(req, res, next) {
     })
     .then(() => {
       return connection.query(`SELECT FormulaEntries.ingredient_id, FormulaEntries.num_native_units,
-        Formulas.name as formula_name, Ingredients.name as ingredient_name 
+        Formulas.id as formula_id, Formulas.name as formula_name, Ingredients.name as ingredient_name 
         FROM FormulaEntries JOIN Ingredients ON FormulaEntries.ingredient_id = Ingredients.id
         JOIN Formulas ON FormulaEntries.formula_id = Formulas.id
         WHERE FormulaEntries.formula_id = ${formulaId}`);
     })
     .then((results) => {
-      const formulaName = results[0].formula_name;
+      const formulaName = `{${results[0].formula_name}=formula_id=${results[0].formula_id}}`;
       const productionStrings = results.map(x => {
         return `${numProducts * x.num_native_units} {${x.ingredient_name}=ingredient_id=${x.ingredient_id}}`;
       });
