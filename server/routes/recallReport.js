@@ -22,7 +22,6 @@ export function getRecallForIngredient(req, res, next) {
     handleError(err, res);
     return;
   }
-  console.log('bleb');
 
   getProducts(recallParams)
     .then((productruns) => {
@@ -32,6 +31,7 @@ export function getRecallForIngredient(req, res, next) {
       res.status(200).send(results);
     })
     .catch((err) => {
+      console.log(err);
       handleError(err, res);
     });
 }
@@ -64,8 +64,9 @@ function getProducts(params) {
   let myProductIds = new Set();
   queryProductionRuns(conditionString)
     .then((productEntries) => {
+      console.log(productEntries);
       let intermediatesProduced = [];
-      productionEntries.forEach(x => {
+      productEntries.forEach(x => {
         if (x.intermediate) {
           intermediatesProduced.push(x);
         }
@@ -80,7 +81,7 @@ function getProducts(params) {
     .catch(err => {
       throw err;
     });
-  return myProductIds;
+  return Promise.resolve(myProductIds);
 }
 
 function createParamObject(x) {
@@ -91,6 +92,12 @@ function createParamObject(x) {
 }
 
 function queryProductionRuns(conditionString) {
+  console.log(`${productionEntriesQuery}, ProductRuns.formula_id, 
+  Formulas.ingredient_id as product_ingredient_id, Formulas.intermediate
+  FROM ProductRunsEntries
+  JOIN ProductRuns ON ProductRunsEntries.productrun_id = ProductRuns.id
+  JOIN Formulas ON ProductRuns.formula_id = Formulas.id
+  ${conditionString}`);
   return connection.query(`${productionEntriesQuery}, ProductRuns.formula_id, 
   Formulas.ingredient_id as product_ingredient_id, Formulas.intermediate
   FROM ProductRunsEntries
@@ -111,9 +118,9 @@ function makeConditionString(params) {
   let cases = [];
   Object.keys(params).forEach(x => {
     if (isNaN(params[x])) {
-      cases.push(`${x} = '${params[x]}'`);
+      cases.push(`ProductRunsEntries.${x} = '${params[x]}'`);
     } else {
-      cases.push(`${x} = ${params[x]}`);
+      cases.push(`ProductRunsEntries.${x} = ${params[x]}`);
     }
   });
   return `WHERE ${cases.join(' AND ')}`;
