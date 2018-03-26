@@ -10,6 +10,8 @@ class VendorList extends Component {
     super(props);
     this.state = {
       vendors: [],
+      vendor: null,
+      viewVendor: false,
       pages: 1,
       page: 1,
       toDelete: 0,
@@ -25,6 +27,7 @@ class VendorList extends Component {
     this.edit = this.edit.bind(this);
     this.finishEdit = this.finishEdit.bind(this);
     this.backToList = this.backToList.bind(this);
+    this.viewVendor = this.viewVendor.bind(this);
   }
 
   componentDidMount() {
@@ -32,10 +35,26 @@ class VendorList extends Component {
     this.selectPage(1);
   }
 
+  viewVendor(id) {
+    axios.get(`/vendors/id/${id}`, {
+      headers: { Authorization: "Token " + global.token }
+    })
+      .then(response => {
+        this.setState({
+          vendor: response.data,
+          viewVendor: true,
+        });
+      })
+      .catch(err => {
+        alert('Error retrieving vendor data');
+      });
+  }
+
   backToList() {
     this.setState({
       adding: false,
       editing: false,
+      viewVendor: false,
     });
   }
 
@@ -62,6 +81,8 @@ class VendorList extends Component {
   finishEdit() {
     this.setState({
       editing: false,
+      adding: false,
+      viewVendor: false,
     });
     this.selectPage(this.state.page);
   }
@@ -169,7 +190,14 @@ class VendorList extends Component {
             {
               this.state.vendors.map((vendor, idx) => {
                 return (
-                  <VendorListItem key={idx} idx={idx} edit={this.edit} delete={this.delete} vendor={vendor} />
+                  <VendorListItem
+                    key={idx}
+                    idx={idx}
+                    edit={this.edit}
+                    delete={this.delete}
+                    vendor={vendor}
+                    viewVendor={this.viewVendor}
+                  />
                 );
               })
             }
@@ -200,6 +228,9 @@ class VendorList extends Component {
     const edit =
     <AddEditVendor mode="edit" backToList={this.backToList} vendor={this.state.vendors[this.state.editingIdx]} finishEdit={this.finishEdit} />;
 
+    const click =
+    <AddEditVendor mode="edit" backToList={this.backToList} vendor={this.state.vendor} finishEdit={this.finishEdit} />;
+
     const add =
     <AddEditVendor mode="add" backToList={this.backToList} finishAdd={this.finishAdd} />;
 
@@ -207,6 +238,8 @@ class VendorList extends Component {
       return edit;
     } else if (this.state.adding) {
       return add;
+    } else if (this.state.viewVendor) {
+      return click;
     } else {
       return main;
     }

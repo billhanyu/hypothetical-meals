@@ -11,7 +11,6 @@ import ViewInventory from '../homepage/inventory/ViewInventory';
 import Order from '../homepage/order/Order';
 import SpendingLog from '../homepage/spendinglog/SpendingLog';
 import StorageList from '../homepage/storage/StorageList';
-import Registration from '../Registration/RegistrationContainer';
 import NewFormula from '../homepage/Formula/NewFormula.js';
 import EditFormula from '../homepage/Formula/EditFormula.js';
 import ProduceFormula from '../homepage/inventory/ProduceFormula.js';
@@ -49,9 +48,6 @@ class HomePage extends Component {
     const funcName = this.state.funcName;
     if (funcName == "viewInventory") {
       return <ViewInventory />;
-    }
-    else if (funcName == "register") {
-      return <Registration />;
     }
     else if (funcName == "productionRun") {
       return <ProductionRun />;
