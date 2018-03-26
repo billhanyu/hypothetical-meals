@@ -5,6 +5,7 @@ class VendorListItem extends Component {
     const vendor = this.props.vendor;
     return (
       <tr>
+        <td>{vendor.id}</td>
         <td>{vendor.name}</td>
         <td>{vendor.code}</td>
         <td>{vendor.contact}</td>
