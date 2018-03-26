@@ -30,17 +30,6 @@ class NewFormula extends Component {
         });
       }
     });
-    console.log({
-        name,
-        description: desc,
-        num_product: quantity,
-        ingredients,
-        intermediate: isIntermediate ? 1 : 0,
-        num_native_units: Number(num_native_units),
-        native_unit,
-        storage_id: 1,
-        package_type,
-    });
     axios.get('/storages', {headers: {Authorization: "Token " + global.token}})
     .then(response => {
       let storage_id = 1;
@@ -74,6 +63,7 @@ class NewFormula extends Component {
           message: 'New Formula Created'
         });
       }).catch(error => {
+        console.log(error.response);
         self.setState({
           open: true,
           message: error.response.data,
