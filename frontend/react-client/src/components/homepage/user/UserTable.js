@@ -96,7 +96,7 @@ class UserTable extends Component {
   render() {
     if(this.state.isLoading) return false;
     const livingUsers = this.state.users.filter(element => {
-      return element.removed.data[0] === 0;
+      return element.removed === 0;
     });
     const permission =
         <ChangePermission

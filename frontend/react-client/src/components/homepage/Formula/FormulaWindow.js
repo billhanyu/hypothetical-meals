@@ -16,7 +16,7 @@ class FormulaWindow extends Component {
     const name = props.newFormulaObject != null ? props.newFormulaObject.name : '';
     const desc = props.newFormulaObject != null ? props.newFormulaObject.description : '';
     const quantity = props.newFormulaObject != null ? props.newFormulaObject.num_product : 0;
-    const removed = props.newFormulaObject != null ? props.newFormulaObject.removed.data[0] : 0;
+    const removed = props.newFormulaObject != null ? props.newFormulaObject.removed : 0;
     const idToQuantityMap = {};
     const values = [];
     const ingredientNameToQuantityMap = {};
@@ -44,7 +44,7 @@ class FormulaWindow extends Component {
       idToQuantityMap,
       values,
       ingredientNameToQuantityMap,
-      isIntermediate: props.newFormulaObject == null ? false : props.newFormulaObject.intermediate.data[0],
+      isIntermediate: props.newFormulaObject == null ? false : props.newFormulaObject.intermediate,
       package_type: ingredient.package_type,
       native_unit: ingredient.native_unit,
       storage_id: ingredient.storage_id,

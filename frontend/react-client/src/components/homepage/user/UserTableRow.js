@@ -32,7 +32,7 @@ class UserTableRow extends Component {
   }
 
   render() {
-    const isOAuth = this.props.oauth.data[0] === 1;
+    const isOAuth = this.props.oauth === 1;
     const actions = [
       <FlatButton
         label="Cancel"
@@ -60,7 +60,7 @@ class UserTableRow extends Component {
         </Dialog>
         <td>{this.props.name}</td>
         <td>{this.props.username}</td>
-        <td style={{ cursor: 'pointer' }} onClick={() => { this.props.changePermission(this.props.username, this.props.user_group, this.props.oauth.data[0])}}><i className="far fa-edit"></i> {this._capitalize(this.props.user_group)}</td>
+        <td style={{ cursor: 'pointer' }} onClick={() => { this.props.changePermission(this.props.username, this.props.user_group, this.props.oauth)}}><i className="far fa-edit"></i> {this._capitalize(this.props.user_group)}</td>
         <td style={{color: isOAuth ? "green" : "red"}}>{isOAuth ? "YES" : "NO"}</td>
         <td style={{cursor: 'pointer'}} onClick={this.handleOpen.bind(this)}><i className="fas fa-trash"></i></td>
       </tr>
