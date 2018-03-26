@@ -3,6 +3,7 @@ import axios from 'axios';
 import UserTableRow from './UserTableRow';
 import ChangePermission from './ChangePermission';
 import Snackbar from 'material-ui/Snackbar';
+import Registration from '../../Registration/RegistrationContainer';
 
 class UserTable extends Component {
   constructor(props) {
@@ -11,11 +12,20 @@ class UserTable extends Component {
       isLoading: true,
       users: [],
       changingPermission: false,
+      register: false,
     };
+    this.register = this.register.bind(this);
+    this.back = this.back.bind(this);
   }
 
   componentWillMount() {
     this.reloadData();
+  }
+
+  register() {
+    this.setState({
+      register: true,
+    });
   }
 
   reloadData() {
@@ -75,10 +85,12 @@ class UserTable extends Component {
     });
   }
 
-  _handleCancel() {
+  back() {
     this.setState({
       changingPermission: false,
+      register: false,
     });
+    this.reloadData();
   }
 
   render() {
@@ -86,16 +98,15 @@ class UserTable extends Component {
     const livingUsers = this.state.users.filter(element => {
       return element.removed.data[0] === 0;
     });
-    return (
-      this.state.changingPermission ?
+    const permission =
         <ChangePermission
-          cancel={this._handleCancel.bind(this)}
+          cancel={this.back}
           reloadData={this.reloadData.bind(this)}
           username={this.state.activeUsername}
           usergroup={this.state.activeUsergroup}
           oauth={this.state.activeOauth}
-        />
-      :
+        />;
+    const main =
     <div>
       <Snackbar
         open={this.state.open}
@@ -104,6 +115,12 @@ class UserTable extends Component {
         onRequestClose={this.handleRequestClose.bind(this)}
       />
       <h2>Users</h2>
+      <button
+        className='btn btn-primary'
+        onClick={this.register}
+      >
+        Add New User
+      </button>
       <table className="table">
         <thead>
           <tr>
@@ -129,7 +146,15 @@ class UserTable extends Component {
         }
         </tbody>
       </table>
-    </div>);
+    </div>;
+
+    if (this.state.changingPermission) {
+      return permission;
+    } else if (this.state.register) {
+      return <Registration back={this.back} reloadData={this.reloadData} />;
+    } else {
+      return main;
+    }
   }
 }
 

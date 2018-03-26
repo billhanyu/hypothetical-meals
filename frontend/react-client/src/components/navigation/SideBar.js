@@ -206,46 +206,19 @@ class SideBar extends Component {
             global.user_group == "admin" &&
             <li className="nav-item">
               <a
-                href="#nav-user"
+                href="javascript:void(0)"
                 role="button"
                 className={"nav-link PermissionCategory" + (this.state.activeCategory == "user" ? "-Active" : "")}
                 id="user"
                 onClick={e=>{
                   this.setActiveCategory("user");
+                  this.props.link('userTable');
                   this.setActive("");
                 }}
-                data-toggle="collapse"
-                aria-expanded="false"
-                aria-controls="nav-user"
                 data-parent="#SideBar"
               >
-                User&nbsp;&nbsp;
-            <i className="fa fa-caret-down"></i>
+                User
               </a>
-              <div className="collapse" id="nav-user">
-                <ul className="nav flex-column">
-                  <PermissionLink
-                    linkKey={"register"}
-                    setActive={this.setActive}
-                    activeKey={this.state.activeLink}
-                    action={e => {
-                      this.props.link('register');
-                      this.setActiveCategory("user");
-                    }}
-                    text="Sign Up User"
-                    permission="admin" />
-                  <PermissionLink
-                    linkKey={"userTable"}
-                    setActive={this.setActive}
-                    activeKey={this.state.activeLink}
-                    action={e => {
-                      this.props.link('userTable');
-                      this.setActiveCategory("user");
-                    }}
-                    text="Modify User"
-                    permission="admin" />
-                </ul>
-              </div>
             </li>
           }
           <li className="nav-item">
