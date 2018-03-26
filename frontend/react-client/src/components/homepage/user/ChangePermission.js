@@ -9,17 +9,17 @@ class ChangePermission extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      oauth: 0,
-      permission: 'unprivileged',
+      oauth: props.oauth,
+      permission: props.usergroup == 'noob' ? 'unprivileged' : props.usergroup,
     };
     this.handleSubmitButtonClick = this.handleSubmitButtonClick.bind(this);
-    this.checkChange = this.checkChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
   }
 
   /*** REQUIRED PROPS
     1. username (String)
     2. cancel (Func)
+    3. usergroup (String)
   **/
 
   handleInputChange(field, event) {
@@ -32,19 +32,13 @@ class ChangePermission extends Component {
     this.setState(newState);
   }
 
-  checkChange(event) {
-    this.setState({
-      oauth: this.state.oauth ? 0 : 1,
-    });
-  }
-
   handleSubmitButtonClick(event) {
     event.preventDefault();
     axios.post('/users/permission', {
       user: {
         username: this.props.username,
         oauth: this.state.oauth,
-        permission: this.state.permission,
+        permission: this.state.permission == 'unprivileged' ? 'noob' : this.state.permission,
       }
     }, {
         headers: { Authorization: "Token " + global.token }
@@ -55,6 +49,7 @@ class ChangePermission extends Component {
           message: "Changed Permission",
         });
         this.props.cancel();
+        this.props.reloadData();
       })
       .catch(err => {
         this.setState({
@@ -88,19 +83,11 @@ class ChangePermission extends Component {
             <input disabled type="text" className="form-control" id="username" aria-describedby="username" placeholder="Username" value={this.props.username} required />
           </div>
           <div className="form-group">
-            <div className="form-check">
-              <input className="form-check-input" onChange={this.checkChange} type="checkbox" id="gridCheck" />
-              <label className="form-check-label" htmlFor="gridCheck">
-                OAuth User?
-              </label>
-            </div>
-          </div>
-          <div className="form-group">
             <label htmlFor="permission">Permission</label>
             <ComboBox className="form-control" id="permission" Options={PERMISSIONS} onChange={this.handleInputChange} selected={this.state.permission} />
           </div>
           <button type="submit" className="btn btn-primary" onClick={this.handleSubmitButtonClick}>Submit</button>
-          <button style={{marginLeft:'8px'}} className="btn btn-primary" onClick={this.props.cancel}>Cancel</button>
+          <button style={{marginLeft:'8px'}} className="btn btn-secondary" onClick={this.props.cancel}>Cancel</button>
         </form>
       </div>
       </div>

@@ -15,6 +15,10 @@ class UserTable extends Component {
   }
 
   componentWillMount() {
+    this.reloadData();
+  }
+
+  reloadData() {
     axios.get('/users', {headers: {Authorization: "Token " + global.token}})
     .then(response => {
       this.setState({
@@ -30,16 +34,21 @@ class UserTable extends Component {
     });
   }
 
-  _changePermission(username) {
+  _changePermission(username, userGroup, oauth) {
     this.setState({
       changingPermission: true,
       activeUsername: username,
+      activeUsergroup: userGroup,
+      activeOauth: oauth,
     });
   }
 
   _handleDelete(username) {
-    axios.post('/users/delete', {
-      data: { user: {username,} },
+    axios.post('/users/delete',
+    {
+      user: { username, }
+    },
+    {
       headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
@@ -78,7 +87,15 @@ class UserTable extends Component {
       return element.removed.data[0] === 0;
     });
     return (
-      this.state.changingPermission ? <ChangePermission cancel={this._handleCancel.bind(this)} username={this.state.activeUsername} /> :
+      this.state.changingPermission ?
+        <ChangePermission
+          cancel={this._handleCancel.bind(this)}
+          reloadData={this.reloadData.bind(this)}
+          username={this.state.activeUsername}
+          usergroup={this.state.activeUsergroup}
+          oauth={this.state.activeOauth}
+        />
+      :
     <div>
       <Snackbar
         open={this.state.open}
@@ -86,7 +103,7 @@ class UserTable extends Component {
         autoHideDuration={2500}
         onRequestClose={this.handleRequestClose.bind(this)}
       />
-      <h2>Ingredients</h2>
+      <h2>Users</h2>
       <table className="table">
         <thead>
           <tr>
@@ -99,7 +116,15 @@ class UserTable extends Component {
         <tbody>
           {
             livingUsers.map((element, key) => {
-              return <UserTableRow changePermission={this._changePermission.bind(this)} onDelete={this._handleDelete.bind(this)} key={key} {...element} />;
+              return (
+                <UserTableRow
+                  changePermission={this._changePermission.bind(this)}
+                  onDelete={this._handleDelete.bind(this)}
+                  reloadData={this.reloadData.bind(this)}
+                  key={key}
+                  {...element}
+                />
+              );
             })
         }
         </tbody>
