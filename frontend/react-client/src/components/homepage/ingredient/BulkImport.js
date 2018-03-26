@@ -7,6 +7,10 @@ class BulkImport extends Component {
     super(props);
     this.submit = this.submit.bind(this);
     this.changeFile = this.changeFile.bind(this);
+    this.state = {
+      open: false,
+      message: '',
+    };
   }
 
   submit(e) {
@@ -65,7 +69,7 @@ class BulkImport extends Component {
           </div>
         </div>
         <div className="row justify-content-md-center">
-          Ensure that the file is a CSV and follows the formatting as specified&nbsp;<a href="https://docs.google.com/document/d/16f1LWxIjfKP0TyBoFHA8kD1QVAxxAlrP-fcYXV0vW9M/edit#">here</a>.
+          Ensure that the file is a CSV and follows the formatting as specified&nbsp;<a href="https://docs.google.com/document/d/17I-GIYnQklkrRr4e2EUlgiejcLClG2CVSYyRdMPHV7Y/edit">here</a>.
         </div>
       </div>
     );
