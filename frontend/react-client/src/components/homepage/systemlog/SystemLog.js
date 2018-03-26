@@ -171,7 +171,7 @@ class SystemLog extends Component {
     })
     .then(response => {
       this.setState({
-        formula: response.data[0],
+        formula: response,
         viewFormula: true,
       });
     })

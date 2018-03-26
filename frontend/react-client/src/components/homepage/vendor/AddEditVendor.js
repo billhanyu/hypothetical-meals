@@ -11,7 +11,7 @@ class EditVendor extends Component {
       this.state = {
         name: props.vendor.name,
         contact: props.vendor.contact,
-        removed: props.vendor.removed.data[0],
+        removed: props.vendor.removed,
         code: props.vendor.code,
         id: props.vendor.id,
       };

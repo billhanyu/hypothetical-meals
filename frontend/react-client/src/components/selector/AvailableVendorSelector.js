@@ -29,10 +29,13 @@ const AvailableVendorSelector = createClass({
       headers: { Authorization: "Token " + global.token }
     })
       .then(response => {
-        const vendors = response.data.map(vendor => {
+        const vendorsAll = response.data.map(vendor => {
           vendor.value = vendor.id;
           vendor.label = vendor.name;
           return vendor;
+        });
+        const vendors = vendorsAll.filter(element => {
+          return element.id !== 1;
         });
         this.setState({
           vendors,
