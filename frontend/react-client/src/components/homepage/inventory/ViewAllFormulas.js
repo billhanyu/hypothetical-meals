@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import ProduceFormulaListNoob from './ProduceFormula/ProduceFormulaListNoob.js';
 import axios from 'axios';
 import BulkImport from '../ingredient/BulkImport';
 

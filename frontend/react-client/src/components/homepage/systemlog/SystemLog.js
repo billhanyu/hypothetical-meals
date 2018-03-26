@@ -6,7 +6,6 @@ import SystemLogFilterBar from './SystemLogFilterBar';
 import PageBar from '../../GeneralComponents/PageBar';
 import axios from 'axios';
 import { COUNT_PER_PAGE } from '../../Constants/Pagination';
-import Snackbar from 'material-ui/Snackbar';
 
 class SystemLog extends Component {
   constructor(props) {

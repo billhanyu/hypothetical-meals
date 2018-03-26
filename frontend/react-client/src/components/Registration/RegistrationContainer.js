@@ -50,6 +50,7 @@ class RegistrationContainer extends Component {
           open: true,
           message: "Success!"
         });
+        this.props.back();
       })
       .catch(error => {
         this.setState({
@@ -104,7 +105,10 @@ class RegistrationContainer extends Component {
             Admin
           </label>
         </div>
-        <div className="RegistrationSubmitButton" onClick={this.handleSubmitButtonClick}>CREATE ACCOUNT</div>
+        <div style={{margin: '20px auto 0 auto', width: '250px'}}>
+          <button className='btn btn-primary' onClick={this.handleSubmitButtonClick}>Create Account</button>
+          <button className='btn btn-secondary' onClick={this.props.back}>Cancel</button>
+        </div>
       </div>
     );
   }

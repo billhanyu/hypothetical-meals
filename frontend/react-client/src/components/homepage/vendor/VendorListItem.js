@@ -5,7 +5,9 @@ class VendorListItem extends Component {
     const vendor = this.props.vendor;
     return (
       <tr>
-        <td>{vendor.name}</td>
+        <td>
+          <a href="javascript:void(0)" onClick={e => this.props.viewVendor(vendor.id)}>{vendor.name}</a>
+        </td>
         <td>{vendor.code}</td>
         <td>{vendor.contact}</td>
         {
