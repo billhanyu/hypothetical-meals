@@ -102,7 +102,7 @@ class IngredientListItem extends Component {
         <td className={columnClass}>
           <a href="javascript:void(0)" onClick={e=>this.props.viewIngredient(this.props.idx)}>{ingredient.name}</a>
           {
-            ingredient.intermediate.data[0] == 1 &&
+            ingredient.intermediate == 1 &&
             <span style={{ 'margin-left': '20px' }} className="badge badge-secondary">Intermediate</span>
           }
         </td>
@@ -167,7 +167,7 @@ class IngredientListItem extends Component {
         <td colSpan={3} className="hiddenRow">
           <div id={`vendoringredient_${this.props.idx}`} className="accordian-body collapse">
             {
-              ingredient.intermediate.data[0] !== 1 &&
+              ingredient.intermediate !== 1 &&
               <VendorIngredientsTable vendoringredients={this.state.vendoringredients} />
             }
             <div style={{'height': '20px'}} />

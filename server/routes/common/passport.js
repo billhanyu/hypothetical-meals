@@ -12,6 +12,9 @@ passport.use(new LocalStrategy({
     if (results.length==0) {
       return done(null, false, `Username or password is invalid`);
     }
+    if (results[0].removed == 1) {
+      return done(null, false, 'User does not exist');
+    }
     let user = new User(results[0]);
     if (!user.validPassword(password)) {
       return done(null, false, `Username or password is invalid`);
@@ -24,4 +27,3 @@ passport.use(new LocalStrategy({
     return res.sendStatus(500);
   });
 }));
-

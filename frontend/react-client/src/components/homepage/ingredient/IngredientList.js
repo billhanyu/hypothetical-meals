@@ -46,7 +46,7 @@ class IngredientList extends Component {
       ingredients.sort((a, b) => a.id - b.id);
       const filtered = [];
       ingredients.forEach(ingredient => {
-        if (!(this.props.order && ingredient.intermediate.data[0])) {
+        if (!(this.props.order && ingredient.intermediate)) {
           filtered.push(ingredient);
         }
       });

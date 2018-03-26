@@ -113,7 +113,7 @@ class VendorList extends Component {
     })
       .then(response => {
         const vendors = response.data.filter(vendor => {
-          return vendor.removed.data[0] == 0 && vendor.id != 1;
+          return vendor.removed == 0 && vendor.id != 1;
         });
         this.setState({
           vendors,
