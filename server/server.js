@@ -38,15 +38,16 @@ const mysqlConfigs = {
 if (process.env.NODE_ENV === 'test') {
   mysqlConfigs.database = `${mysqlConfigs.database}_test`;
   mysqlConfigs.multipleStatements = true;
-  mysqlConfigs.typeCast = (field, next) => {
-    if (field.type == 'BIT' && field.length == 1) {
-        const bit = field.string();
-
-        return (bit === null) ? null : bit.charCodeAt(0);
-    }
-    return next();
-  };
 }
+
+mysqlConfigs.typeCast = (field, next) => {
+  if (field.type == 'BIT' && field.length == 1) {
+      const bit = field.string();
+
+      return (bit === null) ? null : bit.charCodeAt(0);
+  }
+  return next();
+};
 
 const pool = mysql.createPool(mysqlConfigs);
 global.connection = {
