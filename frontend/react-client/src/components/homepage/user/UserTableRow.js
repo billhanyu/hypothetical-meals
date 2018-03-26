@@ -27,7 +27,8 @@ class UserTableRow extends Component {
   }
 
   _capitalize(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    const niceGroup = string == 'noob' ? 'unprivileged' : string;
+    return niceGroup.charAt(0).toUpperCase() + niceGroup.slice(1).toLowerCase();
   }
 
   render() {
@@ -59,7 +60,7 @@ class UserTableRow extends Component {
         </Dialog>
         <td>{this.props.name}</td>
         <td>{this.props.username}</td>
-        <td style={{cursor: 'pointer'}} onClick={() => {this.props.changePermission(this.props.username)}}><i className="far fa-edit"></i> {this._capitalize(this.props.user_group)}</td>
+        <td style={{ cursor: 'pointer' }} onClick={() => { this.props.changePermission(this.props.username, this.props.user_group, this.props.oauth.data[0])}}><i className="far fa-edit"></i> {this._capitalize(this.props.user_group)}</td>
         <td style={{color: isOAuth ? "green" : "red"}}>{isOAuth ? "YES" : "NO"}</td>
         <td style={{cursor: 'pointer'}} onClick={this.handleOpen.bind(this)}><i className="fas fa-trash"></i></td>
       </tr>

@@ -3,6 +3,7 @@ import axios from 'axios';
 import UserTableRow from './UserTableRow';
 import ChangePermission from './ChangePermission';
 import Snackbar from 'material-ui/Snackbar';
+import Registration from '../../Registration/RegistrationContainer';
 
 class UserTable extends Component {
   constructor(props) {
@@ -11,10 +12,23 @@ class UserTable extends Component {
       isLoading: true,
       users: [],
       changingPermission: false,
+      register: false,
     };
+    this.register = this.register.bind(this);
+    this.back = this.back.bind(this);
   }
 
   componentWillMount() {
+    this.reloadData();
+  }
+
+  register() {
+    this.setState({
+      register: true,
+    });
+  }
+
+  reloadData() {
     axios.get('/users', {headers: {Authorization: "Token " + global.token}})
     .then(response => {
       this.setState({
@@ -30,16 +44,21 @@ class UserTable extends Component {
     });
   }
 
-  _changePermission(username) {
+  _changePermission(username, userGroup, oauth) {
     this.setState({
       changingPermission: true,
       activeUsername: username,
+      activeUsergroup: userGroup,
+      activeOauth: oauth,
     });
   }
 
   _handleDelete(username) {
-    axios.post('/users/delete', {
-      data: { user: {username,} },
+    axios.post('/users/delete',
+    {
+      user: { username, }
+    },
+    {
       headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
@@ -66,10 +85,12 @@ class UserTable extends Component {
     });
   }
 
-  _handleCancel() {
+  back() {
     this.setState({
       changingPermission: false,
+      register: false,
     });
+    this.reloadData();
   }
 
   render() {
@@ -77,8 +98,15 @@ class UserTable extends Component {
     const livingUsers = this.state.users.filter(element => {
       return element.removed.data[0] === 0;
     });
-    return (
-      this.state.changingPermission ? <ChangePermission cancel={this._handleCancel.bind(this)} username={this.state.activeUsername} /> :
+    const permission =
+        <ChangePermission
+          cancel={this.back}
+          reloadData={this.reloadData.bind(this)}
+          username={this.state.activeUsername}
+          usergroup={this.state.activeUsergroup}
+          oauth={this.state.activeOauth}
+        />;
+    const main =
     <div>
       <Snackbar
         open={this.state.open}
@@ -86,7 +114,13 @@ class UserTable extends Component {
         autoHideDuration={2500}
         onRequestClose={this.handleRequestClose.bind(this)}
       />
-      <h2>Ingredients</h2>
+      <h2>Users</h2>
+      <button
+        className='btn btn-primary'
+        onClick={this.register}
+      >
+        Add New User
+      </button>
       <table className="table">
         <thead>
           <tr>
@@ -99,12 +133,28 @@ class UserTable extends Component {
         <tbody>
           {
             livingUsers.map((element, key) => {
-              return <UserTableRow changePermission={this._changePermission.bind(this)} onDelete={this._handleDelete.bind(this)} key={key} {...element} />;
+              return (
+                <UserTableRow
+                  changePermission={this._changePermission.bind(this)}
+                  onDelete={this._handleDelete.bind(this)}
+                  reloadData={this.reloadData.bind(this)}
+                  key={key}
+                  {...element}
+                />
+              );
             })
         }
         </tbody>
       </table>
-    </div>);
+    </div>;
+
+    if (this.state.changingPermission) {
+      return permission;
+    } else if (this.state.register) {
+      return <Registration back={this.back} reloadData={this.reloadData} />;
+    } else {
+      return main;
+    }
   }
 }
 
