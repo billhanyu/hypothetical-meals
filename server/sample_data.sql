@@ -58,7 +58,7 @@ INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (6, 4, 'Use
 INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot) VALUES (1, 1, 100, 1, 'aa');
 INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot) VALUES (2, 3, 6, 4, 'abc123');
 INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot) VALUES (3, 4, 6, 3, 'meow123');
-INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (1, 1, 3, 1, 'sb', 10);
+INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (1, 1, 3, 1, 'cs', 10);
 INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (2, 1, 4, 2, 'zz', 10);
 INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (3, 2, 3, 1, 'sb', 2);
 INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (4, 2, 4, 2, 'zz', 3);
