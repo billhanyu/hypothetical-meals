@@ -221,9 +221,11 @@ class AddEditIngredient extends Component {
 
         {this.state.mode == "edit" &&
           <div>
+            {!this.state.intermediate &&
             <VendorIngredientList
               ingredientId={this.state.id}
             />
+            }
             <QuantityByLotTable
               withTitle={true}
               ingredient={{id: this.state.id, native_unit: this.state.native_unit}}

@@ -53,7 +53,7 @@ class QuantityByLotTable extends Component {
         });
         this.setState({
           open: true,
-          error: 'Updated',
+          message: 'Updated',
         });
         this.reloadData();
       })
@@ -61,7 +61,7 @@ class QuantityByLotTable extends Component {
         const message = err.response.data;
         this.setState({
           open: true,
-          error: message,
+          message: message,
         });
       });
   }
