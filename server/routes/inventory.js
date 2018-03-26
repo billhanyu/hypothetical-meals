@@ -4,6 +4,7 @@ import { getSpace } from './common/packageUtilies';
 import success from './common/success';
 import { updateConsumedSpendingLogForCart } from './spendinglog';
 import { logAction } from './systemLogs';
+import { uuid } from './common/uuid';
 
 const basicViewQueryString = 'SELECT Inventories.*, Ingredients.name as ingredient_name, Ingredients.num_native_units as ingredient_num_native_units, Ingredients.package_type as ingredient_package_type, Ingredients.storage_id as ingredient_storage_id, Ingredients.native_unit AS ingredient_native_unit, Ingredients.removed as ingredient_removed, Ingredients.intermediate as ingredient_intermediate FROM Inventories INNER JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id';
 
@@ -72,18 +73,18 @@ export function getLotQuantities(req, res, next) {
     JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id
     JOIN Vendors ON Inventories.vendor_id = Vendors.id
     WHERE ingredient_id = ${ingredientId}`)
-  .then(results => {
-    const lots = results.map(entry => {
-      return {
-        inventory_id: entry.id,
-        lot: entry.lot,
-        vendor: entry.vendor_name,
-        quantity: entry.num_native_units * entry.num_packages,
-      };
-    });
-    return res.json(lots);
-  })
-  .catch(err => handleError(err, res));
+    .then(results => {
+      const lots = results.map(entry => {
+        return {
+          inventory_id: entry.id,
+          lot: entry.lot,
+          vendor: entry.vendor_name,
+          quantity: entry.num_native_units * entry.num_packages,
+        };
+      });
+      return res.json(lots);
+    })
+    .catch(err => handleError(err, res));
 }
 
 /* request body format:
@@ -141,6 +142,11 @@ export function commitCart(req, res, next) {
   const cartItems = [];
   const ingredientIds = [];
   const freshness = [];
+  const changes = {};
+  let intermediateIng;
+
+  const uniqueId = uuid();
+  const productRunEntries = [];
 
   if (!checkNumber.isPositiveInteger(formulaId)) {
     return res.status(400).send('Invalid formula id');
@@ -165,16 +171,16 @@ export function commitCart(req, res, next) {
       return getStockPromise(ingredientIds);
     })
     .then((inventories) => {
-      const changes = {};
       for (let ingredientId of ingredientIds) {
         const inventory = inventories[ingredientId];
+
         if (!inventory) throw createError(`Inventory missing ingredient`);
         inventory.freshnessData.sort((a, b) => a.created_at - b.created_at);
 
         const formulaEntrySearch = formulaEntries.find((formulaEntry) => ingredientId == formulaEntry.ingredient_id);
 
         const reqNumPackages = formulaEntrySearch.num_native_units / inventory.ingredient_num_native_units * numProducts / formula.num_product;
-        
+
         let numPackagesLeft = reqNumPackages;
         let worstDuration = 0;
         let totalWeightedDuration = 0;
@@ -192,37 +198,86 @@ export function commitCart(req, res, next) {
             ingredient_num_native_units: inventory.ingredient_num_native_units,
             num_packages: numPackagesConsumed,
           });
+          productRunEntries.push({
+            ingredient_id: ingredientId,
+            vendor_id: inventory.vendor_id,
+            lot: inventory.lot,
+            num_native_units: inventory.ingredient_num_native_units,
+          });
         }
-        // {ingredient id, worst duration, total duration, total num native units consumed}
-        freshness.push([ingredientId, worstDuration, totalWeightedDuration, reqNumPackages * inventory.ingredient_num_native_units]);
-        if (numPackagesLeft > 0) throw createError(`Inventory missing ingredient`);
+        // Dummy data 'poop', 'sack', 1, 'pounds', 10
+        freshness.push([ingredientId, 'poop', 'sack', 1, 'pounds', 10, worstDuration, totalWeightedDuration, reqNumPackages * inventory.ingredient_num_native_units]);
+        if (numPackagesLeft > 0) throw createError(`Insufficient ingredients in inventory`);
       }
 
+      return (formula.intermediate ? connection.query('SELECT * FROM Ingredients WHERE id = ?', [formula.ingredient_id]) : Promise.resolve());
+    })
+    .then(intermediateIngArr => {
+      if (!formula.intermediate) return Promise.resolve();
+      intermediateIng = intermediateIngArr[0];
+      return connection.query('INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id) VALUES (?, ?, ?, ?)',
+        [intermediateIng.id, 0, uniqueId, 1]);
+    })
+    .then(() => {
+      if (!formula.intermediate) return Promise.resolve();
+      return connection.query('SELECT id, num_packages FROM Inventories WHERE ingredient_id = ?', [intermediateIng.id]);
+    })
+    .then((results) => {
+      if (formula.intermediate) {
+        const result = results[0];
+        changes[result.id] = numProducts / intermediateIng.num_native_units + result.num_packages;
+      }
       return modifyInventoryQuantitiesPromise(changes);
     })
     .then(() => updateConsumedSpendingLogForCart(cartItems, formulaId, numProducts))
-    .then(() => (process.env.NODE_ENV === 'test' ? Promise.resolve() : connection.query(`INSERT INTO Ingredients (id, worst_duration, total_weighted_duration, total_num_native_units) VALUES ?
+    .then(() => (process.env.NODE_ENV === 'test' ? Promise.resolve() : connection.query(`INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units, worst_duration, total_weighted_duration, total_num_native_units) VALUES ?
      ON DUPLICATE KEY UPDATE 
-     worst_duration = GREATEST(worst_duration,VALUES(fruit)), 
+     worst_duration = GREATEST(worst_duration,VALUES(worst_duration)), 
      total_weighted_duration = total_weighted_duration + VALUES(total_weighted_duration),
-     total_num_native_units = total_num_native_units + VALUES(total_num_native_units),`, [freshness])))
+     total_num_native_units = total_num_native_units + VALUES(total_num_native_units)`, [freshness])))
+    .then(() => {
+      return connection.query('INSERT INTO ProductRuns (formula_id, user_id, num_product, lot) VALUES (?)',
+        [[formulaId, req.payload.id, numProducts, uniqueId]]);
+    })
+    .then(() => {
+      return connection.query('SELECT id FROM ProductRuns WHERE lot = ?', [uniqueId]);
+    })
+    .then((results) => {
+      const productRunId = results[0].id;
+      const entries = productRunEntries.map(entry => {
+        return [
+          productRunId,
+          entry.ingredient_id,
+          entry.vendor_id,
+          entry.num_native_units,
+          entry.lot,
+        ];
+      });
+      return connection.query('INSERT INTO ProductRunsEntries (productrun_id, ingredient_id, vendor_id, num_native_units, lot) VALUES ?',
+        [entries]);
+    })
     .then(() => {
       return connection.query(`SELECT FormulaEntries.ingredient_id, FormulaEntries.num_native_units,
-        Formulas.name as formula_name, Ingredients.name as ingredient_name 
+        Formulas.id as formula_id, Formulas.name as formula_name, Ingredients.name as ingredient_name 
         FROM FormulaEntries JOIN Ingredients ON FormulaEntries.ingredient_id = Ingredients.id
         JOIN Formulas ON FormulaEntries.formula_id = Formulas.id
         WHERE FormulaEntries.formula_id = ${formulaId}`);
     })
     .then((results) => {
-      const formulaName = results[0].formula_name;
+      const formulaName = `{${results[0].formula_name}=formula_id=${results[0].formula_id}}`;
       const productionStrings = results.map(x => {
-        return `${numProducts*x.num_native_units} {${x.ingredient_name}=ingredient_id=${x.ingredient_id}}`;
+        return `${numProducts * x.num_native_units} {${x.ingredient_name}=ingredient_id=${x.ingredient_id}}`;
       });
       return logAction(req.payload.id, `Produced ${numProducts} products of ${formulaName} using ${productionStrings.join(', ')}.`);
     })
     .then(() => success(res))
     .catch(err => {
-      handleError(err, res);
+      console.log(err);
+      connection.query('DELETE FROM Inventories WHERE num_packages = 0')
+        .then(() => {
+          handleError(err, res);
+        })
+        .catch((err) => handleError(err, res));
     });
 }
 

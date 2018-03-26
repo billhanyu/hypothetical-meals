@@ -268,7 +268,6 @@ describe('Formulas', () => {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          
           Promise.all([
             connection.query('SELECT * FROM Formulas WHERE removed = 0'),
             connection.query('SELECT * FROM Ingredients WHERE removed = 0'),
