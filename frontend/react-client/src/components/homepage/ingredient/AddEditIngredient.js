@@ -163,6 +163,7 @@ class AddEditIngredient extends Component {
           message={this.state.message}
           autoHideDuration={2500}
           onRequestClose={this.handleRequestClose.bind(this)}
+          style={{ color: '#FFF' }}
         />
         <h2>
           {header}
@@ -221,9 +222,11 @@ class AddEditIngredient extends Component {
 
         {this.state.mode == "edit" &&
           <div>
+            {!this.state.intermediate &&
             <VendorIngredientList
               ingredientId={this.state.id}
             />
+            }
             <QuantityByLotTable
               withTitle={true}
               ingredient={{id: this.state.id, native_unit: this.state.native_unit}}
