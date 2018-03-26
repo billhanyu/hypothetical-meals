@@ -35,20 +35,23 @@ class IngredientList extends Component {
     this.backToList = this.backToList.bind(this);
     this.orderIngredient = this.orderIngredient.bind(this);
     this.viewIngredient = this.viewIngredient.bind(this);
+    this.reloadData = this.reloadData.bind(this);
   }
 
-  componentDidMount() {
+  componentWillMount() {
+    this.reloadData();
+  }
+
+  reloadData() {
     axios.get('/ingredients', {
       headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
       const ingredients = response.data;
       ingredients.sort((a, b) => a.id - b.id);
-      const filtered = [];
-      ingredients.forEach(ingredient => {
-        if (!(this.props.order && ingredient.intermediate)) {
-          filtered.push(ingredient);
-        }
+      const filtered = ingredients.filter(ingredient => {
+        return !(this.props.order && ingredient.intermediate)
+          && !ingredient.removed;
       });
       this.allIngredients = filtered;
       this.selectPage(1);

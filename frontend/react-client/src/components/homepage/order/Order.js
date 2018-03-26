@@ -147,8 +147,6 @@ class Order extends Component {
       };
     }
 
-    console.log(orderObj);
-    
     axios.post('/order', {
       orders: orderObj,
     }, {
