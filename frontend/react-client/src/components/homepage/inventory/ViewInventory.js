@@ -40,7 +40,7 @@ class ViewInventory extends Component {
       const entries = response.data;
       const grouped = [];
       entries.forEach(entry => {
-        entry.ingredient_temperature_state = TempStates[entry.ingredient_storage_id];
+        entry.ingredient_temperature_state = TempStates[entry.ingredient_storage_id-1];
         const existing = grouped.filter(item => item.ingredient_id == entry.ingredient_id);
         if (existing.length) {
           existing[0].num_packages += entry.num_packages;
