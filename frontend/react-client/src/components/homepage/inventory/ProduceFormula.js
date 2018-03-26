@@ -30,7 +30,6 @@ class ProduceFormula extends Component {
       headers: {Authorization: "Token " + global.token}
     })
     .then(response => {
-      console.log(response.data);
       this.setState({
         EditFormulaBoxes: response.data
       });
