@@ -14,6 +14,10 @@ class Freshness extends Component {
       currentPage: 1,
       ingredient: null,
       viewIngredient: false,
+      total: {
+        averageDuration: null,
+        worstDuration: null,
+      },
     };
     this.fresh = [];
     this.filteredFresh = [];
@@ -23,7 +27,23 @@ class Freshness extends Component {
   }
 
   componentDidMount() {
-    axios.get('/ingredients/freshness');
+    axios.get('/ingredients/freshness', {
+      headers: { Authorization: "Token " + global.token}
+    })
+      .then(response => {
+        const data = response.data.ingredients;
+        this.filteredFresh = data;
+        this.fresh = data;
+        this.selectPage(1);
+        this.setState({
+          pages: Math.ceil(data.length / COUNT_PER_PAGE),
+          total: response.data.freshnessData,
+        });
+      })
+      .catch(err => {
+        alert('Error retrieving freshness report data');
+      })
+    ;
   }
 
   viewIngredient(id) {
@@ -69,6 +89,22 @@ class Freshness extends Component {
     const main =
       <div>
         <h3>Freshness Report</h3>
+        <h4>All</h4>
+        <table className='table'>
+          <thead>
+            <tr>
+              <th>Average Time in Inventory</th>
+              <th>Max Time in Inventory</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{this.state.total.averageDuration || 'N/A'}</td>
+              <td>{this.state.total.worstDuration || 'N/A'}</td>
+            </tr>
+          </tbody>
+        </table>
+        <h4>Ingredients</h4>
         <table className='table'>
           <thead>
             <tr>
