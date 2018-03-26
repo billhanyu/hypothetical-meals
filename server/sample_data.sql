@@ -47,7 +47,7 @@ INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VAL
 INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (4, 2, 4, 2);
 INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (5, 3, 2, 3);
 INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (6, 4, 3, 3);
-INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (7, 5, 2, 4);
+INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (7, 6, 2, 4);
 INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (8, 1, 2, 4);
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (1, 5, 'User 5 did blah', '2018.01.01 00:00:01.000');
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (2, 5, 'User 5 added 5 {boop=ingredient_id=3}', '2018.01.02 12:00:00.000');
@@ -57,10 +57,10 @@ INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (5, 6, 'Use
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (6, 4, 'User 4 added 1 {boop=ingredient_id=3}', '2018.01.03 12:00:00.000');
 INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot) VALUES (1, 1, 100, 1, 'aa');
 INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot) VALUES (2, 3, 6, 4, 'abc123');
-INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot) VALUES (3, 4, 6, 3, 'meow123');
-INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (1, 1, 3, 1, 'cs', 10);
+INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot) VALUES (3, 4, 6, 3, 'def123');
+INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (1, 1, 3, 1, 'sb', 10);
 INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (2, 1, 4, 2, 'zz', 10);
 INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (3, 2, 3, 1, 'sb', 2);
 INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (4, 2, 4, 2, 'zz', 3);
-INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (5, 3, 5, 3, 'abc123', 2);
+INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (5, 3, 6, 3, 'abc123', 2);
 INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (6, 3, 1, 3, 'aaa', 2);
