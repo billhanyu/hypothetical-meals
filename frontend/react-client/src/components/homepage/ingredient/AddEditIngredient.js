@@ -37,8 +37,8 @@ class AddEditIngredient extends Component {
       package_type: ingredient.package_type,
       native_unit: ingredient.native_unit,
       num_native_units: ingredient.num_native_units,
-      removed: ingredient.removed.data[0],
-      intermediate: ingredient.intermediate.data[0],
+      removed: ingredient.removed,
+      intermediate: ingredient.intermediate,
       storage_id: ingredient.storage_id,
       storage: Storage2State[ingredient.storage_name],
       mode: props.mode,
@@ -119,7 +119,7 @@ class AddEditIngredient extends Component {
         })
         .then(response => {
           this.setState({
-            id: response.data[0],
+            id: response,
           }, () => {
             this.setState({
               open: true,

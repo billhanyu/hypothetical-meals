@@ -36,7 +36,7 @@ class FormulaInput extends Component {
     .then(response => {
       const allIngredients = [];
       response.data.forEach(element => {
-        if(element.removed.data[0] == 0) {
+        if(element.removed == 0) {
           allIngredients.push(element.name);
         }
       });
