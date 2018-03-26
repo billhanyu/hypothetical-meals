@@ -57,26 +57,31 @@ describe('Storage', () => {
         });
     });
 
-    xit('should ignore truckload or railcar', (done) => {
-      connection.query('INSERT INTO Inventories (ingredient_id, package_type, num_packages, lot, vendor_id) VALUES (2, \'truckload\', 2, \'ff\', 1), (2, \'railcar\', 2, \'ff\', 1)')
-      .then(() => {
-        chai.request(server)
-        .put('/storages')
-        .set('Authorization', `Token ${testTokens.adminTestToken}`)
-        .send({
-          '1': 1800,
+    it('should ignore truckload or railcar', (done) => {
+      connection.query(`INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units)
+        VALUES (7, 'truckload', 'truckload', 1, 'kg', 10),
+        (8, 'railcar', 'railcar', 1, 'kg', 10)`)
+        .then(() => {
+          return connection.query('INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id) VALUES (7, 999999, \'ff\', 1), (8, 999999, \'ff\', 1)');
         })
-        .end((err, res) => {
-          res.should.have.status(200);
-          connection.query('SELECT capacity FROM Storages WHERE id = 1')
-          .then((newCapacity) => {
-            assert.strictEqual(newCapacity[0].capacity, 1800, 'New storage capacity');
-            done();
+        .then(() => {
+          chai.request(server)
+          .put('/storages')
+          .set('Authorization', `Token ${testTokens.adminTestToken}`)
+          .send({
+            '1': 10000,
           })
-          .catch((error) => console.log(error));
-        });
-      })
-      .catch((error) => console.log(error));
+          .end((err, res) => {
+            res.should.have.status(200);
+            connection.query('SELECT capacity FROM Storages WHERE id = 1')
+            .then((newCapacity) => {
+              assert.strictEqual(newCapacity[0].capacity, 10000, 'New storage capacity');
+              done();
+            })
+            .catch((error) => console.log(error));
+          });
+        })
+        .catch((error) => console.log(error));
     });
 
     it('should not change storage capacity if new capacity too small', (done) => {

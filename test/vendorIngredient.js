@@ -17,41 +17,12 @@ describe('VendorIngredient', () => {
     });
   });
 
-  describe('#view()', () => {
-    xit('should return all vendorsingredients', (done) => {
-      chai.request(server)
-        .get('/vendoringredients')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.a('array');
-          assert.strictEqual(res.body.length, 3, '3 vendorsingredients in total');
-          done();
-        });
-    });
-  });
-
-  describe('#viewAvailable()', () => {
-    xit('should return all available vendorsingredients', (done) => {
-      // alasql('UPDATE VendorsIngredients SET removed = 1 WHERE id = 1');
-      chai.request(server)
-        .get('/vendoringredients-available')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.a('array');
-          assert.strictEqual(res.body.length, 2, '2 vendorsingredients available in total');
-          done();
-        });
-    });
-  });
-
   describe('#getVendorsForIngredient()', () => {
     beforeEach(() => {
       return dbSetup.setupTestDatabase();
     });
 
-    xit('should return all vendors for an ingredient', (done) => {
+    it('should return all vendors for an ingredient', (done) => {
       chai.request(server)
         .get('/vendoringredients/1')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
@@ -63,16 +34,21 @@ describe('VendorIngredient', () => {
         });
     });
 
-    xit('should return only available vendors for an ingredient', (done) => {
-      // alasql('UPDATE VendorsIngredients SET removed = 1 WHERE ingredient_id = 1');
-      chai.request(server)
-        .get('/vendoringredients/1')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.a('array');
-          assert.strictEqual(res.body.length, 0, 'Nothing should be selected');
-          done();
+    it('should return only available vendors for an ingredient', (done) => {
+      connection.query('UPDATE VendorsIngredients SET removed = 1 WHERE ingredient_id = 1')
+        .then(result => {
+          chai.request(server)
+            .get('/vendoringredients/1')
+            .set('Authorization', `Token ${testTokens.noobTestToken}`)
+            .end((err, res) => {
+              res.should.have.status(200);
+              res.body.should.be.a('array');
+              assert.strictEqual(res.body.length, 0, 'Nothing should be selected');
+              done();
+            });
+        })
+        .catch(error => {
+          console.log(error);
         });
     });
   });

@@ -43,6 +43,8 @@ class AddEditIngredient extends Component {
       storage: Storage2State[ingredient.storage_name],
       mode: props.mode,
       logs: [],
+      open: false,
+      message: '',
     };
   }
 
