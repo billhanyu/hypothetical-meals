@@ -7,6 +7,10 @@ class DeleteIngredientButton extends Component {
   constructor(props) {
     super(props);
     this.confirmDelete = this.confirmDelete.bind(this);
+    this.state = {
+      open: false,
+      message: '',
+    };
   }
 
   confirmDelete() {

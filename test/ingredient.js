@@ -5,7 +5,6 @@ const testTokens = require('./common/testTokens');
 const supertest = require('supertest');
 const dbSetup = require('./common/dbSetup');
 
-
 describe('Ingredient', () => {
   describe('#pages()', () => {
     it('should return number of pages of data', (done) => {
