@@ -35,10 +35,36 @@ class IngredientList extends Component {
     this.backToList = this.backToList.bind(this);
     this.orderIngredient = this.orderIngredient.bind(this);
     this.viewIngredient = this.viewIngredient.bind(this);
+    this.reloadData = this.reloadData.bind(this);
   }
 
-  componentDidMount() {
-    this._rerenderIngredientList();
+  componentWillMount() {
+    this.reloadData();
+  }
+
+  reloadData() {
+    axios.get('/ingredients', {
+      headers: { Authorization: "Token " + global.token }
+    })
+    .then(response => {
+      const ingredients = response.data;
+      ingredients.sort((a, b) => a.id - b.id);
+      const filtered = ingredients.filter(ingredient => {
+        return !(this.props.order && ingredient.intermediate)
+          && !ingredient.removed;
+      });
+      this.allIngredients = filtered;
+      this.selectPage(1);
+      this.setState({
+        pages: Math.ceil(filtered.length / COUNT_PER_PAGE),
+      });
+    })
+    .catch(err => {
+      this.setState({
+        open: true,
+        message: 'Data Retrieval Error',
+      });
+    });
   }
 
   selectPage(idx) {
@@ -173,7 +199,7 @@ class IngredientList extends Component {
     const ifNeedsRerenderBecauseOfAddedIngredient = global.AddEditIngredientNeedsRerender === true;
     if (ifNeedsRerenderBecauseOfAddedIngredient) {
       global.AddEditIngredientNeedsRerender = false;
-      this._rerenderIngredientList().bind(this)();
+      this.reloadData();
     }
     const edit =
     <AddEditIngredient
