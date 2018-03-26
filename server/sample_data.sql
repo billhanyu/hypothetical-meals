@@ -11,6 +11,7 @@ INSERT INTO Users (id, username, oauth, name, hash, salt, user_group, removed) V
  '8279215f80da2a516d1917c72faf8d23', 'manager', 1); 
 INSERT INTO Vendors (id, name, contact, code) VALUES (1, 'Duke', 'contact', 'code_duke');
 INSERT INTO Vendors (id, name, contact, code) VALUES (2, 'UNC', 'contact', 'code_unc');
+INSERT INTO Vendors (id, name, contact, code) VALUES (3, 'admin', 'contact', 'code_admin');
 INSERT INTO Storages (id, name, capacity) VALUES (1, 'freezer', 2000);
 INSERT INTO Storages (id, name, capacity) VALUES (2, 'refrigerator', 20);
 INSERT INTO Storages (id, name, capacity) VALUES (3, 'warehouse', 500);
@@ -55,5 +56,11 @@ INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (4, 6, 'Use
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (5, 6, 'User 6 did blah', '2018.01.03 13:11:02.000');
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (6, 4, 'User 4 added 1 {boop=ingredient_id=3}', '2018.01.03 12:00:00.000');
 INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot) VALUES (1, 1, 100, 1, 'aa');
+INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot) VALUES (2, 3, 6, 4, 'abc123');
+INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot) VALUES (3, 4, 6, 3, 'meow123');
 INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (1, 1, 3, 1, 'sb', 10);
 INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (2, 1, 4, 2, 'zz', 10);
+INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (3, 2, 3, 1, 'sb', 2);
+INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (4, 2, 4, 2, 'zz', 3);
+INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (5, 3, 5, 3, 'abc123', 2);
+INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (6, 3, 1, 3, 'aaa', 2);

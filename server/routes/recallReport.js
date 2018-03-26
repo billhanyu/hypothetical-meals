@@ -9,7 +9,6 @@ const productionEntriesQuery = `SELECT ProductRunsEntries.*`;
  * @param {*} req
  * req.body.recall = {
  *    ingredient_id: 1,
- *    vendor_id: 1,
  *    lot: 'bleb123',
  * }
  * @param {*} res
@@ -23,6 +22,7 @@ export function getRecallForIngredient(req, res, next) {
     handleError(err, res);
     return;
   }
+  console.log('bleb');
 
   getProducts(recallParams)
     .then((productruns) => {
@@ -36,10 +36,27 @@ export function getRecallForIngredient(req, res, next) {
     });
 }
 
-/** get product run entries for each product run*/
 function queryProductRunInformation() {
+  let productRunMap = {};
   return connection.query(`SELECT ProductRuns.*, Formulas.name
-    FROM ProductRuns JOIN Formulas ON ProductRuns.formula_id = Formulas.id`);
+    FROM ProductRuns JOIN Formulas ON ProductRuns.formula_id = Formulas.id`)
+    .then((productRuns) => {
+      productRuns.forEach(x => {
+        productRunMap[x.id] = x;
+        productRunMap[x.id]['entries'] = [];
+      });
+      const productRunIds = productRuns.map(x => x.id);
+      return connection.query(`${productionEntriesQuery} WHERE id IN ?`, productRunIds);
+    })
+    .then((productEntriesResult) => {
+      productEntriesResult.forEach(x => {
+        productRunMap[x.productrun_id]['entries'].push(x);
+      });
+      return Promise.resolve(Object.values(productRunMap));
+    })
+    .catch((err) => {
+      throw err;
+    });
 }
 
 function getProducts(params) {
