@@ -3,14 +3,14 @@ import PropTypes from 'prop-types';
 
 class FreshnessItem extends Component {
   render() {
-    const { ingredient_id, ingredient_name, average, worst } = this.props.data;
+    const { id, name, averageDuration, worstDuration } = this.props.data;
     return (
       <tr>
         <td>
-          <a href="javascript:void(0)" onClick={e => this.props.viewIngredient(ingredient_id)}>{ingredient_name}</a>
+          <a href="javascript:void(0)" onClick={e => this.props.viewIngredient(id)}>{name}</a>
         </td>
-        <td>{average}</td>
-        <td>{worst}</td>
+        <td>{averageDuration || 'N/A'}</td>
+        <td>{worstDuration || 'N/A'}</td>
       </tr>
     );
   }
@@ -18,10 +18,10 @@ class FreshnessItem extends Component {
 
 FreshnessItem.propTypes = {
   data: PropTypes.shape({
-    ingredient_id: PropTypes.number,
-    ingredient_name: PropTypes.string,
-    average: PropTypes.number,
-    worst: PropTypes.number,
+    id: PropTypes.number,
+    name: PropTypes.string,
+    averageDuration: PropTypes.number,
+    worstDuration: PropTypes.number,
   }),
   viewIngredient: PropTypes.func,
 };
