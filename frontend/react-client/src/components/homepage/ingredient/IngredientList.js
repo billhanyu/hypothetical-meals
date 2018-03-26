@@ -168,7 +168,39 @@ class IngredientList extends Component {
     });
   }
 
+  _rerenderIngredientList() {
+    axios.get('/ingredients', {
+      headers: { Authorization: "Token " + global.token }
+    })
+    .then(response => {
+      const ingredients = response.data;
+      ingredients.sort((a, b) => a.id - b.id);
+      const filtered = [];
+      ingredients.forEach(ingredient => {
+        if (!(this.props.order && ingredient.intermediate)) {
+          filtered.push(ingredient);
+        }
+      });
+      this.allIngredients = filtered;
+      this.selectPage(1);
+      this.setState({
+        pages: Math.ceil(filtered.length / COUNT_PER_PAGE),
+      });
+    })
+    .catch(err => {
+      this.setState({
+        open: true,
+        message: 'Data Retrieval Error',
+      });
+    });
+  }
+
   render() {
+    const ifNeedsRerenderBecauseOfAddedIngredient = global.AddEditIngredientNeedsRerender === true;
+    if (ifNeedsRerenderBecauseOfAddedIngredient) {
+      global.AddEditIngredientNeedsRerender = false;
+      this.reloadData();
+    }
     const edit =
     <AddEditIngredient
       mode="edit"
