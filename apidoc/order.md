@@ -22,7 +22,7 @@ request.body = {
     }, 
   },
 }
-# The keys are the vendor ingredient id.
+# The keys are the vendor ingredient id. Values for lots is the lot number and number of packages for that lot.
 ```
 
 {% endmethod %}
