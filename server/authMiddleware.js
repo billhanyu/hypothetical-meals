@@ -13,9 +13,10 @@ export function noobRequired(req, res, next) {
 }
 
 function userQuery(req, res, next, groups) {
-  connection.query(`SELECT username, oauth, name, user_group FROM Users WHERE id = ${req.payload.id}`)
+  connection.query(`SELECT username, oauth, name, user_group, removed FROM Users WHERE id = ${req.payload.id}`)
     .then(results => {
       if (results.length == 0) throw createError('Database error');
+      if (results[0].removed == 1) throw createError("User does not exist");
       const user = results[0];
       req.user = {
         username: user['username'],
