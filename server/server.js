@@ -39,21 +39,21 @@ const mysqlConfigs = {
 if (process.env.NODE_ENV === 'test') {
   mysqlConfigs.database = `${mysqlConfigs.database}_test`;
   mysqlConfigs.multipleStatements = true;
-  mysqlConfigs.typeCast = function (field, next) {
-    if (field.type == "BIT" && field.length == 1) {
-        var bit = field.string();
+  mysqlConfigs.typeCast = (field, next) => {
+    if (field.type == 'BIT' && field.length == 1) {
+        const bit = field.string();
 
         return (bit === null) ? null : bit.charCodeAt(0);
     }
     return next();
-  }
+  };
 }
 
 const pool = mysql.createPool(mysqlConfigs);
 global.connection = {
   query: (...args) => {
     return new Promise((resolve, reject) => {
-      pool.getConnection(function (err, connection) {
+      pool.getConnection((err, connection) => {
         if (err) reject(err);
         connection.query(...args, (err, results, fields) => {
           if (err) reject(err);

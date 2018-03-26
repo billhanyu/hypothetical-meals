@@ -173,6 +173,7 @@ CREATE TABLE ProductRunsEntries(
 	productrun_id int not null,
 	ingredient_id int not null,
 	vendor_id int not null,
+	num_native_units double not null,
 	lot VARCHAR(100) not null,
 	num_native_units double not null,
 
