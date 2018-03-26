@@ -122,12 +122,31 @@ class Order extends Component {
 
   orderWithVendors(event) {
     event.preventDefault();
+
+    if(!this.state.fullyAllocated) {
+      return this.setState({
+        open: true,
+        message: 'Please fully allocate lot numbers',
+      });
+    }
+
     const orderObj = {};
     for (let item of this.state.cart) {
       const ingredientId = "ingredient" + item.id;
       const ingredient = this.state[ingredientId];
-      orderObj[ingredient.selected] = item.quantity;
+      const correspondingLotArray = this.state.lotNumberSet[item.id];
+      const lots = {};
+      correspondingLotArray.forEach(element => {
+        if(Number(element.quantity) !== 0){
+          lots[element.lotNumber] = Number(element.quantity);
+        }
+      });
+      orderObj[ingredient.selected] = {
+        num_packages: item.quantity,
+        lots,
+      };
     }
+
     axios.post('/order', {
       orders: orderObj,
     }, {
@@ -150,14 +169,10 @@ class Order extends Component {
     });
   }
 
-  _updateLotSet(index, entries, fullyAllocated) {
-    const currentLotSet = this.state.lotNumberSet;
-    currentLotSet[index] = {
-      fullyAllocated,
-      entries,
-    };
+  _updateLotSet(lotNumberSet, fullyAllocated) {
     this.setState({
-      lotNumberSet: currentLotSet,
+      lotNumberSet,
+      fullyAllocated,
     });
   }
 
@@ -192,7 +207,7 @@ class Order extends Component {
               <form className="col-xl-6 col-lg-6 col-sm-8">
               {
                 this.state.cart.map((item, idx) => {
-                  return <ChooseVendorItem lotNumberSet={this.state.lotNumberSet[idx] == null ? [] : this.state.lotNumberSet[idx].entries} updateLotSet={this._updateLotSet.bind(this)} item={item} idx={idx} key={idx} state={this.state} handleInputChange={this.handleInputChange} handleLotNumberChange={this.handleLotNumberChange}/>;
+                  return <ChooseVendorItem lotNumberSet={this.state.lotNumberSet} updateLotSet={this._updateLotSet.bind(this)} item={item} idx={idx} key={idx} state={this.state} handleInputChange={this.handleInputChange} handleLotNumberChange={this.handleLotNumberChange}/>;
                 })
               }
               <button type="button" className="btn btn-secondary" onClick={this.backToCart}>Back</button>

@@ -5,47 +5,72 @@ class AddEditIngredient extends Component {
   constructor(props) {
     super(props);
     this._handleAmountChange = this._handleAmountChange.bind(this);
+    this._deleteLotNumberEntry = this._deleteLotNumberEntry.bind(this);
+  }
+
+  _deleteLotNumberEntry(index) {
+    const {lotNumberSet} = this.props;
+    const entries = lotNumberSet[this.props.item.id];
+    entries.splice(index, 1);
+    let count = 0;
+    entries.forEach(element => {
+      count += Number(element.quantity);
+    });
+    let fullyAllocated = false;
+    if(this.props.item.quantity - count == 0) {
+      fullyAllocated = true;
+    }
+    this.props.updateLotSet(lotNumberSet, fullyAllocated);
   }
 
   _handleAmountChange(event, objectKey, index) {
-    const entries = this.props.lotNumberSet;
+    const {lotNumberSet} = this.props;
+    const entries = lotNumberSet[this.props.item.id];
     //This is an array
     entries[index][objectKey] = event.target.value;
     let count = 0;
     entries.forEach(element => {
-      count += element.quantity;
+      count += Number(element.quantity);
     });
     let fullyAllocated = false;
     if(this.props.item.quantity - count == 0) {
       fullyAllocated = true;
     }
-    this.props.updateLotSet(this.props.idx, entries, fullyAllocated);
+    this.props.updateLotSet(lotNumberSet, fullyAllocated);
   }
 
   _createAdditionalLot() {
-    const entries = this.props.lotNumberSet;
-    entries.push({
-      quantity: 0,
-      lotNumber: '',
-    });
+    const {lotNumberSet} = this.props;
+    let entries = lotNumberSet[this.props.item.id];
+    if(entries != null) {
+      entries.push({
+        quantity: 0,
+        lotNumber: '',
+      });
+    }
+    else {
+      lotNumberSet[this.props.item.id] = [{quantity: 0, lotNumber: '',}];
+      entries = this.props.lotNumberSet[this.props.item.id];
+    }
     let count = 0;
     entries.forEach(element => {
-      count += element.quantity;
+      count += Number(element.quantity);
     });
     let fullyAllocated = false;
     if(this.props.item.quantity - count == 0) {
       fullyAllocated = true;
     }
-    this.props.updateLotSet(this.props.idx, entries, fullyAllocated);
+    this.props.updateLotSet(lotNumberSet, fullyAllocated);
   }
 
   render() {
-    console.log(this.props);
-    const {state, lotNumberSet} = this.props;
+    const {state, lotNumberSet, item} = this.props;
     let count = 0;
-    lotNumberSet.forEach(element => {
-      count += element.quantity;
-    });
+    if(lotNumberSet[item.id] != null){
+      lotNumberSet[item.id].forEach(element => {
+        count += Number(element.quantity);
+      });
+    }
     const leftoverAllocation = this.props.item.quantity - count;
 
     const ingredient = state["ingredient" + this.props.item.id];
@@ -54,8 +79,9 @@ class AddEditIngredient extends Component {
       <div className="form-group" style={{border: '1px solid black', padding:'8px'}}>
         <label htmlFor="vendor">{this.props.item.name} --- <span style={{color: 'red'}}>{leftoverAllocation == 0 ? '' : `${leftoverAllocation} unallocated`}</span></label>
         {
-          this.props.lotNumberSet.map((element, key) => {
-            return <div key={key}>
+          this.props.lotNumberSet[item.id] != null && this.props.lotNumberSet[item.id].map((element, key) => {
+            return <div key={key} style={{borderBottom: '1px solid #000', marginBottom:'10px'}}>
+                <i className="fas fa-times" style={{cursor:'pointer'}} onClick={() => {this._deleteLotNumberEntry(key);}}></i>
                 <div className="ChooseVendorHeader" style={{display:'inline-block', margin:'12px'}}>Amount:
                   <input placeholder="Amount" value={element.quantity} onChange={(e) => {this._handleAmountChange(e, 'quantity', key);}}/>
                 </div>
