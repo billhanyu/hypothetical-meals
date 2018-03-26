@@ -92,6 +92,7 @@ class AddEditIngredient extends Component {
           headers: { Authorization: "Token " + global.token }
         })
         .then(response => {
+          global.AddEditIngredientNeedsRerender = true;
           this.setState({
             open: true,
             message: 'Updated',
@@ -118,14 +119,13 @@ class AddEditIngredient extends Component {
           headers: { Authorization: "Token " + global.token }
         })
         .then(response => {
+          global.AddEditIngredientNeedsRerender = true;
           this.setState({
             id: response,
           }, () => {
             this.setState({
               open: true,
               message: "Added",
-            });
-            this.setState({
               mode: "edit",
             });
           });
@@ -163,6 +163,7 @@ class AddEditIngredient extends Component {
           message={this.state.message}
           autoHideDuration={2500}
           onRequestClose={this.handleRequestClose.bind(this)}
+          style={{ color: '#FFF' }}
         />
         <h2>
           {header}
