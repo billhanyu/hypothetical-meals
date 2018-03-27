@@ -79,7 +79,7 @@ function orderHelper(orders, req, res, next) {
     })
     .then((results) => {
       let orderStrings = results.map(x => {
-        return `${orders[x.vendor_ingredient_id]} package${orders[x.vendor_ingredient_id] > 1 ? 's' : ''} of {${x.name}=ingredient_id=${x.id}} from {${x.vendor_name}=vendor_id=${x.vendor_id}}`;
+        return `${orders[x.vendor_ingredient_id].num_packages} package${orders[x.vendor_ingredient_id].num_packages > 1 ? 's' : ''} of {${x.name}=ingredient_id=${x.id}} from {${x.vendor_name}=vendor_id=${x.vendor_id}}`;
       });
       logAction(req.payload.id, `Ordered ${orderStrings.join(', ')}.`);
     })
