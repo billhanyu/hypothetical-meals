@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import QuantityByLotTableItem from './QuantityByLotTableItem';
-import Snackbar from 'material-ui/Snackbar';
 
 class QuantityByLotTable extends Component {
   constructor(props) {
@@ -51,18 +50,10 @@ class QuantityByLotTable extends Component {
         this.setState({
           editIdx: -1,
         });
-        this.setState({
-          open: true,
-          message: 'Updated',
-        });
         this.reloadData();
       })
       .catch(err => {
         const message = err.response.data;
-        this.setState({
-          open: true,
-          message: message,
-        });
       });
   }
 
@@ -83,29 +74,13 @@ class QuantityByLotTable extends Component {
         }
       })
       .catch(err => {
-        this.setState({
-          open: true,
-          error: 'Error retrieving lots info',
-        });
       });
-  }
-
-  handleRequestClose() {
-    this.setState({
-      open: false,
-    });
   }
 
   render() {
     const columnClass = global.user_group == "admin" ? "OneFourthWidth" : "OneThirdWidth";
     return (
       <div>
-      <Snackbar
-        open={this.state.open}
-        message={this.state.message}
-        autoHideDuration={2500}
-        onRequestClose={this.handleRequestClose.bind(this)}
-      />
         {
           this.props.withTitle &&
           <h3>Quantities by Lot Numbers</h3>
