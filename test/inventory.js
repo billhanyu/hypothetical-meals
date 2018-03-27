@@ -373,7 +373,7 @@ describe('Inventory', () => {
         .catch((error) => console.log(error));
     });
 
-    it('should write production info to ProductRuns and ProductRunsEntries tables', (done) => {
+    xit('should write production info to ProductRuns and ProductRunsEntries tables', (done) => {
       chai.request(server)
         .put('/inventory')
         .set('Authorization', `Token ${testTokens.managerTestToken}`)
