@@ -395,17 +395,17 @@ describe('Inventory', () => {
               assert.strictEqual(productRun.num_product, 30, 'Product run num products is correct');
               assert.strictEqual(productRun.user_id, 6, 'Product run user id is correct');
 
-              assert.strictEqual(productRunsEntries.length, 2 + 2, 'Two entries added to product runs entries');
-              assert.strictEqual(productRunsEntries[2].productrun_id, productRun.id, 'First product run entry correct product run id');
-              assert.strictEqual(productRunsEntries[2].ingredient_id, 1, 'First product run entry correct ingredient id');
-              assert.strictEqual(productRunsEntries[2].vendor_id, 1, 'First product run entry correct vendor id');
-              assert.strictEqual(productRunsEntries[2].num_native_units, 10, 'First product run entry correct num native units');
-              assert.strictEqual(productRunsEntries[2].lot, 'ff', 'First product run entry correct lot');
-              assert.strictEqual(productRunsEntries[3].productrun_id, productRun.id, 'First product run entry correct product run id');
-              assert.strictEqual(productRunsEntries[3].ingredient_id, 2, 'First product run entry correct ingredient id');
-              assert.strictEqual(productRunsEntries[3].vendor_id, 1, 'First product run entry correct vendor id');
-              assert.strictEqual(productRunsEntries[3].num_native_units, 15, 'First product run entry correct num native units');
-              assert.strictEqual(productRunsEntries[3].lot, 'ff', 'First product run entry correct lot');
+              assert.strictEqual(productRunsEntries.length, 6 + 2, 'Two entries added to product runs entries');
+              assert.strictEqual(productRunsEntries[6].productrun_id, productRun.id, 'First product run entry correct product run id');
+              assert.strictEqual(productRunsEntries[6].ingredient_id, 1, 'First product run entry correct ingredient id');
+              assert.strictEqual(productRunsEntries[6].vendor_id, 1, 'First product run entry correct vendor id');
+              assert.strictEqual(productRunsEntries[6].num_native_units, 10, 'First product run entry correct num native units');
+              assert.strictEqual(productRunsEntries[6].lot, 'ff', 'First product run entry correct lot');
+              assert.strictEqual(productRunsEntries[7].productrun_id, productRun.id, 'First product run entry correct product run id');
+              assert.strictEqual(productRunsEntries[7].ingredient_id, 2, 'First product run entry correct ingredient id');
+              assert.strictEqual(productRunsEntries[7].vendor_id, 1, 'First product run entry correct vendor id');
+              assert.strictEqual(productRunsEntries[7].num_native_units, 15, 'First product run entry correct num native units');
+              assert.strictEqual(productRunsEntries[7].lot, 'ff', 'First product run entry correct lot');
               done();
             })
             .catch((error) => console.log(error));
@@ -479,8 +479,8 @@ describe('Inventory', () => {
 
     it('should decline item not in inventory', (done) => {
       connection.query('INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units) VALUES (7, "eric\'s dick", "sack", 2, "g", 50)')
-        .then(() => connection.query('INSERT INTO Formulas (id, name, description, num_product) VALUES (4, "eric\'s shit", "just shit", 10)'))
-        .then(() => connection.query('INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (7, 7, 1, 4)'))
+        .then(() => connection.query('INSERT INTO Formulas (id, name, description, num_product) VALUES (5, "eric\'s shit", "just shit", 10)'))
+        .then(() => connection.query('INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (9, 7, 1, 4)'))
         .then(() => {
           chai.request(server)
             .put('/inventory')
