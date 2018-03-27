@@ -359,15 +359,15 @@ describe('Ingredient', () => {
         .delete('/ingredients')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
-          'ingredients': [1, 2],
+          'ingredients': [2, 5],
         })
         .end((err, res) => {
           res.should.have.status(200);
           connection.query('SELECT * FROM Ingredients')
           .then((left) => {
-            assert.strictEqual(left.length, numIngredients, 'Rows in Ingredients table still the same.');
-          assert.strictEqual(left[0]['removed'], 1, 'ingredient 1 fake deleted');
+          assert.strictEqual(left.length, numIngredients, 'Rows in Ingredients table still the same.');
           assert.strictEqual(left[1]['removed'], 1, 'ingredient 2 fake deleted');
+          assert.strictEqual(left[4]['removed'], 1, 'ingredient 5 fake deleted');
           assert.strictEqual(left[2]['removed'], 0, 'ingredient 3 not fake deleted');
           done();
           })
@@ -382,7 +382,7 @@ describe('Ingredient', () => {
       .delete('/ingredients')
       .set('Authorization', `Token ${testTokens.adminTestToken}`)
       .send({
-        'ingredients': [1, 2],
+        'ingredients': [1, 3],
       })
       .end((err, res) => {
         res.should.have.status(400);
@@ -399,15 +399,15 @@ describe('Ingredient', () => {
           .delete('/ingredients')
           .set('Authorization', `Token ${testTokens.adminTestToken}`)
           .send({
-            'ingredients': [1],
+            'ingredients': [2],
           })
           .end((err, res) => {
             res.should.have.status(200);
             connection.query('SELECT * FROM Ingredients')
             .then((left) => {
               assert.strictEqual(left.length, numIngredients, 'Rows in Ingredients table still the same.');
-              assert.strictEqual(left[0]['removed'], 1, 'ingredient 1 fake deleted');
-              assert.strictEqual(left[1]['removed'], 0, 'ingredient 2 not fake deleted');
+              assert.strictEqual(left[0]['removed'], 0, 'ingredient 1 not fake deleted');
+              assert.strictEqual(left[1]['removed'], 1, 'ingredient 2 fake deleted');
               assert.strictEqual(left[2]['removed'], 0, 'ingredient 3 not fake deleted');
               done();
             })
