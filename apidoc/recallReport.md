@@ -7,7 +7,7 @@ This check inventory capacities, update inventory capacities/stock, and adds to 
 
 {% sample lang="js" %}
 ```js
-request.body = {
+request.query = {
   {
     'recall': {
       'ingredient_id': 1,

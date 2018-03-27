@@ -10,13 +10,13 @@ describe('RecallReport', () => {
     it('should return all products related to that recall (goes through intermediates)', (done) => {
       chai.request(server)
         .get('/recall')
-        .set('Authorization', `Token ${testTokens.managerTestToken}`)
-        .send({
+        .query({
           'recall': {
             'ingredient_id': 3,
             'lot': 'sb',
           },
         })
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .end((err, res) => {
           res.should.have.status(200);
           const results = res.body;
@@ -51,7 +51,7 @@ describe('RecallReport', () => {
       chai.request(server)
         .get('/recall')
         .set('Authorization', `Token ${testTokens.managerTestToken}`)
-        .send({
+        .query({
           'recall': {
             'ingredient_id': 1,
             'lot': 'aaa',
@@ -75,7 +75,7 @@ describe('RecallReport', () => {
       chai.request(server)
         .get('/recall')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
-        .send({
+        .query({
           'recall': {
             'ingredient_id': 1,
             'lot': 'aaa',

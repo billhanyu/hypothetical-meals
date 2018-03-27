@@ -136,6 +136,7 @@ app.get('/productruns', beNoob, productionrun.view);
 
 app.get('/inventory', beNoob, inventory.all);
 app.get('/inventory/lot/:ingredient_id', beNoob, inventory.getLotQuantities);
+app.get('/inventory/productionlots/:ingredient_id', beNoob, inventory.getProductionLots);
 app.get('/inventory/stock', beManager, inventory.getStock);
 app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
 app.put('/inventory', beManager, inventory.commitCart);
