@@ -479,8 +479,8 @@ describe('Inventory', () => {
 
     it('should decline item not in inventory', (done) => {
       connection.query('INSERT INTO Ingredients (id, name, package_type, storage_id, native_unit, num_native_units) VALUES (7, "eric\'s dick", "sack", 2, "g", 50)')
-        .then(() => connection.query('INSERT INTO Formulas (id, name, description, num_product) VALUES (4, "eric\'s shit", "just shit", 10)'))
-        .then(() => connection.query('INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (7, 7, 1, 4)'))
+        .then(() => connection.query('INSERT INTO Formulas (id, name, description, num_product) VALUES (5, "eric\'s shit", "just shit", 10)'))
+        .then(() => connection.query('INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (9, 7, 1, 4)'))
         .then(() => {
           chai.request(server)
             .put('/inventory')

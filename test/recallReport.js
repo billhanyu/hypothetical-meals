@@ -26,23 +26,23 @@ describe('RecallReport', () => {
           assert.strictEqual(results[0].name, 'cake', 'Formula name for recall report');
           assert.strictEqual(results[0].lot, 'aa', 'Lot number given to product run 1');
           assert.strictEqual(results[0].num_product, 100, 'Number of products produced in production run 1');
-          assert.strictEqual(results[0].entries.length, 2, 'Number of ingredients in product run 1');
-          assert.strictEqual(results[0].entries[0].ingredient_id, 3, 'Has ingredient in recall param');
-          assert.strictEqual(results[0].entries[0].lot, 'sb', 'Has proper lot number in recall param');
+          assert.strictEqual(results[0].ingredients.length, 2, 'Number of ingredients in product run 1');
+          assert.strictEqual(results[0].ingredients[0].ingredient_id, 3, 'Has ingredient in recall param');
+          assert.strictEqual(results[0].ingredients[0].lot, 'sb', 'Has proper lot number in recall param');
 
           assert.strictEqual(results[1].id, 2, 'Id of product run with recall params');
           assert.strictEqual(results[1].formula_id, 3, 'Id for formula with recall params');
           assert.strictEqual(results[1].name, 'booploop', 'Formula name for recall report');
           assert.strictEqual(results[1].lot, 'abc123', 'Lot number given to product run 2');
           assert.strictEqual(results[1].num_product, 6, 'Number of products produced in production run 2');
-          assert.strictEqual(results[1].entries.length, 2, 'Number of ingredients in product run 2');
+          assert.strictEqual(results[1].ingredients.length, 2, 'Number of ingredients in product run 2');
 
           assert.strictEqual(results[2].id, 3, 'Id of product run with recall params');
           assert.strictEqual(results[2].formula_id, 4, 'Id for formula with recall params');
           assert.strictEqual(results[2].name, 'booploop final shit', 'Cake formula part of recall report');
           assert.strictEqual(results[2].lot, 'def123', 'Lot number given to product run 3');
           assert.strictEqual(results[2].num_product, 6, 'Number of products produced in production run 3');
-          assert.strictEqual(results[2].entries.length, 2, 'Number of ingredients in product run 3');
+          assert.strictEqual(results[2].ingredients.length, 2, 'Number of ingredients in product run 3');
           done();
         });
     });
@@ -60,14 +60,13 @@ describe('RecallReport', () => {
         .end((err, res) => {
           res.should.have.status(200);
           const results = res.body;
-          console.log(results[0].entries);
           assert.strictEqual(results.length, 1, 'Number of products that have recall params');
           assert.strictEqual(results[0].id, 3, 'Id of product run with recall params');
           assert.strictEqual(results[0].formula_id, 4, 'Id for formula with recall params');
           assert.strictEqual(results[0].name, 'booploop final shit', 'Formula name for recall report');
           assert.strictEqual(results[0].lot, 'def123', 'Lot number given to product run 3');
           assert.strictEqual(results[0].num_product, 6, 'Number of products produced in production run 3');
-          assert.strictEqual(results[0].entries.length, 2, 'Number of ingredients in product run 3');
+          assert.strictEqual(results[0].ingredients.length, 2, 'Number of ingredients in product run 3');
           done();
         });
     });
