@@ -1,6 +1,5 @@
 import * as checkNumber from './common/checkNumber';
 import { createError, handleError } from './common/customError';
-import success from './common/success';
 
 const productionEntriesQuery = `SELECT ProductRunsEntries.*`;
 
@@ -43,14 +42,14 @@ function queryProductRunInformation(productids) {
     .then((productRuns) => {
       productRuns.forEach(x => {
         productRunMap[x.id] = x;
-        productRunMap[x.id]['entries'] = [];
+        productRunMap[x.id]['ingredients'] = [];
       });
       const productRunIds = productRuns.map(x => x.id);
       return connection.query(`SELECT * FROM ProductRunsEntries WHERE productrun_id IN (${productRunIds.join(', ')})`);
     })
     .then((productEntriesResult) => {
       productEntriesResult.forEach(x => {
-        productRunMap[x.productrun_id]['entries'].push(x);
+        productRunMap[x.productrun_id]['ingredients'].push(x);
       });
       return Promise.resolve(Object.values(productRunMap));
     })
