@@ -9,6 +9,7 @@
 * [Production Runs](productrun.md)
 * [SpendingLog](spendinglog.md)
 * [SystemLog](systemLogs.md)
+* [Recall Report](recallReport.md)
 * [Storage](storage.md)
 * [User](user.md)
 * [Vendor](vendor.md)
