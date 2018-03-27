@@ -52,11 +52,14 @@ function getStockPromise(ids) {
             delete stock[result.ingredient_id].total_weighted_duration;
             delete stock[result.ingredient_id].total_num_native_units;
           }
-          stock[result.ingredient_id].freshnessData = [{
+          if (!stock[result.ingredient_id].freshnessData) {
+            stock[result.ingredient_id].freshnessData = [];
+          }
+          stock[result.ingredient_id].freshnessData.push({
             inventoryId: result.id,
             numPackages: result.num_packages,
             createdAt: result.created_at,
-          }];
+          });
         }
         resolve(stock);
       })
