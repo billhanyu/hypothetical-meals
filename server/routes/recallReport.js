@@ -36,8 +36,9 @@ export function getRecallForIngredient(req, res, next) {
 
 function queryProductRunInformation(productids) {
   let productRunMap = {};
-  return connection.query(`SELECT ProductRuns.*, Formulas.name
+  return connection.query(`SELECT ProductRuns.*, Formulas.name, Users.username as user_name
     FROM ProductRuns JOIN Formulas ON ProductRuns.formula_id = Formulas.id
+    JOIN Users ON ProductRuns.user_id = Users.id
     WHERE ProductRuns.id IN (${Array.from(productids).join(', ')})`)
     .then((productRuns) => {
       productRuns.forEach(x => {
@@ -45,7 +46,11 @@ function queryProductRunInformation(productids) {
         productRunMap[x.id]['ingredients'] = [];
       });
       const productRunIds = productRuns.map(x => x.id);
-      return connection.query(`SELECT * FROM ProductRunsEntries WHERE productrun_id IN (${productRunIds.join(', ')})`);
+      return connection.query(`SELECT ProductRunsEntries.*, Vendors.name as vendor_name, Ingredients.name as ingredient_name
+        FROM ProductRunsEntries
+        JOIN Vendors ON ProductRunsEntries.vendor_id = Vendors.id
+        JOIN Ingredients ON ProductRunsEntries.ingredient_id = Ingredients.id
+        WHERE productrun_id IN (${productRunIds.join(', ')})`);
     })
     .then((productEntriesResult) => {
       productEntriesResult.forEach(x => {
@@ -54,6 +59,7 @@ function queryProductRunInformation(productids) {
       return Promise.resolve(Object.values(productRunMap));
     })
     .catch((err) => {
+      console.log(err);
       throw err;
     });
 }
