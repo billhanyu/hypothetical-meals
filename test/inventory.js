@@ -395,7 +395,7 @@ describe('Inventory', () => {
               assert.strictEqual(productRun.num_product, 30, 'Product run num products is correct');
               assert.strictEqual(productRun.user_id, 6, 'Product run user id is correct');
 
-              assert.strictEqual(productRunsEntries.length, 2 + 2, 'Two entries added to product runs entries');
+              assert.strictEqual(productRunsEntries.length, 6 + 2, 'Two entries added to product runs entries');
               assert.strictEqual(productRunsEntries[2].productrun_id, productRun.id, 'First product run entry correct product run id');
               assert.strictEqual(productRunsEntries[2].ingredient_id, 1, 'First product run entry correct ingredient id');
               assert.strictEqual(productRunsEntries[2].vendor_id, 1, 'First product run entry correct vendor id');

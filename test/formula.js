@@ -32,7 +32,7 @@ describe('Formulas', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(3);
+          res.body.length.should.be.eql(4);
           done();
         });
     });
@@ -399,7 +399,7 @@ describe('Formulas', () => {
           res.should.have.status(200);
           connection.query(`SELECT * FROM Formulas WHERE removed = 0`)
           .then((formulas) => {
-            assert.strictEqual(formulas.length, 3, 'Number of formulas in database');
+            assert.strictEqual(formulas.length, 4, 'Number of formulas in database');
             assert.strictEqual(formulas[0].name, 'cake', 'Name for formula 1');
             assert.strictEqual(formulas[0].description, 'A blob', 'Description for formula 3');
             assert.strictEqual(formulas[0].num_product, 1, 'Number of products for formula 3');
@@ -469,7 +469,7 @@ describe('Formulas', () => {
 
           connection.query(`SELECT * FROM Formulas WHERE removed = 0`)
           .then((formulas) => {
-            assert.strictEqual(formulas.length, 3, 'Number of formulas in database');
+            assert.strictEqual(formulas.length, 4, 'Number of formulas in database');
             assert.strictEqual(formulas[0].name, 'cake', 'Name for formula 1');
             assert.strictEqual(formulas[0].description, 'A blob', 'Description for formula 3');
             assert.strictEqual(formulas[0].num_product, 1, 'Number of products for formula 3');
@@ -536,7 +536,7 @@ describe('Formulas', () => {
 
           connection.query(`SELECT * FROM Formulas WHERE removed = 0`)
           .then((formulas) => {
-            assert.strictEqual(formulas.length, 3, 'Number of formulas in database');
+            assert.strictEqual(formulas.length, 4, 'Number of formulas in database');
             assert.strictEqual(formulas[0].name, 'yellow cake', 'Name for formula 1');
             assert.strictEqual(formulas[0].description, 'A simple cake', 'Description for formula 3');
             assert.strictEqual(formulas[0].num_product, 1, 'Number of products for formula 3');
@@ -774,7 +774,7 @@ describe('Formulas', () => {
           .then((results) => {
             const [formulas, formulasRemoved, formulaEntries] = results;
             assert.strictEqual(formulasRemoved.length, 2, 'Should have marked as removed');
-            assert.strictEqual(formulas.length, 3, 'Should have not actually removed all formulas');
+            assert.strictEqual(formulas.length, 4, 'Should have not actually removed all formulas');
             assert.strictEqual(formulas[0].removed, 1, 'Formula 1 marked at removed');
             assert.strictEqual(formulas[1].removed, 1, 'Formula 2 marked as removed');
             assert.strictEqual(formulaEntries.length, 2, 'Should have deleted all formula entries');
@@ -799,7 +799,7 @@ describe('Formulas', () => {
           ])
           .then((results) => {
             const [formulas, formula1, formulaEntries] = results;
-            assert.strictEqual(formulas.length, 3, 'Should have fake deleted one formula');
+            assert.strictEqual(formulas.length, 4, 'Should have fake deleted one formula');
             assert.strictEqual(formula1[0].removed, 1, 'Formula 1 marked as removed');
             assert.strictEqual(formulaEntries.length, 4, 'Should have deleted all formula entries');
             formulaEntries.forEach(element => {
