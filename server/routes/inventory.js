@@ -208,7 +208,7 @@ export function commitCart(req, res, next) {
         let totalWeightedDuration = 0;
         for (let freshnessEntry of inventory.freshnessData) {
           if (numPackagesLeft <= 0) break;
-          const numPackagesConsumed = numPackagesLeft > freshnessEntry.numPackages ? 0 : numPackagesLeft;
+          const numPackagesConsumed = numPackagesLeft > freshnessEntry.numPackages ? freshnessEntry.numPackages : numPackagesLeft;
           changes[freshnessEntry.inventoryId] = freshnessEntry.numPackages - numPackagesConsumed;
           numPackagesLeft = numPackagesLeft - numPackagesConsumed;
           const timeSinceCreation = new Date() - freshnessEntry.createdAt;
