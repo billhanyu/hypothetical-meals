@@ -59,6 +59,9 @@ function getStockPromise(ids) {
             inventoryId: result.id,
             numPackages: result.num_packages,
             createdAt: result.created_at,
+
+            lot: result.lot,
+            vendorId: result.vendor_id,
           });
         }
         resolve(stock);
@@ -222,9 +225,9 @@ export function commitCart(req, res, next) {
           });
           productRunEntries.push({
             ingredient_id: ingredientId,
-            vendor_id: inventory.vendor_id,
-            lot: inventory.lot,
-            num_native_units: inventory.ingredient_num_native_units,
+            vendor_id: freshnessEntry.vendorId,
+            lot: freshnessEntry.lot,
+            num_native_units: numPackagesConsumed * inventory.ingredient_num_native_units,
           });
         }
         // Dummy data 'poop', 'sack', 1, 'pounds', 10
