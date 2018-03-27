@@ -68,6 +68,7 @@ class EditFormula extends Component {
         open: true,
         snackbarText: 'Finished Updating Formula',
         EditFormulaBoxes: response.data,
+        isEditingFormula: false,
       });
     })
     .catch(error => {
