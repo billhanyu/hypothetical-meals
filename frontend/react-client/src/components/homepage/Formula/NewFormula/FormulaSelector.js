@@ -12,6 +12,7 @@ class FormulaInput extends Component {
       ingredientData: [],
       nameToQuantityMap: props.nameToQuantityMap != null ? props.nameToQuantityMap : {},
       ingredientNameToQuantityMap: props.ingredientNameToQuantityMap,
+      searchText: '',
     };
   }
 
@@ -72,8 +73,15 @@ class FormulaInput extends Component {
     array.push(chosenRequest);
     this.setState({
       values: array,
+      searchText: '',
     });
     this.props.onValueChange(array);
+  }
+
+  _updateSearchText(searchText, dataSource, params) {
+    return this.setState({
+      searchText,
+    });
   }
 
   render() {
@@ -88,6 +96,8 @@ class FormulaInput extends Component {
           dataSource={this.state.allIngredients}
           disabled={this.props.readOnly}
           filter={AutoComplete.caseInsensitiveFilter}
+          searchText={this.state.searchText}
+          onUpdateInput={this._updateSearchText.bind(this)}
           listStyle={{color: '#31749d'}}
           onNewRequest={this.handleNewRequest.bind(this)}
           openOnFocus={true}
