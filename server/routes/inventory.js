@@ -87,6 +87,19 @@ export function getLotQuantities(req, res, next) {
     .catch(err => handleError(err, res));
 }
 
+/* return production entries lots for a certain ingredient with id */
+export function getProductionLots(req, res, next) {
+  const ingredientId = req.params.ingredient_id;
+  connection.query('SELECT lot FROM ProductRunsEntries WHERE ingredient_id = ?',
+    [ingredientId])
+    .then(results => {
+      return res.json(results.map(entry => entry.lot));
+    })
+    .catch(err => {
+      handleError(err, res);
+    });
+}
+
 /* request body format:
  * request.body.changes = {
  *   "inventory_id1": new_quantity1,
