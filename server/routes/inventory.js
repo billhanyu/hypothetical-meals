@@ -93,7 +93,13 @@ export function getProductionLots(req, res, next) {
   connection.query('SELECT lot FROM ProductRunsEntries WHERE ingredient_id = ?',
     [ingredientId])
     .then(results => {
-      return res.json(results.map(entry => entry.lot));
+      const arr = [];
+      results.forEach(result => {
+        if (!arr.includes(result.lot)) {
+          arr.push(result.lot);
+        };
+      });
+      return res.json(arr);
     })
     .catch(err => {
       handleError(err, res);
