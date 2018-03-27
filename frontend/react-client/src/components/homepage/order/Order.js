@@ -138,7 +138,7 @@ class Order extends Component {
       const lots = {};
       correspondingLotArray.forEach(element => {
         if(Number(element.quantity) !== 0){
-          lots[element.lotNumber] = Number(element.quantity);
+          lots[element.lotNumber] = lots[element.lotNumber] == null ? Number(element.quantity) : Number(lots[element.lotNumber]) + Number(element.quantity);
         }
       });
       orderObj[ingredient.selected] = {
