@@ -6,7 +6,7 @@ const productionEntriesQuery = `SELECT ProductRunsEntries.*`;
 /**
  *
  * @param {*} req
- * req.body.recall = {
+ * req.query.recall = {
  *    ingredient_id: 1,
  *    lot: 'bleb123',
  * }
@@ -14,7 +14,7 @@ const productionEntriesQuery = `SELECT ProductRunsEntries.*`;
  * @param {*} next
  */
 export function getRecallForIngredient(req, res, next) {
-  const recallParams = req.body.recall;
+  const recallParams = req.query.recall;
   try {
     checkRecallParams(recallParams);
   } catch (err) {
