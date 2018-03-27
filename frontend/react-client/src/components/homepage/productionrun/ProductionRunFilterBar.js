@@ -28,8 +28,16 @@ class SystemLogFilterBar extends Component {
               <input type="date" className="form-control" id="end" value={this.props.filterEndTime} onChange={this.props.changeEndTime} />
             </div>
           </div>
+          <div className="col">
+            <button
+              style={{'margin-top': '35px'}}
+              type="button"
+              className="btn btn-secondary"
+              onClick={this.props.clearFilter}>
+              Clear
+            </button>
+          </div>
         </div>
-        <button type="button" className="btn btn-secondary" onClick={this.props.clearFilter}>Clear</button>
       </form>
     );
   }
