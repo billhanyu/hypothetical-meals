@@ -138,11 +138,11 @@ class IngredientList extends Component {
       }
     })
     .then(response => {
-      this.selectPage(1);
       this.setState({
         open: true,
         message: 'Deleted!',
       });
+      this.reloadData();
     })
     .catch(err => {
       this.setState({
@@ -207,6 +207,7 @@ class IngredientList extends Component {
       ingredient={this.state.ingredients[this.state.editingIdx]}
       backToList={this.backToList}
       finishEdit={this.finishEdit}
+      reloadData={this.reloadData}
     />;
 
     const view =
@@ -214,6 +215,7 @@ class IngredientList extends Component {
         mode="edit"
         ingredient={this.state.ingredients[this.state.viewingIdx]}
         backToList={this.backToList}
+        reloadData={this.reloadData}
       />;
 
     const bulkImport =
@@ -299,6 +301,7 @@ class IngredientList extends Component {
       mode="add"
       backToList={this.backToList}
       finishAdd={this.finishAdd}
+      reloadData={this.reloadData}
     />;
 
     if (this.state.editing) {
