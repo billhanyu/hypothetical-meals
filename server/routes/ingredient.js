@@ -10,7 +10,6 @@ import { logAction } from './systemLogs';
 const fs = require('fs');
 const Papa = require('papaparse');
 
-const numColumnsForBulkImport = 8;
 const basicViewQueryString = 'SELECT Ingredients.*, Storages.name as storage_name, Storages.capacity as storage_capacity FROM Ingredients INNER JOIN Storages ON Storages.id = Ingredients.storage_id';
 
 export function pages(req, res, next) {
@@ -284,16 +283,15 @@ export function bulkImport(req, res, next) {
     return {
       ingredient: a[0],
       package: a[1],
-      amount: a[2],
-      nativeUnit: a[3],
-      unitsPerPackage: a[4],
-      price: a[5],
-      vendorCode: a[6],
-      temperature: a[7],
+      nativeUnit: a[2],
+      unitsPerPackage: a[3],
+      price: a[4],
+      vendorCode: a[5],
+      temperature: a[6],
     };
   });
 
-  const getIngredients = connection.query(`SELECT Ingredients.*, Storages.name as storage_name FROM Ingredients INNER JOIN Storages ON Storages.id = Ingredients.storage_id`);
+  const getIngredients = connection.query(`SELECT Ingredients.*, Storages.name as storage_name FROM Ingredients INNER JOIN Storages ON Storages.id = Ingredients.storage_id WHERE Ingredients.removed = 0`);
   const getVendors = connection.query(`SELECT * FROM Vendors`);
   const getVendorsIngredients = connection.query('SELECT VendorsIngredients.*,Ingredients.name as ingredient_name, Ingredients.storage_id as ingredient_storage_id, Ingredients.removed as ingredient_removed FROM (VendorsIngredients INNER JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id)');
   const getInventories = connection.query(`SELECT * FROM Inventories`);
@@ -304,6 +302,9 @@ export function bulkImport(req, res, next) {
   let vendorsIngredients;
   let inventories;
   let storages;
+
+  let ingredsToAdd = '';
+  const entryNames = [];
 
   Promise.all([getIngredients, getVendors, getVendorsIngredients, getInventories, getStorages])
     .then((response) => {
@@ -319,14 +320,10 @@ export function bulkImport(req, res, next) {
         else throw createError(`Storage type is nonexistant in database: ${entry.temperature}.`);
       }
 
-      // Ensure added ingredients do not exceed storage
-      // return resolve();
-      //   return checkSufficientStorage(storages, entries, inventories);
-      // })
-      // .then(() => {
       // Compile list of new ingredients to add to db
-      let ingredsToAdd = '';
+      
       for (let entry of entries) {
+        entryNames.push(entry.ingredient);
         const existingIngredient = ingredients.find(ingredient => entry.ingredient.toLowerCase() == ingredient.name.toLowerCase());
 
         if (!existingIngredient) {
@@ -339,12 +336,12 @@ export function bulkImport(req, res, next) {
             'num_native_units': entry.unitsPerPackage,
           });
         } else {
-          if (existingIngredient.package_type != entry.package) throw createError(`Ingredient ${entry.ingredient} is in database but package types do not match`);
-          if (existingIngredient.storage_name != entry.temperature) throw createError(`Ingredient ${entry.ingredient} is in database but storage types do not match`);
-          if (existingIngredient.native_unit != entry.nativeUnit) throw createError(`Ingredient ${entry.ingredient} is in database but native units do not match`);
-          if (existingIngredient.num_native_units != entry.unitsPerPackage) throw createError(`Ingredient ${entry.ingredient} is in database but number of units per package do not match`);
+          throw createError(`Ingredient ${entry.ingredient} is already in database.`);
         }
       }
+      return connection.query('DELETE FROM Ingredients WHERE name IN (?) AND removed = 1', [entryNames]);
+    })
+    .then(() => {
       return ingredsToAdd == '' ? Promise.resolve() : connection.query(`INSERT INTO Ingredients (name, package_type, storage_id, native_unit, num_native_units) VALUES ${ingredsToAdd.slice(0, -1)}`);
     })
     .then(() => connection.query(`SELECT Ingredients.*, Storages.name as storage_name FROM Ingredients INNER JOIN Storages ON Storages.id = Ingredients.storage_id`))
@@ -386,57 +383,21 @@ export function bulkImport(req, res, next) {
     });
 }
 
-function checkSufficientStorage(storages, entries, backup) {
-  return new Promise((resolve, reject) => {
-    const sums = {};
-    const capacities = {};
-    for (let storage of storages) {
-      sums[storage.id] = 0;
-      capacities[storage.id] = storage.capacity;
-    }
-
-    // Add bulk import to sums
-    for (let entry of entries) {
-      const storageEntry = storages.find(storage => storage.name.toLowerCase() == entry.temperature.toLowerCase());
-      if (!storageEntry) reject(createError(`Storage type is nonexistant in database: ${temperature}.`));
-      sums[storageEntry.id] += parseInt(entry.amount);
-    }
-
-    // Add already existing inventory to sums
-    connection.query(`SELECT Ingredients.package_type, Inventories.num_packages, Ingredients.storage_id
-                                  FROM Inventories
-                                  INNER JOIN Ingredients
-                                  ON Inventories.ingredient_id = Ingredients.id`)
-      .then(items => {
-        items.forEach(item => {
-          sums[item.storage_id] += getSpace(item.package_type) * item.num_packages;
-        });
-        for (let id of Object.keys(sums)) {
-          if (sums[id] > capacities[id]) {
-            reject(createError('New quantities too large for current storages'));
-          }
-        }
-      })
-      .then(() => resolve())
-      .catch(err => reject(err));
-  });
-}
-
 function checkForBulkImportFormattingErrors(data) {
-  if (data[0].length != numColumnsForBulkImport) return `Headers incorrectly formatted. Should be ${numColumnsForBulkImport} but received ${data[0].length}.`;
-  const headers = ['INGREDIENT', 'PACKAGE', 'AMOUNT (NATIVE UNITS)', 'NATIVE UNIT', 'UNITS PER PACKAGE', 'PRICE PER PACKAGE', 'VENDOR FREIGHT CODE', 'TEMPERATURE'];
+  const headers = ['INGREDIENT', 'PACKAGE', 'NATIVE UNIT', 'UNITS PER PACKAGE', 'PRICE PER PACKAGE', 'VENDOR FREIGHT CODE', 'TEMPERATURE'];
+  if (data[0].length != headers.length) return `Headers incorrectly formatted. Should be ${headers.length} but received ${data[0].length}.`;
   for (let i = 0; i < headers.length; i++) {
     if (data[0][i] !== headers[i]) {
       return `Incorrect header in column ${i + 1}. Should be ${headers[i]} but received ${data[0][i]}.`;
     }
   }
   for (let i = 1; i < data.length; i++) {
-    if (data[i].length != numColumnsForBulkImport) {
+    if (data[i].length != headers.length) {
       // Check for the new line at bottom of sheet
       if (i == data.length - 1 && data[i].length == 1 && data[i][0] == '') {
         data = data.pop();
         return;
-      } else return `Incorrect number of columns in row ${i + 1}. Should be ${numColumnsForBulkImport} but received ${data[i].length}.`;
+      } else return `Incorrect number of columns in row ${i + 1}. Should be ${headers.length} but received ${data[i].length}.`;
     }
     // Ensure valid package type
     try {
@@ -444,18 +405,16 @@ function checkForBulkImportFormattingErrors(data) {
     } catch (error) {
       return `Invalid package type: ${data[i][1]}`;
     }
-    // Ensure integer number of native units
-    if (!checkNumber.isPositiveInteger(data[i][2])) return `Invalid amount in native units: ${data[i][2]}`;
     // Ensure integer number of units per package
-    if (!checkNumber.isPositiveInteger(data[i][4])) return `Invalid number of units per package: ${data[i][2]}`;
+    if (!checkNumber.isPositiveInteger(data[i][3])) return `Invalid number of units per package: ${data[i][3]}`;
     // Ensure valid price
-    if (isNaN(data[i][5]) || data[i][5] <= 0) return `Invalid package price: ${data[i][5]}`;
+    if (isNaN(data[i][4]) || data[i][4] <= 0) return `Invalid package price: ${data[i][4]}`;
     // Ensure valid storage type
     // Edit #6 changed it to frozen and refrigerated, changing back to freezer and refrigerator for ease of integration
-    if (data[i][7] == 'frozen') data[i][7] = 'freezer';
-    else if (data[i][7] == 'refrigerated') data[i][7] = 'refrigerator';
-    else if (data[i][7] == 'room temperature') data[i][7] = 'warehouse';
-    if (validStorageTypes.indexOf(data[i][7].toLowerCase()) < 0) return `Invalid package type: ${data[i][7]}`;
+    if (data[i][6] == 'frozen') data[i][6] = 'freezer';
+    else if (data[i][6] == 'refrigerated') data[i][6] = 'refrigerator';
+    else if (data[i][6] == 'room temperature') data[i][6] = 'warehouse';
+    if (validStorageTypes.indexOf(data[i][6].toLowerCase()) < 0) return `Invalid package type: ${data[i][6]}`;
   }
 }
 

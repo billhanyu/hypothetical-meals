@@ -4,7 +4,9 @@ import success from './common/success';
 import { updateDatabaseHelper } from './common/updateUtilities';
 import { getPaginationQueryString, getNumPages } from './common/pagination';
 import { logAction } from './systemLogs';
+import { validStorageTypes } from './common/storageUtilities';
 import { checkIngredientProperties } from './ingredient';
+import { getSpace } from './common/packageUtilies';
 
 const fs = require('fs');
 const Papa = require('papaparse');
@@ -13,8 +15,6 @@ const Papa = require('papaparse');
 const formulaQueryString = 'SELECT * FROM Formulas WHERE removed = 0';
 const formulaEntryQuery = 'SELECT FormulaEntries.*';
 const dbFormulaNameCheck = `${formulaQueryString} AND name IN`;
-
-const numColumnsForBulkImport = 5;
 
 export function pages(req, res, next) {
   getNumPages('Formulas')
@@ -428,12 +428,12 @@ export function deleteFormulas(req, res, next) {
 }
 
 
-export function bulkImport(req, res, next) {
+export function finalBulkImport(req, res, next) {
   const csv = fs.readFileSync(req.file.path);
   const papaResponse = Papa.parse(csv.toString());
   const data = papaResponse.data;
 
-  const formattingError = checkForBulkImportFormattingErrors(data);
+  const formattingError = checkForFinalBulkImportFormattingErrors(data);
   if (formattingError) {
     return handleError(createError(formattingError), res);
   }
@@ -499,9 +499,9 @@ export function bulkImport(req, res, next) {
     });
 }
 
-function checkForBulkImportFormattingErrors(data) {
-  if (data[0].length != numColumnsForBulkImport) return `Headers incorrectly formatted. Should be ${numColumnsForBulkImport} but received ${data[0].length}.`;
-  const headers = ['FORMULA', 'PRODUCT UNITS', 'DESCRIPTION', 'INGREDIENT', 'INGREDIENT UNITS'];
+function checkForFinalBulkImportFormattingErrors(data) {
+  const headers = ['NAME', 'PRODUCT UNITS', 'DESCRIPTION', 'INGREDIENT', 'INGREDIENT UNITS'];
+  if (data[0].length != headers.length) return `Headers incorrectly formatted. Should be ${headers.length} but received ${data[0].length}.`;
   for (let i = 0; i < headers.length; i++) {
     if (data[0][i] !== headers[i]) {
       return `Incorrect header in column ${i + 1}. Should be ${headers[i]} but received ${data[0][i]}.`;
@@ -510,12 +510,12 @@ function checkForBulkImportFormattingErrors(data) {
   let prevFormulaNames = [];
   let isFirstRowOfFormula = true;
   for (let i = 1; i < data.length; i++) {
-    if (data[i].length != numColumnsForBulkImport) {
+    if (data[i].length != headers.length) {
       // Check for the new line at bottom of sheet
       if (i == data.length - 1 && data[i].length == 1 && data[i][0] == '') {
         data = data.pop();
         return;
-      } else return `Incorrect number of columns in row ${i + 1}. Should be ${numColumnsForBulkImport} but received ${data[i].length}.`;
+      } else return `Incorrect number of columns in row ${i + 1}. Should be ${headers.length} but received ${data[i].length}.`;
     }
     // Ensure valid formula name
     if (prevFormulaNames.length == 0 || data[i][0] != prevFormulaNames[prevFormulaNames.length - 1]) {
@@ -529,5 +529,146 @@ function checkForBulkImportFormattingErrors(data) {
     if (isFirstRowOfFormula && !checkNumber.isPositiveInteger(data[i][1])) return `Invalid amount in product units: ${data[i][1]}`;
     // Ensure valid ingredient num native units
     if (isNaN(data[i][4]) || data[i][4] <= 0) return `Invalid ingredient units: ${data[i][4]}`;
+  }
+}
+//////////////////// INTERMEDIATE
+
+export function intermediateBulkImport(req, res, next) {
+  const csv = fs.readFileSync(req.file.path);
+  const papaResponse = Papa.parse(csv.toString());
+  const data = papaResponse.data;
+
+  const formattingError = checkForIntermediateBulkImportFormattingErrors(data);
+  if (formattingError) {
+    return handleError(createError(formattingError), res);
+  }
+
+  const slicedData = data.slice(1);
+  const entries = slicedData.map(a => {
+    return {
+      formula: a[0],
+      amount: a[1],
+      description: a[2],
+      package: a[3],
+      nativeUnits: a[4],
+      unitsPerPackage: a[5],
+      temperature: a[6],
+      ingredient: a[7],
+      numNativeUnits: a[8],
+    };
+  });
+
+  let formulasToAdd = '';
+  const prevFormulaNames = [];
+  const newIntermediateIngredients = [];
+
+  // Make sure no repeated formulas
+  Promise.all([
+    connection.query(`SELECT name FROM Formulas`),
+    connection.query(`SELECT id FROM Ingredients`),
+  ])
+    .then(results => {
+      const [formulas, ingredients] = results;
+      let lastIngredientId = ingredients.length;
+      for (let entry of entries) {
+        lastIngredientId++;
+        const duplicateFormula = formulas.find(formula => formula.name.toLowerCase() == entry.formula.toLowerCase());
+        if (duplicateFormula) throw createError(`Formula ${entry.formula} already exists`);
+
+        if (prevFormulaNames.length == 0 || entry.formula != prevFormulaNames[prevFormulaNames.length - 1]) {
+          prevFormulaNames.push(entry.formula);
+          formulasToAdd += `(1, ${lastIngredientId}, '${entry.formula}', '${entry.description}', ${entry.amount}),`;
+
+          newIntermediateIngredients.push([entry.formula, entry.package, validStorageTypes.indexOf(entry.temperature) + 1, entry.nativeUnits, entry.unitsPerPackage, 1]);
+        }
+      }
+      return connection.query(`SELECT id, name, removed FROM Ingredients`);
+    })
+    // Make sure ingredients exist
+    .then(ingredients => {
+      console.log(ingredients);
+      for (let entry of entries) {
+        const existingIngredient = ingredients.find(ingredient => ingredient.name.toLowerCase() == entry.ingredient.toLowerCase() && ingredient.removed == 0);
+        if (!existingIngredient) throw createError(`Ingredient ${entry.ingredient} does not exist`);
+        entry.ingredientId = existingIngredient.id;
+      }
+
+      return connection.query(`INSERT INTO Ingredients (name, package_type, storage_id, native_unit, num_native_units, intermediate) VALUES ?`, [newIntermediateIngredients]);
+    })
+    .then(() => {
+      // Add formulas
+      return connection.query(`INSERT INTO Formulas (intermediate, ingredient_id, name, description, num_product) VALUES ${formulasToAdd.slice(0, -1)}`);
+    })
+    .then(() => connection.query(`SELECT * FROM Formulas`))
+    .then(formulas => {
+      // Add formula entries
+      let formulaEntriesToAdd = '';
+      for (let entry of entries) {
+        const formulaFromDb = formulas.find(formula => formula.name == entry.formula);
+        entry.id = formulaFromDb.id;
+        formulaEntriesToAdd += `(${entry.ingredientId}, ${entry.numNativeUnits}, ${formulaFromDb.id}),`;
+      }
+      return connection.query(`INSERT INTO FormulaEntries (ingredient_id, num_native_units, formula_id) VALUES ${formulaEntriesToAdd.slice(0, -1)}`);
+    })
+    .then(() => {
+      let queryStrings = [];
+      for (let entry of entries) {
+        queryStrings.push(`{${entry.formula}=formula_id=${entry.id}}`);
+      }
+      return logAction(req.payload.id, `Bulk import added the following formulas: ${queryStrings.join(', ')}`);
+    })
+    .then(() => res.sendStatus(200))
+    .catch((err) => {
+      handleError(err, res);
+    });
+}
+
+function checkForIntermediateBulkImportFormattingErrors(data) {
+  const headers = ['NAME', 'PRODUCT UNITS', 'DESCRIPTION', 'PACKAGE', 'NATIVE UNIT', 'UNITS PER PACKAGE', 'TEMPERATURE', 'INGREDIENT', 'INGREDIENT UNITS'];
+  if (data[0].length != headers.length) return `Headers incorrectly formatted. Should be ${headers.length} but received ${data[0].length}.`;
+  for (let i = 0; i < headers.length; i++) {
+    if (data[0][i] !== headers[i]) {
+      return `Incorrect header in column ${i + 1}. Should be ${headers[i]} but received ${data[0][i]}.`;
+    }
+  }
+  let prevFormulaNames = [];
+  let isFirstRowOfFormula = true;
+  for (let i = 1; i < data.length; i++) {
+    if (data[i].length != headers.length) {
+      // Check for the new line at bottom of sheet
+      if (i == data.length - 1 && data[i].length == 1 && data[i][0] == '') {
+        data = data.pop();
+        return;
+      } else return `Incorrect number of columns in row ${i + 1}. Should be ${headers.length} but received ${data[i].length}.`;
+    }
+    // Ensure valid formula name
+    if (prevFormulaNames.length == 0 || data[i][0] != prevFormulaNames[prevFormulaNames.length - 1]) {
+      if (prevFormulaNames.indexOf(data[i][0]) >= 0) return `${data[i][0]} formula is not in consecutive rows`;
+      prevFormulaNames.push(data[i][0]);
+      isFirstRowOfFormula = true;
+
+      // Ensure valid package type
+      try {
+        getSpace(data[i][3].toLowerCase());
+      } catch (error) {
+        return `Invalid package type: ${data[i][3]}`;
+      }
+      // Ensure positive units per package
+      if (isNaN(data[i][5]) || data[i][5] <= 0) return `Invalid number of units per package: ${data[i][5]}`;
+      // Ensure valid storage type
+      // Edit #6 changed it to frozen and refrigerated, changing back to freezer and refrigerator for ease of integration
+      if (data[i][6] == 'frozen') data[i][6] = 'freezer';
+      else if (data[i][6] == 'refrigerated') data[i][6] = 'refrigerator';
+      else if (data[i][6] == 'room temperature') data[i][6] = 'warehouse';
+      if (validStorageTypes.indexOf(data[i][6].toLowerCase()) < 0) return `Invalid package type: ${data[i][6]}`;
+
+    } else {
+      isFirstRowOfFormula = false;
+    }
+    // Ensure integer number of product units
+    if (isFirstRowOfFormula && !checkNumber.isPositiveInteger(data[i][1])) return `Invalid amount in product units: ${data[i][1]}`;
+    
+    // Ensure valid ingredient num native units
+    if (isNaN(data[i][8]) || data[i][8] <= 0) return `Invalid ingredient units: ${data[i][8]}`;
   }
 }
