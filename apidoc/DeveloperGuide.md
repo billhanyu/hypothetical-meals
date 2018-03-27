@@ -26,7 +26,8 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
 
 ### User
 
- - **Id** 
+ - **Id**
+ - Username 
  - Name 
  - Hash 
  - Salt
@@ -60,6 +61,10 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
 	 - Railcar
  - Native unit (lb, fluid ounces, etc).
  - Number of native units (Quantity of native units in packaage)
+ - Intermediate
+ - Worst duration time
+ - Total weighted duration time
+ - Total number of native units
  - Removed
  
 ### Vendor Ingredients
@@ -74,6 +79,24 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
  - *Ingredient id*
  - Package type
  - Number of packages
+ - Lot
+ - *Vendor id*
+ - Created at
+
+### Formulas
+ - **Id**
+ - Intermediate
+ - *ingredient id* (if is intermediate product)
+ - Name
+ - Description
+ - Number of products
+ - Removed
+
+### FormulaEntries
+ - **Id**
+ - *ingredient_id*
+ - Number of native units
+ - *Formula id*
 
 ### Logs
 
@@ -104,6 +127,22 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
  - *User id*
  - Description (refers to actions taken and entities involved)
  - Created at (time stamp)
+
+### Product Runs
+ - **Id**
+ - *Formula id*
+ - Number of products
+ - *User id*
+ - lot
+ - Created at
+
+### Product Runs Entries
+ - **Id**
+ - *Product run id*
+ - *Ingredient id*
+ - *Vendor id*
+ - Number of native units
+ - Lot
 
 *Primary key in bold
 **Foreign key in italics
