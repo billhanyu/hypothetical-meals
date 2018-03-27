@@ -186,12 +186,12 @@ describe('Vendor', () => {
           connection.query('SELECT * FROM Vendors')
           .then((changed) => {
             assert.strictEqual(changed.length, 5, 'Number of rows in Vendor table.');
-            assert.strictEqual(changed[2]['name'], 'hi', 'Name for vendor 3.');
-            assert.strictEqual(changed[2]['contact'], 'hi@duke.edu', 'Contact for vendor 3.');
-            assert.strictEqual(changed[2]['code'], 'codehi', 'Code for vendor 3.');
-            assert.strictEqual(changed[3]['name'], 'bleh', 'Name for vendor 4.');
-            assert.strictEqual(changed[3]['contact'], 'bleh@unc.edu', 'Contact for vendor 4.');
-            assert.strictEqual(changed[3]['code'], 'codebleh', 'Code for vendor 4.');
+            assert.strictEqual(changed[3]['name'], 'hi', 'Name for vendor 3.');
+            assert.strictEqual(changed[3]['contact'], 'hi@duke.edu', 'Contact for vendor 3.');
+            assert.strictEqual(changed[3]['code'], 'codehi', 'Code for vendor 3.');
+            assert.strictEqual(changed[4]['name'], 'bleh', 'Name for vendor 4.');
+            assert.strictEqual(changed[4]['contact'], 'bleh@unc.edu', 'Contact for vendor 4.');
+            assert.strictEqual(changed[4]['code'], 'codebleh', 'Code for vendor 4.');
             done();
           })
           .catch((error) => console.log(error));

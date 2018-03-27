@@ -777,7 +777,7 @@ describe('Formulas', () => {
             assert.strictEqual(formulas.length, 4, 'Should have not actually removed all formulas');
             assert.strictEqual(formulas[0].removed, 1, 'Formula 1 marked at removed');
             assert.strictEqual(formulas[1].removed, 1, 'Formula 2 marked as removed');
-            assert.strictEqual(formulaEntries.length, 2, 'Should have deleted all formula entries');
+            assert.strictEqual(formulaEntries.length, 4, 'Should have deleted all formula entries');
             done();
           })
           .catch((error) => console.log(error));
@@ -801,7 +801,7 @@ describe('Formulas', () => {
             const [formulas, formula1, formulaEntries] = results;
             assert.strictEqual(formulas.length, 4, 'Should have fake deleted one formula');
             assert.strictEqual(formula1[0].removed, 1, 'Formula 1 marked as removed');
-            assert.strictEqual(formulaEntries.length, 4, 'Should have deleted all formula entries');
+            assert.strictEqual(formulaEntries.length, 6, 'Should have deleted all formula entries');
             formulaEntries.forEach(element => {
               assert.notEqual(element.formula_id, 1, 'Should not be equal to deleted formula id');
             });
