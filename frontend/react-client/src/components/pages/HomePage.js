@@ -80,7 +80,7 @@ class HomePage extends Component {
       return <StorageList />;
     }
     else if (funcName == "NewFormula") {
-      return <NewFormula />;
+      return <NewFormula link={this.link} />;
     }
     else if (funcName == "EditFormula") {
       return <EditFormula />;
