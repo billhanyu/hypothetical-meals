@@ -28,6 +28,7 @@ class DeleteIngredientButton extends Component {
           message: 'Deleted!',
         });
         this.props.backToList();
+        this.props.reloadData();
       })
       .catch(err => {
         this.setState({
