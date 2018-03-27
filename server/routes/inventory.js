@@ -90,7 +90,7 @@ export function getLotQuantities(req, res, next) {
 /* return production entries lots for a certain ingredient with id */
 export function getProductionLots(req, res, next) {
   const ingredientId = req.params.ingredient_id;
-  connection.query('SELECT lot FROM ProductRunsEntries WHERE ingredient_id = ?',
+  connection.query('SELECT lot FROM Inventories WHERE ingredient_id = ?',
     [ingredientId])
     .then(results => {
       const arr = [];
