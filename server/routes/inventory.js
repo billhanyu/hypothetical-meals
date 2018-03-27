@@ -285,7 +285,6 @@ export function commitCart(req, res, next) {
     })
     .then(() => success(res))
     .catch(err => {
-      console.log(err);
       connection.query('DELETE FROM Inventories WHERE num_packages = 0')
         .then(() => {
           handleError(err, res);

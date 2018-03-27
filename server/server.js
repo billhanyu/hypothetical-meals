@@ -18,6 +18,7 @@ import * as systemlogs from './routes/systemLogs';
 import * as order from './routes/order';
 import * as formulas from './routes/formula';
 import * as productionlog from './routes/productionlog';
+import * as recallReport from './routes/recallReport';
 import * as productionrun from './routes/productrun';
 import { adminRequired, noobRequired, managerRequired } from './authMiddleware';
 
@@ -147,7 +148,10 @@ app.get('/formulas/page/:page_num', beNoob, formulas.view);
 app.put('/formulas', beAdmin, formulas.modify);
 app.post('/formulas', beAdmin, formulas.add);
 app.delete('/formulas', beAdmin, formulas.deleteFormulas);
-app.post('/formulas/import', [auth.required, adminRequired, upload.single('bulk')], formulas.bulkImport);
+app.post('/formulas/import/final', [auth.required, adminRequired, upload.single('bulk')], formulas.finalBulkImport);
+app.post('/formulas/import/intermediate', [auth.required, adminRequired, upload.single('bulk')], formulas.intermediateBulkImport);
+
+app.get('/recall', beManager, recallReport.getRecallForIngredient);
 
 const distDir = `${__dirname}/../frontend/react-client/dist`;
 app.use(express.static(distDir));
