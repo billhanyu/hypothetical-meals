@@ -32,7 +32,7 @@ describe('Formulas', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(3);
+          res.body.length.should.be.eql(4);
           done();
         });
     });
@@ -399,7 +399,7 @@ describe('Formulas', () => {
           res.should.have.status(200);
           connection.query(`SELECT * FROM Formulas WHERE removed = 0`)
           .then((formulas) => {
-            assert.strictEqual(formulas.length, 3, 'Number of formulas in database');
+            assert.strictEqual(formulas.length, 4, 'Number of formulas in database');
             assert.strictEqual(formulas[0].name, 'cake', 'Name for formula 1');
             assert.strictEqual(formulas[0].description, 'A blob', 'Description for formula 3');
             assert.strictEqual(formulas[0].num_product, 1, 'Number of products for formula 3');
@@ -469,7 +469,7 @@ describe('Formulas', () => {
 
           connection.query(`SELECT * FROM Formulas WHERE removed = 0`)
           .then((formulas) => {
-            assert.strictEqual(formulas.length, 3, 'Number of formulas in database');
+            assert.strictEqual(formulas.length, 4, 'Number of formulas in database');
             assert.strictEqual(formulas[0].name, 'cake', 'Name for formula 1');
             assert.strictEqual(formulas[0].description, 'A blob', 'Description for formula 3');
             assert.strictEqual(formulas[0].num_product, 1, 'Number of products for formula 3');
@@ -536,7 +536,7 @@ describe('Formulas', () => {
 
           connection.query(`SELECT * FROM Formulas WHERE removed = 0`)
           .then((formulas) => {
-            assert.strictEqual(formulas.length, 3, 'Number of formulas in database');
+            assert.strictEqual(formulas.length, 4, 'Number of formulas in database');
             assert.strictEqual(formulas[0].name, 'yellow cake', 'Name for formula 1');
             assert.strictEqual(formulas[0].description, 'A simple cake', 'Description for formula 3');
             assert.strictEqual(formulas[0].num_product, 1, 'Number of products for formula 3');
@@ -774,10 +774,10 @@ describe('Formulas', () => {
           .then((results) => {
             const [formulas, formulasRemoved, formulaEntries] = results;
             assert.strictEqual(formulasRemoved.length, 2, 'Should have marked as removed');
-            assert.strictEqual(formulas.length, 3, 'Should have not actually removed all formulas');
+            assert.strictEqual(formulas.length, 4, 'Should have not actually removed all formulas');
             assert.strictEqual(formulas[0].removed, 1, 'Formula 1 marked at removed');
             assert.strictEqual(formulas[1].removed, 1, 'Formula 2 marked as removed');
-            assert.strictEqual(formulaEntries.length, 2, 'Should have deleted all formula entries');
+            assert.strictEqual(formulaEntries.length, 4, 'Should have deleted all formula entries');
             done();
           })
           .catch((error) => console.log(error));
@@ -799,9 +799,9 @@ describe('Formulas', () => {
           ])
           .then((results) => {
             const [formulas, formula1, formulaEntries] = results;
-            assert.strictEqual(formulas.length, 3, 'Should have fake deleted one formula');
+            assert.strictEqual(formulas.length, 4, 'Should have fake deleted one formula');
             assert.strictEqual(formula1[0].removed, 1, 'Formula 1 marked as removed');
-            assert.strictEqual(formulaEntries.length, 4, 'Should have deleted all formula entries');
+            assert.strictEqual(formulaEntries.length, 6, 'Should have deleted all formula entries');
             formulaEntries.forEach(element => {
               assert.notEqual(element.formula_id, 1, 'Should not be equal to deleted formula id');
             });
@@ -851,7 +851,7 @@ describe('Formulas', () => {
     });
 
     it('should fail bulk import as noob', (done) => {
-      supertest(server).post('/formulas/import')
+      supertest(server).post('/formulas/import/final')
         .set('Authorization', `Token ${testTokens.noobTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/validData.csv')
         .end((err, res) => {
@@ -861,7 +861,7 @@ describe('Formulas', () => {
     });
 
     it('should fail data with bad ingredient units', (done) => {
-      supertest(server).post('/formulas/import')
+      supertest(server).post('/formulas/import/final')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/badIngredientUnitsData.csv')
         .end(function(err, res) {
@@ -871,7 +871,7 @@ describe('Formulas', () => {
     });
 
     it('should fail data with bad product units', (done) => {
-      supertest(server).post('/formulas/import')
+      supertest(server).post('/formulas/import/final')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/badProductUnitsData.csv')
         .end(function(err, res) {
@@ -881,7 +881,7 @@ describe('Formulas', () => {
     });
 
     it('should fail data with extra argument for formula', (done) => {
-      supertest(server).post('/formulas/import')
+      supertest(server).post('/formulas/import/final')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/extraArgumentData.csv')
         .end(function(err, res) {
@@ -891,7 +891,7 @@ describe('Formulas', () => {
     });
 
     it('should fail data with invalid header data', (done) => {
-      supertest(server).post('/formulas/import')
+      supertest(server).post('/formulas/import/final')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/invalidHeaderData.csv')
         .end(function(err, res) {
@@ -901,7 +901,7 @@ describe('Formulas', () => {
     });
 
     it('should fail data with missing argument for formula', (done) => {
-      supertest(server).post('/formulas/import')
+      supertest(server).post('/formulas/import/final')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/missingArgumentData.csv')
         .end(function(err, res) {
@@ -911,7 +911,7 @@ describe('Formulas', () => {
     });
 
     it('should fail data with nonconsecutive formula entries', (done) => {
-      supertest(server).post('/formulas/import')
+      supertest(server).post('/formulas/import/final')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/notConsecutiveFormulaEntriesData.csv')
         .end(function(err, res) {
@@ -921,7 +921,7 @@ describe('Formulas', () => {
     });
 
     it('should fail data with duplicate formula entries as database', (done) => {
-      supertest(server).post('/formulas/import')
+      supertest(server).post('/formulas/import/final')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/duplicateFormulaData.csv')
         .end(function(err, res) {
@@ -931,7 +931,7 @@ describe('Formulas', () => {
     });
 
     it('should fail data with with missing ingredients in database', (done) => {
-      supertest(server).post('/formulas/import')
+      supertest(server).post('/formulas/import/final')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .attach('bulk', './test/bulk_import/formulas/missingIngredientsData.csv')
         .end(function(err, res) {
@@ -950,7 +950,7 @@ describe('Formulas', () => {
         const [formulaResult, formulaEntryResult] = results;
         const numFormulas = formulaResult[0]['COUNT(1)'];
         const numFormulaEntries = formulaEntryResult[0]['COUNT(1)'];
-        supertest(server).post('/formulas/import')
+        supertest(server).post('/formulas/import/final/')
           .set('Authorization', `Token ${testTokens.adminTestToken}`)
           .attach('bulk', './test/bulk_import/formulas/validData.csv')
           .end(function(err, res) {
@@ -990,6 +990,83 @@ describe('Formulas', () => {
               assert.strictEqual(formulaEntries[numFormulaEntries+4].ingredient_id, 1, 'Ingredient ID is correct');
               assert.strictEqual(formulaEntries[numFormulaEntries+4].num_native_units, 1, 'Number of native units is correct');
               assert.strictEqual(formulaEntries[numFormulaEntries+4].formula_id, numFormulas + 2, 'Formula ID is correct');
+              done();
+            })
+            .catch((error) => console.log(error));
+          });
+      })
+      .catch((error) => console.log(error));
+    });
+
+    it('should pass valid intermediate data', (done) => {
+      Promise.all([
+        connection.query(`SELECT COUNT(1) FROM Ingredients`),
+        connection.query(`SELECT COUNT(1) FROM Formulas`),
+        connection.query(`SELECT COUNT(1) FROM FormulaEntries`),
+        connection.query('UPDATE Storages SET capacity = 1000000'),
+      ])
+      .then((results) => {
+        const [ingredientResult, formulaResult, formulaEntryResult] = results;
+        const numIngredients = ingredientResult[0]['COUNT(1)'];
+        const numFormulas = formulaResult[0]['COUNT(1)'];
+        const numFormulaEntries = formulaEntryResult[0]['COUNT(1)'];
+        supertest(server).post('/formulas/import/intermediate/')
+          .set('Authorization', `Token ${testTokens.adminTestToken}`)
+          .attach('bulk', './test/bulk_import/formulas/validIntermediateData.csv')
+          .end(function(err, res) {
+            res.should.have.status(200);
+
+            Promise.all([
+              connection.query(`SELECT * FROM Ingredients`),
+              connection.query(`SELECT * FROM Formulas`),
+              connection.query(`SELECT * FROM FormulaEntries`),
+            ])
+            .then((results) => {
+              const [ingredients, formulas, formulaEntries] = results;
+
+              assert.strictEqual(formulas.length, numFormulas + 3, 'Three formulas added to formulas table.');
+              let refinedOil = formulas[numFormulas];
+              assert.strictEqual(refinedOil.name, 'Refined Oil', 'Name of refined oil');
+              assert.strictEqual(refinedOil.description, 'better oil ', 'Description of refined oil');
+              assert.strictEqual(refinedOil.num_product, 15, 'Amount of refined oil');
+              assert.strictEqual(refinedOil.removed, 0, 'Removed status of refined oil');
+              const seasoning = formulas[numFormulas + 1];
+              assert.strictEqual(seasoning.name, 'Seasoning', 'Name of seasoning');
+              assert.strictEqual(seasoning.description, 'extraordinary taste', 'Description of seasoning');
+              assert.strictEqual(seasoning.num_product, 5, 'Amount of seasoning');
+              assert.strictEqual(seasoning.removed, 0, 'Removed status of seasoning');
+              const sugarCoating = formulas[numFormulas + 2];
+              assert.strictEqual(sugarCoating.name, 'Sugar Coating', 'Name of sugar coating');
+              assert.strictEqual(sugarCoating.description, 'improves taste and look', 'Description of sugar coating');
+              assert.strictEqual(sugarCoating.num_product, 7, 'Amount of sugar coating');
+              assert.strictEqual(sugarCoating.removed, 0, 'Removed status of sugar coating');
+
+              assert.strictEqual(ingredients.length, numIngredients + 3, 'Three ingredients added to ingredients table.');
+              refinedOil = ingredients[numIngredients];
+              assert.strictEqual(refinedOil.name, 'Refined Oil', 'Name of refined oil');
+              assert.strictEqual(refinedOil.package_type, 'drum', 'Package type of refined oil');
+              assert.strictEqual(refinedOil.storage_id, 3, 'Storage type of refined oil is warehouse');
+              assert.strictEqual(refinedOil.native_unit, 'gallons', 'Native units of refined oil');
+              assert.strictEqual(refinedOil.num_native_units, 18, 'Number of native units of refined oil');
+              assert.strictEqual(refinedOil.intermediate, 1, 'Intermediate status of refined oil');
+              assert.strictEqual(refinedOil.removed, 0, 'Removed status of refined oil');
+
+              assert.strictEqual(formulaEntries.length, numFormulaEntries + 5, 'Five formula entries added to formula entries table.');
+              assert.strictEqual(formulaEntries[numFormulaEntries].ingredient_id, 1, 'Ingredient ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries].num_native_units, 20, 'Number of native units is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries].formula_id, numFormulas + 1, 'Formula ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+1].ingredient_id, 2, 'Ingredient ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+1].num_native_units, 16, 'Number of native units is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+1].formula_id, numFormulas + 2, 'Formula ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+2].ingredient_id, 3, 'Ingredient ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+2].num_native_units, 11, 'Number of native units is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+2].formula_id, numFormulas + 2, 'Formula ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+3].ingredient_id, 4, 'Ingredient ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+3].num_native_units, 5, 'Number of native units is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+3].formula_id, numFormulas + 3, 'Formula ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+4].ingredient_id, 1, 'Ingredient ID is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+4].num_native_units, 28, 'Number of native units is correct');
+              assert.strictEqual(formulaEntries[numFormulaEntries+4].formula_id, numFormulas + 3, 'Formula ID is correct');
               done();
             })
             .catch((error) => console.log(error));
