@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import IngredientSelector from '../../selector/IngredientSelector';
+import RecallReportContent from './RecallReportContent';
 
 class RecallReport extends Component {
   constructor(props) {
@@ -7,6 +8,7 @@ class RecallReport extends Component {
     this.state = {
       ingredientId: '',
       viewReport: false,
+      runs: [],
     };
     this.changeIngredientId = this.changeIngredientId.bind(this);
     this.generate = this.generate.bind(this);
@@ -33,9 +35,12 @@ class RecallReport extends Component {
   }
 
   render() {
-    return (
+    const content =
+      <RecallReportContent runs={this.state.runs} back={this.back} />;
+
+    const main =
       <div>
-        <h3>Recall Report</h3>
+        <h2>Recall Report</h2>
         <IngredientSelector changeIngredientId={this.changeIngredientId} />
         <button
           type="button"
@@ -43,8 +48,9 @@ class RecallReport extends Component {
           onClick={this.generate}>
           Generate Report
         </button>
-      </div>
-    );
+      </div>;
+
+    return this.state.viewReport ? content : main;
   }
 }
 
