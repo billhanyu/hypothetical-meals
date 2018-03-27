@@ -88,7 +88,7 @@ class Freshness extends Component {
 
     const main =
       <div>
-        <h3>Freshness Report</h3>
+        <h2>Freshness Report</h2>
         <h4>All</h4>
         <table className='table'>
           <thead>

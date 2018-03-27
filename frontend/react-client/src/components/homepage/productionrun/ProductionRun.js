@@ -8,6 +8,7 @@ import AddEditVendor from '../vendor/AddEditVendor';
 import FormulaWindow from '../Formula/FormulaWindow';
 import axios from 'axios';
 import Snackbar from 'material-ui/Snackbar';
+import PropTypes from 'prop-types';
 
 class ProductionRun extends Component {
   constructor(props) {
@@ -36,20 +37,19 @@ class ProductionRun extends Component {
     this.viewIngredient = this.viewIngredient.bind(this);
     this.viewFormula = this.viewFormula.bind(this);
     this.viewVendor = this.viewVendor.bind(this);
+    this.processData = this.processData.bind(this);
   }
 
   componentDidMount() {
+    if (this.props.runs) {
+      this.processData(this.props.runs);
+      return;
+    }
     axios.get('/productruns', {
       headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
-      this.runs = response.data;
-      this.filteredRuns = response.data;
-      const pages = Math.ceil(this.filteredRuns.length / COUNT_PER_PAGE);
-      this.setState({
-        pages,
-      });
-      this.selectPage(1);
+      this.processData(response.data);
     })
     .catch(err => {
       this.setState({
@@ -57,6 +57,16 @@ class ProductionRun extends Component {
         message: err.response.data
       });
     });
+  }
+
+  processData(data) {
+    this.runs = data;
+    this.filteredRuns = data;
+    const pages = Math.ceil(this.filteredRuns.length / COUNT_PER_PAGE);
+    this.setState({
+      pages,
+    });
+    this.selectPage(1);
   }
 
   viewIngredient(id) {
@@ -213,7 +223,18 @@ class ProductionRun extends Component {
           autoHideDuration={2500}
           onRequestClose={this.handleRequestClose.bind(this)}
         />
-        <h3>Production Runs</h3>
+        {
+          this.props.runs
+          ?
+          <div>
+            <h2>Recalled Runs</h2>
+            <button type='button' className='btn btn-secondary' onClick={this.props.back}>
+              Back
+            </button>
+          </div>
+          :
+          <h2>Production Runs</h2>
+        }
         <ProductionRunFilterBar
           filterName={this.state.filterName}
           filterStartTime={this.state.filterStartTime}
@@ -264,5 +285,10 @@ class ProductionRun extends Component {
     }
   }
 }
+
+ProductionRun.propTypes = {
+  runs: PropTypes.array,
+  back: PropTypes.func,
+};
 
 export default ProductionRun;
