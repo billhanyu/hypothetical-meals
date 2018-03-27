@@ -47,7 +47,6 @@ function getStockPromise(ids) {
             stock[result.ingredient_id].num_packages += result.num_packages;
           } else {
             // Clone
-            console.log(result);
             stock[result.ingredient_id] = JSON.parse(JSON.stringify(result));
             delete stock[result.ingredient_id].worst_duration;
             delete stock[result.ingredient_id].total_weighted_duration;
