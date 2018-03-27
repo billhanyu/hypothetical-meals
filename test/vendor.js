@@ -25,7 +25,7 @@ describe('Vendor', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(2);
+          res.body.length.should.be.eql(3);
           done();
         });
     });
@@ -39,7 +39,7 @@ describe('Vendor', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(2);
+          res.body.length.should.be.eql(3);
           done();
         });
     });
@@ -156,7 +156,7 @@ describe('Vendor', () => {
           res.should.have.status(200);
           connection.query('SELECT id FROM Vendors')
           .then((changed) => {
-            assert.strictEqual(changed.length, 4, 'new number of vendors');
+            assert.strictEqual(changed.length, 5, 'new number of vendors');
             done();
           })
           .catch((error) => console.log(error));
@@ -185,7 +185,7 @@ describe('Vendor', () => {
           res.should.have.status(200);
           connection.query('SELECT * FROM Vendors')
           .then((changed) => {
-            assert.strictEqual(changed.length, 4, 'Number of rows in Vendor table.');
+            assert.strictEqual(changed.length, 5, 'Number of rows in Vendor table.');
             assert.strictEqual(changed[2]['name'], 'hi', 'Name for vendor 3.');
             assert.strictEqual(changed[2]['contact'], 'hi@duke.edu', 'Contact for vendor 3.');
             assert.strictEqual(changed[2]['code'], 'codehi', 'Code for vendor 3.');
