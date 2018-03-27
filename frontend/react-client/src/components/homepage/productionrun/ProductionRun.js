@@ -105,7 +105,7 @@ class ProductionRun extends Component {
     })
       .then(response => {
         this.setState({
-          formula: response,
+          formula: response.data[0],
           viewFormula: true,
         });
       })

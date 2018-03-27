@@ -4,6 +4,7 @@ import RecallReportContent from './RecallReportContent';
 import axios from 'axios';
 import Snackbar from 'material-ui/Snackbar';
 import LotSelector from '../../selector/LotSelector';
+import qs from 'qs';
 
 class RecallReport extends Component {
   constructor(props) {
@@ -37,7 +38,6 @@ class RecallReport extends Component {
       headers: { Authorization: "Token " + global.token }
     })
       .then(response => {
-        console.log(response.data);
         this.setState({
           lots: response.data
         });
@@ -70,10 +70,32 @@ class RecallReport extends Component {
       });
       return;
     }
-    // API call
-    this.setState({
-      viewReport: true,
-    });
+    axios.get('/recall', {
+      params: {
+        recall: {
+          ingredient_id: this.state.ingredientId,
+          lot: this.state.lot,
+        },
+      },
+      paramsSerializer: function (params) {
+        return qs.stringify(params, { arrayFormat: 'repeat' });
+      },
+      headers: {
+        Authorization: "Token " + global.token,
+      }
+    })
+      .then(response => {
+        this.setState({
+          viewReport: true,
+          runs: response.data,
+        });
+      })
+      .catch(err => {
+        this.setState({
+          open: true,
+          message: 'Error generating Recall Report',
+        });
+      });
   }
 
   render() {
