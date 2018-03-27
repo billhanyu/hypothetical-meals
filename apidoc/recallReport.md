@@ -23,7 +23,7 @@ returns
     lot: 'def123',
     created_at: '2018-03-26T22:21:31.000Z',
     name: 'booploop final shit',
-    entries: [ {
+    ingredients: [ {
     { id: 5,
       productrun_id: 3,
       ingredient_id: 6,
