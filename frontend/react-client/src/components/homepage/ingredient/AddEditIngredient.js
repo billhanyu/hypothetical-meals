@@ -97,6 +97,9 @@ class AddEditIngredient extends Component {
             open: true,
             message: 'Updated',
           });
+          if (this.props.reloadData) {
+            this.props.reloadData();
+          }
         })
         .catch(error => {
           const msg = error.response.data;
@@ -128,6 +131,9 @@ class AddEditIngredient extends Component {
               message: "Added",
               mode: "edit",
             });
+            if (this.props.reloadData) {
+              this.props.reloadData();
+            }
           });
         })
         .catch(error => {
@@ -182,6 +188,7 @@ class AddEditIngredient extends Component {
           <DeleteIngredientButton
             id={this.state.id}
             backToList={this.props.backToList}
+            reloadData={this.props.reloadData}
           />
           :
           <button
