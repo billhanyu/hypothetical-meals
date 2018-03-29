@@ -48,10 +48,10 @@ export function changeStorage(req, res, next) {
     if (newCapacity < sum) {
       throw createError(`New capacity ${newCapacity} sqft is smaller than current total storage space ${sum} sqft`);
     }
-    return connection.query(`UPDATE Storages SET capacity = ${newCapacity} WHERE id = ${storageId}`);
+    return connection.query(`UPDATE Storages SET capacity = ? WHERE id = ?`, [newCapacity, storageId]);
   })
   .then(() => success(res))
-  .then(() => connection.query(`SELECT * FROM Storages WHERE id = ${storageId}`))
+  .then(() => connection.query(`SELECT * FROM Storages WHERE id = ?`, [storageId]))
   .then((results) => {
     const name = results[0].name;
     const storageSpace = results[0].capacity;
@@ -62,7 +62,7 @@ export function changeStorage(req, res, next) {
 
 function storageSumPromise(storageId) {
   return new Promise((resolve, reject) => {
-    connection.query(`SELECT id FROM Storages WHERE id = ${storageId}`)
+    connection.query(`SELECT id FROM Storages WHERE id = ?`, [storageId])
       .then(results => {
         if (results.length < 1) {
           reject(createError('Storage ID not in Storages Table'));
@@ -72,7 +72,7 @@ function storageSumPromise(storageId) {
       FROM Inventories
       INNER JOIN Ingredients 
       ON Ingredients.id = Inventories.ingredient_id 
-      WHERE Ingredients.storage_id = ${storageId}`);
+      WHERE Ingredients.storage_id = ?`, [storageId]);
       })
       .then(results => {
         let sum = 0;
