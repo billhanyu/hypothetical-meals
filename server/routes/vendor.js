@@ -33,7 +33,7 @@ export function viewWithId(req, res, next) {
   if (!req.params.id || !checkNumber.isPositiveInteger(req.params.id)) {
     return res.status(400).send('Invalid vendor id');
   }
-  connection.query(`SELECT * FROM Vendors WHERE id = ${req.params.id}`)
+  connection.query(`SELECT * FROM Vendors WHERE id = ?`, [req.params.id])
     .then(results => {
       if (results.length != 1) {
         return res.status(404).send('Vendor not found');
