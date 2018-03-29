@@ -2,6 +2,10 @@ const testTokens = require('./common/testTokens');
 const dbSetup = require('./common/dbSetup');
 const assert = require('chai').assert;
 
+beforeEach(() => {
+  return dbSetup.setupTestDatabase();
+});
+
 describe('Vendor', () => {
   describe('#pages()', () => {
     it('should return number of pages of data', (done) => {

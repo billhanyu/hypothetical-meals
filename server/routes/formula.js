@@ -106,9 +106,9 @@ export function add(req, res, next) {
         intermediateMap[x.name] = x;
       });
       formulas.forEach(x => {
-        formulaCases.push(`('${x.name}', '${x.description}', ${x.num_product}, ${x.intermediate}, ${x.ingredient_name && intermediateMap[x.ingredient_name] ? intermediateMap[x.ingredient_name].id : 'NULL'})`);
+        formulaCases.push([x.name, x.description, x.num_product, x.intermediate, x.ingredient_name && intermediateMap[x.ingredient_name] ? intermediateMap[x.ingredient_name].id : null]);
       });
-      return connection.query(`INSERT INTO Formulas (name, description, num_product, intermediate, ingredient_id) VALUES ${formulaCases.join(', ')}`);
+      return connection.query('INSERT INTO Formulas (name, description, num_product, intermediate, ingredient_id) VALUES ?', [formulaCases]);
     })
     .then(() => {
       return addFormulaEntries(formulas);
