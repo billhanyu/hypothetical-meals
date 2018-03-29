@@ -26,7 +26,7 @@ export function pages(req, res, next) {
 
 export function view(req, res, next) {
   const viewByPageQuery = getPaginationQueryString(req.params.page_num, 'Formulas', formulaQueryString);
-  getFormulas(viewByPageQuery, req, res, next);
+  getFormulas(viewByPageQuery, [], req, res, next);
 }
 
 /**
@@ -36,19 +36,19 @@ export function view(req, res, next) {
  * @param {*} next
  */
 export function viewAll(req, res, next) {
-  getFormulas(formulaQueryString, req, res, next);
+  getFormulas(formulaQueryString, [], req, res, next);
 }
 
 export function viewWithId(req, res, next) {
   if (!req.params.id || !checkNumber.isPositiveInteger(req.params.id)) {
     return res.status(400).send('Invalid vendor id');
   }
-  getFormulas(`SELECT * FROM Formulas WHERE id = ${req.params.id}`, req, res, next);
+  getFormulas(`SELECT * FROM Formulas WHERE id = ?`, [req.params.id], req, res, next);
 }
 
-function getFormulas(queryString, req, res, next) {
+function getFormulas(queryString, queryParams, req, res, next) {
   let myFormulas = {};
-  connection.query(`${queryString}`)
+  connection.query(queryString, queryParams)
     .then((results) => {
       results.forEach(x => {
         let formulaObject = x;

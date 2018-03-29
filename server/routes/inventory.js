@@ -78,7 +78,7 @@ export function getLotQuantities(req, res, next) {
   connection.query(`SELECT Inventories.*, Ingredients.num_native_units, Vendors.name as vendor_name FROM Inventories
     JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id
     JOIN Vendors ON Inventories.vendor_id = Vendors.id
-    WHERE ingredient_id = ${ingredientId}`)
+    WHERE ingredient_id = ?`, [ingredientId])
     .then(results => {
       const lots = results.map(entry => {
         return {
@@ -179,13 +179,13 @@ export function commitCart(req, res, next) {
   if (!checkNumber.isPositiveInteger(numProducts)) {
     return res.status(400).send('Invalid number of products');
   }
-  connection.query(`SELECT * FROM Formulas WHERE id =${formulaId}`)
+  connection.query(`SELECT * FROM Formulas WHERE id = ?`, [formulaId])
     .then((results) => {
       if (results.length != 1) {
         throw createError('Invalid formula id');
       }
       formula = results[0];
-      return connection.query(`SELECT * FROM FormulaEntries WHERE formula_id =${formulaId}`);
+      return connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ?`, [formulaId]);
     })
     .then((results) => {
       if (results.length == 0) throw createError('Invalid formula id');
@@ -286,7 +286,7 @@ export function commitCart(req, res, next) {
         Formulas.id as formula_id, Formulas.name as formula_name, Ingredients.name as ingredient_name 
         FROM FormulaEntries JOIN Ingredients ON FormulaEntries.ingredient_id = Ingredients.id
         JOIN Formulas ON FormulaEntries.formula_id = Formulas.id
-        WHERE FormulaEntries.formula_id = ${formulaId}`);
+        WHERE FormulaEntries.formula_id = ?`, [formulaId]);
     })
     .then((results) => {
       const formulaName = `{${results[0].formula_name}=formula_id=${results[0].formula_id}}`;
