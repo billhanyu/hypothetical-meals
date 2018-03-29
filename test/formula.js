@@ -159,7 +159,7 @@ describe('Formulas', () => {
               assert.strictEqual(formulas[lastIndex].description, 'Fried up Bill', 'Description for formula 3');
               assert.strictEqual(formulas[lastIndex].num_product, 1, 'Number of products for formula 3');
               assert.strictEqual(formulas[lastIndex].intermediate, 0, 'Intermediate status of formula 3');
-              return connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[lastIndex].id}`);
+              return connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ?`, [formulas[lastIndex].id]);
             })
             .then((formulaIngredients) => {
               assert.strictEqual(formulaIngredients.length, 2, 'Number of ingredients in formula 3');
@@ -291,7 +291,7 @@ describe('Formulas', () => {
             assert.strictEqual(formulas[lastFormulaIndex-1].description, 'Fried up Bill', 'Description for formula 3');
             assert.strictEqual(formulas[lastFormulaIndex-1].num_product, 1, 'Number of products for formula 3');
             assert.strictEqual(formulas[lastFormulaIndex-1].intermediate, 0, 'Intermediate status of formula 3');
-            return connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[lastFormulaIndex-1].id}`);
+            return connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ?`, [formulas[lastFormulaIndex-1].id]);
           })
           .then((formulaIngredients) => {
             assert.strictEqual(formulaIngredients.length, 2, 'Number of ingredients in formula 3');
@@ -407,8 +407,8 @@ describe('Formulas', () => {
             assert.strictEqual(formulas[1].description, 'Chinaman', 'Description for formula 3');
             assert.strictEqual(formulas[1].num_product, 1, 'Number of products for formula 3');
             return Promise.all([
-              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[0].id}`),
-              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[1].id}`),
+              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ?`, [formulas[0].id]),
+              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ?`, [formulas[1].id]),
             ]);
           })
           .then((results) => {
@@ -477,8 +477,8 @@ describe('Formulas', () => {
             assert.strictEqual(formulas[1].description, 'Chinaman', 'Description for formula 3');
             assert.strictEqual(formulas[1].num_product, 1, 'Number of products for formula 3');
             return Promise.all([
-              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[0].id}`),
-              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[1].id}`),
+              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ?`, [formulas[0].id]),
+              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ?`, [formulas[1].id]),
             ]);
           })
           .then((results) => {
@@ -544,8 +544,8 @@ describe('Formulas', () => {
             assert.strictEqual(formulas[1].description, 'same as the name', 'Description for formula 3');
             assert.strictEqual(formulas[1].num_product, 10, 'Number of products for formula 3');
             return Promise.all([
-              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[0].id}`),
-              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[1].id}`),
+              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ?`, [formulas[0].id]),
+              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ?`, [formulas[1].id]),
             ]);
           })
           .then((results) => {
@@ -602,8 +602,8 @@ describe('Formulas', () => {
             assert.strictEqual(formulas[2].description, 'hehe', 'Description for formula 3');
             assert.strictEqual(formulas[2].num_product, 1, 'Number of products for formula 3');
             return Promise.all([
-              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ${formulas[2].id}`),
-              connection.query(`SELECT * FROM Ingredients WHERE id = ${intermediateId}`),
+              connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ?`, [formulas[2].id]),
+              connection.query(`SELECT * FROM Ingredients WHERE id = ?`, [intermediateId]),
             ]);
           })
           .then((results) => {

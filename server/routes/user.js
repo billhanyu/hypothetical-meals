@@ -78,7 +78,7 @@ export function deleteUser(req, res, next) {
         throw createError('Trying to delete nonexistant user');
       }
       userId = results[0].id;
-      return connection.query(`UPDATE Users SET removed = 1 WHERE id = ${userId}`);
+      return connection.query(`UPDATE Users SET removed = 1 WHERE id = ?`, [userId]);
     })
     .then(() => {
       return logAction(req.payload.id, `Account deleted for user ${user.username}.`);
