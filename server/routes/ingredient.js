@@ -229,7 +229,7 @@ function deleteIngredientHelper(items, req, res, next) {
       }
       return Promise.resolve();
     })
-    .then(() => connection.query(`SELECT DISTINCT formula_id FROM FormulaEntries WHERE ingredient_id IN (?)`, [ingredientIds])
+    .then(() => connection.query(`SELECT DISTINCT formula_id FROM FormulaEntries WHERE ingredient_id IN (?)`, [ingredientIds]))
     .then((results) => {
       if (results.length == 0) return Promise.resolve();
       const formulaIds = [];
