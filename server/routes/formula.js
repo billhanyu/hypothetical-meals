@@ -533,7 +533,8 @@ function checkForFinalBulkImportFormattingErrors(data) {
     if (isNaN(data[i][4]) || data[i][4] <= 0) return `Invalid ingredient units: ${data[i][4]}`;
   }
 }
-//////////////////// INTERMEDIATE
+
+// INTERMEDIATE
 
 export function intermediateBulkImport(req, res, next) {
   const csv = fs.readFileSync(req.file.path);
@@ -663,13 +664,12 @@ function checkForIntermediateBulkImportFormattingErrors(data) {
       else if (data[i][6] == 'refrigerated') data[i][6] = 'refrigerator';
       else if (data[i][6] == 'room temperature') data[i][6] = 'warehouse';
       if (validStorageTypes.indexOf(data[i][6].toLowerCase()) < 0) return `Invalid package type: ${data[i][6]}`;
-
     } else {
       isFirstRowOfFormula = false;
     }
     // Ensure integer number of product units
     if (isFirstRowOfFormula && !checkNumber.isPositiveInteger(data[i][1])) return `Invalid amount in product units: ${data[i][1]}`;
-    
+
     // Ensure valid ingredient num native units
     if (isNaN(data[i][8]) || data[i][8] <= 0) return `Invalid ingredient units: ${data[i][8]}`;
   }
