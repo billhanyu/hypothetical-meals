@@ -321,7 +321,7 @@ export function bulkImport(req, res, next) {
       }
 
       // Compile list of new ingredients to add to db
-      
+
       for (let entry of entries) {
         entryNames.push(entry.ingredient);
         const existingIngredient = ingredients.find(ingredient => entry.ingredient.toLowerCase() == ingredient.name.toLowerCase());
