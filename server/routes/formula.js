@@ -52,15 +52,17 @@ function getFormulas(queryString, queryParams, req, res, next) {
     .then((results) => {
       results.forEach(x => {
         let formulaObject = x;
-        formulaObject['ingredients'] = {};
-        myFormulas[`${x.id}`] = formulaObject;
+        formulaObject.ingredients = {};
+        myFormulas[x.id] = formulaObject;
       });
       return connection.query(`${formulaEntryQuery}, Ingredients.name, Ingredients.package_type, Ingredients.storage_id, Ingredients.native_unit, Ingredients.num_native_units as ingredient_num_native_units, Ingredients.removed FROM FormulaEntries
             JOIN Ingredients ON FormulaEntries.ingredient_id = Ingredients.id`);
     })
     .then((formulaEntries) => {
       formulaEntries.forEach(x => {
-        myFormulas[`${x['formula_id']}`]['ingredients'][`${x.name}`] = x;
+        if (myFormulas[x.formula_id]) {
+          myFormulas[x.formula_id].ingredients[x.name] = x;
+        }
       });
       res.status(200).send(Object.values(myFormulas));
     })
