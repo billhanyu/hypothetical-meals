@@ -48,7 +48,7 @@ class FormulaWindow extends Component {
       package_type: ingredient.package_type,
       native_unit: ingredient.native_unit,
       storage_id: ingredient.storage_id,
-      storage: Storage2State[ingredient.storage_name],
+      storage: ingredient.storage_name,
     };
   }
 
