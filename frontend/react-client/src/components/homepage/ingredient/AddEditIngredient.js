@@ -120,7 +120,7 @@ class AddEditIngredient extends Component {
         .then(response => {
           global.AddEditIngredientNeedsRerender = true;
           this.setState({
-            id: response,
+            id: response.data[0],
           }, () => {
             this.setState({
               open: true,
