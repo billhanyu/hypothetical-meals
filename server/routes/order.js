@@ -115,11 +115,14 @@ function checkOrderParameters(orders, res) {
     handleError(createError('No orders given'), res);
     return false;
   }
-  Object.keys(orders).forEach(x => {
+  return Object.keys(orders).every(x => {
     if (!checkNumber.isPositiveInteger(x)) {
       handleError(createError('Gave invalid vendor ingredient id'), res);
       return false;
     } else if (!('lots' in orders[x])) {
+      handleError(createError('Did not specify lots. Lots are mandatory'), res);
+      return false;
+    } else if ('' in orders[x].lots) {
       handleError(createError('Did not specify lots. Lots are mandatory'), res);
       return false;
     } else if (!(checkNumber.isPositiveInteger(orders[x].num_packages))) {
@@ -138,8 +141,8 @@ function checkOrderParameters(orders, res) {
         handleError(createError('Lot quantities do not add up to number of packages'), res);
         return false;
       }
+      return true;
     }
   });
-  return true;
 }
 
