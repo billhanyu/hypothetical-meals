@@ -20,12 +20,8 @@ class AddEditIngredient extends Component {
       name: '',
       package_type: 'sack',
       native_unit: '',
-      removed: {
-        data: [0],
-      },
-      intermediate: {
-        data: [0],
-      },
+      removed: 0,
+      intermediate: 0,
       storage_id: 1,
       storage_name: 'freezer',
       id: 0,
