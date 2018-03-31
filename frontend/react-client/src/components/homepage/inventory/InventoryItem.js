@@ -35,7 +35,7 @@ class InventoryItem extends Component {
           <td className={columnClass}>{ingredient_temperature_state}</td>
           <td className={columnClass}>{ingredient_package_type}</td>
           <td className={columnClass}>{quantity} {ingredient_native_unit}</td>
-          <td className={columnClass}>{(packageSpaceMap[ingredient_package_type] * num_packages).toFixed(1) + ' sqft'}</td>
+          <td className={columnClass}>{(packageSpaceMap[ingredient_package_type] * Math.ceil(num_packages)).toFixed(1) + ' sqft'}</td>
         </tr>
         <tr>
           <td colSpan={1} className="hiddenRow"></td>
