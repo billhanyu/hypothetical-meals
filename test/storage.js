@@ -62,7 +62,7 @@ describe('Storage', () => {
         VALUES (7, 'truckload', 'truckload', 1, 'kg', 10),
         (8, 'railcar', 'railcar', 1, 'kg', 10)`)
         .then(() => {
-          return connection.query('INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id) VALUES (7, 999999, \'ff\', 1), (8, 999999, \'ff\', 1)');
+          return connection.query('INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id, per_package_cost) VALUES (7, 999999, \'ff\', 1, 0), (8, 999999, \'ff\', 1, 0)');
         })
         .then(() => {
           chai.request(server)
