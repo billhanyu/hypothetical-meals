@@ -48,7 +48,7 @@ export function getVendorWithCode(req, res, next) {
   if (!req.query.code) {
     return res.status(400).send('No code provided');
   }
-  connection.query(`SELECT * FROM Vendors WHERE code = '${req.query.code}'`)
+  connection.query('SELECT * FROM Vendors WHERE code = ?', [req.query.code])
     .then(results => {
       if (results.length > 0) {
         return res.status(200).send(results[0]);
@@ -88,17 +88,17 @@ export function addVendors(req, res, next) {
     }
     names.push(name);
     codes.push(code);
-    values.push(`('${name}', '${contact}', '${code}')`);
+    values.push([name, contact, code]);
   }
 
-  return connection.query(`INSERT INTO Vendors (name, contact, code) VALUES ${values.join(', ')}`)
+  return connection.query('INSERT INTO Vendors (name, contact, code) VALUES ?', [values])
     .then(() => success(res))
     .then(() => {
       let stringNames = [];
       names.forEach(x => {
         stringNames.push(`'${x}'`);
       });
-      return connection.query(`SELECT * FROM Vendors WHERE name IN (${stringNames.join(', ')})`);
+      return connection.query('SELECT * FROM Vendors WHERE name IN (?)', [names]);
     })
     .then((results) => {
       let nameStrings = results.map(x => {
@@ -140,7 +140,7 @@ export function modifyVendors(req, res, next) {
     if (code) codes.push(code);
   }
 
-  connection.query(`SELECT * FROM Vendors WHERE id IN (${Object.keys(vendors).join(', ')})`)
+  connection.query('SELECT * FROM Vendors WHERE id IN (?)', [Object.keys(vendors)])
     .then(olds => {
       const nameCases = [];
       const contactCases = [];
@@ -166,11 +166,7 @@ export function modifyVendors(req, res, next) {
           WHERE id IN (${Object.keys(vendors).join(', ')})`);
     })
     .then(() => {
-      let stringNames = [];
-      names.forEach(x => {
-        stringNames.push(`'${x}'`);
-      });
-      return connection.query(`SELECT * FROM Vendors WHERE name IN (${stringNames.join(', ')})`);
+      return connection.query('SELECT * FROM Vendors WHERE name IN (?)', [names]);
     })
     .then((results) => {
       let nameStrings = results.map(x => {
@@ -203,9 +199,9 @@ export function deleteVendors(req, res, next) {
       return res.status(400).send(`Invalid id ${id}`);
     }
   }
-  connection.query(`UPDATE Vendors SET removed = 1 WHERE id IN (${ids.join(', ')})`)
+  connection.query('UPDATE Vendors SET removed = 1 WHERE id IN (?)', [ids])
     .then(() => {
-      return connection.query(`SELECT id FROM VendorsIngredients WHERE vendor_id IN (${ids.join(', ')})`);
+      return connection.query('SELECT id FROM VendorsIngredients WHERE vendor_id IN (?)', [ids]);
     })
     .then(results => {
       const vendorIngredientIds = results.map(e => e.id);
@@ -213,7 +209,7 @@ export function deleteVendors(req, res, next) {
     })
     .then(() => success(res))
     .then(() => {
-      return connection.query(`SELECT * FROM Vendors WHERE id IN (${ids.join(', ')})`);
+      return connection.query('SELECT * FROM Vendors WHERE id IN (?)', [ids]);
     })
     .then((results) => {
       const nameStrings = results.map(x => {

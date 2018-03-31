@@ -77,12 +77,12 @@ function addIngredientHelper(ingredients, req, res, next) {
     if (isNaN(ingredient.num_native_units) || parseFloat(ingredient.num_native_units) <= 0) {
       return res.status(400).send('Invalid size, has to be greater than 0.');
     }
-    ingredientsToAdd.push(`('${ingredient.name}', '${ingredient.package_type}', '${ingredient.native_unit}', ${ingredient.num_native_units}, ${ingredient.storage_id})`);
+    ingredientsToAdd.push([ingredient.name, ingredient.package_type, ingredient.native_unit, ingredient.num_native_units, ingredient.storage_id]);
   }
-  connection.query(`INSERT INTO Ingredients (name, package_type, native_unit, num_native_units, storage_id) VALUES ${ingredientsToAdd.join(', ')}`)
+  connection.query('INSERT INTO Ingredients (name, package_type, native_unit, num_native_units, storage_id) VALUES ?', [ingredientsToAdd])
     .then(() => {
       const names = ingredients.map(x => `'${x.name}'`);
-      return connection.query(`SELECT * FROM Ingredients WHERE name IN (${names.join(', ')})`);
+      return connection.query('SELECT * FROM Ingredients WHERE name IN (?)', [names]);
     })
     .then((results) => {
       const nameStrings = [];
@@ -156,7 +156,7 @@ function modifyIngredientHelper(items, req, res, next) {
   const nativeUnitCases = [];
   const numNativeUnitsCases = [];
   const packageTypeCases = [];
-  connection.query(`SELECT id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
+  connection.query('SELECT id FROM Ingredients WHERE id IN (?)', [ingredientIds])
     .then(results => {
       if (results.length < ingredientIds.length) {
         throw createError('Changing storage id or name of invalid ingredient.');
@@ -180,11 +180,11 @@ function modifyIngredientHelper(items, req, res, next) {
             name = (case ${nameCases.join(' ')} end),
             native_unit = (case ${nativeUnitCases.join(' ')} end),
             num_native_units = (case ${numNativeUnitsCases.join(' ')} end)
-        WHERE id IN (${ingredientIds.join(', ')})`);
+        WHERE id IN (?)`, [ingredientIds]);
     })
     .then(() => {
       const myIds = Object.keys(items);
-      return connection.query(`SELECT * FROM Ingredients WHERE id IN (${myIds.join(', ')})`);
+      return connection.query('SELECT * FROM Ingredients WHERE id IN (?)', [myIds]);
     })
     .then((results) => {
       const nameStrings = [];
@@ -222,21 +222,21 @@ function deleteIngredientHelper(items, req, res, next) {
     ingredientIds.push(idString);
   }
 
-  connection.query(`SELECT id, storage_id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
+  connection.query(`SELECT id, storage_id FROM Ingredients WHERE id IN (?)`, [ingredientIds])
     .then(results => {
       if (results.length < ingredientIds.length) {
         throw createError('Deleting nonexistent ingredient.');
       }
       return Promise.resolve();
     })
-    .then(() => connection.query(`SELECT DISTINCT formula_id FROM FormulaEntries WHERE ingredient_id IN (${ingredientIds.join(', ')})`))
+    .then(() => connection.query(`SELECT DISTINCT formula_id FROM FormulaEntries WHERE ingredient_id IN (?)`, [ingredientIds]))
     .then((results) => {
       if (results.length == 0) return Promise.resolve();
       const formulaIds = [];
       for (let result of results) {
         formulaIds.push(result.formula_id);
       }
-      return connection.query(`SELECT name FROM Formulas WHERE id IN (${formulaIds.join(', ')}) AND removed = 0`);
+      return connection.query(`SELECT name FROM Formulas WHERE id IN (?) AND removed = 0`, [formulaIds]);
     })
     .then((results) => {
       const formulasWithIngredient = [];
@@ -246,9 +246,9 @@ function deleteIngredientHelper(items, req, res, next) {
         }
       }
     if (formulasWithIngredient.length > 0) throw createError(`Formulas ${formulasWithIngredient.join(', ')} contains one or more ingredients that are attempted to be deleted`);
-    return connection.query(`UPDATE Ingredients SET removed = 1 WHERE id IN (${ingredientIds.join(', ')})`);
+    return connection.query(`UPDATE Ingredients SET removed = 1 WHERE id IN (?)`, [ingredientIds]);
   })
-  .then(() => connection.query(`SELECT id FROM VendorsIngredients WHERE ingredient_id IN (${ingredientIds.join(', ')})`))
+  .then(() => connection.query(`SELECT id FROM VendorsIngredients WHERE ingredient_id IN (?)`, [ingredientIds]))
   .then(results => {
     const vendorsIngredientsIds = results.map(e => e.id);
     return fakeDeleteMultipleVendorIngredients(vendorsIngredientsIds);
@@ -321,7 +321,7 @@ export function bulkImport(req, res, next) {
       }
 
       // Compile list of new ingredients to add to db
-      
+
       for (let entry of entries) {
         entryNames.push(entry.ingredient);
         const existingIngredient = ingredients.find(ingredient => entry.ingredient.toLowerCase() == ingredient.name.toLowerCase());

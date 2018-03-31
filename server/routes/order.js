@@ -58,13 +58,13 @@ function orderHelper(orders, req, res, next) {
           'lots': orders[result.id].lots,
         };
       }
-      
+
       findRequestedStorageQuantity(ingredientIds, ingredientsMap, requestedCapacities);
       createInventoryCases(ingredientIds, newIngredientCases, ingredientsMap);
       return checkStoragePromise(requestedCapacities);
     })
     .then(() => {
-      return connection.query(`INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id) VALUES ${newIngredientCases.join(', ')}`);
+      return connection.query(`INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id, per_package_cost) VALUES ${newIngredientCases.join(', ')}`);
     })
     .then(() => {
       let logReq = Object.values(ingredientsMap);
@@ -94,7 +94,8 @@ function orderHelper(orders, req, res, next) {
 function createInventoryCases(ingredientIds, newIngredientCases, ingredientsMap) {
   ingredientIds.forEach(ingredientId => {
     Object.keys(ingredientsMap[ingredientId].lots).forEach(lotNumber => {
-      newIngredientCases.push(`(${ingredientId}, ${ingredientsMap[ingredientId]['lots'][lotNumber]}, '${lotNumber}', ${ingredientsMap[ingredientId]['vendor_id']})`);
+      newIngredientCases.push(`(${ingredientId}, ${ingredientsMap[ingredientId]['lots'][lotNumber]}, '${lotNumber}', ${ingredientsMap[ingredientId]['vendor_id']}, 0)`);
+      // TODO: update the last per package cost later
     });
   });
 }
