@@ -589,7 +589,6 @@ export function intermediateBulkImport(req, res, next) {
     })
     // Make sure ingredients exist
     .then(ingredients => {
-      console.log(ingredients);
       for (let entry of entries) {
         const existingIngredient = ingredients.find(ingredient => ingredient.name.toLowerCase() == entry.ingredient.toLowerCase() && ingredient.removed == 0);
         if (!existingIngredient) throw createError(`Ingredient ${entry.ingredient} does not exist`);
