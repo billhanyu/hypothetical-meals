@@ -23,7 +23,7 @@ class InventoryItem extends Component {
   }
 
   render() {
-    const {num_packages, ingredient_num_native_units, ingredient_name, ingredient_temperature_state, ingredient_package_type, ingredient_native_unit}
+    const {num_packages, ingredient_num_native_units, ingredient_name, ingredient_temperature_state, ingredient_package_type, ingredient_native_unit, ingredient_intermediate}
       = this.props.item;
     const rawQuantity = num_packages * ingredient_num_native_units;
     const quantity = rawQuantity.toFixed(2);
@@ -31,7 +31,13 @@ class InventoryItem extends Component {
     return (
       <tbody>
         <tr data-toggle="collapse" data-target={`#inventory_${this.props.idx}`} className="accordion-toggle tablerow-hover">
-          <td className={columnClass}><a href="javascript:void(0)" onClick={e=>this.props.viewIngredient(this.props.idx)}>{ingredient_name}</a></td>
+          <td className={columnClass}>
+            <a href="javascript:void(0)" onClick={e => this.props.viewIngredient(this.props.idx)}>{ingredient_name}</a>
+            {
+              ingredient_intermediate == 1 &&
+              <span style={{ 'margin-left': '10px' }} className="badge badge-secondary">Intermediate</span>
+            }
+          </td>
           <td className={columnClass}>{ingredient_temperature_state}</td>
           <td className={columnClass}>{ingredient_package_type}</td>
           <td className={columnClass}>{quantity} {ingredient_native_unit}</td>
@@ -67,6 +73,7 @@ InventoryItem.propTypes = {
     ingredient_temperature_state: PropTypes.string,
     ingredient_package_type: PropTypes.string,
     ingredient_native_unit: PropTypes.string,
+    ingredient_intermediate: PropTypes.oneOf([0, 1]),
   }),
   viewIngredient: PropTypes.func.isRequired,
   mode: PropTypes.string,

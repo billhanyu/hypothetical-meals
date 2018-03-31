@@ -171,7 +171,7 @@ class AddEditIngredient extends Component {
           {header}
           {
             this.state.intermediate == 1 &&
-            <span style={{ 'margin-left': '20px' }} className="badge badge-secondary">Intermediate</span>
+            <span style={{ 'margin-left': '10px' }} className="badge badge-secondary">Intermediate</span>
           }
           {
             this.state.removed == 1 &&
@@ -250,6 +250,7 @@ AddEditIngredient.propTypes = {
   ingredient: PropTypes.object,
   mode: PropTypes.string,
   backToList: PropTypes.func,
+  reloadData: PropTypes.func,
 };
 
 export default AddEditIngredient;

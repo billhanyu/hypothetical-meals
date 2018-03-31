@@ -233,9 +233,11 @@ class IngredientList extends Component {
       />
       {!this.props.order &&
       <div>
-      <h2>Ingredients</h2>
-      {global.user_group == 'admin' && <button type="button" className="btn btn-primary" onClick={this.add}>Add Ingredient</button>}
-      {global.user_group == 'admin' && <button type="button" className="btn btn-primary" onClick={this.bulkImport}>Bulk Import</button>}
+        <h2>Ingredients</h2>
+        <div className='btn-group' role='group' aria-label='Basic example'>
+          {global.user_group == 'admin' && <button type="button" className="btn btn-primary" onClick={this.add}>Add Ingredient</button>}
+          {global.user_group == 'admin' && <button type="button" className="btn btn-secondary" onClick={this.bulkImport}>Bulk Import</button>}
+        </div>
       </div>
       }
       <table className="table">

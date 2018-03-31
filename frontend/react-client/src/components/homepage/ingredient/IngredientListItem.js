@@ -103,7 +103,7 @@ class IngredientListItem extends Component {
           <a href="javascript:void(0)" onClick={e=>this.props.viewIngredient(this.props.idx)}>{ingredient.name}</a>
           {
             ingredient.intermediate == 1 &&
-            <span style={{ 'margin-left': '20px' }} className="badge badge-secondary">Intermediate</span>
+            <span style={{ 'margin-left': '10px' }} className="badge badge-secondary">Intermediate</span>
           }
         </td>
         <td className={columnClass}>{ingredient.package_type}</td>
