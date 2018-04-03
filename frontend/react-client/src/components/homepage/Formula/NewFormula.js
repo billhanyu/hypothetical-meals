@@ -30,8 +30,6 @@ class NewFormula extends Component {
         });
       }
     });
-    console.log("HELLO WORLD");
-    console.log(storage);
     axios.get('/storages', {headers: {Authorization: "Token " + global.token}})
     .then(response => {
       let storage_id = 1;
@@ -44,7 +42,6 @@ class NewFormula extends Component {
       else if(storage === 'warehouse') {
         storage_id = 3;
       }
-      console.log(storage_id);
       axios.post(`/formulas`, {'formulas':[
         {
             name,
