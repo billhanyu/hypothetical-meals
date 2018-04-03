@@ -1,4 +1,10 @@
+DROP TABLE IF EXISTS Sales;
+DROP TABLE IF EXISTS FinalProductInventories;
+DROP TABLE IF EXISTS Orders;
 DROP TABLE IF EXISTS ProductRunsEntries;
+DROP TABLE IF EXISTS ProductionlinesOccupancies;
+DROP TABLE IF EXISTS FormulaProductionLines;
+DROP TABLE IF EXISTS Productionlines;
 DROP TABLE IF EXISTS ProductRuns;
 DROP TABLE IF EXISTS SystemLogs;
 DROP TABLE IF EXISTS ProductionLogs;
@@ -78,9 +84,10 @@ CREATE TABLE VendorsIngredients(
 CREATE TABLE Inventories(
 	id int not null AUTO_INCREMENT,
 	ingredient_id int not null,
-	num_packages double not null default 0,
+	num_packages double not null DEFAULT 0,
 	lot varchar(500) not null,
 	vendor_id int not null,
+	per_package_cost double not null,
 	created_at timestamp DEFAULT now() not null,
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
@@ -118,6 +125,9 @@ CREATE TABLE Formulas(
 	name varchar(70) not null UNIQUE,
 	description text not null,
 	num_product int not null,
+	worst_duration BIGINT DEFAULT 0 not null,
+	total_weighted_duration BIGINT DEFAULT 0 not null,
+	total_num_products double DEFAULT 0 not null,
 	removed BIT DEFAULT 0,
 
 	PRIMARY KEY (id)
@@ -128,7 +138,6 @@ CREATE TABLE FormulaEntries(
 	ingredient_id int not null,
 	num_native_units double not null,
 	formula_id int not null,
-
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
@@ -161,10 +170,40 @@ CREATE TABLE ProductRuns(
 	num_product int not null,
 	user_id int not null,
 	lot VARCHAR(100) not null,
+	cost_for_run double not null,
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
 	FOREIGN KEY (user_id) REFERENCES Users(id),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Productionlines(
+	id int not null AUTO_INCREMENT,
+	name varchar(70) not null UNIQUE, 
+	description text,
+	productrun_id int DEFAULT 0,
+
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE FormulaProductionLines(
+	formula_id int not null,
+	productionline_id int not null,
+
+	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
+	FOREIGN KEY (productionline_id) REFERENCES Productionlines(id)
+);
+
+CREATE TABLE ProductionlinesOccupancies(
+	id int not null AUTO_INCREMENT,
+	productionline_id int not null,
+	formula_id int not null,
+	start_time timestamp DEFAULT now() not null,
+	end_time timestamp DEFAULT now() not null,
+
+	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
+	FOREIGN KEY (productionline_id) REFERENCES Productionlines(id),
 	PRIMARY KEY (id)
 );
 
@@ -179,5 +218,35 @@ CREATE TABLE ProductRunsEntries(
 	FOREIGN KEY (productrun_id) REFERENCES ProductRuns(id),
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	FOREIGN KEY (vendor_id) REFERENCES Vendors(id),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Orders(
+	id int not null AUTO_INCREMENT,
+	arrived bit not null DEFAULT 0,
+	ingredient_id int not null,
+	num_packages int not null,
+
+	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE FinalProductInventories(
+	id int not null AUTO_INCREMENT,
+	formula_id int not null,
+	num_packages int not null DEFAULT 0,
+	created_at timestamp DEFAULT now() not null,
+
+	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE Sales(
+	id int not null AUTO_INCREMENT,
+	formula_id int not null,
+	num_packages int not null DEFAULT 0,
+	unit_price double not null DEFAULT 0,
+
+	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
 	PRIMARY KEY (id)
 );

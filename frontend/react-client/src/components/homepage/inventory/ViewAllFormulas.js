@@ -7,21 +7,30 @@ class ViewAllFormulas extends Component {
     super(props);
     this.state = {
       EditFormulaBoxes: [],
-      bulkImport: false,
+      finalBulkImport: false,
+      intermediateBulkImport: false,
     };
     this.backToList = this.backToList.bind(this);
-    this.bulkImport = this.bulkImport.bind(this);
+    this.finalBulkImport = this.finalBulkImport.bind(this);
+    this.intermediateBulkImport = this.intermediateBulkImport.bind(this);
   }
 
-  bulkImport() {
+  finalBulkImport() {
     this.setState({
-      bulkImport: true,
+      finalBulkImport: true,
+    });
+  }
+
+  intermediateBulkImport() {
+    this.setState({
+      intermediateBulkImport: true,
     });
   }
 
   backToList() {
     this.setState({
-      bulkImport: false,
+      intermediateBulkImport: false,
+      finalBulkImport: false,
     });
     this.reloadData();
   }
@@ -42,14 +51,16 @@ class ViewAllFormulas extends Component {
   }
 
   render() {
-
-    const bulkImport =
-      <BulkImport endpoint='/formulas/import' backToList={this.backToList} />;
+    const finalBulkImport =
+      <BulkImport endpoint='/formulas/import/final' backToList={this.backToList} />;
+    const intermediateBulkImport =
+      <BulkImport endpoint='/formulas/import/intermediate' backToList={this.backToList} />;
     const main =
       <div>
         <div className="ProduceFormulaHeader">
           All Formulas
-          {global.user_group == 'admin' && <button type="button" className="btn btn-primary" onClick={this.bulkImport}>Bulk Import</button>}
+          {global.user_group == 'admin' && <button style={{margin: '0 8px'}} type="button" className="btn btn-primary" onClick={this.finalBulkImport}>Final Product Bulk Import</button>}
+          {global.user_group == 'admin' && <button style={{margin: '0 8px'}} type="button" className="btn btn-primary" onClick={this.intermediateBulkImport}>Intermediate Product Bulk Import</button>}
         </div>
         <table className="table">
           <thead>
@@ -73,8 +84,11 @@ class ViewAllFormulas extends Component {
         </table>
       </div>;
 
-    if (this.state.bulkImport) {
-      return bulkImport;
+    if (this.state.finalBulkImport) {
+      return finalBulkImport;
+    }
+    else if (this.state.intermediateBulkImport) {
+        return intermediateBulkImport;
     } else {
       return main;
     }

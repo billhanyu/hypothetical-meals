@@ -61,12 +61,8 @@ class NewFormula extends Component {
       ]}, {
         headers: {Authorization: "Token " + global.token}
       }).then(response => {
-        self.setState({
-          open: true,
-          message: 'New Formula Created'
-        });
+        this.props.link('EditFormula');
       }).catch(error => {
-        console.log(error.response);
         self.setState({
           open: true,
           message: error.response.data,
@@ -78,8 +74,7 @@ class NewFormula extends Component {
         open: true,
         message: error.response.data,
       });
-    })
-
+    });
   }
 
   render() {
