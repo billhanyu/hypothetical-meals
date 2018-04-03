@@ -52,11 +52,17 @@ function getStockPromise(ids) {
             delete stock[result.ingredient_id].total_weighted_duration;
             delete stock[result.ingredient_id].total_num_native_units;
           }
-          stock[result.ingredient_id].freshnessData = [{
+          if (!stock[result.ingredient_id].freshnessData) {
+            stock[result.ingredient_id].freshnessData = [];
+          }
+          stock[result.ingredient_id].freshnessData.push({
             inventoryId: result.id,
             numPackages: result.num_packages,
             createdAt: result.created_at,
-          }];
+
+            lot: result.lot,
+            vendorId: result.vendor_id,
+          });
         }
         resolve(stock);
       })
@@ -72,7 +78,7 @@ export function getLotQuantities(req, res, next) {
   connection.query(`SELECT Inventories.*, Ingredients.num_native_units, Vendors.name as vendor_name FROM Inventories
     JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id
     JOIN Vendors ON Inventories.vendor_id = Vendors.id
-    WHERE ingredient_id = ${ingredientId}`)
+    WHERE ingredient_id = ?`, [ingredientId])
     .then(results => {
       const lots = results.map(entry => {
         return {
@@ -85,6 +91,25 @@ export function getLotQuantities(req, res, next) {
       return res.json(lots);
     })
     .catch(err => handleError(err, res));
+}
+
+/* return production entries lots for a certain ingredient with id */
+export function getProductionLots(req, res, next) {
+  const ingredientId = req.params.ingredient_id;
+  connection.query('SELECT lot FROM ProductRunsEntries WHERE ingredient_id = ?',
+    [ingredientId])
+    .then(results => {
+      const arr = [];
+      results.forEach(result => {
+        if (!arr.includes(result.lot)) {
+          arr.push(result.lot);
+        };
+      });
+      return res.json(arr);
+    })
+    .catch(err => {
+      handleError(err, res);
+    });
 }
 
 /* request body format:
@@ -154,13 +179,13 @@ export function commitCart(req, res, next) {
   if (!checkNumber.isPositiveInteger(numProducts)) {
     return res.status(400).send('Invalid number of products');
   }
-  connection.query(`SELECT * FROM Formulas WHERE id =${formulaId}`)
+  connection.query(`SELECT * FROM Formulas WHERE id = ?`, [formulaId])
     .then((results) => {
       if (results.length != 1) {
         throw createError('Invalid formula id');
       }
       formula = results[0];
-      return connection.query(`SELECT * FROM FormulaEntries WHERE formula_id =${formulaId}`);
+      return connection.query(`SELECT * FROM FormulaEntries WHERE formula_id = ?`, [formulaId]);
     })
     .then((results) => {
       if (results.length == 0) throw createError('Invalid formula id');
@@ -186,7 +211,7 @@ export function commitCart(req, res, next) {
         let totalWeightedDuration = 0;
         for (let freshnessEntry of inventory.freshnessData) {
           if (numPackagesLeft <= 0) break;
-          const numPackagesConsumed = numPackagesLeft > freshnessEntry.numPackages ? 0 : numPackagesLeft;
+          const numPackagesConsumed = numPackagesLeft > freshnessEntry.numPackages ? freshnessEntry.numPackages : numPackagesLeft;
           changes[freshnessEntry.inventoryId] = freshnessEntry.numPackages - numPackagesConsumed;
           numPackagesLeft = numPackagesLeft - numPackagesConsumed;
           const timeSinceCreation = new Date() - freshnessEntry.createdAt;
@@ -200,9 +225,9 @@ export function commitCart(req, res, next) {
           });
           productRunEntries.push({
             ingredient_id: ingredientId,
-            vendor_id: inventory.vendor_id,
-            lot: inventory.lot,
-            num_native_units: inventory.ingredient_num_native_units,
+            vendor_id: freshnessEntry.vendorId,
+            lot: freshnessEntry.lot,
+            num_native_units: numPackagesConsumed * inventory.ingredient_num_native_units,
           });
         }
         // Dummy data 'poop', 'sack', 1, 'pounds', 10
@@ -215,8 +240,9 @@ export function commitCart(req, res, next) {
     .then(intermediateIngArr => {
       if (!formula.intermediate) return Promise.resolve();
       intermediateIng = intermediateIngArr[0];
-      return connection.query('INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id) VALUES (?, ?, ?, ?)',
-        [intermediateIng.id, 0, uniqueId, 1]);
+      return connection.query('INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id, per_package_cost) VALUES (?)',
+        [[intermediateIng.id, 0, uniqueId, 1, 0]]);
+      // TODO: update this per package cost later
     })
     .then(() => {
       if (!formula.intermediate) return Promise.resolve();
@@ -236,8 +262,9 @@ export function commitCart(req, res, next) {
      total_weighted_duration = total_weighted_duration + VALUES(total_weighted_duration),
      total_num_native_units = total_num_native_units + VALUES(total_num_native_units)`, [freshness])))
     .then(() => {
-      return connection.query('INSERT INTO ProductRuns (formula_id, user_id, num_product, lot) VALUES (?)',
-        [[formulaId, req.payload.id, numProducts, uniqueId]]);
+      // TODO: update this cost_for_run later
+      return connection.query('INSERT INTO ProductRuns (formula_id, user_id, num_product, lot, cost_for_run) VALUES (?)',
+        [[formulaId, req.payload.id, numProducts, uniqueId, 0]]);
     })
     .then(() => {
       return connection.query('SELECT id FROM ProductRuns WHERE lot = ?', [uniqueId]);
@@ -261,7 +288,7 @@ export function commitCart(req, res, next) {
         Formulas.id as formula_id, Formulas.name as formula_name, Ingredients.name as ingredient_name 
         FROM FormulaEntries JOIN Ingredients ON FormulaEntries.ingredient_id = Ingredients.id
         JOIN Formulas ON FormulaEntries.formula_id = Formulas.id
-        WHERE FormulaEntries.formula_id = ${formulaId}`);
+        WHERE FormulaEntries.formula_id = ?`, [formulaId]);
     })
     .then((results) => {
       const formulaName = `{${results[0].formula_name}=formula_id=${results[0].formula_id}}`;

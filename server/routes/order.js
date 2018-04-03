@@ -58,13 +58,13 @@ function orderHelper(orders, req, res, next) {
           'lots': orders[result.id].lots,
         };
       }
-      
+
       findRequestedStorageQuantity(ingredientIds, ingredientsMap, requestedCapacities);
       createInventoryCases(ingredientIds, newIngredientCases, ingredientsMap);
       return checkStoragePromise(requestedCapacities);
     })
     .then(() => {
-      return connection.query(`INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id) VALUES ${newIngredientCases.join(', ')}`);
+      return connection.query(`INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id, per_package_cost) VALUES ${newIngredientCases.join(', ')}`);
     })
     .then(() => {
       let logReq = Object.values(ingredientsMap);
@@ -79,7 +79,7 @@ function orderHelper(orders, req, res, next) {
     })
     .then((results) => {
       let orderStrings = results.map(x => {
-        return `${orders[x.vendor_ingredient_id]} package${orders[x.vendor_ingredient_id] > 1 ? 's' : ''} of {${x.name}=ingredient_id=${x.id}} from {${x.vendor_name}=vendor_id=${x.vendor_id}}`;
+        return `${orders[x.vendor_ingredient_id].num_packages} package${orders[x.vendor_ingredient_id].num_packages > 1 ? 's' : ''} of {${x.name}=ingredient_id=${x.id}} from {${x.vendor_name}=vendor_id=${x.vendor_id}}`;
       });
       logAction(req.payload.id, `Ordered ${orderStrings.join(', ')}.`);
     })
@@ -94,7 +94,8 @@ function orderHelper(orders, req, res, next) {
 function createInventoryCases(ingredientIds, newIngredientCases, ingredientsMap) {
   ingredientIds.forEach(ingredientId => {
     Object.keys(ingredientsMap[ingredientId].lots).forEach(lotNumber => {
-      newIngredientCases.push(`(${ingredientId}, ${ingredientsMap[ingredientId]['lots'][lotNumber]}, '${lotNumber}', ${ingredientsMap[ingredientId]['vendor_id']})`);
+      newIngredientCases.push(`(${ingredientId}, ${ingredientsMap[ingredientId]['lots'][lotNumber]}, '${lotNumber}', ${ingredientsMap[ingredientId]['vendor_id']}, 0)`);
+      // TODO: update the last per package cost later
     });
   });
 }
@@ -115,11 +116,14 @@ function checkOrderParameters(orders, res) {
     handleError(createError('No orders given'), res);
     return false;
   }
-  Object.keys(orders).forEach(x => {
+  return Object.keys(orders).every(x => {
     if (!checkNumber.isPositiveInteger(x)) {
       handleError(createError('Gave invalid vendor ingredient id'), res);
       return false;
     } else if (!('lots' in orders[x])) {
+      handleError(createError('Did not specify lots. Lots are mandatory'), res);
+      return false;
+    } else if ('' in orders[x].lots) {
       handleError(createError('Did not specify lots. Lots are mandatory'), res);
       return false;
     } else if (!(checkNumber.isPositiveInteger(orders[x].num_packages))) {
@@ -138,8 +142,8 @@ function checkOrderParameters(orders, res) {
         handleError(createError('Lot quantities do not add up to number of packages'), res);
         return false;
       }
+      return true;
     }
   });
-  return true;
 }
 

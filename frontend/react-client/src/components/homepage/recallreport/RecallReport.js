@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
 import IngredientSelector from '../../selector/IngredientSelector';
+import RecallReportContent from './RecallReportContent';
+import axios from 'axios';
+import Snackbar from 'material-ui/Snackbar';
+import LotSelector from '../../selector/LotSelector';
+import qs from 'qs';
 
 class RecallReport extends Component {
   constructor(props) {
@@ -7,15 +12,47 @@ class RecallReport extends Component {
     this.state = {
       ingredientId: '',
       viewReport: false,
+      lots: [],
+      lot: '',
+      runs: [],
+      open: false,
+      message: '',
     };
     this.changeIngredientId = this.changeIngredientId.bind(this);
+    this.changeLot = this.changeLot.bind(this);
     this.generate = this.generate.bind(this);
     this.back = this.back.bind(this);
+  }
+
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
   }
 
   changeIngredientId(newValue) {
     this.setState({
       ingredientId: newValue,
+    });
+    axios.get(`/inventory/productionlots/${newValue}`, {
+      headers: { Authorization: "Token " + global.token }
+    })
+      .then(response => {
+        this.setState({
+          lots: response.data
+        });
+      })
+      .catch(err => {
+        this.setState({
+          open: true,
+          message: 'Error retrieving lots for ingredient',
+        });
+      });
+  }
+
+  changeLot(newValue) {
+    this.setState({
+      lot: newValue,
     });
   }
 
@@ -26,25 +63,65 @@ class RecallReport extends Component {
   }
 
   generate() {
-    // API call
-    this.setState({
-      viewReport: true,
-    });
+    if (!this.state.ingredientId || !this.state.lot) {
+      this.setState({
+        open: true,
+        message: 'Please fill in both ingredient and lot',
+      });
+      return;
+    }
+    axios.get('/recall', {
+      params: {
+        recall: {
+          ingredient_id: this.state.ingredientId,
+          lot: this.state.lot,
+        },
+      },
+      paramsSerializer: function (params) {
+        return qs.stringify(params, { arrayFormat: 'repeat' });
+      },
+      headers: {
+        Authorization: "Token " + global.token,
+      }
+    })
+      .then(response => {
+        this.setState({
+          viewReport: true,
+          runs: response.data,
+        });
+      })
+      .catch(err => {
+        this.setState({
+          open: true,
+          message: 'Error generating Recall Report',
+        });
+      });
   }
 
   render() {
-    return (
+    const content =
+      <RecallReportContent runs={this.state.runs} back={this.back} />;
+
+    const main =
       <div>
-        <h3>Recall Report</h3>
+        <h2>Recall Report</h2>
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
         <IngredientSelector changeIngredientId={this.changeIngredientId} />
+        <LotSelector lots={this.state.lots} changeLot={this.changeLot} />
         <button
           type="button"
           className="btn btn-primary"
           onClick={this.generate}>
           Generate Report
         </button>
-      </div>
-    );
+      </div>;
+
+    return this.state.viewReport ? content : main;
   }
 }
 

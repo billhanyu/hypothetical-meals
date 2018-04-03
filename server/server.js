@@ -18,6 +18,7 @@ import * as systemlogs from './routes/systemLogs';
 import * as order from './routes/order';
 import * as formulas from './routes/formula';
 import * as productionlog from './routes/productionlog';
+import * as recallReport from './routes/recallReport';
 import * as productionrun from './routes/productrun';
 import { adminRequired, noobRequired, managerRequired } from './authMiddleware';
 
@@ -135,18 +136,22 @@ app.get('/productruns', beNoob, productionrun.view);
 
 app.get('/inventory', beNoob, inventory.all);
 app.get('/inventory/lot/:ingredient_id', beNoob, inventory.getLotQuantities);
+app.get('/inventory/productionlots/:ingredient_id', beNoob, inventory.getProductionLots);
 app.get('/inventory/stock', beManager, inventory.getStock);
 app.put('/inventory/admin', beAdmin, inventory.modifyQuantities);
 app.put('/inventory', beManager, inventory.commitCart);
 
 app.get('/formulas', beNoob, formulas.viewAll);
-app.get('/formulas/id/:id', beNoob, formulas.viewAll);
+app.get('/formulas/id/:id', beNoob, formulas.viewWithId);
 app.get('/formulas/pages', beNoob, formulas.pages);
 app.get('/formulas/page/:page_num', beNoob, formulas.view);
 app.put('/formulas', beAdmin, formulas.modify);
 app.post('/formulas', beAdmin, formulas.add);
 app.delete('/formulas', beAdmin, formulas.deleteFormulas);
-app.post('/formulas/import', [auth.required, adminRequired, upload.single('bulk')], formulas.bulkImport);
+app.post('/formulas/import/final', [auth.required, adminRequired, upload.single('bulk')], formulas.finalBulkImport);
+app.post('/formulas/import/intermediate', [auth.required, adminRequired, upload.single('bulk')], formulas.intermediateBulkImport);
+
+app.get('/recall', beManager, recallReport.getRecallForIngredient);
 
 const distDir = `${__dirname}/../frontend/react-client/dist`;
 app.use(express.static(distDir));

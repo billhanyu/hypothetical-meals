@@ -76,6 +76,33 @@ describe('Order', () => {
         });
     });
 
+    it('should reject for empty lot number', (done) => {
+      connection.query(`SELECT COUNT(1) FROM Inventories`)
+        .then((inventoryResult) => {
+          chai.request(server)
+            .post('/order')
+            .set('Authorization', `Token ${testTokens.noobTestToken}`)
+            .send({
+              'orders': {
+                '1': {
+                  'num_packages': 2,
+                  'lots': {
+                    '': 1,
+                    '03859': 1,
+                  },
+                },
+              },
+            })
+            .end((err, res) => {
+              res.should.have.status(400);
+              done();
+            });
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    });
+
     it('should place reject an order with invalid ingredients', (done) => {
       chai.request(server)
         .post('/order')
