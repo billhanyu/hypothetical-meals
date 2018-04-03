@@ -13,7 +13,7 @@ class ComboBox extends Component {
   */
 
   handleChange(event) {
-    this.props.onChange(this.props.id, event);
+    this.props.onChange(this.props.id, event.target.value);
   }
 
   render() {

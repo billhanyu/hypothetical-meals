@@ -48,7 +48,7 @@ class FormulaWindow extends Component {
       package_type: ingredient.package_type,
       native_unit: ingredient.native_unit,
       storage_id: ingredient.storage_id,
-      storage: Storage2State[ingredient.storage_name],
+      storage: ingredient.storage_name,
     };
   }
 
@@ -158,9 +158,6 @@ class FormulaWindow extends Component {
             open: true,
             message: "Finished updating"
           });
-          if (this.props.onFinish) {
-            this.props.onFinish();
-          }
         })
         .catch(err => {
           this.setState({
@@ -169,7 +166,7 @@ class FormulaWindow extends Component {
           });
         });
     } else {
-      this.props.onFinish(this.state, this.props.activeId);
+      this.props.onFinish(this.state);
     }
   }
 
