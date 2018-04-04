@@ -22,9 +22,10 @@ CREATE TABLE Users(
 	salt character(32), 
 	user_group enum('admin', 'manager', 'noob') not null,
 	removed BIT DEFAULT 0,
+	isactive varchar(70) DEFAULT 'Yes',
 
 	PRIMARY KEY (id),
-	UNIQUE (username, oauth)
+	UNIQUE (username, oauth, isactive)
 );
 
 CREATE TABLE Vendors(
@@ -115,7 +116,7 @@ CREATE TABLE Formulas(
 	id int not null AUTO_INCREMENT,
 	intermediate BIT DEFAULT 0,
 	ingredient_id int,
-	name varchar(70) not null UNIQUE,
+	name varchar(70) not null,
 	description text not null,
 	num_product int not null,
 	removed BIT DEFAULT 0,
