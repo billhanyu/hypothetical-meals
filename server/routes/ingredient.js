@@ -82,7 +82,7 @@ function addIngredientHelper(ingredients, req, res, next) {
   connection.query(`INSERT INTO Ingredients (name, package_type, native_unit, num_native_units, storage_id) VALUES ${ingredientsToAdd.join(', ')}`)
     .then(() => {
       const names = ingredients.map(x => `'${x.name}'`);
-      return connection.query(`SELECT * FROM Ingredients WHERE name IN (${names.join(', ')})`);
+      return connection.query(`SELECT * FROM Ingredients WHERE name IN (${names.join(', ')} AND removed = 0)`);
     })
     .then((results) => {
       const nameStrings = [];
@@ -222,7 +222,7 @@ function deleteIngredientHelper(items, req, res, next) {
     ingredientIds.push(idString);
   }
 
-  connection.query(`SELECT id, storage_id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')})`)
+  connection.query(`SELECT id, storage_id FROM Ingredients WHERE id IN (${ingredientIds.join(', ')} AND removed = 0)`)
     .then(results => {
       if (results.length < ingredientIds.length) {
         throw createError('Deleting nonexistent ingredient.');
