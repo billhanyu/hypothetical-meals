@@ -170,6 +170,7 @@ class SystemLog extends Component {
       headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
+      console.log(response.data);
       this.setState({
         formula: response.data[0],
         viewFormula: true,
