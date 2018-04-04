@@ -52,15 +52,17 @@ function getFormulas(queryString, queryParams, req, res, next) {
     .then((results) => {
       results.forEach(x => {
         let formulaObject = x;
-        formulaObject['ingredients'] = {};
-        myFormulas[`${x.id}`] = formulaObject;
+        formulaObject.ingredients = {};
+        myFormulas[x.id] = formulaObject;
       });
       return connection.query(`${formulaEntryQuery}, Ingredients.name, Ingredients.package_type, Ingredients.storage_id, Ingredients.native_unit, Ingredients.num_native_units as ingredient_num_native_units, Ingredients.removed FROM FormulaEntries
             JOIN Ingredients ON FormulaEntries.ingredient_id = Ingredients.id`);
     })
     .then((formulaEntries) => {
       formulaEntries.forEach(x => {
-        myFormulas[`${x['formula_id']}`]['ingredients'][`${x.name}`] = x;
+        if (myFormulas[x.formula_id]) {
+          myFormulas[x.formula_id].ingredients[x.name] = x;
+        }
       });
       res.status(200).send(Object.values(myFormulas));
     })
@@ -106,9 +108,9 @@ export function add(req, res, next) {
         intermediateMap[x.name] = x;
       });
       formulas.forEach(x => {
-        formulaCases.push(`('${x.name}', '${x.description}', ${x.num_product}, ${x.intermediate}, ${x.ingredient_name && intermediateMap[x.ingredient_name] ? intermediateMap[x.ingredient_name].id : 'NULL'})`);
+        formulaCases.push([x.name, x.description, x.num_product, x.intermediate, x.ingredient_name && intermediateMap[x.ingredient_name] ? intermediateMap[x.ingredient_name].id : null]);
       });
-      return connection.query(`INSERT INTO Formulas (name, description, num_product, intermediate, ingredient_id) VALUES ${formulaCases.join(', ')}`);
+      return connection.query('INSERT INTO Formulas (name, description, num_product, intermediate, ingredient_id) VALUES ?', [formulaCases]);
     })
     .then(() => {
       return addFormulaEntries(formulas);
@@ -532,7 +534,8 @@ function checkForFinalBulkImportFormattingErrors(data) {
     if (isNaN(data[i][4]) || data[i][4] <= 0) return `Invalid ingredient units: ${data[i][4]}`;
   }
 }
-//////////////////// INTERMEDIATE
+
+// INTERMEDIATE
 
 export function intermediateBulkImport(req, res, next) {
   const csv = fs.readFileSync(req.file.path);
@@ -587,7 +590,6 @@ export function intermediateBulkImport(req, res, next) {
     })
     // Make sure ingredients exist
     .then(ingredients => {
-      console.log(ingredients);
       for (let entry of entries) {
         const existingIngredient = ingredients.find(ingredient => ingredient.name.toLowerCase() == entry.ingredient.toLowerCase() && ingredient.removed == 0);
         if (!existingIngredient) throw createError(`Ingredient ${entry.ingredient} does not exist`);
@@ -662,13 +664,12 @@ function checkForIntermediateBulkImportFormattingErrors(data) {
       else if (data[i][6] == 'refrigerated') data[i][6] = 'refrigerator';
       else if (data[i][6] == 'room temperature') data[i][6] = 'warehouse';
       if (validStorageTypes.indexOf(data[i][6].toLowerCase()) < 0) return `Invalid package type: ${data[i][6]}`;
-
     } else {
       isFirstRowOfFormula = false;
     }
     // Ensure integer number of product units
     if (isFirstRowOfFormula && !checkNumber.isPositiveInteger(data[i][1])) return `Invalid amount in product units: ${data[i][1]}`;
-    
+
     // Ensure valid ingredient num native units
     if (isNaN(data[i][8]) || data[i][8] <= 0) return `Invalid ingredient units: ${data[i][8]}`;
   }

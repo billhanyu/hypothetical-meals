@@ -240,8 +240,9 @@ export function commitCart(req, res, next) {
     .then(intermediateIngArr => {
       if (!formula.intermediate) return Promise.resolve();
       intermediateIng = intermediateIngArr[0];
-      return connection.query('INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id) VALUES (?, ?, ?, ?)',
-        [intermediateIng.id, 0, uniqueId, 1]);
+      return connection.query('INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id, per_package_cost) VALUES (?)',
+        [[intermediateIng.id, 0, uniqueId, 1, 0]]);
+      // TODO: update this per package cost later
     })
     .then(() => {
       if (!formula.intermediate) return Promise.resolve();
@@ -261,8 +262,9 @@ export function commitCart(req, res, next) {
      total_weighted_duration = total_weighted_duration + VALUES(total_weighted_duration),
      total_num_native_units = total_num_native_units + VALUES(total_num_native_units)`, [freshness])))
     .then(() => {
-      return connection.query('INSERT INTO ProductRuns (formula_id, user_id, num_product, lot) VALUES (?)',
-        [[formulaId, req.payload.id, numProducts, uniqueId]]);
+      // TODO: update this cost_for_run later
+      return connection.query('INSERT INTO ProductRuns (formula_id, user_id, num_product, lot, cost_for_run) VALUES (?)',
+        [[formulaId, req.payload.id, numProducts, uniqueId, 0]]);
     })
     .then(() => {
       return connection.query('SELECT id FROM ProductRuns WHERE lot = ?', [uniqueId]);
@@ -297,6 +299,7 @@ export function commitCart(req, res, next) {
     })
     .then(() => success(res))
     .catch(err => {
+      console.log(err);
       connection.query('DELETE FROM Inventories WHERE num_packages = 0')
         .then(() => {
           handleError(err, res);
