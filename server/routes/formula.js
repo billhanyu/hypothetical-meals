@@ -115,8 +115,7 @@ export function add(req, res, next) {
     .then(() => {
       return addFormulaEntries(formulas);
     })
-    .then((bleb) => {
-      console.log(bleb);
+    .then(() => {
       return connection.query(`${dbFormulaNameCheck} (${names.join(', ')})`);
     })
     .then((results) => {

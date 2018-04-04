@@ -98,7 +98,7 @@ export function addVendors(req, res, next) {
       names.forEach(x => {
         stringNames.push(`'${x}'`);
       });
-      return connection.query('SELECT * FROM Vendors WHERE name IN (?)', [names]);
+      return connection.query('SELECT * FROM Vendors WHERE name IN (?) and removed = 0', [names]);
     })
     .then((results) => {
       let nameStrings = results.map(x => {
@@ -166,7 +166,7 @@ export function modifyVendors(req, res, next) {
           WHERE id IN (${Object.keys(vendors).join(', ')})`);
     })
     .then(() => {
-      return connection.query('SELECT * FROM Vendors WHERE name IN (?)', [names]);
+      return connection.query('SELECT * FROM Vendors WHERE id IN (?)', [Object.keys(vendors)]);
     })
     .then((results) => {
       let nameStrings = results.map(x => {
@@ -199,7 +199,7 @@ export function deleteVendors(req, res, next) {
       return res.status(400).send(`Invalid id ${id}`);
     }
   }
-  connection.query('UPDATE Vendors SET removed = 1 WHERE id IN (?)', [ids])
+  connection.query('UPDATE Vendors SET removed = 1, isactive = NULL WHERE id IN (?)', [ids])
     .then(() => {
       return connection.query('SELECT id FROM VendorsIngredients WHERE vendor_id IN (?)', [ids]);
     })
