@@ -11,10 +11,8 @@ import ViewInventory from '../homepage/inventory/ViewInventory';
 import Order from '../homepage/order/Order';
 import SpendingLog from '../homepage/spendinglog/SpendingLog';
 import StorageList from '../homepage/storage/StorageList';
-import NewFormula from '../homepage/Formula/NewFormula.js';
-import EditFormula from '../homepage/Formula/EditFormula.js';
 import ProduceFormula from '../homepage/inventory/ProduceFormula.js';
-import ViewAllFormulas from '../homepage/inventory/ViewAllFormulas.js';
+import ViewAllFormulas from '../homepage/formula/ViewAllFormulas.js';
 import ProductionLog from '../homepage/productionlog/ProductionLog';
 import SystemLog from '../homepage/systemlog/SystemLog';
 import ProductionRun from '../homepage/productionrun/ProductionRun';
@@ -78,12 +76,6 @@ class HomePage extends Component {
     }
     else if (funcName == "viewStorages") {
       return <StorageList />;
-    }
-    else if (funcName == "NewFormula") {
-      return <NewFormula link={this.link} />;
-    }
-    else if (funcName == "EditFormula") {
-      return <EditFormula />;
     }
     else if (funcName == 'produceFormulas') {
       return <ProduceFormula link={this.link} />;
