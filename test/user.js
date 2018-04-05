@@ -69,6 +69,51 @@ describe('User', () => {
       .catch((error) => console.log(error));
     });
 
+    it('should add back removed netid users to table', (done) => {
+      Promise.all([
+        connection.query('INSERT INTO Users (username, name, oauth, removed) VALUES ("hy103", "Bill Yu", 0, 1)'),
+        connection.query('INSERT INTO Users (username, name, oauth, user_group, removed) VALUES ("hy103", "Bill Yu", 1, "admin", 1)'),
+      ])
+      .then(() => {
+        connection.query('SELECT id FROM Users')
+          .then((oldLength) => {
+            chai.request(server)
+              .post('/users/login/oauth')
+              .send({
+                'info': {
+                  'netid': 'hy103',
+                  'name': 'Bill Yu',
+                },
+              })
+              .end((err, res) => {
+                res.should.have.status(200);
+                Promise.all([
+                  connection.query('SELECT id FROM Users'),
+                  connection.query('SELECT * FROM Users WHERE username = "hy103" and oauth = 0'),
+                  connection.query('SELECT * FROM Users WHERE username = "hy103" and oauth = 1'),
+                ])
+                  .then((results) => {
+                    const [newLength, regularUser, oauthUser] = results;
+                    assert.strictEqual(oldLength.length, newLength.length, 'No new user to table');
+                    assert.strictEqual(regularUser[0].name, 'Bill Yu', 'Bill Yu registered to database');
+                    assert.strictEqual(regularUser[0].oauth, 0, 'User is not oauth');
+                    assert.strictEqual(regularUser[0].user_group, 'noob', 'Default to noob user');
+                    assert.strictEqual(regularUser[0].removed, 1, 'Regular user is not added back');
+
+                    assert.strictEqual(oauthUser[0].name, 'Bill Yu', 'Bill Yu registered to database');
+                    assert.strictEqual(oauthUser[0].oauth, 1, 'User is oauth');
+                    assert.strictEqual(oauthUser[0].user_group, 'noob', 'Default to noob user');
+                    assert.strictEqual(oauthUser[0].removed, 0, 'User is added back');
+                    done();
+                  })
+                  .catch((error) => console.log(error));
+              });
+          })
+          .catch((error) => console.log(error));
+        })
+        .catch((error) => console.log(error));
+    });
+
     it('should not add existing netid user to table', (done) => {
       connection.query('SELECT id FROM Users')
       .then((oldLength) => {

@@ -140,7 +140,6 @@ describe('Ingredient', () => {
         .end((err, res) => {
           res.should.have.status(200);
           assert.strictEqual(res.body.length, 2, 'return added ids');
-
           connection.query('SELECT * FROM Ingredients')
             .then((changed) => {
               assert.strictEqual(changed[numIngredients]['name'], 'turkey', 'Name for ingredient 4.');

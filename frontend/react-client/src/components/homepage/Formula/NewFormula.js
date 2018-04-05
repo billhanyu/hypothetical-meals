@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import FormulaWindow from './FormulaWindow.js';
 import Snackbar from 'material-ui/Snackbar';
+import PropTypes from 'prop-types';
 
 class NewFormula extends Component {
   constructor(props) {
@@ -58,7 +59,7 @@ class NewFormula extends Component {
       ]}, {
         headers: {Authorization: "Token " + global.token}
       }).then(response => {
-        this.props.link('EditFormula');
+        this.props.onFinish();
       }).catch(error => {
         self.setState({
           open: true,
@@ -77,7 +78,11 @@ class NewFormula extends Component {
   render() {
     return (
       <div>
-        <FormulaWindow onFinish={this.onFinish.bind(this)}/>
+        <FormulaWindow
+          onFinish={this.onFinish.bind(this)}
+          BackButtonShown={true}
+          onBackClick={this.props.onBackClick}
+        />
         <Snackbar
           open={this.state.open}
           message={this.state.message}
@@ -88,5 +93,10 @@ class NewFormula extends Component {
     );
   }
 }
+
+NewFormula.propTypes = {
+  onBackClick: PropTypes.func,
+  onFinish: PropTypes.func,
+};
 
 export default NewFormula;
