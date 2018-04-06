@@ -19,6 +19,7 @@ import ProductionRun from '../homepage/productionrun/ProductionRun';
 import RecallReport from '../homepage/recallreport/RecallReport';
 import Freshness from '../homepage/freshnessreport/Freshness';
 import UserTable from '../homepage/user/UserTable';
+import ProductionLine from '../homepage/productionline/ProductionLine';
 
 class HomePage extends Component {
   constructor(props) {
@@ -85,6 +86,9 @@ class HomePage extends Component {
     }
     else if (funcName == 'userTable') {
       return <UserTable />;
+    }
+    else if (funcName == 'productionline') {
+      return <ProductionLine />;
     }
   }
 
