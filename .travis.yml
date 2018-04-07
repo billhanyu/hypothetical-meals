@@ -14,4 +14,4 @@ before_install:
 after_success:
 - eval \"$(ssh-agent -s)\"
 - ssh-add secret
-- ssh vcm@152.3.53.74 'cd meals && npm run deploy'
+- yes | ssh vcm@152.3.53.74 'cd meals && npm run deploy'
