@@ -8,10 +8,9 @@ before_script:
 - mysql -u root -e "CREATE DATABASE meals_test"
 addons:
   ssh_known_hosts: '152.3.53.74'
-before_install:
+after_success:
 - openssl aes-256-cbc -K $encrypted_95a91f9e7702_key -iv $encrypted_95a91f9e7702_iv
   -in hm-staging.enc -out secret -d
-after_success:
 - eval \"$(ssh-agent -s)\"
 - ssh-add secret
-- yes | ssh vcm@152.3.53.74 'cd meals && npm run deploy'
+- ssh vcm@152.3.53.74 'cd meals && npm run deploy'
