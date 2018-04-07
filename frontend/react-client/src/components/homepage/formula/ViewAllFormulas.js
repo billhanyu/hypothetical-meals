@@ -4,7 +4,7 @@ import BulkImport from '../ingredient/BulkImport';
 import NewFormula from './NewFormula';
 import FormulaListItem from './FormulaListItem';
 import AddEditIngredient from '../ingredient/AddEditIngredient';
-import FormulaWindow from '../formula/FormulaWindow';
+import FormulaWindow from '../Formula/FormulaWindow';
 import Snackbar from 'material-ui/Snackbar';
 
 class ViewAllFormulas extends Component {

@@ -5,7 +5,7 @@ import { COUNT_PER_PAGE } from '../../Constants/Pagination';
 import ProductionLineItem from './ProductionLineItem';
 import AddEditProductionLine from './AddEditProductionLine';
 import PageBar from '../../GeneralComponents/PageBar';
-import FormulaWindow from '../formula/FormulaWindow';
+import FormulaWindow from '../Formula/FormulaWindow';
 
 class ProductionLine extends Component {
   constructor(props) {
