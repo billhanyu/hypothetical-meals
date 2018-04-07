@@ -10,8 +10,6 @@ WORKDIR ./frontend
 
 RUN rm -rf ./node_modules
 
-RUN ls
-
 RUN npm i
 
 RUN npm run build
@@ -24,4 +22,4 @@ RUN chmod +x ./wait-for-it.sh
 
 CMD node ./build/server.js
 
-EXPOSE 80
+EXPOSE 1717
