@@ -12,7 +12,7 @@ import Order from '../homepage/order/Order';
 import SpendingLog from '../homepage/spendinglog/SpendingLog';
 import StorageList from '../homepage/storage/StorageList';
 import ProduceFormula from '../homepage/inventory/ProduceFormula.js';
-import ViewAllFormulas from '../homepage/formula/ViewAllFormulas.js';
+import ViewAllFormulas from '../homepage/Formula/ViewAllFormulas.js';
 import ProductionLog from '../homepage/productionlog/ProductionLog';
 import SystemLog from '../homepage/systemlog/SystemLog';
 import ProductionRun from '../homepage/productionrun/ProductionRun';

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "cross-env NODE_ENV=dev nodemon --exec babel-node server/server.js",
     "test": "cross-env NODE_ENV=test mocha --timeout 10000 --require babel-polyfill --require babel-register --require test/common/mochaConfig.js --exit",
-    "start-production": "./deploy.sh"
+    "deploy": "./deploy.sh",
+    "build": "babel -d ./build ./server -s"
   },
   "author": "Eric Song, Bill Yu, Brian Zhou, Christine Zhou",
   "license": "ISC",
