@@ -38,17 +38,20 @@ class ProductionLineItem extends Component {
             ?
               <div>
                 <span style={{ color: 'blue' }}>In Progress</span>
-                <button
-                  type='button'
-                  style={{'margin-left': '10px'}}
-                  className='btn btn-primary no-collapse'
-                  onClick={() => {
-                    if (productionrun_id && global.user_group !== 'noob') {
-                      this.props.markComplete(id);
-                    }
-                  }}>
-                  Mark Complete
-                </button>
+                {
+                  global.user_group !== 'noob' &&
+                  <button
+                    type='button'
+                    style={{'margin-left': '10px'}}
+                    className='btn btn-primary no-collapse'
+                    onClick={() => {
+                      if (productionrun_id && global.user_group !== 'noob') {
+                        this.props.markComplete(id);
+                      }
+                    }}>
+                    Mark Complete
+                  </button>
+                }
               </div>
             :
               <span style={{ color: 'green' }}>Idle</span>

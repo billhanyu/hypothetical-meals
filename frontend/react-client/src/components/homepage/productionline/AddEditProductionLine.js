@@ -2,24 +2,32 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Snackbar from 'material-ui/Snackbar';
 import axios from 'axios';
+import AvailableFormulaSelector from '../../selector/AvailableFormulaSelector';
 
 class AddEditProductionLine extends Component {
   constructor(props) {
     super(props);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmitButtonClick = this.handleSubmitButtonClick.bind(this);
+    this.changeFormulaId = this.changeFormulaId.bind(this);
+    this.addFormula = this.addFormula.bind(this);
+    this.removeFormula = this.removeFormula.bind(this);
     const defaultLine = {
       name: '',
       description: '',
       id: 0,
+      formulas: [],
     };
     const line = props.line || defaultLine;
     this.state = {
       id: line.id,
       name: line.name,
       description: line.description,
+      formulas: line.formulas,
       open: false,
       message: '',
+      formulaToAdd: '',
+      mode: props.mode,
     };
   }
 
@@ -27,6 +35,91 @@ class AddEditProductionLine extends Component {
     const newState = Object.assign({}, this.state);
     newState[fieldName] = event.target.value;
     this.setState(newState);
+  }
+
+  changeFormulaId(newValue) {
+    this.setState({
+      formulaToAdd: newValue,
+    });
+  }
+
+  reloadData() {
+    axios.get(`/productionlines/${this.state.id}`, {
+      headers: {Authorization: 'Token ' + global.token},
+    })
+      .then(response => {
+        const line = response.data;
+        this.setState({
+          name: line.name,
+          description: line.description,
+          formulas: line.formulas,
+        });
+      })
+      .catch(err => {
+        this.setState({
+          open: true,
+          message: 'Error reloading for this production line',
+        });
+      });
+  }
+
+  addFormula(e) {
+    e.preventDefault();
+    if (!this.state.formulaToAdd) {
+      this.setState({
+        open: true,
+        message: 'Please select a formula to add',
+      });
+      return;
+    }
+    const formulaIds = this.state.formulas.map(formula => formula.id);
+    formulaIds.push(this.state.formulaToAdd);
+    axios.put('/productionlines', {
+      id: this.state.id,
+      name: this.state.name,
+      description: this.state.description,
+      formulaIds,
+    }, {
+      headers: {Authorization: 'Token ' + global.token},
+    })
+      .then(response => {
+        this.setState({
+          open: true,
+          message: 'Formula added to this line',
+        });
+        this.reloadData();
+      })
+      .catch(err => {
+        this.setState({
+          open: true,
+          message: 'Error adding formula',
+        });
+      });
+  }
+
+  removeFormula(id) {
+    const formulaIds = this.state.formulas.map(formula => formula.id).filter(origId => origId !== id);
+    axios.put('/productionlines', {
+      id: this.state.id,
+      name: this.state.name,
+      description: this.state.description,
+      formulaIds,
+    }, {
+        headers: { Authorization: 'Token ' + global.token },
+      })
+      .then(response => {
+        this.setState({
+          open: true,
+          message: 'Formula removed',
+        });
+        this.reloadData();
+      })
+      .catch(err => {
+        this.setState({
+          open: true,
+          message: 'Error removing formula',
+        });
+      });
   }
 
   handleSubmitButtonClick(event) {
@@ -180,8 +273,50 @@ class AddEditProductionLine extends Component {
           </form>
         </div>
 
-        {this.state.mode == "edit" &&
-          <div>
+        {this.state.mode == 'edit' &&
+          <div style={{'margin-top': '40px'}}>
+            <h4>Formulas that this production line produces</h4>
+            {
+              global.user_group !== 'noob' &&
+              <div className="row justify-content-md-center">
+                <form className="col-xl-6 col-lg-6 col-sm-8">
+                  <div className="form-group">
+                    <AvailableFormulaSelector changeFormulaId={this.changeFormulaId} existing={this.state.formulas} />
+                  </div>
+                  <button type="submit" className="btn btn-primary" onClick={this.addFormula}>Add</button>
+                </form>
+              </div>
+            }
+            <div className="row justify-content-md-center" style={{'margin-top': '30px'}}>
+              <table className='table col-xl-6 col-lg-6 col-sm-8'>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    {
+                      global.user_group !== 'noob' &&
+                      <th>Options</th>
+                    }
+                  </tr>
+                </thead>
+                <tbody>
+                  {
+                    this.state.formulas.map((formula, idx) => {
+                      return (
+                        <tr key={idx}>
+                          <td>{formula.name}</td>
+                          {
+                            global.user_group !== 'noob' &&
+                            <td onClick={e=>this.removeFormula(formula.id)} style={{cursor: 'pointer'}}>
+                              <i className="fas fa-trash"></i>
+                            </td>
+                          }
+                        </tr>
+                      );
+                    })
+                  }
+                </tbody>
+              </table>
+            </div>
           </div>
         }
         <div className="modal fade" id="deleteProductionlineModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -212,6 +347,7 @@ AddEditProductionLine.propTypes = {
   line: PropTypes.object,
   backToList: PropTypes.func,
   delete: PropTypes.func,
+  mode: PropTypes.string,
 };
 
 export default AddEditProductionLine;
