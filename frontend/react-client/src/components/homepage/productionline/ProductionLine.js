@@ -184,7 +184,8 @@ class ProductionLine extends Component {
   }
 
   markComplete(id) {
-    // mark production line complete
+    // REQUEST
+    // then reload data
   }
 
   render() {
