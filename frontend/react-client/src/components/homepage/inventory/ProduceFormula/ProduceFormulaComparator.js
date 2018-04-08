@@ -28,9 +28,13 @@ class ProduceFormulaComparator extends Component {
       });
       Object.keys(formulaPackageObject.ingredients).forEach(ingredient => {
         const ingredientObject = formulaPackageObject.ingredients[ingredient];
+        const isIntermediate = props.EditFormulaBoxes.find(element => {
+          return element.ingredient_id == ingredientObject.ingredient_id && (element.intermediate == 1);
+        }) != null;
         const addedIngredients = numProducts / formulaAmount * ingredientObject.num_native_units;
         if(ingredientIDtoAmountMap[ingredientObject.ingredient_id] != null) {
           ingredientIDtoAmountMap[ingredientObject.ingredient_id].amount = ingredientIDtoAmountMap[ingredientObject.ingredient_id].amount + addedIngredients;
+          ingredientIDtoAmountMap[ingredientObject.ingredient_id].intermediate = isIntermediate;
         }
         else {
           ingredientList.push(ingredientObject);
@@ -38,6 +42,7 @@ class ProduceFormulaComparator extends Component {
             name: ingredientObject.name,
             amount: addedIngredients,
             stock: 0,
+            intermediate: isIntermediate,
           };
         }
       });
@@ -57,7 +62,7 @@ class ProduceFormulaComparator extends Component {
     Object.keys(this.ingredientIDtoAmountMap).map((elementId, key) => {
       const leftoverStock = this.ingredientIDtoAmountMap[elementId].stock - this.ingredientIDtoAmountMap[elementId].amount;
       if(leftoverStock < 0) {
-        this.negativeEntries.push({elementId, leftoverStock});
+        this.negativeEntries.push({elementId, leftoverStock, isIntermediate:this.ingredientIDtoAmountMap[elementId].intermediate });
       }
     });
   }
@@ -88,12 +93,16 @@ class ProduceFormulaComparator extends Component {
 
   addIngredientsToCart() {
     global.cart = [];
+    let negativeIntermediateIssue = false;
     this.negativeEntries.forEach(negativeIngredientObj => {
+      if(negativeIngredientObj.isIntermediate) {
+        negativeIntermediateIssue = true;
+      }
       const ingredientObj = this.ingredientList.find(ingredientObj => {
         return ingredientObj.ingredient_id == negativeIngredientObj.elementId;
       });
       const stockRequired = Math.abs(negativeIngredientObj.leftoverStock);
-      ingredientObj.quantity = Math.ceil(stockRequired / ingredientObj.ingredient_num_native_units);
+      ingredientObj.quantity = Math.ceil(stockRequired / ingredientObj.num_native_units);
       //Modify the object to become more like the cart Object
       ingredientObj.id = ingredientObj.ingredient_id;
       ingredientObj.num_native_units = ingredientObj.ingredient_num_native_units;
@@ -103,6 +112,12 @@ class ProduceFormulaComparator extends Component {
 
       global.cart.push(ingredientObj);
     });
+    if(negativeIntermediateIssue) {
+      return this.setState({
+        open: true,
+        snackbarMessage: 'Need more intermediate products - cannot add to cart'
+      });
+    }
     this.setState({
       open: true,
       snackbarMessage: "Added to Cart",

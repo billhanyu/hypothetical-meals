@@ -13,14 +13,18 @@ class AddEditIngredient extends Component {
     const entries = lotNumberSet[this.props.item.id];
     entries.splice(index, 1);
     let count = 0;
+    let noBlankLotNumbers = true;
     entries.forEach(element => {
+      if(element.lotNumber.length === 0) {
+        noBlankLotNumbers = false;
+      }
       count += Number(element.quantity);
     });
     let fullyAllocated = false;
     if(this.props.item.quantity - count == 0) {
       fullyAllocated = true;
     }
-    this.props.updateLotSet(lotNumberSet, fullyAllocated);
+    this.props.updateLotSet(lotNumberSet, fullyAllocated, noBlankLotNumbers);
   }
 
   _handleAmountChange(event, objectKey, index) {
@@ -29,14 +33,18 @@ class AddEditIngredient extends Component {
     //This is an array
     entries[index][objectKey] = event.target.value;
     let count = 0;
+    let noBlankLotNumbers = true;
     entries.forEach(element => {
+      if(element.lotNumber.length === 0) {
+        noBlankLotNumbers = false;
+      }
       count += Number(element.quantity);
     });
     let fullyAllocated = false;
     if(this.props.item.quantity - count == 0) {
       fullyAllocated = true;
     }
-    this.props.updateLotSet(lotNumberSet, fullyAllocated);
+    this.props.updateLotSet(lotNumberSet, fullyAllocated, noBlankLotNumbers);
   }
 
   _createAdditionalLot() {
@@ -52,22 +60,29 @@ class AddEditIngredient extends Component {
       lotNumberSet[this.props.item.id] = [{quantity: 0, lotNumber: '',}];
       entries = this.props.lotNumberSet[this.props.item.id];
     }
-    let count = 0;
+    let count = 0; let noBlankLotNumbers = true;
     entries.forEach(element => {
+      if(element.lotNumber.length === 0) {
+        noBlankLotNumbers = false;
+      }
       count += Number(element.quantity);
     });
     let fullyAllocated = false;
     if(this.props.item.quantity - count == 0) {
       fullyAllocated = true;
     }
-    this.props.updateLotSet(lotNumberSet, fullyAllocated);
+    this.props.updateLotSet(lotNumberSet, fullyAllocated, noBlankLotNumbers);
   }
 
   render() {
     const {state, lotNumberSet, item} = this.props;
     let count = 0;
+    let noBlankLotNumbers = true;
     if(lotNumberSet[item.id] != null){
       lotNumberSet[item.id].forEach(element => {
+        if(element.lotNumber.length === 0) {
+          noBlankLotNumbers = false;
+        }
         count += Number(element.quantity);
       });
     }
@@ -77,7 +92,10 @@ class AddEditIngredient extends Component {
     let vendoringredients = ingredient ? ingredient.vendoringredients : ['N/A'];
     return (
       <div className="form-group" style={{border: '1px solid black', padding:'8px'}}>
-        <label htmlFor="vendor">{this.props.item.name} --- <span style={{color: 'red'}}>{leftoverAllocation == 0 ? '' : `${leftoverAllocation} unallocated`}</span></label>
+        <label htmlFor="vendor">{this.props.item.name} ---
+          <span style={{color: 'red'}}>{!noBlankLotNumbers ? 'Please assign lot numbers to all amounts -' : ''}</span>
+          <span style={{color: 'red'}}>{leftoverAllocation == 0 ? '' : `${leftoverAllocation} unallocated`}</span>
+        </label>
         {
           this.props.lotNumberSet[item.id] != null && this.props.lotNumberSet[item.id].map((element, key) => {
             return <div key={key} style={{borderBottom: '1px solid #000', marginBottom:'10px'}}>
@@ -86,7 +104,7 @@ class AddEditIngredient extends Component {
                   <input placeholder="Amount" value={element.quantity} onChange={(e) => {this._handleAmountChange(e, 'quantity', key);}}/>
                 </div>
                 <div className="ChooseVendorHeader" style={{display:'inline-block', margin:'12px'}}>Lot Number:
-                  <input placeholder="Lot Number" value={element.lotNumber} onChange={(e) => {this._handleAmountChange(e, 'lotNumber', key);}}/>
+                  <input placeholder="Lot Number" style={element.lotNumber.length === 0 ? {border:'1px solid red'} : null} value={element.lotNumber} onChange={(e) => {this._handleAmountChange(e, 'lotNumber', key);}}/>
                 </div>
             </div>;
           })
