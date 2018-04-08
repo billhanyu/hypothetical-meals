@@ -25,7 +25,7 @@ class Order extends Component {
     this.showOrders = this.showOrders.bind(this);
     if (global.cart != null) {
       for (let item of global.cart) {
-        this.orderIngredient(item);
+        this.orderIngredient(item, item.quantity);
       }
     }
   }
@@ -132,11 +132,20 @@ class Order extends Component {
 
   orderWithVendors(event) {
     event.preventDefault();
-
+    let message = ''; let errored = false;
+    if(!this.state.noBlankLotNumbers) {
+      message += 'Please fill out all lot numbers values -';
+      errored = true;
+    }
     if(!this.state.fullyAllocated) {
+      errored = true;
+      message += 'Please fully allocate lot numbers';
+    }
+
+    if(errored){
       return this.setState({
         open: true,
-        message: 'Please fully allocate lot numbers',
+        message,
       });
     }
 
@@ -179,10 +188,11 @@ class Order extends Component {
     });
   }
 
-  _updateLotSet(lotNumberSet, fullyAllocated) {
+  _updateLotSet(lotNumberSet, fullyAllocated, noBlankLotNumbers) {
     this.setState({
       lotNumberSet,
       fullyAllocated,
+      noBlankLotNumbers,
     });
   }
 

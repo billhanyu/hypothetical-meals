@@ -55,16 +55,9 @@ class FormulaInput extends Component {
     const IDforElement = this.state.ingredientData.find(element => {
       return elementName === element.name;
     }).id;
-
-    if((isNaN(Number(newQuantity)) || Number(newQuantity) <= 0)) {
-      newQuantityMap[IDforElement] = 1;
-      newIngredientNameToQuantityMap[elementName] = 1;
-    }
-    else {
-      newQuantityMap[IDforElement] = newQuantity;
-      newIngredientNameToQuantityMap[elementName] = newQuantity;
-    }
-
+    const replacedValue = Number(newQuantity.replace('.', '').replace('-', ''));
+    newQuantityMap[IDforElement] = isNaN(replacedValue) ? newQuantity : replacedValue;
+    newIngredientNameToQuantityMap[elementName] = isNaN(replacedValue) ? newQuantity : replacedValue;
     this.props.onChange(newQuantityMap, newIngredientNameToQuantityMap);
   }
 
@@ -81,6 +74,17 @@ class FormulaInput extends Component {
   _updateSearchText(searchText, dataSource, params) {
     return this.setState({
       searchText,
+    });
+  }
+
+  _handleDelete(elementName) {
+    const currentElements = this.state.values;
+    const indexOfElement = this.state.values.findIndex(element => {
+      return element == elementName;
+    });
+    currentElements.splice(indexOfElement, 1);
+    this.setState({
+      values: currentElements,
     });
   }
 
@@ -110,6 +114,7 @@ class FormulaInput extends Component {
              elementName={elementName}
              value={this.props.ingredientNameToQuantityMap[elementName]}
              onInputChange={this.handleInputChange.bind(this)}
+             onDelete={this._handleDelete.bind(this)}
             />;
            })
          }

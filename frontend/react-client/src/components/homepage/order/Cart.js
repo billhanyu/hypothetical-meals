@@ -60,7 +60,7 @@ class Cart extends Component {
         <table className="table" style={{'background-color': 'white'}}>
           <thead>
             <th>
-            <div 
+            <div
               className="fa fa-remove CartDeleteColumn DeleteCartItem"
               aria-hidden="true"
               style={{'color': 'rgba(0,0,0,0)', 'cursor': ''}}
