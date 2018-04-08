@@ -226,6 +226,7 @@ CREATE TABLE Orders(
 	arrived bit not null DEFAULT 0,
 	ingredient_id int not null,
 	num_packages int not null,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	PRIMARY KEY (id)

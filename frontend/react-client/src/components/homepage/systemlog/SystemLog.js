@@ -254,6 +254,7 @@ class SystemLog extends Component {
           <tbody>
             {
               this.state.pagedLogs.map((log, idx) => {
+                console.log(log.created_at);
                 return (
                   <tr className="row" style={{ 'margin': 0 }} key={idx}>
                     <td className="col-md-3">{(new Date(log.created_at)).toString().split(' GMT')[0]}</td>
