@@ -228,7 +228,7 @@ CREATE TABLE Orders(
 	num_packages int not null,
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
 
-	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
+	FOREIGN KEY (vendoringredient_id) REFERENCES VendorsIngredients(id),
 	PRIMARY KEY (id)
 );
 
