@@ -255,6 +255,22 @@ class SideBar extends Component {
           </li>
           <li className="nav-item">
             <a
+              href="javascript:void(0)"
+              role="button"
+              className={"nav-link PermissionCategory" + (this.state.activeCategory == "productionrun_nonreport" ? "-Active" : "")}
+              id="user"
+              onClick={e => {
+                this.setActiveCategory("productionrun_nonreport");
+                this.props.link('productionrun_nonreport');
+                this.setActive("");
+              }}
+              data-parent="#SideBar"
+            >
+              Production Runs
+              </a>
+          </li>
+          <li className="nav-item">
+            <a
               className="nav-link active PermissionCategory"
               href="javascript:void(0)"
               data-toggle="modal"

@@ -8,6 +8,8 @@ import Checkbox from 'material-ui/Checkbox';
 import ComboBox from '../../GeneralComponents/ComboBox';
 import Storage2State from '../../Constants/Storage2State';
 import packageTypes from '../../Constants/PackageTypes';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
 class FormulaWindow extends Component {
   constructor(props) {
@@ -19,6 +21,8 @@ class FormulaWindow extends Component {
     const removed = props.newFormulaObject != null ? props.newFormulaObject.removed : 0;
     const idToQuantityMap = {};
     const values = [];
+    const productionLines = [];
+    const productionLinesAll = ["Line 1", "Line 2"];
     const ingredientNameToQuantityMap = {};
     if (props.newFormulaObject != null) {
       Object.keys(props.newFormulaObject.ingredients).forEach(ingredient => {
@@ -40,6 +44,8 @@ class FormulaWindow extends Component {
       name,
       desc,
       quantity,
+      productionLines,
+      productionLinesAll,
       removed,
       idToQuantityMap,
       values,
@@ -176,6 +182,24 @@ class FormulaWindow extends Component {
     });
   }
 
+  selectedProductionLine(event, index, values) {
+    this.setState({
+      productionLines: values,
+    });
+  }
+
+  productionItems(values) {
+    return this.state.productionLinesAll.map((name) => (
+      <MenuItem
+        key={name}
+        insetChildren={true}
+        checked={values && values.indexOf(name) > -1}
+        value={name}
+        primaryText={name}
+      />
+    ));
+  }
+
   handleRequestClose() {
     this.setState({
       open: false,
@@ -211,6 +235,20 @@ class FormulaWindow extends Component {
         </h3>
         <FormulaInput readOnly={readOnly} error={this.state.nameError} errorText="Invalid Name" value={this.state.name} id="name" onChange={this.handleInputChange} HeaderText="Unique Formula Name" ContentText="Name of the amalgamated entity" placeholder="Formula Name" />
         <FormulaInput readOnly={readOnly} error={this.state.descError} errorText="Invalid Desc" value={this.state.desc} id="desc" onChange={this.handleInputChange} HeaderText="Formula Description" ContentText="Full description or important notes for this particular formula" useTextArea />
+        <div className="FormulaInputContainer">
+          <div className="FormulaTextContainer">
+            <div className="FormulaTextHeader">Formula Production Lines</div>
+            <div className="FormulaTextContent">All production lines that can produce this formula</div>
+          </div>
+          <SelectField
+            multiple={true}
+            hintText="Select production lines"
+            value={this.state.productionLines}
+            onChange={this.selectedProductionLine.bind(this)}
+          >
+            {this.productionItems(this.state.productionLines)}
+          </SelectField>
+        </div>
         <FormulaSelector
           readOnly={readOnly}
           onChange={this._handleIngredientChange.bind(this)}
