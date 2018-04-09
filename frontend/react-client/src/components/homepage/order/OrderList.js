@@ -3,6 +3,7 @@ import axios from 'axios';
 import Snackbar from 'material-ui/Snackbar';
 import OrderListItem from './OrderListItem';
 import PropTypes from 'prop-types';
+import DistributeLotItem from './DistributeLotItem';
 
 class OrderList extends Component {
   constructor(props) {
@@ -11,7 +12,11 @@ class OrderList extends Component {
       orders: [],
       open: false,
       message: '',
+      markingArrived: false,
+      arrivingOrder: {},
     };
+    this.markArrived = this.markArrived.bind(this);
+    this.back = this.back.bind(this);
   }
 
   handleRequestClose() {
@@ -21,6 +26,20 @@ class OrderList extends Component {
   }
   
   componentWillMount() {
+    this.reloadData();
+  }
+
+  markArrived(arrivingOrder) {
+    this.setState({
+      arrivingOrder,
+      markingArrived: true,
+    });
+  }
+
+  back() {
+    this.setState({
+      markingArrived: false,
+    });
     this.reloadData();
   }
 
@@ -42,6 +61,9 @@ class OrderList extends Component {
               ingredient: {
                 name: 'FUCK',
               },
+              vendor: {
+                name: 'Duke',
+              },
               created_at: '2018-03-31T06:56:44.000Z',
               num_packages: 2,
               arrived: 0,
@@ -49,6 +71,9 @@ class OrderList extends Component {
             {
               ingredient: {
                 name: 'damn',
+              },
+              vendor: {
+                name: 'UNC',
               },
               created_at: '2018-04-01T06:56:44.000Z',
               num_packages: 1,
@@ -60,7 +85,8 @@ class OrderList extends Component {
   }
   
   render() {
-    return (
+    const columnClass = 'OneFifthWidth';
+    const main =
       <div>
         <Snackbar
           open={this.state.open}
@@ -75,20 +101,31 @@ class OrderList extends Component {
         <table className='table'>
           <thead>
             <tr>
-              <th>Order Time</th>
-              <th>Ingredient Name</th>
-              <th>Number of Packages</th>
-              <th>Status</th>
+              <th className={columnClass}>Order Time</th>
+              <th className={columnClass}>Ingredient</th>
+              <th className={columnClass}>Vendor</th>
+              <th className={columnClass}>Number of Packages</th>
+              <th className={columnClass}>Status</th>
             </tr>
           </thead>
           <tbody>
             {
-              this.state.orders.map((order, idx) => <OrderListItem key={idx} order={order} />)
+              this.state.orders.map((order, idx) =>
+                <OrderListItem
+                  markArrived={this.markArrived}
+                  key={idx}
+                  order={order}
+                  columnClass={columnClass}
+                />)
             }
           </tbody>
         </table>
-      </div>
-    );
+      </div>;
+    
+    const markingArrived =
+      <DistributeLotItem order={this.state.arrivingOrder} back={this.back} />;
+    
+    return this.state.markingArrived ? markingArrived : main;
   }
 }
 
