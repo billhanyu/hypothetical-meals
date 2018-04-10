@@ -341,6 +341,7 @@ describe('Inventory', () => {
             .then((results) => {
               assert.strictEqual(results.length, 1, 'Intermediate product added to inventory');
               const product = results[0];
+              assert.isOk(Math.abs(product.per_package_cost-0.438 < 0.0001), 'Correct per package cost for intermediate product');
               assert.strictEqual(product.num_packages, 1, 'One package of intermediate product added to inventory');
               assert.strictEqual(product.vendor_id, 1, 'Intermediate product vendor ID is us');
               done();
@@ -373,7 +374,7 @@ describe('Inventory', () => {
         .catch((error) => console.log(error));
     });
 
-    xit('should write production info to ProductRuns and ProductRunsEntries tables', (done) => {
+    it('should write production info to ProductRuns and ProductRunsEntries tables', (done) => {
       chai.request(server)
         .put('/inventory')
         .set('Authorization', `Token ${testTokens.managerTestToken}`)
@@ -399,12 +400,12 @@ describe('Inventory', () => {
               assert.strictEqual(productRunsEntries[6].productrun_id, productRun.id, 'First product run entry correct product run id');
               assert.strictEqual(productRunsEntries[6].ingredient_id, 1, 'First product run entry correct ingredient id');
               assert.strictEqual(productRunsEntries[6].vendor_id, 1, 'First product run entry correct vendor id');
-              assert.strictEqual(productRunsEntries[6].num_native_units, 10, 'First product run entry correct num native units');
+              assert.strictEqual(productRunsEntries[6].num_native_units, 9, 'First product run entry correct num native units');
               assert.strictEqual(productRunsEntries[6].lot, 'ff', 'First product run entry correct lot');
               assert.strictEqual(productRunsEntries[7].productrun_id, productRun.id, 'First product run entry correct product run id');
               assert.strictEqual(productRunsEntries[7].ingredient_id, 2, 'First product run entry correct ingredient id');
               assert.strictEqual(productRunsEntries[7].vendor_id, 1, 'First product run entry correct vendor id');
-              assert.strictEqual(productRunsEntries[7].num_native_units, 15, 'First product run entry correct num native units');
+              assert.strictEqual(productRunsEntries[7].num_native_units, 12, 'First product run entry correct num native units');
               assert.strictEqual(productRunsEntries[7].lot, 'ff', 'First product run entry correct lot');
               done();
             })
