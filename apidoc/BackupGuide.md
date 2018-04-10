@@ -3,7 +3,7 @@
 Our backup system is performed via a MySQL dump between our server Duke VCM server (main server) and a dedicated database backup Duke VCM server (backup server). To begin explaining our backup process, let us take a look at a shell script in our backup server:
 
 ```shell
-echo "Beginning backup at $(date +'%m/%d/%Y %H:%M:%S.%N')." | mail -s "[BEGIN] Database Backup for Kung Foods $(date +'%m-%d-%Y')" eric.s.song@duke.edu
+echo "Beginning backup at $(date +'%m/%d/%Y %H:%M:%S.%N')." | mail -s "[BEGIN] Database Backup for Kung Foods $(date +'%m-%d-%Y')" han.yu@duke.edu christine.zhou@duke.edu brian.zhou@duke.edu eric.s.song@duke.edu
 CURRENT_DATE_FILE="$(date +'%m-%d-%Y')-backup.sql"
 
 if output="$(ssh vcm@vcm-3173.vm.duke.edu "mysqldump -u root -p'billsucks' meals" > "$CURRENT_DATE_FILE")"; then
