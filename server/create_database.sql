@@ -200,7 +200,7 @@ CREATE TABLE ProductionlinesOccupancies(
 	productionline_id int not null,
 	formula_id int not null,
 	start_time timestamp DEFAULT now() not null,
-	end_time timestamp DEFAULT now() not null,
+	end_time timestamp null,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
 	FOREIGN KEY (productionline_id) REFERENCES Productionlines(id),
