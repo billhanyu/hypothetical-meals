@@ -28,17 +28,22 @@ CREATE TABLE Users(
 	salt character(32), 
 	user_group enum('admin', 'manager', 'noob') not null DEFAULT 'noob',
 	removed BIT DEFAULT 0,
+	isactive varchar(70) DEFAULT 'Yes',
 
 	PRIMARY KEY (id),
-	UNIQUE (username, oauth)
+	UNIQUE (username, oauth, isactive)
 );
 
 CREATE TABLE Vendors(
 	id int not null AUTO_INCREMENT,
-	name varchar(70) not null UNIQUE,
+	name varchar(70) not null,
 	contact varchar(255) not null,
-	code varchar(255) not null UNIQUE,
+	code varchar(255) not null,
 	removed BIT DEFAULT 0,
+	isactive varchar(70) DEFAULT 'Yes',
+	
+	UNIQUE(name, isactive),
+	UNIQUE(code, isactive),
 
 	PRIMARY KEY (id)
 );
@@ -53,7 +58,7 @@ CREATE TABLE Storages(
 
 CREATE TABLE Ingredients(
 	id int not null AUTO_INCREMENT,
-	name varchar(70) not null UNIQUE,
+	name varchar(70) not null,
 	package_type enum('sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar') not null,
 	storage_id int not null,
 	native_unit varchar(70) not null,
@@ -122,7 +127,7 @@ CREATE TABLE Formulas(
 	id int not null AUTO_INCREMENT,
 	intermediate BIT DEFAULT 0,
 	ingredient_id int,
-	name varchar(70) not null UNIQUE,
+	name varchar(70) not null,
 	description text not null,
 	num_product int not null,
 	worst_duration BIGINT DEFAULT 0 not null,
