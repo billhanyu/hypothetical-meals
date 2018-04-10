@@ -59,6 +59,7 @@ function getStockPromise(ids) {
             inventoryId: result.id,
             numPackages: result.num_packages,
             createdAt: result.created_at,
+            perPackageCost: result.per_package_cost,
 
             lot: result.lot,
             vendorId: result.vendor_id,
@@ -169,6 +170,7 @@ export function commitCart(req, res, next) {
   const freshness = [];
   const changes = {};
   let intermediateIng;
+  let totalCost = 0;
 
   const uniqueId = uuid();
   const productRunEntries = [];
@@ -212,6 +214,7 @@ export function commitCart(req, res, next) {
         for (let freshnessEntry of inventory.freshnessData) {
           if (numPackagesLeft <= 0) break;
           const numPackagesConsumed = numPackagesLeft > freshnessEntry.numPackages ? freshnessEntry.numPackages : numPackagesLeft;
+          totalCost += numPackagesConsumed * freshnessEntry.perPackageCost;
           changes[freshnessEntry.inventoryId] = freshnessEntry.numPackages - numPackagesConsumed;
           numPackagesLeft = numPackagesLeft - numPackagesConsumed;
           const timeSinceCreation = new Date() - freshnessEntry.createdAt;
@@ -241,8 +244,7 @@ export function commitCart(req, res, next) {
       if (!formula.intermediate) return Promise.resolve();
       intermediateIng = intermediateIngArr[0];
       return connection.query('INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id, per_package_cost) VALUES (?)',
-        [[intermediateIng.id, 0, uniqueId, 1, 0]]);
-      // TODO: update this per package cost later
+        [[intermediateIng.id, 0, uniqueId, 1, totalCost / numProducts]]);
     })
     .then(() => {
       if (!formula.intermediate) return Promise.resolve();
@@ -264,7 +266,7 @@ export function commitCart(req, res, next) {
     .then(() => {
       // TODO: update this cost_for_run later
       return connection.query('INSERT INTO ProductRuns (formula_id, user_id, num_product, lot, cost_for_run) VALUES (?)',
-        [[formulaId, req.payload.id, numProducts, uniqueId, 0]]);
+        [[formulaId, req.payload.id, numProducts, uniqueId, totalCost]]);
     })
     .then(() => {
       return connection.query('SELECT id FROM ProductRuns WHERE lot = ?', [uniqueId]);
@@ -299,7 +301,6 @@ export function commitCart(req, res, next) {
     })
     .then(() => success(res))
     .catch(err => {
-      console.log(err);
       connection.query('DELETE FROM Inventories WHERE num_packages = 0')
         .then(() => {
           handleError(err, res);
