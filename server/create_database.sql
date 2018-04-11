@@ -28,7 +28,7 @@ CREATE TABLE Users(
 	salt character(32), 
 	user_group enum('admin', 'manager', 'noob') not null,
 	removed BIT DEFAULT 0,
-	isactive varchar(70) DEFAULT 'Yes',
+	isactive varchar(1) DEFAULT 'Y',
 
 	PRIMARY KEY (id),
 	UNIQUE (username, oauth, isactive)
@@ -40,7 +40,7 @@ CREATE TABLE Vendors(
 	contact varchar(255) not null,
 	code varchar(255) not null,
 	removed BIT DEFAULT 0,
-	isactive varchar(70) DEFAULT 'Yes',
+	isactive varchar(1) DEFAULT 'Y',
 	
 	UNIQUE(name, isactive),
 	UNIQUE(code, isactive),
@@ -68,6 +68,9 @@ CREATE TABLE Ingredients(
 	total_weighted_duration BIGINT DEFAULT 0 not null,
 	total_num_native_units double DEFAULT 0 not null,
 	removed BIT DEFAULT 0,
+	isactive varchar(1) DEFAULT 'Y',
+
+	UNIQUE(name, isactive),
 
 	FOREIGN KEY (storage_id) REFERENCES Storages(id),
 	PRIMARY KEY (id)
@@ -134,6 +137,9 @@ CREATE TABLE Formulas(
 	total_weighted_duration BIGINT DEFAULT 0 not null,
 	total_num_products double DEFAULT 0 not null,
 	removed BIT DEFAULT 0,
+	isactive varchar(1) DEFAULT 'Y',
+
+	UNIQUE(name, isactive),
 
 	PRIMARY KEY (id)
 );
