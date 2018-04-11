@@ -180,29 +180,39 @@ CREATE TABLE ProductRuns(
 
 CREATE TABLE Productionlines(
 	id int not null AUTO_INCREMENT,
-	name varchar(70) not null UNIQUE, 
+	name varchar(70) not null, 
 	description text,
-	productrun_id int DEFAULT 0,
+	isactive varchar(1) DEFAULT 'Y',
+
+	UNIQUE(name, isactive),
 
 	PRIMARY KEY (id)
 );
 
 CREATE TABLE FormulaProductionLines(
+	id int not null AUTO_INCREMENT,
 	formula_id int not null,
 	productionline_id int not null,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
-	FOREIGN KEY (productionline_id) REFERENCES Productionlines(id)
+	FOREIGN KEY (productionline_id) REFERENCES Productionlines(id),
+
+	UNIQUE(formula_id, productionline_id),
+	
+	PRIMARY KEY (id)
 );
 
 CREATE TABLE ProductionlinesOccupancies(
 	id int not null AUTO_INCREMENT,
 	productionline_id int not null,
+	productrun_id int not null,
 	formula_id int not null,
 	start_time timestamp DEFAULT now() not null,
 	end_time timestamp null,
+	busy BIT DEFAULT 1,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
+	FOREIGN KEY (productrun_id) REFERENCES ProductRuns(id),
 	FOREIGN KEY (productionline_id) REFERENCES Productionlines(id),
 	PRIMARY KEY (id)
 );
