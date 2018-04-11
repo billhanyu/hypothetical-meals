@@ -246,7 +246,7 @@ function deleteIngredientHelper(items, req, res, next) {
         }
       }
     if (formulasWithIngredient.length > 0) throw createError(`Formulas ${formulasWithIngredient.join(', ')} contains one or more ingredients that are attempted to be deleted`);
-    return connection.query(`UPDATE Ingredients SET removed = 1 WHERE id IN (?)`, [ingredientIds]);
+    return connection.query(`UPDATE Ingredients SET removed = 1, isactive = NULL WHERE id IN (?)`, [ingredientIds]);
   })
   .then(() => connection.query(`SELECT id FROM VendorsIngredients WHERE ingredient_id IN (?)`, [ingredientIds]))
   .then(results => {
