@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS SalesEntries;
 DROP TABLE IF EXISTS Sales;
 DROP TABLE IF EXISTS FinalProductInventories;
 DROP TABLE IF EXISTS Orders;
@@ -245,20 +246,29 @@ CREATE TABLE Orders(
 
 CREATE TABLE FinalProductInventories(
 	id int not null AUTO_INCREMENT,
-	formula_id int not null,
+	productrun_id int not null,
 	num_packages int not null DEFAULT 0,
 	created_at timestamp DEFAULT now() not null,
 
-	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
+	FOREIGN KEY (productrun_id) REFERENCES ProductRuns(id),
 	PRIMARY KEY (id)
 );
 
 CREATE TABLE Sales(
 	id int not null AUTO_INCREMENT,
+	created_at timestamp DEFAULT now() not null,
+
+	PRIMARY KEY (id)
+)
+
+CREATE TABLE SalesEntries(
+	id int not null AUTO_INCREMENT,
+	sale_id int not null,
 	formula_id int not null,
 	num_packages int not null DEFAULT 0,
 	unit_price double not null DEFAULT 0,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
+	FOREIGN KEY (sale_id) REFERENCES Sales(id),
 	PRIMARY KEY (id)
 );
