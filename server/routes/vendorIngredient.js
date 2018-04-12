@@ -165,7 +165,6 @@ export function deleteVendorIngredients(req, res, next) {
     }
   }
   fakeDeleteMultipleVendorIngredients(ids)
-    .then(() => success(res))
     .then(() => {
       return connection.query(`SELECT Vendors.name as vendor_name, 
         Vendors.id as vendor_id, Ingredients.name as ingredient_name, Ingredients.id as ingredient_id
@@ -180,6 +179,7 @@ export function deleteVendorIngredients(req, res, next) {
       });
       return logAction(req.payload.id, `Removed ${vendorIngredientStrings.join(', ')}.`);
     })
+    .then(() => success(res))
     .catch(err => handleError(err, res));
 }
 
