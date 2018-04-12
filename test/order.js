@@ -8,11 +8,15 @@ describe('Order', () => {
       return dbSetup.setupTestDatabase();
     });
 
-    // add back when lot assignment is complete
     it('should place an order for valid ingredients', (done) => {
-      connection.query(`SELECT COUNT(1) FROM Inventories`)
-        .then((inventoryResult) => {
+      Promise.all([
+        connection.query(`SELECT COUNT(1) FROM Inventories`),
+        connection.query(`SELECT COUNT(1) FROM Orders`),
+      ])
+        .then((allResults) => {
+          const [inventoryResult, orderResult] = allResults;
           const numInventoryEntries = inventoryResult[0]['COUNT(1)'];
+          const numOrders = orderResult[0]['COUNT(1)'];
           chai.request(server)
             .post('/order')
             .set('Authorization', `Token ${testTokens.noobTestToken}`)
@@ -20,16 +24,9 @@ describe('Order', () => {
               'orders': {
                 '1': {
                   'num_packages': 2,
-                  'lots': {
-                    'abc123': 1,
-                    '03859': 1,
-                  },
                 },
                 '3': {
                   'num_packages': 1,
-                  'lots': {
-                    'qbd910': 1,
-                  },
                 },
               },
             })
@@ -37,22 +34,19 @@ describe('Order', () => {
               res.should.have.status(200);
               connection.query('SELECT * FROM Inventories')
                 .then((inventory) => {
-                  assert.strictEqual(inventory.length, numInventoryEntries + 3, 'Number of things in inventory');
+                  assert.strictEqual(inventory.length, numInventoryEntries + 2, 'Number of things in inventory');
                   assert.strictEqual(inventory[numInventoryEntries].id, numInventoryEntries + 1, 'Id for order with lot number abc123');
                   assert.strictEqual(inventory[numInventoryEntries].ingredient_id, 1, 'Ingredient id for order with lot number abc123');
-                  assert.strictEqual(inventory[numInventoryEntries].num_packages, 1, 'Number of packages for order with lot number abc123');
-                  assert.strictEqual(inventory[numInventoryEntries].lot, 'abc123', 'Lot number in order');
+                  assert.strictEqual(inventory[numInventoryEntries].num_packages, 2, 'Number of packages for order with lot number abc123');
+                  assert.strictEqual(inventory[numInventoryEntries].lot, 'PENDING', 'Lot number in order');
+                  assert.strictEqual(inventory[numInventoryEntries].order_id, numOrders + 1, 'Order id for inventory entry');
                   assert.strictEqual(inventory[numInventoryEntries].per_package_cost, 10, 'Package cost of ingredient');
                   assert.strictEqual(inventory[numInventoryEntries + 1].id, numInventoryEntries + 2, 'Id for order with lot number 03859');
-                  assert.strictEqual(inventory[numInventoryEntries + 1].ingredient_id, 1, 'Ingredient id for order with lot number 03859');
+                  assert.strictEqual(inventory[numInventoryEntries + 1].ingredient_id, 3, 'Ingredient id for order with lot number 03859');
                   assert.strictEqual(inventory[numInventoryEntries + 1].num_packages, 1, 'Number of packages for order with lot number 03859');
-                  assert.strictEqual(inventory[numInventoryEntries + 1].lot, '03859', 'Lot number in order');
-                  assert.strictEqual(inventory[numInventoryEntries + 1].per_package_cost, 10, 'Package cost of ingredient');
-                  assert.strictEqual(inventory[numInventoryEntries + 2].id, numInventoryEntries + 3, 'Id for order with lot number 03859');
-                  assert.strictEqual(inventory[numInventoryEntries + 2].ingredient_id, 3, 'Ingredient id for order with lot number 03859');
-                  assert.strictEqual(inventory[numInventoryEntries + 2].num_packages, 1, 'Number of packages for order with lot number 03859');
-                  assert.strictEqual(inventory[numInventoryEntries + 2].lot, 'qbd910', 'Lot number in order');
-                  assert.strictEqual(inventory[numInventoryEntries + 2].per_package_cost, 30, 'Package cost of ingredient');
+                  assert.strictEqual(inventory[numInventoryEntries + 1].lot, 'PENDING', 'Lot number in order');
+                  assert.strictEqual(inventory[numInventoryEntries].order_id, numOrders + 1, 'Order id for inventory entry');
+                  assert.strictEqual(inventory[numInventoryEntries + 1].per_package_cost, 30, 'Package cost of ingredient');
                   return connection.query('SELECT * FROM SpendingLogs');
                 })
                 .then(spendingLogs => {
@@ -69,6 +63,11 @@ describe('Order', () => {
                   assert.strictEqual(spendingLogs[2].total_weight, 520, 'Ingredient weight for spending log 3');
                   assert.strictEqual(spendingLogs[2].total, 5030, 'Total amount spent for ingredient 3');
                   assert.strictEqual(spendingLogs[2].consumed, 50, 'Total amount consumed in weight for ingredient 3');
+
+                  return connection.query(`SELECT * FROM Orders`);
+                })
+                .then(orders => {
+                  assert.strictEqual(orders.length, numOrders + 1, 'Total number of orders');
                   done();
                 })
                 .catch((err) => console.error(err));
@@ -79,7 +78,7 @@ describe('Order', () => {
         });
     });
 
-    it('should reject for empty lot number', (done) => {
+    xit('should reject for empty lot number', (done) => {
       connection.query(`SELECT COUNT(1) FROM Inventories`)
         .then((inventoryResult) => {
           chai.request(server)
@@ -114,9 +113,6 @@ describe('Order', () => {
           'orders': {
             '10': {
               'num_packages': 2,
-              'lots': {
-                'abc123': 2,
-              },
             },
           },
         })
@@ -135,9 +131,6 @@ describe('Order', () => {
           'orders': {
             '4': {
               'num_packages': 100,
-              'lots': {
-                'abc123': 100,
-              },
             },
           },
         })
