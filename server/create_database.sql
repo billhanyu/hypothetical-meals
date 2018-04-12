@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS Sales;
 DROP TABLE IF EXISTS FinalProductInventories;
+DROP TABLE IF EXISTS OrderEntries;
 DROP TABLE IF EXISTS Orders;
 DROP TABLE IF EXISTS ProductRunsEntries;
 DROP TABLE IF EXISTS ProductionlinesOccupancies;
@@ -235,8 +236,9 @@ CREATE TABLE OrderEntries(
 	inventory_id int not null,
 	
 	FOREIGN KEY (inventory_id) REFERENCES Inventories(id),
+	FOREIGN KEY (order_id) REFERENCES Orders(id),
 	PRIMARY KEY (id)
-)
+);
 
 CREATE TABLE FinalProductInventories(
 	id int not null AUTO_INCREMENT,
