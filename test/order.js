@@ -42,14 +42,17 @@ describe('Order', () => {
                   assert.strictEqual(inventory[numInventoryEntries].ingredient_id, 1, 'Ingredient id for order with lot number abc123');
                   assert.strictEqual(inventory[numInventoryEntries].num_packages, 1, 'Number of packages for order with lot number abc123');
                   assert.strictEqual(inventory[numInventoryEntries].lot, 'abc123', 'Lot number in order');
+                  assert.strictEqual(inventory[numInventoryEntries].per_package_cost, 10, 'Package cost of ingredient');
                   assert.strictEqual(inventory[numInventoryEntries + 1].id, numInventoryEntries + 2, 'Id for order with lot number 03859');
                   assert.strictEqual(inventory[numInventoryEntries + 1].ingredient_id, 1, 'Ingredient id for order with lot number 03859');
                   assert.strictEqual(inventory[numInventoryEntries + 1].num_packages, 1, 'Number of packages for order with lot number 03859');
                   assert.strictEqual(inventory[numInventoryEntries + 1].lot, '03859', 'Lot number in order');
+                  assert.strictEqual(inventory[numInventoryEntries + 1].per_package_cost, 10, 'Package cost of ingredient');
                   assert.strictEqual(inventory[numInventoryEntries + 2].id, numInventoryEntries + 3, 'Id for order with lot number 03859');
                   assert.strictEqual(inventory[numInventoryEntries + 2].ingredient_id, 3, 'Ingredient id for order with lot number 03859');
                   assert.strictEqual(inventory[numInventoryEntries + 2].num_packages, 1, 'Number of packages for order with lot number 03859');
                   assert.strictEqual(inventory[numInventoryEntries + 2].lot, 'qbd910', 'Lot number in order');
+                  assert.strictEqual(inventory[numInventoryEntries + 2].per_package_cost, 30, 'Package cost of ingredient');
                   return connection.query('SELECT * FROM SpendingLogs');
                 })
                 .then(spendingLogs => {
