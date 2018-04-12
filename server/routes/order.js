@@ -63,6 +63,9 @@ function orderHelper(orders, req, res, next) {
       return connection.query(`INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id, per_package_cost) VALUES ${newIngredientCases.join(', ')}`);
     })
     .then(() => {
+      return addPendingOrder(newIngredientCases.length);
+    })
+    .then(() => {
       return updateLogForIngredient(spendingLogReq);
     })
     .then(() => {
@@ -82,6 +85,7 @@ function orderHelper(orders, req, res, next) {
       success(res);
     })
     .catch((err) => {
+      console.log(err);
       handleError(err, res);
     });
 }
@@ -122,6 +126,34 @@ function findRequestedStorageQuantity(ingredientIds, ingredientsMap, requestedCa
     }
     requestedCapacities[storageKey] += ingredientsMap[ingredientId]['quantity'] * getSpace(itemPackage);
   });
+}
+
+function addPendingOrder(addedIngredientLength) {
+  return connection.query(`SELECT * FROM (
+    SELECT * FROM Inventories ORDER BY id DESC LIMIT ${addedIngredientLength}
+  ) as inv ORDER BY id`)
+    .then((addedInventories) => {
+      return createOrder(addedInventories.map(x => x.id));
+    })
+    .catch((err) => {
+      throw createError('Error creating pending order');
+    });
+}
+
+function createOrder(inventoryIds) {
+  return connection.query(`INSERT INTO Orders VALUES ()`)
+    .then(() => {
+      return connection.query(`SELECT LAST_INSERT_ID()`);
+    })
+    .then((orderId) => {
+      const orderEntryCases = inventoryIds.map(x => {
+        return [orderId[0]['LAST_INSERT_ID()'], x];
+      });
+      return connection.query(`INSERT INTO OrderEntries (order_id, inventory_id) VALUES ?`, [orderEntryCases]); 
+    })
+    .catch((err) => {
+      throw createError('Error add orders and order entries');
+    });
 }
 
 function checkOrderParameters(orders, res) {
