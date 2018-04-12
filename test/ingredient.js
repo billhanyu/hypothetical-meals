@@ -161,6 +161,53 @@ describe('Ingredient', () => {
       .catch((error) => console.log(error));
     });
 
+    it('should allow if inactive ingredient exists with same name', (done) => {
+      connection.query(`INSERT INTO Ingredients 
+        (name, package_type, storage_id, native_unit, num_native_units, removed, isactive)
+        VALUES ('test', 1, 1, 1, 1, 1, NULL)`)
+        .then(() => {
+          chai.request(server)
+            .post('/ingredients')
+            .set('Authorization', `Token ${testTokens.adminTestToken}`)
+            .send({
+              'ingredients': [{
+                'name': 'test',
+                'package_type': 'pail',
+                'native_unit': 'kg',
+                'storage_id': 1,
+                'num_native_units': 10,
+              },
+              ],
+            })
+            .end((err, res) => {
+              res.should.have.status(200);
+              done();
+            });
+        })
+        .catch((err) => console.log(err));
+    });
+
+    it('should decline if active ingredient exists with same name', (done) => {
+      chai.request(server)
+        .post('/ingredients')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'ingredients': [{
+            'name': 'boop',
+            'package_type': 'pail',
+            'native_unit': 'kg',
+            'storage_id': 1,
+            'num_native_units': 10,
+          },
+          ],
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          assert.strictEqual(res.text, 'ER_DUP_ENTRY', 'Catches duplicate entry');
+          done();
+        });
+    });
+
     it('should decline if request body empty', (done) => {
       chai.request(server)
         .post('/ingredients')
