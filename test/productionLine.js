@@ -82,5 +82,230 @@ describe('ProductionLines', () => {
             .catch(e => console.log(e));
         });
     });
+
+    it('should decline add for manager', (done) => {
+      chai.request(server)
+        .post('/productionlines')
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
+    it('should decline add for noob', (done) => {
+      chai.request(server)
+        .post('/productionlines')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+  });
+
+  describe('#addFormulaToLine()', () => {
+    beforeEach(() => {
+      return dbSetup.setupTestDatabase();
+    });
+
+    it('should add a formula to a line', (done) => {
+      chai.request(server)
+        .post('/formulaproductionlines')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'lineid': 2,
+          'formulaid': 2,
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          connection.query(`SELECT * FROM FormulaProductionLines WHERE formula_id = 2 AND productionline_id = 2`)
+            .then((result) => {
+              assert.strictEqual(result.length, 1, 'Added formula production line mapping');
+              done();
+            })
+            .catch((e) => console.log(e));
+        });
+    });
+
+    it('should reject for noob add a formula to a line', (done) => {
+      chai.request(server)
+        .post('/formulaproductionlines')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+
+    it('should reject for manager add a formula to a line', (done) => {
+      chai.request(server)
+        .post('/formulaproductionlines')
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+  });
+
+  describe('#deleteFormulaFromLine', () => {
+    it('should delete a formula production line mapping', (done) => {
+      chai.request(server)
+      .delete('/formulaproductionlines')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .send({
+        'lineid': 1,
+        'formulaid': 2,
+      })
+      .end((err, res) => {
+        res.should.have.status(200);
+        connection.query(`SELECT * FROM FormulaProductionLines WHERE formula_id = 2 AND productionline_id = 1`)
+          .then((result) => {
+            assert.strictEqual(result.length, 0, 'Removed formula production line mapping');
+            done();
+          })
+          .catch((e) => console.log(e));
+      });
+    });
+
+    it('should reject for noob delete a formula production line mapping', (done) => {
+      chai.request(server)
+      .delete('/formulaproductionlines')
+      .set('Authorization', `Token ${testTokens.noobTestToken}`)
+      .end((err, res) => {
+        res.should.have.status(401);
+        done();
+      });
+    });
+
+    it('should reject for manager delete a formula production line mapping', (done) => {
+      chai.request(server)
+      .delete('/formulaproductionlines')
+      .set('Authorization', `Token ${testTokens.managerTestToken}`)
+      .end((err, res) => {
+        res.should.have.status(401);
+        done();
+      });
+    });
+  });
+
+  describe('#modify()', () => {
+    beforeEach(() => {
+      return dbSetup.setupTestDatabase();
+    });
+
+    it('should modify the name and formulas of a production line', (done) => {
+      chai.request(server)
+      .put('/productionlines')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .send({
+        'lines': [{
+          'id': 1,
+          'name': 'namechange',
+          'formulas': [3],
+        }],
+      })
+      .end((err, res) => {
+        res.should.have.status(200);
+        Promise.all([
+          connection.query(`SELECT * FROM Productionlines WHERE id = 1`),
+          connection.query(`SELECT * FROM FormulaProductionLines WHERE productionline_id = 1`),
+        ])
+          .then((results) => {
+            const [line, formulaLine] = results;
+            assert.strictEqual(line[0].name, 'namechange', 'Changed name of production line');
+            assert.strictEqual(formulaLine.length, 1, 'Only one formula mapped to line');
+            assert.strictEqual(formulaLine[0].formula_id, 3, 'Id of formula mapped to line');
+            done();
+          })
+          .catch((e) => console.log(e));
+      });
+    });
+
+    it('should reject modify for noob', (done) => {
+      chai.request(server)
+      .put('/productionlines')
+      .set('Authorization', `Token ${testTokens.noobTestToken}`)
+      .send({
+        'lines': [{
+          'id': 1,
+          'name': 'namechange',
+          'formulas': [3],
+        }],
+      })
+      .end((err, res) => {
+        res.should.have.status(401);
+        done();
+      });
+    });
+
+    it('should reject modify for manager', (done) => {
+      chai.request(server)
+      .put('/productionlines')
+      .set('Authorization', `Token ${testTokens.managerTestToken}`)
+      .end((err, res) => {
+        res.should.have.status(401);
+        done();
+      });
+    });
+  });
+
+  describe('#deleteProductionLine', (done) => {
+    it('should fake delete production line', (done) => {
+      chai.request(server)
+      .delete('/productionlines')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .send({
+        'lines': [2],
+      })
+      .end((err, res) => {
+        res.should.have.status(200);
+        Promise.all([
+          connection.query(`SELECT * FROM Productionlines WHERE id = 2`),
+          connection.query(`SELECT * FROM FormulaProductionLines WHERE productionline_id = 2`),
+        ])
+          .then((results) => {
+            const [line, formulaLine] = results;
+            assert.strictEqual(line[0].isactive, null, 'Line no longer active');
+            assert.strictEqual(formulaLine.length, 0, 'Only one formula mapped to line');
+            done();
+          })
+          .catch((e) => console.log(e));
+      });
+    });
+
+    it('should not delete busy production line', (done) => {
+      chai.request(server)
+      .delete('/productionlines')
+      .set('Authorization', `Token ${testTokens.adminTestToken}`)
+      .send({
+        'lines': [1],
+      })
+      .end((err, res) => {
+        res.should.have.status(400);
+        done();
+      });
+    });
+
+    it('should reject delete for manager', (done) => {
+      chai.request(server)
+      .delete('/productionlines')
+      .set('Authorization', `Token ${testTokens.managerTestToken}`)
+      .end((err, res) => {
+        res.should.have.status(401);
+        done();
+      });
+    });
+
+    it('should reject delete for noob', (done) => {
+      chai.request(server)
+      .delete('/productionlines')
+      .set('Authorization', `Token ${testTokens.noobTestToken}`)
+      .end((err, res) => {
+        res.should.have.status(401);
+        done();
+      });
+    });
   });
 });
