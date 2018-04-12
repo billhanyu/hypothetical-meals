@@ -31,8 +31,6 @@ INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot, per_pa
 INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot, per_package_cost) VALUES (4, 2, 20, 1, 'ff', 1.1);
 INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot, per_package_cost) VALUES (5, 3, 20, 1, 'ff', 1.1);
 INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot, per_package_cost) VALUES (6, 4, 20, 2, 'ff', 1.1);
-INSERT INTO Logs (id, user_id, vendor_ingredient_id, quantity) VALUES (1, 1, 1, 18);
-INSERT INTO Logs (id, user_id, vendor_ingredient_id, quantity) VALUES (2, 1, 3, 5);
 INSERT INTO SpendingLogs (id, ingredient_id, total_weight, total, consumed) VALUES (1, 1, 500, 5000, 50);
 INSERT INTO SpendingLogs (id, ingredient_id, total_weight, total, consumed) VALUES (2, 2, 500, 5000, 50);
 INSERT INTO SpendingLogs (id, ingredient_id, total_weight, total, consumed) VALUES (3, 3, 500, 5000, 50);
