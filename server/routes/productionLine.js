@@ -40,7 +40,6 @@ export function view(req, res, next) {
           'name': formulaLine.formula_name,
           'formula_id': formulaLine.formula_id,
         };
-        myProductionLine[0].formulas.push(formula);
         productionLineMap[formulaLine.productionline_id].formulas.push(formula);
       });
       res.status(200).send(Object.values(productionLineMap));
