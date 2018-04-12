@@ -255,6 +255,22 @@ class SideBar extends Component {
           </li>
           <li className="nav-item">
             <a
+              href="javascript:void(0)"
+              role="button"
+              className={"nav-link PermissionCategory" + (this.state.activeCategory == "productinventory" ? "-Active" : "")}
+              id="user"
+              onClick={e => {
+                this.setActiveCategory("productinventory");
+                this.props.link('productinventory');
+                this.setActive("");
+              }}
+              data-parent="#SideBar"
+            >
+              Product Inventory
+              </a>
+          </li>
+          <li className="nav-item">
+            <a
               className="nav-link active PermissionCategory"
               href="javascript:void(0)"
               data-toggle="modal"

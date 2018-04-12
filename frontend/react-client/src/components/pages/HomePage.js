@@ -20,6 +20,7 @@ import RecallReport from '../homepage/recallreport/RecallReport';
 import Freshness from '../homepage/freshnessreport/Freshness';
 import UserTable from '../homepage/user/UserTable';
 import ProductionLine from '../homepage/productionline/ProductionLine';
+import ProductInventory from '../homepage/productinventory/ProductInventory';
 
 class HomePage extends Component {
   constructor(props) {
@@ -89,6 +90,9 @@ class HomePage extends Component {
     }
     else if (funcName == 'productionline') {
       return <ProductionLine />;
+    }
+    else if (funcName == 'productinventory') {
+      return <ProductInventory />;
     }
   }
 
