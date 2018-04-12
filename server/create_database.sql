@@ -245,11 +245,11 @@ CREATE TABLE ProductRunsEntries(
 CREATE TABLE Orders(
 	id int not null AUTO_INCREMENT,
 	arrived bit not null DEFAULT 0,
-	ingredient_id int not null,
+	vendoringredient_id int not null,
 	num_packages int not null,
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
 
-	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
+	FOREIGN KEY (vendoringredient_id) REFERENCES VendorsIngredients(id),
 	PRIMARY KEY (id)
 );
 
