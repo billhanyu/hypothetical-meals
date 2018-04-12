@@ -4,6 +4,7 @@ import Cart from './Cart';
 import axios from 'axios';
 import Snackbar from 'material-ui/Snackbar';
 import ChooseVendorItem from './ChooseVendorItem';
+import OrderList from './OrderList';
 
 class Order extends Component {
   constructor(props) {
@@ -11,6 +12,7 @@ class Order extends Component {
     this.state = {
       cart: [],
       chooseVendor: false,
+      showOrders: false,
       lotNumberSet: {},
     };
     this.orderIngredient = this.orderIngredient.bind(this);
@@ -20,11 +22,18 @@ class Order extends Component {
     this.orderWithVendors = this.orderWithVendors.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.backToCart = this.backToCart.bind(this);
+    this.showOrders = this.showOrders.bind(this);
     if (global.cart != null) {
       for (let item of global.cart) {
-        this.orderIngredient(item);
+        this.orderIngredient(item, item.quantity);
       }
     }
+  }
+
+  showOrders() {
+    this.setState({
+      showOrders: true,
+    });
   }
 
   handleInputChange(e, idx) {
@@ -36,6 +45,7 @@ class Order extends Component {
   backToCart() {
     this.setState({
       chooseVendor: false,
+      showOrders: false,
     });
   }
 
@@ -122,11 +132,20 @@ class Order extends Component {
 
   orderWithVendors(event) {
     event.preventDefault();
-
+    let message = ''; let errored = false;
+    if(!this.state.noBlankLotNumbers) {
+      message += 'Please fill out all lot numbers values -';
+      errored = true;
+    }
     if(!this.state.fullyAllocated) {
+      errored = true;
+      message += 'Please fully allocate lot numbers';
+    }
+
+    if(errored){
       return this.setState({
         open: true,
-        message: 'Please fully allocate lot numbers',
+        message,
       });
     }
 
@@ -169,10 +188,11 @@ class Order extends Component {
     });
   }
 
-  _updateLotSet(lotNumberSet, fullyAllocated) {
+  _updateLotSet(lotNumberSet, fullyAllocated, noBlankLotNumbers) {
     this.setState({
       lotNumberSet,
       fullyAllocated,
+      noBlankLotNumbers,
     });
   }
 
@@ -183,7 +203,7 @@ class Order extends Component {
   }
 
   render() {
-    return (
+    const main =
       <div>
         <Snackbar
           open={this.state.open}
@@ -195,6 +215,9 @@ class Order extends Component {
           !this.state.chooseVendor &&
           <div>
             <h2>Order</h2>
+            <button type='button' className='btn btn-primary' onClick={this.showOrders}>
+              All Orders
+            </button>
             <IngredientList order={true} orderIngredient={this.orderIngredient} />
             <Cart cart={this.state.cart} setQuantity={this.setQuantity} removeItem={this.removeItem} order={this.order}/>
           </div>
@@ -216,8 +239,11 @@ class Order extends Component {
             </div>
           </div>
         }
-      </div>
-    );
+      </div>;
+    
+    const showOrders = <OrderList back={this.backToCart} />;
+
+    return this.state.showOrders ? showOrders : main;
   }
 }
 

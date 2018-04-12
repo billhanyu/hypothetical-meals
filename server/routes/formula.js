@@ -55,7 +55,7 @@ function getFormulas(queryString, queryParams, req, res, next) {
         formulaObject.ingredients = {};
         myFormulas[x.id] = formulaObject;
       });
-      return connection.query(`${formulaEntryQuery}, Ingredients.name, Ingredients.package_type, Ingredients.storage_id, Ingredients.native_unit, Ingredients.num_native_units as ingredient_num_native_units, Ingredients.removed FROM FormulaEntries
+      return connection.query(`${formulaEntryQuery}, Ingredients.name, Ingredients.package_type, Ingredients.storage_id, Ingredients.native_unit, Ingredients.num_native_units as ingredient_num_native_units, Ingredients.removed, Ingredients.intermediate FROM FormulaEntries
             JOIN Ingredients ON FormulaEntries.ingredient_id = Ingredients.id`);
     })
     .then((formulaEntries) => {

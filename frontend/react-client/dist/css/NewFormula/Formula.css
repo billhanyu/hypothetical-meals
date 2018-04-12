@@ -59,6 +59,18 @@
   margin-left: 5%;
 }
 
+.FormulaIngredientItemContainer i {
+  cursor: pointer;
+  transition: all 0.5s ease;
+  color: #888;
+  float: left;
+  margin: 8px 0 0 -40px;
+}
+
+.FormulaIngredientItemContainer i:hover {
+  color: #000;
+}
+
 .FormulaInputContainer .FormulaTextContainer {
   float: left;
   width: 330px;
