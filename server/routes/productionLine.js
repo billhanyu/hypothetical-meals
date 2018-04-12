@@ -8,6 +8,8 @@ import { checkParamId } from './common/checkParams';
 
 const productionLineQuery = `SELECT * FROM Productionlines WHERE isactive = 'Y'`;
 const productionOccupanciesQuery = `SELECT * FROM ProductionlinesOccupancies`;
+const formulaProductionQuery = `SELECT FormulaProductionLines*, Formulas.name as formula_name FROM FormulaProductionLines
+  JOIN Formulas ON FormulaProductionLines.formula_id = Formulas.id`;
 
 /**
  *
@@ -22,12 +24,19 @@ export function view(req, res, next) {
       productionLines.forEach(line => {
         productionLineMap[line.id] = line;
         productionLineMap[line.id].occupancies = [];
+        productionLineMap[line.id].formulas = [];
       });
       return connection.query(`${productionOccupanciesQuery} WHERE busy = 1`);
     })
     .then((productionOccupancies) => {
       productionOccupancies.forEach(occupancy => {
         productionLineMap[occupancy.productionline_id].occupancies.push(occupancy);
+      });
+      return connection.query(`${formulaProductionQuery}`);
+    })
+    .then((formulaLines) => {
+      formulaLines.forEach(formulaLine => {
+        productionLineMap[formulaLine.productionline_id].push(`{${formulaLine.formula_name}=formula_id=${formulaLine.formula_id}}`);
       });
       res.status(200).send(Object.values(productionLineMap));
     })

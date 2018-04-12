@@ -64,3 +64,6 @@ INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot
 INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (4, 2, 4, 2, 'zz', 3);
 INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (5, 3, 6, 3, 'abc123', 2);
 INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (6, 3, 1, 3, 'aaa', 2);
+INSERT INTO Productionlines (id, name, description) VALUES (1, 'line1', 'first line');
+INSERT INTO Productionlines (id, name, description) VALUES (2, 'line2', 'second line');
+INSERT INTO ProductionlinesOccupancies
