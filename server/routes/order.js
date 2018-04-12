@@ -55,15 +55,15 @@ function orderHelper(orders, req, res, next) {
         createIngredientsMap(ingredientsMap, result, quantity, orders);
         createSpendingLogMap(spendingLogReq, result, quantity);
       });
-      createInventoryCases(ingredientIds, newIngredientCases, ingredientsMap);
       findRequestedStorageQuantity(ingredientIds, ingredientsMap, requestedCapacities);
       return checkStoragePromise(requestedCapacities);
     })
     .then(() => {
-      return connection.query(`INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id, per_package_cost) VALUES ${newIngredientCases.join(', ')}`);
+      return addPendingOrder();
     })
-    .then(() => {
-      return addPendingOrder(newIngredientCases.length);
+    .then((orderId) => {
+      createInventoryCases(ingredientIds, newIngredientCases, ingredientsMap, orderId);
+      return connection.query(`INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id, per_package_cost, order_id) VALUES ${newIngredientCases.join(', ')}`);
     })
     .then(() => {
       return updateLogForIngredient(spendingLogReq);
@@ -109,10 +109,10 @@ function createIngredientsMap(ingredientsMap, result, quantity, orders) {
   };
 }
 
-function createInventoryCases(ingredientIds, newIngredientCases, ingredientsMap) {
+function createInventoryCases(ingredientIds, newIngredientCases, ingredientsMap, orderId) {
   ingredientIds.forEach(ingredientId => {
     Object.keys(ingredientsMap[ingredientId].lots).forEach(lotNumber => {
-      newIngredientCases.push(`(${ingredientId}, ${ingredientsMap[ingredientId]['lots'][lotNumber]}, '${lotNumber}', ${ingredientsMap[ingredientId]['vendor_id']}, ${ingredientsMap[ingredientId]['package_price']})`);
+      newIngredientCases.push(`(${ingredientId}, ${ingredientsMap[ingredientId]['lots'][lotNumber]}, '${lotNumber}', ${ingredientsMap[ingredientId]['vendor_id']}, ${ingredientsMap[ingredientId]['package_price']}, ${orderId})`);
     });
   });
 }
@@ -128,28 +128,20 @@ function findRequestedStorageQuantity(ingredientIds, ingredientsMap, requestedCa
   });
 }
 
-function addPendingOrder(addedIngredientLength) {
-  return connection.query(`SELECT * FROM (
-    SELECT * FROM Inventories ORDER BY id DESC LIMIT ${addedIngredientLength}
-  ) as inv ORDER BY id`)
-    .then((addedInventories) => {
-      return createOrder(addedInventories.map(x => x.id));
-    })
+function addPendingOrder() {
+  return createOrder()
     .catch((err) => {
       throw createError('Error creating pending order');
     });
 }
 
-function createOrder(inventoryIds) {
+function createOrder() {
   return connection.query(`INSERT INTO Orders VALUES ()`)
     .then(() => {
       return connection.query(`SELECT LAST_INSERT_ID()`);
     })
     .then((orderId) => {
-      const orderEntryCases = inventoryIds.map(x => {
-        return [orderId[0]['LAST_INSERT_ID()'], x];
-      });
-      return connection.query(`INSERT INTO OrderEntries (order_id, inventory_id) VALUES ?`, [orderEntryCases]); 
+      return Promise.resolve(orderId[0]['LAST_INSERT_ID()']);
     })
     .catch((err) => {
       throw createError('Error add orders and order entries');

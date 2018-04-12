@@ -1,7 +1,5 @@
 DROP TABLE IF EXISTS Sales;
 DROP TABLE IF EXISTS FinalProductInventories;
-DROP TABLE IF EXISTS OrderEntries;
-DROP TABLE IF EXISTS Orders;
 DROP TABLE IF EXISTS ProductRunsEntries;
 DROP TABLE IF EXISTS ProductionlinesOccupancies;
 DROP TABLE IF EXISTS FormulaProductionLines;
@@ -12,8 +10,8 @@ DROP TABLE IF EXISTS ProductionLogs;
 DROP TABLE IF EXISTS FormulaEntries;
 DROP TABLE IF EXISTS Formulas;
 DROP TABLE IF EXISTS SpendingLogs;
-DROP TABLE IF EXISTS Logs;
 DROP TABLE IF EXISTS Inventories;
+DROP TABLE IF EXISTS Orders;
 DROP TABLE IF EXISTS VendorsIngredients;
 DROP TABLE IF EXISTS Ingredients;
 DROP TABLE IF EXISTS Storages;
@@ -82,6 +80,13 @@ CREATE TABLE VendorsIngredients(
 	PRIMARY KEY (id)
 );
 
+CREATE TABLE Orders(
+	id int not null AUTO_INCREMENT,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
+
+	PRIMARY KEY (id)
+);
+
 CREATE TABLE Inventories(
 	id int not null AUTO_INCREMENT,
 	ingredient_id int not null,
@@ -89,22 +94,14 @@ CREATE TABLE Inventories(
 	lot varchar(500) not null,
 	vendor_id int not null,
 	per_package_cost double not null,
+	order_id int,
+	arrived BIT DEFAULT 0,
+	-- created_at in inventory is updated to arrival time upon ingredient arrival
 	created_at timestamp DEFAULT now() not null,
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	FOREIGN KEY (vendor_id) REFERENCES Vendors(id),
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE Logs(
-	id int not null AUTO_INCREMENT,
-	user_id int not null,
-	vendor_ingredient_id int not null,
-	quantity int not null,
-	created_at timestamp DEFAULT now() not null,
- 
-	FOREIGN KEY (user_id) REFERENCES Users(id),
-	FOREIGN KEY (vendor_ingredient_id) REFERENCES VendorsIngredients(id),
+	FOREIGN KEY (order_id) REFERENCES Orders(id),
 	PRIMARY KEY (id)
 );
 
@@ -219,24 +216,6 @@ CREATE TABLE ProductRunsEntries(
 	FOREIGN KEY (productrun_id) REFERENCES ProductRuns(id),
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	FOREIGN KEY (vendor_id) REFERENCES Vendors(id),
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE Orders(
-	id int not null AUTO_INCREMENT,
-	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
-
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE OrderEntries(
-	id int not null AUTO_INCREMENT,
-	order_id int not null,
-	arrived bit not null DEFAULT 0,
-	inventory_id int not null,
-	
-	FOREIGN KEY (inventory_id) REFERENCES Inventories(id),
-	FOREIGN KEY (order_id) REFERENCES Orders(id),
 	PRIMARY KEY (id)
 );
 
