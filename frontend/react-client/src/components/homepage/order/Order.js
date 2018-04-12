@@ -13,7 +13,6 @@ class Order extends Component {
       cart: [],
       chooseVendor: false,
       showOrders: false,
-      lotNumberSet: {},
     };
     this.orderIngredient = this.orderIngredient.bind(this);
     this.setQuantity = this.setQuantity.bind(this);
@@ -132,37 +131,13 @@ class Order extends Component {
 
   orderWithVendors(event) {
     event.preventDefault();
-    let message = ''; let errored = false;
-    if(!this.state.noBlankLotNumbers) {
-      message += 'Please fill out all lot numbers values -';
-      errored = true;
-    }
-    if(!this.state.fullyAllocated) {
-      errored = true;
-      message += 'Please fully allocate lot numbers';
-    }
-
-    if(errored){
-      return this.setState({
-        open: true,
-        message,
-      });
-    }
 
     const orderObj = {};
     for (let item of this.state.cart) {
       const ingredientId = "ingredient" + item.id;
       const ingredient = this.state[ingredientId];
-      const correspondingLotArray = this.state.lotNumberSet[item.id];
-      const lots = {};
-      correspondingLotArray.forEach(element => {
-        if(Number(element.quantity) !== 0){
-          lots[element.lotNumber] = lots[element.lotNumber] == null ? Number(element.quantity) : Number(lots[element.lotNumber]) + Number(element.quantity);
-        }
-      });
       orderObj[ingredient.selected] = {
         num_packages: item.quantity,
-        lots,
       };
     }
 
@@ -185,14 +160,6 @@ class Order extends Component {
         open: true,
         message: err.response.data
       });
-    });
-  }
-
-  _updateLotSet(lotNumberSet, fullyAllocated, noBlankLotNumbers) {
-    this.setState({
-      lotNumberSet,
-      fullyAllocated,
-      noBlankLotNumbers,
     });
   }
 
@@ -230,7 +197,7 @@ class Order extends Component {
               <form className="col-xl-6 col-lg-6 col-sm-8">
               {
                 this.state.cart.map((item, idx) => {
-                  return <ChooseVendorItem lotNumberSet={this.state.lotNumberSet} updateLotSet={this._updateLotSet.bind(this)} item={item} idx={idx} key={idx} state={this.state} handleInputChange={this.handleInputChange} handleLotNumberChange={this.handleLotNumberChange}/>;
+                  return <ChooseVendorItem item={item} idx={idx} key={idx} state={this.state} handleInputChange={this.handleInputChange} />;
                 })
               }
               <button type="button" className="btn btn-secondary" onClick={this.backToCart}>Back</button>
