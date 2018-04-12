@@ -65,6 +65,22 @@ class SideBar extends Component {
             <a
               href="javascript:void(0)"
               role="button"
+              className={"nav-link PermissionCategory" + (this.state.activeCategory == "formula" ? "-Active" : "")}
+              id="formula"
+              onClick={e => {
+                this.props.link('viewFormulas');
+                this.setActiveCategory("formula");
+                this.setActive("");
+              }}
+              data-parent="#SideBar"
+            >
+              Formula
+            </a>
+          </li>
+          <li className="nav-item">
+            <a
+              href="javascript:void(0)"
+              role="button"
               className={"nav-link PermissionCategory" + (this.state.activeCategory == "storage" ? "-Active" : "")}
               id="storage"
               data-parent="#SideBar"
@@ -223,55 +239,20 @@ class SideBar extends Component {
           }
           <li className="nav-item">
             <a
-              href="#nav-formula"
+              href="javascript:void(0)"
               role="button"
-              className={"nav-link PermissionCategory" + (this.state.activeCategory == "formula" ? "-Active" : "")}
-              id="formula"
-              onClick={e=>{
-                this.props.link('viewFormulas');
-                this.setActiveCategory("formula");
+              className={"nav-link PermissionCategory" + (this.state.activeCategory == "productionline" ? "-Active" : "")}
+              id="user"
+              onClick={e => {
+                this.setActiveCategory("productionline");
+                this.props.link('productionline');
                 this.setActive("");
               }}
-              data-toggle="collapse"
-              aria-expanded="false"
-              aria-controls="nav-formula"
               data-parent="#SideBar"
             >
-              Formula
-              {
-                global.user_group == "admin" &&
-                <span>&nbsp;&nbsp;</span>
-              }
-              {
-                global.user_group == "admin" &&
-                <i className="fa fa-caret-down"></i>
-              }
+              Production Line
               </a>
-              <div className="collapse" id="nav-formula">
-                <ul className="nav flex-column">
-                  <PermissionLink
-                    linkKey="newFormula"
-                    setActive={this.setActive}
-                    activeKey={this.state.activeLink}
-                    action={e => {
-                      this.props.link('NewFormula');
-                      this.setActiveCategory("formula");
-                    }}
-                    text="New Formula"
-                    permission="admin" />
-                  <PermissionLink
-                    linkKey="editFormula"
-                    setActive={this.setActive}
-                    activeKey={this.state.activeLink}
-                    action={e => {
-                      this.props.link('EditFormula');
-                      this.setActiveCategory("formula");
-                    }}
-                    text="Edit Existing Formula"
-                    permission="admin" />
-                </ul>
-              </div>
-            </li>
+          </li>
           <li className="nav-item">
             <a
               className="nav-link active PermissionCategory"

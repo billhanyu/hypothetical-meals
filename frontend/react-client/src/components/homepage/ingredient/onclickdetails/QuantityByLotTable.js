@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import QuantityByLotTableItem from './QuantityByLotTableItem';
+import Snackbar from 'material-ui/Snackbar';
 
 class QuantityByLotTable extends Component {
   constructor(props) {
@@ -10,11 +11,19 @@ class QuantityByLotTable extends Component {
       lots: [],
       editQuantity: '',
       editIdx: -1,
+      open: false,
+      message: '',
     };
     this.edit = this.edit.bind(this);
     this.changeQuantity = this.changeQuantity.bind(this);
     this.cancelEdit = this.cancelEdit.bind(this);
     this.finishEdit = this.finishEdit.bind(this);
+  }
+
+  handleRequestClose() {
+    this.setState({
+      open: false,
+    });
   }
 
   edit(idx) {
@@ -54,6 +63,10 @@ class QuantityByLotTable extends Component {
       })
       .catch(err => {
         const message = err.response.data;
+        this.setState({
+          open: true,
+          message,
+        });
       });
   }
 
@@ -85,15 +98,23 @@ class QuantityByLotTable extends Component {
           this.props.withTitle &&
           <h3>Quantities by Lot Numbers</h3>
         }
+        <Snackbar
+          open={this.state.open}
+          message={this.state.message}
+          autoHideDuration={2500}
+          onRequestClose={this.handleRequestClose.bind(this)}
+        />
       <table className="table">
         <thead>
-          <th className={columnClass}>Lot Number</th>
-          <th className={columnClass}>Vendor</th>
-          <th className={columnClass}>Quantity</th>
-          {
-            global.user_group == "admin" &&
-            <th className={columnClass}>Options</th>
-          }
+          <tr>
+            <th className={columnClass}>Lot Number</th>
+            <th className={columnClass}>Vendor</th>
+            <th className={columnClass}>Quantity</th>
+            {
+              global.user_group == "admin" &&
+              <th className={columnClass}>Options</th>
+            }
+          </tr>
         </thead>
         <tbody>
         {

@@ -110,8 +110,8 @@ export function loginOauth(req, res, next) {
     .then(result => {
       if (result.length == 0) {
         connection.query(`INSERT INTO Users
-          (username, name, oauth, user_group) VALUES
-          ('${netid}', '${name}', 1, 'noob')`)
+          (username, name, oauth) VALUES
+          ('${netid}', '${name}', 1) ON DUPLICATE KEY UPDATE removed = 0, user_group = 'noob'`)
           .then(result => {
             return connection.query(`SELECT * FROM Users WHERE username = '${netid}' AND oauth = 1 AND removed = 0`);
           })

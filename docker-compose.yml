@@ -1,0 +1,18 @@
+version: '2'
+services:
+  meals:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql
+    restart: always
+    ports:
+      - 1717:1717
+    command: ./wait-for-it.sh mysql:3306 -- node ./build/server.js
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: billsucks
+      MYSQL_DATABASE: meals

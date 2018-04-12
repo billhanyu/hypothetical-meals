@@ -13,9 +13,12 @@ class UserTable extends Component {
       users: [],
       changingPermission: false,
       register: false,
+      deleting: '',
     };
     this.register = this.register.bind(this);
     this.back = this.back.bind(this);
+    this.delete = this.delete.bind(this);
+    this.confirmDelete = this.confirmDelete.bind(this);
   }
 
   componentWillMount() {
@@ -25,6 +28,12 @@ class UserTable extends Component {
   register() {
     this.setState({
       register: true,
+    });
+  }
+
+  delete(username) {
+    this.setState({
+      deleting: username,
     });
   }
 
@@ -53,10 +62,10 @@ class UserTable extends Component {
     });
   }
 
-  _handleDelete(username) {
+  confirmDelete() {
     axios.post('/users/delete',
     {
-      user: { username, }
+      user: { username: this.state.deleting, }
     },
     {
       headers: { Authorization: "Token " + global.token }
@@ -136,7 +145,7 @@ class UserTable extends Component {
               return (
                 <UserTableRow
                   changePermission={this._changePermission.bind(this)}
-                  onDelete={this._handleDelete.bind(this)}
+                  onDelete={this.delete.bind(this)}
                   reloadData={this.reloadData.bind(this)}
                   key={key}
                   {...element}
@@ -146,6 +155,26 @@ class UserTable extends Component {
         }
         </tbody>
       </table>
+
+      <div className="modal fade" id="deleteUserModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="exampleModalLabel">Confirm Delete</h5>
+              <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              Are you sure you want to delete this user?
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.confirmDelete}>Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>;
 
     if (this.state.changingPermission) {

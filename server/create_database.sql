@@ -26,7 +26,7 @@ CREATE TABLE Users(
 	name varchar(70) not null,
 	hash text(1024), 
 	salt character(32), 
-	user_group enum('admin', 'manager', 'noob') not null,
+	user_group enum('admin', 'manager', 'noob') not null DEFAULT 'noob',
 	removed BIT DEFAULT 0,
 	isactive varchar(1) DEFAULT 'Y',
 
@@ -211,7 +211,7 @@ CREATE TABLE ProductionlinesOccupancies(
 	productionline_id int not null,
 	formula_id int not null,
 	start_time timestamp DEFAULT now() not null,
-	end_time timestamp DEFAULT now() not null,
+	end_time timestamp null,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
 	FOREIGN KEY (productionline_id) REFERENCES Productionlines(id),
@@ -237,6 +237,7 @@ CREATE TABLE Orders(
 	arrived bit not null DEFAULT 0,
 	ingredient_id int not null,
 	num_packages int not null,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	PRIMARY KEY (id)

@@ -20,12 +20,8 @@ class AddEditIngredient extends Component {
       name: '',
       package_type: 'sack',
       native_unit: '',
-      removed: {
-        data: [0],
-      },
-      intermediate: {
-        data: [0],
-      },
+      removed: 0,
+      intermediate: 0,
       storage_id: 1,
       storage_name: 'freezer',
       id: 0,
@@ -124,7 +120,7 @@ class AddEditIngredient extends Component {
         .then(response => {
           global.AddEditIngredientNeedsRerender = true;
           this.setState({
-            id: response,
+            id: response.data[0],
           }, () => {
             this.setState({
               open: true,
@@ -175,7 +171,7 @@ class AddEditIngredient extends Component {
           {header}
           {
             this.state.intermediate == 1 &&
-            <span style={{ 'margin-left': '20px' }} className="badge badge-secondary">Intermediate</span>
+            <span style={{ 'margin-left': '10px' }} className="badge badge-secondary">Intermediate</span>
           }
           {
             this.state.removed == 1 &&
@@ -254,6 +250,7 @@ AddEditIngredient.propTypes = {
   ingredient: PropTypes.object,
   mode: PropTypes.string,
   backToList: PropTypes.func,
+  reloadData: PropTypes.func,
 };
 
 export default AddEditIngredient;
