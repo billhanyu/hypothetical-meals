@@ -68,4 +68,5 @@ INSERT INTO Productionlines (id, name, description) VALUES (1, 'line1', 'first l
 INSERT INTO Productionlines (id, name, description) VALUES (2, 'line2', 'second line');
 INSERT INTO FormulaProductionLines (id, formula_id, productionline_id) VALUES (1, 1, 1);
 INSERT INTO FormulaProductionLines (id, formula_id, productionline_id) VALUES (2, 2, 1);
+INSERT INTO FormulaProductionLines (id, formula_id, productionline_id) VALUES (3, 4, 2);
 INSERT INTO ProductionlinesOccupancies (id, productionline_id, productrun_id, formula_id, busy) VALUES (1, 1, 1, 1, 1);

@@ -122,7 +122,6 @@ export function add(req, res, next) {
       success(res);
     })
     .catch((err) => {
-      console.log(err);
       handleError(err, res);
     });
 }
@@ -142,7 +141,7 @@ function createProductionLineLogString(formulas, productionLines, myAddedLines) 
   });
   let productionLineStrings = myAddedLines.map(addedLine => {
     return `production line {${addedLine.name}=productionline_id=${addedLine.id}}
-        ${productionFormulaMap[addedLine.name].length > 0 ? ` with formulas ${productionFormulaMap[addedLine.name].join(', ')}` : ''}`;
+        ${productionFormulaMap[addedLine.name].length > 0 ? ` with formula(s) ${productionFormulaMap[addedLine.name].join(', ')}` : ''}`;
   });
   return productionLineStrings;
 }
@@ -173,68 +172,71 @@ function addFormulaProductionLines(productionLines) {
           formulaProductionLineCases.push([formulaLine, nameIdTuple[line.name]]);
         });
       });
-      return connection.query(`INSERT INTO FormulaProductionLines (formula_id, productionline_id) VALUES ?`, [formulaProductionLineCases]);
+      return formulaProductionLineCases.length > 0 ?
+        connection.query(`INSERT INTO FormulaProductionLines (formula_id, productionline_id) VALUES ?`, [formulaProductionLineCases])
+        : Promise.resolve();
     })
     .then(() => {
       return Promise.resolve(myLines);
     })
     .catch((err) => {
-      console.log(err);
       throw createError('Error adding production line occupancies');
     });
 }
 
 /**
  * Adds a single formula to a production line
- * @param {*} req req.params.lineid = 1, req.params.formulaid = 2
+ * @param {*} req req.body.lineid = 1, req.body.formulaid = 2
  * @param {*} res
  * @param {*} next
  */
 export function addFormulaToLine(req, res, next) {
-  const lineId = req.params.lineid;
-  const formulaId = req.params.formulaid;
+  const lineId = req.body.lineid;
+  const formulaId = req.body.formulaid;
   connection.query(`INSERT INTO FormulaProductionLines (formula_id, productionline_id) VALUES (${formulaId}, ${lineId})`)
     .then(() => {
-      return getProductionOccupancyNames('MAX(ProductionlineOccupancies.id)');
+      return getFormulaLineNames('MAX(FormulaProductionLines.id)', true);
     })
     .then((names) => {
       const addString = `formula {${names[0].formula_name}=formula_id=${formulaId}} to production line {${names[0].line_name}=productionline_id=${lineId}}`;
       return logAction(req.payload.id, `Added ${addString}.`);
     })
+    .then(() => success(res))
     .catch((err) => {
       handleError(err, res);
     });
 }
 
-function getProductionOccupancyNames(id) {
+function getFormulaLineNames(condition, having) {
   return connection.query(`SELECT Formulas.name as formula_name, Productionlines.name as line_name 
-      FROM ProductionlineOccupancies
-      JOIN Formulas ON ProductionlineOccupancies.formula_id = Formulas.id
-      JOIN Productionlines ON ProductionlineOccupancies.productionline_id = Productionlines.id
-      HAVING ProductionlineOccupancies.id = ${id}`);
+      FROM FormulaProductionLines
+      JOIN Formulas ON FormulaProductionLines.formula_id = Formulas.id
+      JOIN Productionlines ON FormulaProductionLines.productionline_id = Productionlines.id
+      ${having ? 'HAVING' : 'WHERE'} ${condition}`);
 }
 
 /**
  * Deletes a single formula from a production line
- * @param {*} req req.params.lineid = 1, req.params.formulaid = 2
+ * @param {*} req req.body.lineid = 1, req.body.formulaid = 2
  * @param {*} res
  * @param {*} next
  */
 export function deleteFormulaFromLine(req, res, next) {
-  const lineId = req.params.lineid;
-  const formulaId = req.params.formulaid;
-  const names = [];
-  let occupancyId;
-  connection.query(`${productionOccupanciesQuery} WHERE productionline_id = ${lineId} AND formula_id = ${formulaId}`)
+  const lineId = req.body.lineid;
+  const formulaId = req.body.formulaid;
+  let names = [];
+  let formulaLineId;
+  connection.query(`${formulaProductionQuery} WHERE productionline_id = ${lineId} AND formula_id = ${formulaId}`)
     .then((result) => {
-      occupancyId = result.id;
-      if (result.length < 1) {
+      formulaLineId = result[0].id;
+      if (result.length != 1) {
         throw createError('Trying to remove when formula not in production line');
       }
-      return getProductionOccupancyNames(occupancyId);
+      return getFormulaLineNames(`FormulaProductionLines.id = ${formulaLineId}`);
     })
-    .then(() => {
-      return connection.query(`DELETE FROM ProductionlineOccupancies WHERE id = ${occupancyId}`);
+    .then((formulaLineNames) => {
+      names = formulaLineNames;
+      return connection.query(`DELETE FROM FormulaProductionLines WHERE id = ${formulaLineId}`);
     })
     .then(() => {
       const removeString = `formula {${names[0].formula_name}=formula_id=${formulaId}} from production line {${names[0].line_name}=productionline_id=${lineId}}`;
@@ -265,9 +267,9 @@ export function deleteFormulaFromLine(req, res, next) {
  * @param {*} next
  */
 export function modify(req, res, next) {
-  const productionLineIds = productionLines.map(x => x.id);
-  const checkIds = productionLineIds.every(x => {
-    if (!checkNumber.isPositiveInteger()) {
+  const productionLines = req.body.lines;
+  const checkIds = productionLines.every(x => {
+    if (!checkNumber.isPositiveInteger(x.id)) {
       return false;
     } else {
       return true;
@@ -279,10 +281,10 @@ export function modify(req, res, next) {
     return;
   }
 
-  const productionLines = req.body.lines;
+  const productionLineIds = productionLines.map(x => x.id);
   let toUpdate = [];
   let myLines = [];
-  connection.query(`${productionLineQuery} AND id IN (?)`, [])
+  connection.query(`${productionLineQuery} AND id IN (?)`, [productionLineIds])
     .then((results) => {
       myLines = results;
       if (results.length != productionLines.length) {
@@ -304,7 +306,7 @@ export function modify(req, res, next) {
       return updateDatabaseHelper('Productionlines', toUpdate);
     })
     .then(() => {
-      return connection.query(`DELETE FROM FormulaProductionLines WHERE productionline_id IN (?)`, [productionLines.map(x => x.id)]);
+      return removeMappedFormulasToLines(productionLines.map(x => x.id));
     })
     .then(() => {
       return addFormulaProductionLines(productionLines);
@@ -319,10 +321,15 @@ export function modify(req, res, next) {
       success(res);
     })
     .catch((err) => {
+      console.log(err);
       handleError(err, res);
     });
 }
 
+
+function removeMappedFormulasToLines(productionLineIds) {
+  return connection.query(`DELETE FROM FormulaProductionLines WHERE productionline_id IN (?)`, [productionLineIds]);
+}
 
 /**
  *
@@ -336,7 +343,7 @@ export function modify(req, res, next) {
  * @param {*} next
  */
 export function deleteProductionLine(req, res, next) {
-  const productionLineIds = req.body.lines.map(x => x.id);
+  const productionLineIds = req.body.lines;
   let oldLines = [];
   connection.query(`${productionLineQuery} AND id IN (?)`, [productionLineIds])
     .then((results) => {
@@ -353,6 +360,9 @@ export function deleteProductionLine(req, res, next) {
         throw createError('Trying to delete a busy production line');
       }
       return connection.query(`UPDATE Productionlines SET isactive = NULL WHERE id IN (?)`, [productionLineIds]);
+    })
+    .then(() => {
+      removeMappedFormulasToLines(productionLineIds);
     })
     .then(() => {
       const nameStrings = oldLines.map(x => {
