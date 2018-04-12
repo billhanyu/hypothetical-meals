@@ -215,6 +215,26 @@ class SideBar extends Component {
                   }}
                   text="Freshness Report"
                   permission="noob" />
+                <PermissionLink
+                  linkKey={"finalProductFreshnessReport"}
+                  setActive={this.setActive}
+                  activeKey={this.state.activeLink}
+                  action={e => {
+                    this.props.link('finalProductFreshnessReport');
+                    this.setActiveCategory("log");
+                  }}
+                  text="Final Product Freshness Report"
+                  permission="noob" />
+                <PermissionLink
+                  linkKey={"profitabilityReport"}
+                  setActive={this.setActive}
+                  activeKey={this.state.activeLink}
+                  action={e => {
+                    this.props.link('profitabilityReport');
+                    this.setActiveCategory("log");
+                  }}
+                  text="Profitability Report"
+                  permission="noob" />
               </ul>
             </div>
           </li>
@@ -251,22 +271,6 @@ class SideBar extends Component {
               data-parent="#SideBar"
             >
               Production Line
-              </a>
-          </li>
-          <li className="nav-item">
-            <a
-              href="javascript:void(0)"
-              role="button"
-              className={"nav-link PermissionCategory" + (this.state.activeCategory == "productionrun_nonreport" ? "-Active" : "")}
-              id="user"
-              onClick={e => {
-                this.setActiveCategory("productionrun_nonreport");
-                this.props.link('productionrun_nonreport');
-                this.setActive("");
-              }}
-              data-parent="#SideBar"
-            >
-              Production Runs
               </a>
           </li>
           <li className="nav-item">

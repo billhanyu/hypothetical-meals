@@ -8,6 +8,8 @@ import FormulaListItem from './FormulaListItem';
 import axios from 'axios';
 import qs from 'qs';
 import Snackbar from 'material-ui/Snackbar';
+import FlatButton from 'material-ui/FlatButton';
+import ProductionRunNonReport from '../productionrun_nonreport/ProductionRunNonReport';
 
 class ProduceFormula extends Component {
   constructor(props) {
@@ -114,6 +116,9 @@ class ProduceFormula extends Component {
   }
 
   render() {
+    if(this.state.isShowingProductionRuns) {
+      return <ProductionRunNonReport onClick={() => {this.setState({isShowingProductionRuns: false,});}} />;
+    }
     return (
       <div>
         <Snackbar
@@ -123,6 +128,7 @@ class ProduceFormula extends Component {
           onRequestClose={this.handleRequestClose.bind(this)}
         />
         <ProduceFormulaHeader />
+        <FlatButton label="See Production Runs" backgroundColor='#377CC9' labelStyle={{color: '#FFF'}} hoverColor='#4694ec' onClick={() => {this.setState({isShowingProductionRuns: true,});}}/>
         {
           this.state.shouldShowSummaryTable ?
             <ProduceFormulaComparator

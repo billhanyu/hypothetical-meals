@@ -17,6 +17,10 @@ class ProductionRunNonReport extends Component {
     this.reloadData = this.reloadData.bind(this);
   }
 
+  /**** REQUIRED PROPS
+    1. onClick (Func)
+  */
+
   componentDidMount() {
     this.reloadData();
   }
@@ -97,6 +101,7 @@ class ProductionRunNonReport extends Component {
           Mark production run as complete?
         </Dialog>
         <h2>Production Runs</h2>
+        <FlatButton label="Back" backgroundColor='#377CC9' labelStyle={{color: '#FFF'}} hoverColor='#4694ec' onClick={this.props.onClick}/>
         <table className="table">
           <thead>
             <tr>
