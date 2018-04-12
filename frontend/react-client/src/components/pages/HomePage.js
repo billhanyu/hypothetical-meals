@@ -21,6 +21,7 @@ import Freshness from '../homepage/freshnessreport/Freshness';
 import UserTable from '../homepage/user/UserTable';
 import ProductionLine from '../homepage/productionline/ProductionLine';
 import ProductInventory from '../homepage/productinventory/ProductInventory';
+import PropTypes from 'prop-types';
 
 class HomePage extends Component {
   constructor(props) {
@@ -131,5 +132,9 @@ class HomePage extends Component {
     );
   }
 }
+
+HomePage.propTypes = {
+  history: PropTypes.object,
+};
 
 export default withRouter(HomePage);

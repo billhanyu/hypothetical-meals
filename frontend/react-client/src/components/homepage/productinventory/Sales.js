@@ -12,9 +12,13 @@ class Sales extends Component {
       open: false,
       message: '',
       requesting: false,
+      canceling: '',
     };
     this.request = this.request.bind(this);
     this.back = this.back.bind(this);
+    this.confirmCancel = this.confirmCancel.bind(this);
+    this.cancel = this.cancel.bind(this);
+    this.confirm = this.confirm.bind(this);
   }
 
   request() {
@@ -26,6 +30,22 @@ class Sales extends Component {
   back() {
     this.setState({
       requesting: false,
+    });
+  }
+
+  confirmCancel() {
+    // REQUEST
+    // Reload data
+  }
+
+  confirm(id) {
+    // REQUEST
+    // reload data
+  }
+
+  cancel(id) {
+    this.setState({
+      canceling: id,
     });
   }
   
@@ -89,11 +109,38 @@ class Sales extends Component {
           {
             this.state.sales.map((sale, idx) => {
               return (
-                <SaleItem columnClass={columnClass} idx={idx} key={idx} sale={sale} />
+                <SaleItem
+                  columnClass={columnClass}
+                  idx={idx}
+                  key={idx}
+                  sale={sale}
+                  cancel={this.cancel}
+                  confirm={this.confirm}
+                />
               );
             })
           }
         </table>
+
+        <div className="modal fade" id="cancelSaleModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">Confirm Delete</h5>
+                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Are you sure you want to cancel this sale?
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" data-dismiss="modal">Back</button>
+                <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.confirmCancel}>Yeah Sure</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

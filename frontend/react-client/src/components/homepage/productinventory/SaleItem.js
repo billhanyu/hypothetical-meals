@@ -22,6 +22,7 @@ class SaleItem extends Component {
 
   render() {
     const { columnClass, sale } = this.props;
+    const id = sale.id;
     return (
       <tbody>
         <tr data-toggle="collapse" data-target={`#sale_${this.props.idx}`} className="accordion-toggle tablerow-hover">
@@ -30,7 +31,24 @@ class SaleItem extends Component {
           <td className={columnClass}></td>
           {
             global.user_group !== 'noob' &&
-            <td className={columnClass}></td>
+            <td className={columnClass}>
+              <div className="btn-group" role="group" aria-label="Basic example">
+                <button
+                  type="button"
+                  className="btn btn-secondary no-collapse"
+                  onClick={e => this.props.confirm(id)}>
+                  Confirm
+                </button>   
+                <button
+                  type="button"
+                  className="btn btn-danger no-collapse"
+                  onClick={e => this.props.cancel(id)}
+                  data-toggle="modal"
+                  data-target="#cancelSaleModal">
+                  Cancel
+                </button>
+              </div>
+            </td>
           }
         </tr>
         <tr>
@@ -50,6 +68,8 @@ SaleItem.propTypes = {
   columnClass: PropTypes.string,
   sale: PropTypes.object,
   idx: PropTypes.number,
+  confirm: PropTypes.func,
+  cancel: PropTypes.func,
 };
 
 export default SaleItem;

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PermissionLink from './PermissionLink';
+import PropTypes from 'prop-types';
 
 class SideBar extends Component {
   constructor(props) {
@@ -284,5 +285,9 @@ class SideBar extends Component {
     );
   }
 }
+
+SideBar.propTypes = {
+  link: PropTypes.func,
+};
 
 export default SideBar;
