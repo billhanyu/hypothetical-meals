@@ -79,7 +79,7 @@ class ProductInventory extends Component {
           className='btn btn-primary'
           onClick={this.showSales}
         >
-          Sales
+          Sale Requests
         </button>
         <table className='table'>
           <thead>
