@@ -259,7 +259,7 @@ CREATE TABLE Sales(
 	created_at timestamp DEFAULT now() not null,
 
 	PRIMARY KEY (id)
-)
+);
 
 CREATE TABLE SalesEntries(
 	id int not null AUTO_INCREMENT,
