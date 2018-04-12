@@ -168,6 +168,41 @@ describe('User', () => {
         });
     });
 
+    it('should fail to create user with same username as active user', (done) => {
+      chai.request(server)
+        .post('/users/noob')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'user': {
+            'username': 'christine',
+            'name': 'Christine Zhou',
+            'password': 'abc123',
+          },
+        })
+        .end((err, res) => {
+          console.log(err);
+          res.should.have.status(422); // error for user already registered
+          done();
+        });
+    });
+
+    it('should allow admin to create user with same username as inactive user', (done) => {
+      chai.request(server)
+        .post('/users/noob')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'user': {
+            'username': 'blah',
+            'name': 'foo bar',
+            'password': 'abc123',
+          },
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          done();
+        });
+    });
+
     it('should fail noob user creation as noob', (done) => {
       chai.request(server)
         .post('/users/noob')
