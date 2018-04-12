@@ -36,7 +36,12 @@ export function view(req, res, next) {
     })
     .then((formulaLines) => {
       formulaLines.forEach(formulaLine => {
-        productionLineMap[formulaLine.productionline_id].formulas.push(`{${formulaLine.formula_name}=formula_id=${formulaLine.formula_id}}`);
+        const formula = {
+          'name': formulaLine.formula_name,
+          'formula_id': formulaLine.formula_id,
+        };
+        myProductionLine[0].formulas.push(formula);
+        productionLineMap[formulaLine.productionline_id].formulas.push(formula);
       });
       res.status(200).send(Object.values(productionLineMap));
     })
@@ -71,7 +76,11 @@ export function viewWithId(req, res, next) {
     })
     .then((formulaLines) => {
       formulaLines.forEach(formulaLine => {
-        myProductionLine[0].formulas.push(`{${formulaLine.formula_name}=formula_id=${formulaLine.formula_id}}`);
+        const formula = {
+          'name': formulaLine.formula_name,
+          'formula_id': formulaLine.formula_id,
+        };
+        myProductionLine[0].formulas.push(formula);
       });
       res.status(200).send(myProductionLine);
     })

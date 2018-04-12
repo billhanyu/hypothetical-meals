@@ -21,7 +21,15 @@ response.body = [
         end_time: null,
         busy: 1 }
     } ],
-    formulas: [ '{cake=formula_id=1}', '{shit=formula_id=2}' ] 
+    formulas: [
+      {
+        name: 'cake',
+        formula_id: '1'
+      },
+      { name: 'shit',
+        formula_id: '2'
+      },
+    ], 
   }
 ]
 ```
@@ -48,7 +56,10 @@ response.body = [
         end_time: null,
         busy: 1 }
     } ],
-    formulas: [ '{cake=formula_id=1}', '{shit=formula_id=2}' ] 
+    formulas: [ {
+        name: 'cake',
+        formula_id: '1'
+      }, ] 
   }
 ]
 ```
