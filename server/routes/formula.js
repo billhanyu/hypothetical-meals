@@ -95,13 +95,8 @@ export function add(req, res, next) {
   formulas.forEach(x => {
     names.push(`'${x.name}'`);
   });
-  connection.query(`${dbFormulaNameCheck} (${names.join(', ')})`)
-    .then((results) => {
-      if (results.length > 0) {
-        throw createError('Trying to add a formula that already exists in database');
-      }
-      return addIntermediateProducts(formulas, req.payload.id);
-    })
+
+  addIntermediateProducts(formulas, req.payload.id)
     .then((intermediates) => {
       let intermediateMap = {};
       let formulaCases = [];
@@ -129,7 +124,6 @@ export function add(req, res, next) {
       success(res);
     })
     .catch((err) => {
-      console.log(err);
       handleError(err, res);
     });
 }
@@ -414,7 +408,7 @@ export function deleteFormulas(req, res, next) {
       return connection.query(`DELETE FROM FormulaEntries WHERE formula_id IN (${toDelete.join(', ')})`);
     })
     .then(() => {
-      return connection.query(`UPDATE Formulas SET removed = 1 WHERE id IN (${toDelete.join(', ')})`);
+      return connection.query(`UPDATE Formulas SET removed = 1, isactive = NULL WHERE id IN (${toDelete.join(', ')})`);
     })
     .then(() => {
       const formulaStrings = oldFormulas.map(x => {

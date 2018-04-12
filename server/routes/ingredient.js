@@ -82,7 +82,7 @@ function addIngredientHelper(ingredients, req, res, next) {
   connection.query('INSERT INTO Ingredients (name, package_type, native_unit, num_native_units, storage_id) VALUES ?', [ingredientsToAdd])
     .then(() => {
       const names = ingredients.map(x => `'${x.name}'`);
-      return connection.query('SELECT * FROM Ingredients WHERE name IN (?)', [names]);
+      return connection.query(`SELECT * FROM Ingredients WHERE name IN (?) AND removed = 0`, [names]);
     })
     .then((results) => {
       const nameStrings = [];
@@ -222,7 +222,7 @@ function deleteIngredientHelper(items, req, res, next) {
     ingredientIds.push(idString);
   }
 
-  connection.query(`SELECT id, storage_id FROM Ingredients WHERE id IN (?)`, [ingredientIds])
+  connection.query(`SELECT id, storage_id FROM Ingredients WHERE id IN (?) AND removed = 0`, [ingredientIds])
     .then(results => {
       if (results.length < ingredientIds.length) {
         throw createError('Deleting nonexistent ingredient.');
@@ -246,7 +246,7 @@ function deleteIngredientHelper(items, req, res, next) {
         }
       }
     if (formulasWithIngredient.length > 0) throw createError(`Formulas ${formulasWithIngredient.join(', ')} contains one or more ingredients that are attempted to be deleted`);
-    return connection.query(`UPDATE Ingredients SET removed = 1 WHERE id IN (?)`, [ingredientIds]);
+    return connection.query(`UPDATE Ingredients SET removed = 1, isactive = NULL WHERE id IN (?)`, [ingredientIds]);
   })
   .then(() => connection.query(`SELECT id FROM VendorsIngredients WHERE ingredient_id IN (?)`, [ingredientIds]))
   .then(results => {

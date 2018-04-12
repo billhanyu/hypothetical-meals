@@ -303,6 +303,62 @@ describe('Formulas', () => {
         });
     });
 
+    it('should allow add of formula with same name as inactive formula', (done) => {
+      connection.query(`INSERT INTO Formulas (name, description, num_product, removed, isactive) VALUES 
+        ('test', 'abc123', 5, 1, NULL)`)
+        .then((results) => {
+          chai.request(server)
+            .post('/formulas')
+            .set('Authorization', `Token ${testTokens.adminTestToken}`)
+            .send({
+              'formulas': [
+                {
+                  'name': 'test',
+                  'description': 'abc',
+                  'num_product': 1,
+                  'ingredients': [
+                    {
+                      'ingredient_id': 1,
+                      'num_native_units': 2,
+                    },
+                  ],
+                },
+              ],
+            })
+            .end((err, res)=> {
+              res.should.have.status(200);
+              done();
+            });
+        })
+        .catch((err) => console.log(err));
+    });
+
+    it('should disallow add of formula with same name as active formula', (done) => {
+      chai.request(server)
+        .post('/formulas')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'formulas': [
+            {
+              'name': 'cake',
+              'description': 'abc',
+              'num_product': 1,
+              'ingredients': [
+                {
+                  'ingredient_id': 1,
+                  'num_native_units': 2,
+                },
+              ],
+            },
+          ],
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          assert.strictEqual(res.text, 'ER_DUP_ENTRY', 'Catches duplicate entry');
+          done();
+        });
+    });
+
     it('should reject an add request from a noob', (done) => {
       chai.request(server)
         .post('/formulas')
