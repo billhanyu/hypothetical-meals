@@ -1,5 +1,4 @@
 import * as checkNumber from './common/checkNumber';
-import { addEntry } from './log';
 import { createError, handleError } from './common/customError';
 import { getSpace } from './common/packageUtilies';
 import { checkStoragePromise } from './common/storageUtilities';
@@ -51,7 +50,7 @@ function orderHelper(orders, req, res, next) {
         throw createError('Some id not in Vendor Ingredients');
       }
       ingredientIds = results.map(x => x.ingredient_id);
-      result.forEach(result => {
+      results.forEach(result => {
         let quantity = orders[result.id].num_packages;
         createIngredientsMap(ingredientsMap, result, quantity, orders);
         createSpendingLogMap(spendingLogReq, result, quantity);
