@@ -28,17 +28,22 @@ CREATE TABLE Users(
 	salt character(32), 
 	user_group enum('admin', 'manager', 'noob') not null DEFAULT 'noob',
 	removed BIT DEFAULT 0,
+	isactive varchar(1) DEFAULT 'Y',
 
 	PRIMARY KEY (id),
-	UNIQUE (username, oauth)
+	UNIQUE (username, oauth, isactive)
 );
 
 CREATE TABLE Vendors(
 	id int not null AUTO_INCREMENT,
-	name varchar(70) not null UNIQUE,
+	name varchar(70) not null,
 	contact varchar(255) not null,
-	code varchar(255) not null UNIQUE,
+	code varchar(255) not null,
 	removed BIT DEFAULT 0,
+	isactive varchar(1) DEFAULT 'Y',
+	
+	UNIQUE(name, isactive),
+	UNIQUE(code, isactive),
 
 	PRIMARY KEY (id)
 );
@@ -53,7 +58,7 @@ CREATE TABLE Storages(
 
 CREATE TABLE Ingredients(
 	id int not null AUTO_INCREMENT,
-	name varchar(70) not null UNIQUE,
+	name varchar(70) not null,
 	package_type enum('sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar') not null,
 	storage_id int not null,
 	native_unit varchar(70) not null,
@@ -63,6 +68,9 @@ CREATE TABLE Ingredients(
 	total_weighted_duration BIGINT DEFAULT 0 not null,
 	total_num_native_units double DEFAULT 0 not null,
 	removed BIT DEFAULT 0,
+	isactive varchar(1) DEFAULT 'Y',
+
+	UNIQUE(name, isactive),
 
 	FOREIGN KEY (storage_id) REFERENCES Storages(id),
 	PRIMARY KEY (id)
@@ -122,13 +130,16 @@ CREATE TABLE Formulas(
 	id int not null AUTO_INCREMENT,
 	intermediate BIT DEFAULT 0,
 	ingredient_id int,
-	name varchar(70) not null UNIQUE,
+	name varchar(70) not null,
 	description text not null,
 	num_product int not null,
 	worst_duration BIGINT DEFAULT 0 not null,
 	total_weighted_duration BIGINT DEFAULT 0 not null,
 	total_num_products double DEFAULT 0 not null,
 	removed BIT DEFAULT 0,
+	isactive varchar(1) DEFAULT 'Y',
+
+	UNIQUE(name, isactive),
 
 	PRIMARY KEY (id)
 );
@@ -200,7 +211,7 @@ CREATE TABLE ProductionlinesOccupancies(
 	productionline_id int not null,
 	formula_id int not null,
 	start_time timestamp DEFAULT now() not null,
-	end_time timestamp DEFAULT now() not null,
+	end_time timestamp null,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
 	FOREIGN KEY (productionline_id) REFERENCES Productionlines(id),
@@ -224,11 +235,11 @@ CREATE TABLE ProductRunsEntries(
 CREATE TABLE Orders(
 	id int not null AUTO_INCREMENT,
 	arrived bit not null DEFAULT 0,
-	ingredient_id int not null,
+	vendoringredient_id int not null,
 	num_packages int not null,
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
 
-	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
+	FOREIGN KEY (vendoringredient_id) REFERENCES VendorsIngredients(id),
 	PRIMARY KEY (id)
 );
 

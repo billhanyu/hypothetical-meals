@@ -138,6 +138,94 @@ describe('Vendor', () => {
         });
     });
 
+    it('should add vendor if inactive vendor has same name', (done) => {
+      connection.query(`INSERT INTO Vendors (name, contact, code, isactive) VALUES
+        ('mcd', 'abc', 'mcd', NULL)`)
+        .then(() => {
+          chai.request(server)
+            .post('/vendors')
+            .set('Authorization', `Token ${testTokens.adminTestToken}`)
+            .send({
+              'vendors': [
+                {
+                  'name': 'bleblebleb',
+                  'contact': 'mcd@mcd.com',
+                  'code': 'mcd',
+                },
+              ],
+            })
+            .end((err, res) => {
+              res.should.have.status(200);
+              done();
+            });
+        })
+        .catch(err => console.log(err));
+    });
+
+    it('should add vendor if inactive vendor has same name', (done) => {
+      connection.query(`INSERT INTO Vendors (name, contact, code, isactive) VALUES
+        ('mcd', 'abc', 'mcd', NULL)`)
+        .then(() => {
+          chai.request(server)
+            .post('/vendors')
+            .set('Authorization', `Token ${testTokens.adminTestToken}`)
+            .send({
+              'vendors': [
+                {
+                  'name': 'mcd',
+                  'contact': 'mcd@mcd.com',
+                  'code': 'mcd',
+                },
+              ],
+            })
+            .end((err, res) => {
+              res.should.have.status(200);
+              done();
+            });
+        })
+        .catch(err => console.log(err));
+    });
+
+    it('should reject if active vendor has same name', (done) => {
+        chai.request(server)
+          .post('/vendors')
+          .set('Authorization', `Token ${testTokens.adminTestToken}`)
+          .send({
+            'vendors': [
+              {
+                'name': 'Duke',
+                'contact': 'abc',
+                'code': 'abc',
+              },
+            ],
+          })
+          .end((err, res) => {
+            res.should.have.status(400);
+            assert.strictEqual(res.text, 'Duplicate name or code with other vendor', 'Catches duplicate entry');
+            done();
+          });
+    });
+
+    it('should reject if active vendor has same code', (done) => {
+      chai.request(server)
+        .post('/vendors')
+        .set('Authorization', `Token ${testTokens.adminTestToken}`)
+        .send({
+          'vendors': [
+            {
+              'name': 'test_code',
+              'contact': 'abc',
+              'code': 'code_admin',
+            },
+          ],
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          assert.strictEqual(res.text, 'Duplicate name or code with other vendor', 'Catches duplicate entry');
+          done();
+        });
+  });
+
     it('should add vendors for valid requests', (done) => {
       chai.request(server)
         .post('/vendors')
