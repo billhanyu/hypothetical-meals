@@ -7,6 +7,7 @@ import { logAction } from './systemLogs';
 import { validStorageTypes } from './common/storageUtilities';
 import { checkIngredientProperties } from './ingredient';
 import { getSpace } from './common/packageUtilies';
+import { checkParamId } from './common/checkParams';
 
 const fs = require('fs');
 const Papa = require('papaparse');
@@ -40,8 +41,8 @@ export function viewAll(req, res, next) {
 }
 
 export function viewWithId(req, res, next) {
-  if (!req.params.id || !checkNumber.isPositiveInteger(req.params.id)) {
-    return res.status(400).send('Invalid vendor id');
+  if (!checkParamId(req, res, 'Invalid formula id')) {
+    return;
   }
   getFormulas(`SELECT * FROM Formulas WHERE id = ?`, [req.params.id], req, res, next);
 }

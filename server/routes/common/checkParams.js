@@ -1,3 +1,5 @@
+import * as checkNumber from './checkNumber';
+
 export function checkBlankParams(obj, params) {
   let blankParams = [];
   for (let param of params) {
@@ -19,4 +21,19 @@ export function checkSuperset(set, subset) {
     return set.indexOf(x) >= 0;
   });
   return superSet;
+}
+
+/**
+ * Checks that req.params.id is given and is a positive integer
+ * @param {*} req
+ * @param {*} res
+ * @param {*} message Error message
+ * @return {Boolean} True if valid, false if invalid
+ */
+export function checkParamId(req, res, message) {
+  if (!req.params.id || !checkNumber.isPositiveInteger(req.params.id)) {
+    res.status(400).send(message);
+    return false;
+  }
+  return true;
 }
