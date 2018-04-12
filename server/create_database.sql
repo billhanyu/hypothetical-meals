@@ -194,10 +194,10 @@ CREATE TABLE FormulaProductionLines(
 	formula_id int not null,
 	productionline_id int not null,
 
+	UNIQUE(formula_id, productionline_id),
+	
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
 	FOREIGN KEY (productionline_id) REFERENCES Productionlines(id),
-
-	UNIQUE(formula_id, productionline_id),
 	
 	PRIMARY KEY (id)
 );

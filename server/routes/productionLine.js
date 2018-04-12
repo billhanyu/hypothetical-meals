@@ -8,7 +8,7 @@ import { checkParamId } from './common/checkParams';
 
 const productionLineQuery = `SELECT * FROM Productionlines WHERE isactive = 'Y'`;
 const productionOccupanciesQuery = `SELECT * FROM ProductionlinesOccupancies`;
-const formulaProductionQuery = `SELECT FormulaProductionLines*, Formulas.name as formula_name FROM FormulaProductionLines
+const formulaProductionQuery = `SELECT FormulaProductionLines.*, Formulas.name as formula_name FROM FormulaProductionLines
   JOIN Formulas ON FormulaProductionLines.formula_id = Formulas.id`;
 
 /**
@@ -36,7 +36,7 @@ export function view(req, res, next) {
     })
     .then((formulaLines) => {
       formulaLines.forEach(formulaLine => {
-        productionLineMap[formulaLine.productionline_id].push(`{${formulaLine.formula_name}=formula_id=${formulaLine.formula_id}}`);
+        productionLineMap[formulaLine.productionline_id].formulas.push(`{${formulaLine.formula_name}=formula_id=${formulaLine.formula_id}}`);
       });
       res.status(200).send(Object.values(productionLineMap));
     })
@@ -60,11 +60,18 @@ export function viewWithId(req, res, next) {
     .then((productionLine) => {
       myProductionLine = productionLine;
       myProductionLine[0].occupancies = [];
+      myProductionLine[0].formulas = [];
       return connection.query(`${productionOccupanciesQuery} WHERE busy = 1 AND productionline_id = ${req.params.id}`);
     })
     .then((occupancy) => {
       occupancy.forEach(x => {
         myProductionLine[0].occupancies.push(x);
+      });
+      return connection.query(`${formulaProductionQuery} WHERE FormulaProductionLines.productionline_id = ${req.params.id}`);
+    })
+    .then((formulaLines) => {
+      formulaLines.forEach(formulaLine => {
+        myProductionLine[0].formulas.push(`{${formulaLine.formula_name}=formula_id=${formulaLine.formula_id}}`);
       });
       res.status(200).send(myProductionLine);
     })
@@ -91,7 +98,7 @@ export function viewWithId(req, res, next) {
 export function add(req, res, next) {
   const productionLines = req.body.lines;
   if (!checkProductionLineParams(productionLines)) {
-    handleError(createError('Invalid production line paramters'), res);
+    handleError(createError('Invalid production line parameters'), res);
     return;
   }
   let myAddedLines = [];
@@ -103,7 +110,7 @@ export function add(req, res, next) {
       myAddedLines = addedLines;
       let formulaIds = [];
       productionLines.forEach(line => {
-        formulaIds.concat(line.formulas);
+        formulaIds = formulaIds.concat(line.formulas);
       });
       return connection.query(`SELECT id, name FROM Formulas WHERE id IN (?)`, [formulaIds]);
     })
@@ -115,6 +122,7 @@ export function add(req, res, next) {
       success(res);
     })
     .catch((err) => {
+      console.log(err);
       handleError(err, res);
     });
 }
@@ -148,7 +156,7 @@ function addProductionLine(productionLines) {
 
 function addFormulaProductionLines(productionLines) {
   const lineNames = productionLines.map(x => x.name);
-  const myLines = [];
+  let myLines = [];
   return connection.query(`${productionLineQuery} AND name IN (?)`, [lineNames])
     .then(lines => {
       if (lines.length != lineNames.length) {
@@ -165,12 +173,13 @@ function addFormulaProductionLines(productionLines) {
           formulaProductionLineCases.push([formulaLine, nameIdTuple[line.name]]);
         });
       });
-      return connection.query(`INSERT INTO FormulaProductionLines (formula_id, productionline_id) VALUES (?)`, [formulaProductionLineCases]);
+      return connection.query(`INSERT INTO FormulaProductionLines (formula_id, productionline_id) VALUES ?`, [formulaProductionLineCases]);
     })
     .then(() => {
       return Promise.resolve(myLines);
     })
     .catch((err) => {
+      console.log(err);
       throw createError('Error adding production line occupancies');
     });
 }
@@ -328,7 +337,7 @@ export function modify(req, res, next) {
  */
 export function deleteProductionLine(req, res, next) {
   const productionLineIds = req.body.lines.map(x => x.id);
-  const oldLines = [];
+  let oldLines = [];
   connection.query(`${productionLineQuery} AND id IN (?)`, [productionLineIds])
     .then((results) => {
       if (results.length != productionLineIds.length) {
@@ -367,11 +376,7 @@ export function deleteProductionLine(req, res, next) {
  */
 function checkProductionLineParams(params) {
   return params.every(line => {
-    if (!('name' in line)) {
-      return false;
-    } else if (!('description' in line)) {
-      return false;
-    } else if (!('formulas' in line) || !Array.isArray(line.formulas)) {
+    if (!line.name || !line.description || !line.formulas) {
       return false;
     } else {
       return true;
