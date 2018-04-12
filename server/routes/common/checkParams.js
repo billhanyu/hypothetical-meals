@@ -1,3 +1,5 @@
+import * as checkNumber from './checkNumber';
+
 export function checkBlankParams(obj, params) {
   let blankParams = [];
   for (let param of params) {
