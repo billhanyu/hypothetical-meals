@@ -5,6 +5,7 @@ import { getSpace } from './common/packageUtilies';
 import { checkStoragePromise } from './common/storageUtilities';
 import success from './common/success';
 import { logAction } from './systemLogs';
+import { updateLogForIngredient } from './spendinglog';
 
 /* request body format:
  * example:
@@ -34,12 +35,14 @@ function orderHelper(orders, req, res, next) {
   let requestedCapacities = {};
   let newIngredientCases = [];
   let ingredientsMap = {};
+  let spendingLogReq = {};
 
   if (!checkOrderParameters(orders, res)) {
     return;
   }
 
-  connection.query(`SELECT VendorsIngredients.id, VendorsIngredients.ingredient_id, Vendors.id as vendor_id, Ingredients.package_type, Ingredients.storage_id
+  connection.query(`SELECT VendorsIngredients.id, VendorsIngredients.price, VendorsIngredients.ingredient_id, Vendors.id as vendor_id, 
+    Ingredients.package_type, Ingredients.storage_id, Ingredients.num_native_units
     FROM VendorsIngredients JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id 
     JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id
     WHERE VendorsIngredients.id IN (${Object.keys(orders).join(', ')})`)
@@ -48,27 +51,20 @@ function orderHelper(orders, req, res, next) {
         throw createError('Some id not in Vendor Ingredients');
       }
       ingredientIds = results.map(x => x.ingredient_id);
-      for (let result of results) {
-        ingredientsMap[result['ingredient_id']] = {
-          'package_type': result['package_type'],
-          'quantity': orders[result.id].num_packages,
-          'storage_id': result['storage_id'],
-          'vendor_ingredient_id': result['id'],
-          'vendor_id': result['vendor_id'],
-          'lots': orders[result.id].lots,
-        };
-      }
-
-      findRequestedStorageQuantity(ingredientIds, ingredientsMap, requestedCapacities);
+      result.forEach(result => {
+        let quantity = orders[result.id].num_packages;
+        createIngredientsMap(ingredientsMap, result, quantity, orders);
+        createSpendingLogMap(spendingLogReq, result, quantity);
+      });
       createInventoryCases(ingredientIds, newIngredientCases, ingredientsMap);
+      findRequestedStorageQuantity(ingredientIds, ingredientsMap, requestedCapacities);
       return checkStoragePromise(requestedCapacities);
     })
     .then(() => {
       return connection.query(`INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id, per_package_cost) VALUES ${newIngredientCases.join(', ')}`);
     })
     .then(() => {
-      let logReq = Object.values(ingredientsMap);
-      return addEntry(logReq, req.payload.id);
+      return updateLogForIngredient(spendingLogReq);
     })
     .then(() => {
       let vendorIngredientIds = Object.keys(orders);
@@ -91,11 +87,29 @@ function orderHelper(orders, req, res, next) {
     });
 }
 
+function createSpendingLogMap(spendingLogReq, result, quantity) {
+  spendingLogReq[result['ingredient_id']] = {
+    'total_weight': result['num_native_units'] * quantity,
+    'cost': quantity * result['price'],
+  };
+}
+
+function createIngredientsMap(ingredientsMap, result, quantity, orders) {
+  ingredientsMap[result['ingredient_id']] = {
+    'package_type': result['package_type'],
+    'quantity': quantity,
+    'package_price': result['price'],
+    'storage_id': result['storage_id'],
+    'vendor_ingredient_id': result['id'],
+    'vendor_id': result['vendor_id'],
+    'lots': orders[result.id].lots,
+  };
+}
+
 function createInventoryCases(ingredientIds, newIngredientCases, ingredientsMap) {
   ingredientIds.forEach(ingredientId => {
     Object.keys(ingredientsMap[ingredientId].lots).forEach(lotNumber => {
-      newIngredientCases.push(`(${ingredientId}, ${ingredientsMap[ingredientId]['lots'][lotNumber]}, '${lotNumber}', ${ingredientsMap[ingredientId]['vendor_id']}, 0)`);
-      // TODO: update the last per package cost later
+      newIngredientCases.push(`(${ingredientId}, ${ingredientsMap[ingredientId]['lots'][lotNumber]}, '${lotNumber}', ${ingredientsMap[ingredientId]['vendor_id']}, ${ingredientsMap[ingredientId]['package_price']})`);
     });
   });
 }

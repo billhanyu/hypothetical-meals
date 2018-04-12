@@ -223,14 +223,20 @@ CREATE TABLE ProductRunsEntries(
 
 CREATE TABLE Orders(
 	id int not null AUTO_INCREMENT,
-	arrived bit not null DEFAULT 0,
-	ingredient_id int not null,
-	num_packages int not null,
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
 
-	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	PRIMARY KEY (id)
 );
+
+CREATE TABLE OrderEntries(
+	id int not null AUTO_INCREMENT,
+	order_id int not null,
+	arrived bit not null DEFAULT 0,
+	inventory_id int not null,
+	
+	FOREIGN KEY (inventory_id) REFERENCES Inventories(id),
+	PRIMARY KEY (id)
+)
 
 CREATE TABLE FinalProductInventories(
 	id int not null AUTO_INCREMENT,
