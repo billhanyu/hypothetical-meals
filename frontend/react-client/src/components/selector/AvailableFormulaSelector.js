@@ -24,7 +24,7 @@ const AvailableFormulaSelector = createClass({
     };
   },
 
-  componentDidMount() {
+  componentWillMount() {
     axios.get('/formulas', {
       headers: { Authorization: "Token " + global.token }
     })
@@ -49,7 +49,7 @@ const AvailableFormulaSelector = createClass({
   },
 
   componentWillReceiveProps(newProps) {
-    const formulas = this.state.allFormulas.filter(formula => !newProps.existing.find(el => el.id == formula.id));
+    const formulas = this.state.allFormulas.filter(formula => !newProps.existing.find(el => el.formula_id == formula.id));
     this.setState({
       formulas,
     });
