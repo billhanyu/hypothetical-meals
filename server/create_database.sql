@@ -11,17 +11,22 @@ CREATE TABLE Users(
 	salt character(32), 
 	user_group enum('admin', 'manager', 'noob') not null DEFAULT 'noob',
 	removed BIT DEFAULT 0,
+	isactive varchar(1) DEFAULT 'Y',
 
 	PRIMARY KEY (id),
-	UNIQUE (username, oauth)
+	UNIQUE (username, oauth, isactive)
 );
 
 CREATE TABLE Vendors(
 	id int not null AUTO_INCREMENT,
-	name varchar(70) not null UNIQUE,
+	name varchar(70) not null,
 	contact varchar(255) not null,
-	code varchar(255) not null UNIQUE,
+	code varchar(255) not null,
 	removed BIT DEFAULT 0,
+	isactive varchar(1) DEFAULT 'Y',
+	
+	UNIQUE(name, isactive),
+	UNIQUE(code, isactive),
 
 	PRIMARY KEY (id)
 );
@@ -36,7 +41,7 @@ CREATE TABLE Storages(
 
 CREATE TABLE Ingredients(
 	id int not null AUTO_INCREMENT,
-	name varchar(70) not null UNIQUE,
+	name varchar(70) not null,
 	package_type enum('sack', 'pail', 'drum', 'supersack', 'truckload', 'railcar') not null,
 	storage_id int not null,
 	native_unit varchar(70) not null,
@@ -46,6 +51,9 @@ CREATE TABLE Ingredients(
 	total_weighted_duration BIGINT DEFAULT 0 not null,
 	total_num_native_units double DEFAULT 0 not null,
 	removed BIT DEFAULT 0,
+	isactive varchar(1) DEFAULT 'Y',
+
+	UNIQUE(name, isactive),
 
 	FOREIGN KEY (storage_id) REFERENCES Storages(id),
 	PRIMARY KEY (id)
@@ -103,13 +111,16 @@ CREATE TABLE Formulas(
 	id int not null AUTO_INCREMENT,
 	intermediate BIT DEFAULT 0,
 	ingredient_id int,
-	name varchar(70) not null UNIQUE,
+	name varchar(70) not null,
 	description text not null,
 	num_product int not null,
 	worst_duration BIGINT DEFAULT 0 not null,
 	total_weighted_duration BIGINT DEFAULT 0 not null,
 	total_num_products double DEFAULT 0 not null,
 	removed BIT DEFAULT 0,
+	isactive varchar(1) DEFAULT 'Y',
+
+	UNIQUE(name, isactive),
 
 	PRIMARY KEY (id)
 );
@@ -161,29 +172,39 @@ CREATE TABLE ProductRuns(
 
 CREATE TABLE Productionlines(
 	id int not null AUTO_INCREMENT,
-	name varchar(70) not null UNIQUE, 
+	name varchar(70) not null, 
 	description text,
-	productrun_id int DEFAULT 0,
+	isactive varchar(1) DEFAULT 'Y',
+
+	UNIQUE(name, isactive),
 
 	PRIMARY KEY (id)
 );
 
 CREATE TABLE FormulaProductionLines(
+	id int not null AUTO_INCREMENT,
 	formula_id int not null,
 	productionline_id int not null,
 
+	UNIQUE(formula_id, productionline_id),
+	
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
-	FOREIGN KEY (productionline_id) REFERENCES Productionlines(id)
+	FOREIGN KEY (productionline_id) REFERENCES Productionlines(id),
+	
+	PRIMARY KEY (id)
 );
 
 CREATE TABLE ProductionlinesOccupancies(
 	id int not null AUTO_INCREMENT,
 	productionline_id int not null,
+	productrun_id int not null,
 	formula_id int not null,
 	start_time timestamp DEFAULT now() not null,
 	end_time timestamp null,
+	busy BIT DEFAULT 1,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
+	FOREIGN KEY (productrun_id) REFERENCES ProductRuns(id),
 	FOREIGN KEY (productionline_id) REFERENCES Productionlines(id),
 	PRIMARY KEY (id)
 );
