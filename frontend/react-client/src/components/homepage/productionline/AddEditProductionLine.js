@@ -221,7 +221,7 @@ class AddEditProductionLine extends Component {
   render() {
     const header = "Production Line: " + this.state.name;
     const readOnly = global.user_group !== 'admin';
-    const columnClass = 'OneHalfWidth';
+    const columnClass = 'HalfWidth';
     return (
       <div>
         <Snackbar
@@ -276,10 +276,12 @@ class AddEditProductionLine extends Component {
               global.user_group !== 'noob' &&
               <div className="row justify-content-md-center">
                 <form className="col-xl-6 col-lg-6 col-sm-8">
-                  <div className="form-group">
-                    <AvailableFormulaSelector changeFormulaId={this.changeFormulaId} existing={this.state.formulas} />
+                  <div className='row'>
+                    <div className="col-md-10">
+                      <AvailableFormulaSelector changeFormulaId={this.changeFormulaId} existing={this.state.formulas} />
+                    </div>
+                    <button type="submit" className="btn btn-primary col-md-2" onClick={this.addFormula}>Add</button>
                   </div>
-                  <button type="submit" className="btn btn-primary" onClick={this.addFormula}>Add</button>
                 </form>
               </div>
             }

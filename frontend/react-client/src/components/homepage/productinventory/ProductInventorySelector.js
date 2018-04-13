@@ -55,11 +55,11 @@ const ProductInventorySelector = createClass({
     this.allInventories = [
       {
         value: 1,
-        label: 'fuck',
+        label: 'cake',
       },
       {
         value: 2,
-        label: 'damn',
+        label: 'shit',
       },
     ];
     this.setState({
