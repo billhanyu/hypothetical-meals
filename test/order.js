@@ -9,7 +9,31 @@ describe('Order', () => {
     });
 
     it('Should show all pending orders and linked inventory information', (done) => {
-
+      Promise.all([
+        connection.query(`INSERT INTO Inventories
+          (ingredient_id, num_packages, lot, vendor_id, per_package_cost, order_id, arrived) VALUES
+          (1, 2, 'PENDING', 1, 10, 1, 0)`),
+      ])
+        .then(() => {
+          chai.request(server)
+            .get('/order/pending')
+            .set('Authorization', `Token ${testTokens.managerTestToken}`)
+            .end((err, res) => {
+              res.should.have.status(200);
+              const orders = res.body;
+              const inventoryIngredient = orders['1'];
+              assert.strictEqual(orders['1'].length, 1, 'Total number of ingredients pending in order 1');
+              assert.strictEqual(inventoryIngredient[0].id, 7, 'Inventory id of pending order 1 ingredient');
+              assert.strictEqual(inventoryIngredient[0].ingredient_id, 1, 'Ingredient pending order 1');
+              assert.strictEqual(inventoryIngredient[0].num_packages, 2, 'Number of packages of pending ingredient');
+              assert.strictEqual(inventoryIngredient[0].vendor_id, 1, 'Vendor for pending ingredient');
+              assert.strictEqual(inventoryIngredient[0].per_package_cost, 10, 'Package cost of pending ingredient');
+              assert.strictEqual(inventoryIngredient[0].order_id, 1, 'Order number of ingredient');
+              assert.strictEqual(inventoryIngredient[0].arrived, 0, 'Status of ingredient');
+              done();
+            });
+        })
+        .catch((err) => console.log(err));
     });
   });
 
@@ -19,7 +43,23 @@ describe('Order', () => {
     });
 
     it('Should show all orders and linked inventory information', (done) => {
-
+      chai.request(server)
+        .get('/order')
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          const orders = res.body;
+          const inventoryIngredient = orders['1'];
+          assert.strictEqual(orders['1'].length, 1, 'Total number of ingredients in order 1');
+          assert.strictEqual(inventoryIngredient[0].id, 5, 'Inventory id of order 1 ingredient');
+          assert.strictEqual(inventoryIngredient[0].ingredient_id, 3, 'Ingredient order 1');
+          assert.strictEqual(inventoryIngredient[0].num_packages, 20, 'Number of packages of ingredient');
+          assert.strictEqual(inventoryIngredient[0].vendor_id, 1, 'Vendor for ingredient');
+          assert.strictEqual(inventoryIngredient[0].per_package_cost, 5.1, 'Package cost of ingredient');
+          assert.strictEqual(inventoryIngredient[0].order_id, 1, 'Order number of ingredient');
+          assert.strictEqual(inventoryIngredient[0].arrived, 1, 'Status of ingredient');
+          done();
+        });
     });
   });
 
@@ -39,7 +79,7 @@ describe('Order', () => {
           const numOrders = orderResult[0]['COUNT(1)'];
           chai.request(server)
             .post('/order')
-            .set('Authorization', `Token ${testTokens.noobTestToken}`)
+            .set('Authorization', `Token ${testTokens.managerTestToken}`)
             .send({
               'orders': {
                 '1': {
@@ -98,37 +138,10 @@ describe('Order', () => {
         });
     });
 
-    xit('should reject for empty lot number', (done) => {
-      connection.query(`SELECT COUNT(1) FROM Inventories`)
-        .then((inventoryResult) => {
-          chai.request(server)
-            .post('/order')
-            .set('Authorization', `Token ${testTokens.noobTestToken}`)
-            .send({
-              'orders': {
-                '1': {
-                  'num_packages': 2,
-                  'lots': {
-                    '': 1,
-                    '03859': 1,
-                  },
-                },
-              },
-            })
-            .end((err, res) => {
-              res.should.have.status(400);
-              done();
-            });
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    });
-
     it('should place reject an order with invalid ingredients', (done) => {
       chai.request(server)
         .post('/order')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .send({
           'orders': {
             '10': {
@@ -146,7 +159,7 @@ describe('Order', () => {
     it('should reject an order with ingredient over capacity', (done) => {
       chai.request(server)
         .post('/order')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .send({
           'orders': {
             '4': {
@@ -158,6 +171,58 @@ describe('Order', () => {
           res.should.have.status(400);
           done();
         });
+    });
+  });
+
+  describe('#markIngredientArrived()', () => {
+    it('Should mark an ingredient as arrived', (done) => {
+      Promise.all([
+        connection.query(`INSERT INTO Inventories
+        (ingredient_id, num_packages, lot, vendor_id, per_package_cost, order_id, arrived) VALUES
+        (1, 2, 'PENDING', 1, 10, 1, 0)`),
+      ])
+        .then((results) => {
+          const inventorySize = 7;
+          chai.request(server)
+            .put('/order')
+            .set('Authorization', `Token ${testTokens.managerTestToken}`)
+            .send({
+              'ingredients': [
+                {
+                  'inventory_id': inventorySize,
+                  'lots': {
+                    '1849abc': 1,
+                    '18a82b': 1,
+                  },
+                },
+              ],
+            })
+            .end((err, res) => {
+              res.should.have.status(200);
+              connection.query(`SELECT * FROM Inventories`)
+                .then((inventories) => {
+                  const lastIndex = inventories.length-1;
+                  assert.strictEqual(inventories.every(x => x.id != 7), true, 'Deleted old placehold entry');
+                  assert.strictEqual(inventories[lastIndex-1].ingredient_id, 1, 'Ingredient id of inventory');
+                  assert.strictEqual(inventories[lastIndex-1].num_packages, 1, 'Number of packages in inventory for ingredient');
+                  assert.strictEqual(inventories[lastIndex-1].lot, '1849abc', 1, 'Correct lot number assigned');
+                  assert.strictEqual(inventories[lastIndex-1].vendor_id, 1, 'Vendor for ingredient in inventory');
+                  assert.strictEqual(inventories[lastIndex-1].per_package_cost, 10, 'Cost per package for ingredient');
+                  assert.strictEqual(inventories[lastIndex-1].order_id, 1, 'Order number of inventory ingredient');
+                  assert.strictEqual(inventories[lastIndex-1].arrived, 1, 'Status of ingredient in inventory'); 
+                  assert.strictEqual(inventories[lastIndex].ingredient_id, 1, 'Ingredient id of inventory');
+                  assert.strictEqual(inventories[lastIndex].num_packages, 1, 'Number of packages in inventory for ingredient');
+                  assert.strictEqual(inventories[lastIndex].lot, '18a82b', 1, 'Correct lot number assigned');
+                  assert.strictEqual(inventories[lastIndex].vendor_id, 1, 'Vendor for ingredient in inventory');
+                  assert.strictEqual(inventories[lastIndex].per_package_cost, 10, 'Cost per package for ingredient');
+                  assert.strictEqual(inventories[lastIndex].order_id, 1, 'Order number of inventory ingredient');
+                  assert.strictEqual(inventories[lastIndex].arrived, 1, 'Status of ingredient in inventory');
+                  done();
+                })
+                .catch((e) => console.log(e));
+            });
+        })
+        .catch((err) => console.log(err));
     });
   });
 });

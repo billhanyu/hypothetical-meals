@@ -29,7 +29,7 @@ export function viewPendingOrders(req, res, next) {
         }
         myPendingOrders[x.order_id].push(x);
       });
-      res.status(200).send(myOrders);
+      res.status(200).send(myPendingOrders);
     })
     .catch((err) => {
       handleError(err, res);
@@ -49,10 +49,7 @@ export function viewAllOrders(req, res, next) {
       const orderIds = results.map(x => x.order_id);
       orderIds.forEach(orderId => myOrders[orderId] = []);
       results.forEach(x => {
-        if (x.created_at && x.arrived != 0) {
-          delete x.created_at;
-        } else {
-          x.arrived_at = x.created_at;
+        if (x.created_at && x.arrived == 0) {
           delete x.created_at;
         }
         myOrders[x.order_id].push(x);
@@ -138,7 +135,6 @@ function orderHelper(orders, req, res, next) {
       success(res);
     })
     .catch((err) => {
-      console.log(err);
       handleError(err, res);
     });
 }
@@ -220,13 +216,13 @@ function checkOrderParameters(orders, res) {
  * Mark an ingredient in inventory as arrived and give lot numbers
  * @param {*} req
  * req.body.ingredients =
- *  {
+ *  [{
  *    'inventory_id': 1,
  *    'lots': {
  *      'lotnum1': 1849abc,
  *      'lotnum2': 18a82b,
  *     },
- *  }
+ *  }]
  * @param {*} res
  * @param {*} next
  */
@@ -250,7 +246,7 @@ export function markIngredientArrived(req, res, next) {
           'per_package_cost': x.per_package_cost,
           'order_id': x.order_id,
         };
-        inventoryLotsMap[x.id].order_cost = x.num_packages;
+        inventoryLotsMap[x.id].order_total = x.num_packages;
       });
       return connection.query(`DELETE FROM Inventories WHERE id IN (?)`, [results.map(x => x.id)]);
     })
@@ -261,9 +257,9 @@ export function markIngredientArrived(req, res, next) {
       }
       let newInventoryCases = [];
       Object.values(inventoryLotsMap).forEach(ingredient => {
-        const ingredientData = inventoryMap[ingredientsMap[ingredient.id]];
+        const ingredientData = inventoryMap[ingredient.id];
         Object.keys(ingredient.lots).forEach(ingredientLot => {
-          const lotQuantity = ingredientLots[ingredientLot];
+          const lotQuantity = inventoryLotsMap[ingredient.id]['lots'][ingredientLot];
           newInventoryCases.push(
             [ingredientData.ingredient_id, ingredientData.vendor_id,
               ingredientData.per_package_cost, ingredientData.order_id,
@@ -275,6 +271,7 @@ export function markIngredientArrived(req, res, next) {
         (ingredient_id, vendor_id, per_package_cost, order_id, lot, num_packages, arrived, created_at) 
         VALUES ?`, [newInventoryCases]);
     })
+    .then(() => success(res))
     .catch((err) => {
       handleError(err, res);
     });
