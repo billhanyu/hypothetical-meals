@@ -219,8 +219,8 @@ function checkOrderParameters(orders, res) {
  *  [{
  *    'inventory_id': 1,
  *    'lots': {
- *      'lotnum1': 1849abc,
- *      'lotnum2': 18a82b,
+ *      '1849abc': 1,
+ *      '18a82b': 1,
  *     },
  *  }]
  * @param {*} res
@@ -237,10 +237,13 @@ export function markIngredientArrived(req, res, next) {
 
   let inventoryMap = {};
   const inventoryIds = Object.keys(inventoryLotsMap);
-  connection.query(`SELECT * FROM Inventories WHERE id IN (?)`, [inventoryIds])
+  connection.query(`SELECT Inventories.*, Ingredients.name
+    FROM Inventories JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id
+      WHERE Inventories.id IN (?)`, [inventoryIds])
     .then((results) => {
       results.forEach(x => {
         inventoryMap[x.id] = {
+          'name': x.name,
           'ingredient_id': x.ingredient_id,
           'vendor_id': x.vendor_id,
           'per_package_cost': x.per_package_cost,
@@ -270,6 +273,12 @@ export function markIngredientArrived(req, res, next) {
       return connection.query(`INSERT INTO Inventories
         (ingredient_id, vendor_id, per_package_cost, order_id, lot, num_packages, arrived, created_at) 
         VALUES ?`, [newInventoryCases]);
+    })
+    .then(() => {
+      const nameStrings = Object.values(inventoryMap).map(x => {
+        return `{${x.name}=ingredient_id=${x.ingredient_id}} from order ${x.order_id}`;
+      });
+      return logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} arrived.`);
     })
     .then(() => success(res))
     .catch((err) => {
