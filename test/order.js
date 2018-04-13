@@ -3,6 +3,26 @@ const assert = require('chai').assert;
 const testTokens = require('./common/testTokens');
 
 describe('Order', () => {
+  describe('#viewPendingOrders()', () => {
+    beforeEach(() => {
+      return dbSetup.setupTestDatabase();
+    });
+
+    it('Should show all pending orders and linked inventory information', (done) => {
+
+    });
+  });
+
+  describe('#viewAllOrders()', () => {
+    beforeEach(() => {
+      return dbSetup.setupTestDatabase();
+    });
+
+    it('Should show all orders and linked inventory information', (done) => {
+
+    });
+  });
+
   describe('#placeOrder()', () => {
     beforeEach(() => {
       return dbSetup.setupTestDatabase();
