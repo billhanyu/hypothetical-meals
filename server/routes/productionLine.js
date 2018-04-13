@@ -120,9 +120,12 @@ export function add(req, res, next) {
       productionLines.forEach(line => {
         formulaIds = formulaIds.concat(line.formulas);
       });
-      return connection.query(`SELECT id, name FROM Formulas WHERE id IN (?)`, [formulaIds]);
+      return formulaIds.length !== 0
+       ? connection.query(`SELECT id, name FROM Formulas WHERE id IN (?)`, [formulaIds])
+       : Promise.resolve([]);
     })
     .then((formulas) => {
+      console.log(myAddedLines);
       let productionLineStrings = createProductionLineLogString(formulas, productionLines, myAddedLines);
       return logAction(req.payload.id, `Created ${productionLineStrings.join(',  ')}.`);
     })
@@ -130,6 +133,7 @@ export function add(req, res, next) {
       success(res);
     })
     .catch((err) => {
+      console.log(err);
       handleError(err, res);
     });
 }
@@ -254,6 +258,7 @@ export function deleteFormulaFromLine(req, res, next) {
       success(res);
     })
     .catch((err) => {
+      console.log(err);
       handleError(err, res);
     });
 }
@@ -382,6 +387,7 @@ export function deleteProductionLine(req, res, next) {
       success(res);
     })
     .catch((err) => {
+      console.log(err);
       handleError(err, res);
     });
 }

@@ -36,7 +36,7 @@ response.body = [
 {% endmethod %}
 
 {% method %}
-## GET '/productionlines/:id'
+## GET '/productionlines/id/:id'
 
 Get all producton lines along with current occupancies and formulas for an id.
 {% sample lang="js" %}
