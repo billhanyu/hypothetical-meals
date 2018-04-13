@@ -2,12 +2,18 @@ import React, { Component } from 'react';
 import ProduceFormulaComparatorRow from './ProduceFormulaComparatorRow.js';
 import axios from 'axios';
 import Snackbar from 'material-ui/Snackbar';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
 class ProduceFormulaComparator extends Component {
   constructor(props) {
     super(props);
+    const productionLines = [];
+    const productionLinesAll = ["Line 1", "Line 2"];
     this.state = {
       open: false,
+      productionLines,
+      productionLinesAll,
       snackbarMessage: "Finished",
     };
 
@@ -155,6 +161,24 @@ class ProduceFormulaComparator extends Component {
     });
   }
 
+  selectedProductionLine(event, index, values) {
+    this.setState({
+      productionLines: values,
+    });
+  }
+
+  productionItems(values) {
+    return this.state.productionLinesAll.map((name) => (
+      <MenuItem
+        key={name}
+        insetChildren={true}
+        checked={values && values.indexOf(name) > -1}
+        value={name}
+        primaryText={name}
+      />
+    ));
+  }
+
   render() {
     return (
       <div className="ProduceFormulaComparator borderAll">
@@ -183,6 +207,20 @@ class ProduceFormulaComparator extends Component {
             }
           </tbody>
         </table>
+        <div className="FormulaInputContainer">
+          <div className="FormulaTextContainer">
+            <div className="FormulaTextHeader">Production Line</div>
+            <div className="FormulaTextContent">Select the production line to produce</div>
+          </div>
+          <SelectField
+            hintText="Select production line"
+            value={this.state.productionLines}
+            onChange={this.selectedProductionLine.bind(this)}
+          >
+            {this.productionItems(this.state.productionLines)}
+          </SelectField>
+        </div>
+
         {
           this.negativeEntries.length > 0 ?
           <div>
