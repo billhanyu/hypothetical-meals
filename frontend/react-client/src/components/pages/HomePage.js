@@ -22,6 +22,7 @@ import UserTable from '../homepage/user/UserTable';
 import ProductionLine from '../homepage/productionline/ProductionLine';
 import ProductInventory from '../homepage/productinventory/ProductInventory';
 import PropTypes from 'prop-types';
+import EfficiencyReport from '../homepage/efficiencyreport/EfficiencyReport';
 
 class HomePage extends Component {
   constructor(props) {
@@ -94,6 +95,9 @@ class HomePage extends Component {
     }
     else if (funcName == 'productinventory') {
       return <ProductInventory />;
+    }
+    else if (funcName == 'efficiencyReport') {
+      return <EfficiencyReport />;
     }
   }
 
