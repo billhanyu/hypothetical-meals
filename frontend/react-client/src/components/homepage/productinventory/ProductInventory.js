@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Snackbar from 'material-ui/Snackbar';
-import Sales from './Sales';
+import AddSale from './AddSale';
 
 class ProductInventory extends Component {
   constructor(props) {
@@ -10,10 +10,11 @@ class ProductInventory extends Component {
       inventories: [],
       open: false,
       message: '',
-      showSales: false,
+      newSale: false,
     };
-    this.showSales = this.showSales.bind(this);
+    this.newSale = this.newSale.bind(this);
     this.back = this.back.bind(this);
+    this.cancelSale = this.cancelSale.bind(this);
   }
 
   handleRequestClose() {
@@ -24,13 +25,13 @@ class ProductInventory extends Component {
 
   back() {
     this.setState({
-      showSales: false,
+      newSale: false,
     });
   }
 
-  showSales() {
+  newSale() {
     this.setState({
-      showSales: true,
+      newSale: true,
     });
   }
 
@@ -41,8 +42,14 @@ class ProductInventory extends Component {
   reloadData() {
     const inventories = [
       {
-        formula_name: 'fuck',
+        formula_id: 1,
+        formula_name: 'cake',
         num_packages: 10,
+      },
+      {
+        formula_id: 2,
+        formula_name: 'shit',
+        num_packages: 20,
       },
     ];
     axios.get('/finalproductinventories', {
@@ -62,9 +69,17 @@ class ProductInventory extends Component {
     this.setState({
       inventories,
     });
-  }  
+  }
+
+  cancelSale() {
+    this.setState({
+      open: true,
+      message: 'Sale Cancelled',
+    });
+  }
   
   render() {
+    const columnClass = 'HalfWidth';
     const main =
       <div>
         <Snackbar
@@ -74,18 +89,21 @@ class ProductInventory extends Component {
           onRequestClose={this.handleRequestClose.bind(this)}
         />
         <h2>Product Inventory</h2>
-        <button
-          type='button'
-          className='btn btn-primary'
-          onClick={this.showSales}
-        >
-          Sale Requests
-        </button>
+        {
+          global.user_group !== 'noob' &&
+          <button
+            type='button'
+            className='btn btn-primary'
+            onClick={this.newSale}
+          >
+            New Sale
+          </button>
+        }
         <table className='table'>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Number of Packages</th>
+              <th className={columnClass}>Name</th>
+              <th className={columnClass}>Number of Packages</th>
             </tr>
           </thead>
           <tbody>
@@ -93,8 +111,8 @@ class ProductInventory extends Component {
               this.state.inventories.map((inventory, idx) => {
                 return (
                   <tr key={idx}>
-                    <td>{inventory.formula_name}</td>
-                    <td>{inventory.num_packages}</td>
+                    <td className={columnClass}>{inventory.formula_name}</td>
+                    <td className={columnClass}>{inventory.num_packages}</td>
                   </tr>
                 );
               })
@@ -103,9 +121,9 @@ class ProductInventory extends Component {
         </table>
       </div>;
     
-    const sales = <Sales back={this.back} />;
+    const sales = <AddSale back={this.back} inventories={this.state.inventories} cancelSale={this.cancelSale} />;
 
-    return this.state.showSales ? sales : main;
+    return this.state.newSale ? sales : main;
   }
 }
 
