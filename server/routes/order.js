@@ -8,6 +8,62 @@ import { updateLogForIngredient } from './spendinglog';
 
 const pendingLotNumber = 'PENDING';
 
+const ordersQuery = `SELECT Inventories.*, Orders.id as order_id, Orders.created_at as order_start_time 
+  FROM Inventories JOIN Orders 
+  ON Inventories.order_id = Orders.id`;
+/**
+ * View orders with pending/unarrived ingredients
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export function viewPendingOrders(req, res, next) {
+  let myPendingOrders = {};
+  connection.query(`${ordersQuery} WHERE Inventories.arrived = 0`)
+    .then((results) => {
+      const orderIds = results.map(x => x.order_id);
+      orderIds.forEach(orderId => myPendingOrders[orderId] = []);
+      results.forEach(x => {
+        if (x.created_at) {
+          delete x.created_at;
+        }
+        myPendingOrders[x.order_id].push(x);
+      });
+      res.status(200).send(myOrders);
+    })
+    .catch((err) => {
+      handleError(err, res);
+    });
+}
+
+/**
+ * View pending and completed orders
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export function viewAllOrders(req, res, next) {
+  let myOrders = {};
+  connection.query(`${ordersQuery}`)
+    .then((results) => {
+      const orderIds = results.map(x => x.order_id);
+      orderIds.forEach(orderId => myOrders[orderId] = []);
+      results.forEach(x => {
+        if (x.created_at && x.arrived != 0) {
+          delete x.created_at;
+        } else {
+          x.arrived_at = x.created_at;
+          delete x.created_at;
+        }
+        myOrders[x.order_id].push(x);
+      });
+      res.status(200).send(myOrders);
+    })
+    .catch((err) => {
+      handleError(err, res);
+    });
+}
+
 /* request body format:
  * example:
  * {
@@ -160,3 +216,80 @@ function checkOrderParameters(orders, res) {
   });
 }
 
+/**
+ * Mark an ingredient in inventory as arrived and give lot numbers
+ * @param {*} req
+ * req.body.ingredients =
+ *  {
+ *    'inventory_id': 1,
+ *    'lots': {
+ *      'lotnum1': 1849abc,
+ *      'lotnum2': 18a82b,
+ *     },
+ *  }
+ * @param {*} res
+ * @param {*} next
+ */
+export function markIngredientArrived(req, res, next) {
+  let inventoryIngredients = req.body.ingredients;
+  let inventoryLotsMap = {};
+  inventoryIngredients.forEach(x => {
+    inventoryLotsMap[x.inventory_id] = {};
+    inventoryLotsMap[x.inventory_id].id = x.inventory_id;
+    inventoryLotsMap[x.inventory_id].lots = x.lots;
+  });
+
+  let inventoryMap = {};
+  const inventoryIds = Object.keys(inventoryLotsMap);
+  connection.query(`SELECT * FROM Inventories WHERE id IN (?)`, [inventoryIds])
+    .then((results) => {
+      results.forEach(x => {
+        inventoryMap[x.id] = {
+          'ingredient_id': x.ingredient_id,
+          'vendor_id': x.vendor_id,
+          'per_package_cost': x.per_package_cost,
+          'order_id': x.order_id,
+        };
+        inventoryLotsMap[x.id].order_cost = x.num_packages;
+      });
+      return connection.query(`DELETE FROM Inventories WHERE id IN (?)`, [results.map(x => x.id)]);
+    })
+    .then(() => {
+      const lotSumsCorrect = Object.values(inventoryLotsMap).every(x => checkLotSums(x));
+      if (!lotSumsCorrect) {
+        throw createError('Lots assigned do not equal total packages ordered');
+      }
+      let newInventoryCases = [];
+      Object.values(inventoryLotsMap).forEach(ingredient => {
+        const ingredientData = inventoryMap[ingredientsMap[ingredient.id]];
+        Object.keys(ingredient.lots).forEach(ingredientLot => {
+          const lotQuantity = ingredientLots[ingredientLot];
+          newInventoryCases.push(
+            [ingredientData.ingredient_id, ingredientData.vendor_id,
+              ingredientData.per_package_cost, ingredientData.order_id,
+              ingredientLot, lotQuantity, 1, new Date().toISOString().slice(0, 19).replace('T', ' '),
+            ]);
+        });
+      });
+      return connection.query(`INSERT INTO Inventories
+        (ingredient_id, vendor_id, per_package_cost, order_id, lot, num_packages, arrived, created_at) 
+        VALUES ?`, [newInventoryCases]);
+    })
+    .catch((err) => {
+      handleError(err, res);
+    });
+}
+
+function checkLotSums(inventoryLots) {
+  let lotQuantitySum = 0;
+  Object.values(inventoryLots.lots).forEach(lotQuantity => {
+    if (!checkNumber.isPositiveInteger(lotQuantity)) {
+      return false;
+    }
+    lotQuantitySum += lotQuantity;
+  });
+  if (lotQuantitySum != inventoryLots.order_total) {
+    return false;
+  }
+  return true;
+}
