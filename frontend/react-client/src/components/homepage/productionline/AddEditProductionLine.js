@@ -12,6 +12,7 @@ class AddEditProductionLine extends Component {
     this.changeFormulaId = this.changeFormulaId.bind(this);
     this.addFormula = this.addFormula.bind(this);
     this.removeFormula = this.removeFormula.bind(this);
+    this.confirmDelete = this.confirmDelete.bind(this);
     const defaultLine = {
       name: '',
       description: '',
@@ -44,11 +45,11 @@ class AddEditProductionLine extends Component {
   }
 
   reloadData() {
-    axios.get(`/productionlines/${this.state.id}`, {
+    axios.get(`/productionlines/id/${this.state.id}`, {
       headers: {Authorization: 'Token ' + global.token},
     })
       .then(response => {
-        const line = response.data;
+        const line = response.data[0];
         this.setState({
           name: line.name,
           description: line.description,
@@ -72,13 +73,9 @@ class AddEditProductionLine extends Component {
       });
       return;
     }
-    const formulaIds = this.state.formulas.map(formula => formula.id);
-    formulaIds.push(this.state.formulaToAdd);
-    axios.put('/productionlines', {
-      id: this.state.id,
-      name: this.state.name,
-      description: this.state.description,
-      formulaIds,
+    axios.post('/formulaproductionlines', {
+      lineid: this.state.id,
+      formulaid: this.state.formulaToAdd,
     }, {
       headers: {Authorization: 'Token ' + global.token},
     })
@@ -98,13 +95,11 @@ class AddEditProductionLine extends Component {
   }
 
   removeFormula(id) {
-    const formulaIds = this.state.formulas.map(formula => formula.id).filter(origId => origId !== id);
-    axios.put('/productionlines', {
-      id: this.state.id,
-      name: this.state.name,
-      description: this.state.description,
-      formulaIds,
-    }, {
+    axios.delete('/formulaproductionlines', {
+        data: {
+          lineid: this.state.id,
+          formulaid: id,
+        },
         headers: { Authorization: 'Token ' + global.token },
       })
       .then(response => {
@@ -136,13 +131,13 @@ class AddEditProductionLine extends Component {
     const line = {
       name: this.state.name,
       description: this.state.description,
+      formulas: [],
     };
 
     if (this.state.mode == "edit") {
-      const newLine = {};
-      newLine[this.state.id] = line;
+      line.id = this.state.id,
       axios.put("/productionlines", {
-        productionlines: newLine,
+        lines: [line],
       }, {
           headers: { Authorization: "Token " + global.token }
         })
@@ -161,7 +156,7 @@ class AddEditProductionLine extends Component {
         });
     } else {
       axios.post("/productionlines", {
-        productionlines: [line],
+        lines: [line],
       }, {
           headers: { Authorization: "Token " + global.token }
         })
@@ -196,7 +191,7 @@ class AddEditProductionLine extends Component {
   confirmDelete() {
     axios.delete('/productionlines', {
       data: {
-        ids: [this.state.id]
+        lines: [this.state.id]
       },
       headers: { Authorization: "Token " + global.token }
     })
@@ -226,6 +221,7 @@ class AddEditProductionLine extends Component {
   render() {
     const header = "Production Line: " + this.state.name;
     const readOnly = global.user_group !== 'admin';
+    const columnClass = 'HalfWidth';
     return (
       <div>
         <Snackbar
@@ -280,10 +276,12 @@ class AddEditProductionLine extends Component {
               global.user_group !== 'noob' &&
               <div className="row justify-content-md-center">
                 <form className="col-xl-6 col-lg-6 col-sm-8">
-                  <div className="form-group">
-                    <AvailableFormulaSelector changeFormulaId={this.changeFormulaId} existing={this.state.formulas} />
+                  <div className='row'>
+                    <div className="col-md-10">
+                      <AvailableFormulaSelector changeFormulaId={this.changeFormulaId} existing={this.state.formulas} />
+                    </div>
+                    <button type="submit" className="btn btn-primary col-md-2" onClick={this.addFormula}>Add</button>
                   </div>
-                  <button type="submit" className="btn btn-primary" onClick={this.addFormula}>Add</button>
                 </form>
               </div>
             }
@@ -291,10 +289,10 @@ class AddEditProductionLine extends Component {
               <table className='table col-xl-6 col-lg-6 col-sm-8'>
                 <thead>
                   <tr>
-                    <th>Name</th>
+                    <th className={columnClass}>Name</th>
                     {
                       global.user_group !== 'noob' &&
-                      <th>Options</th>
+                      <th className={columnClass}>Options</th>
                     }
                   </tr>
                 </thead>
@@ -303,10 +301,13 @@ class AddEditProductionLine extends Component {
                     this.state.formulas.map((formula, idx) => {
                       return (
                         <tr key={idx}>
-                          <td>{formula.name}</td>
+                          <td className={columnClass}>{formula.name}</td>
                           {
                             global.user_group !== 'noob' &&
-                            <td onClick={e=>this.removeFormula(formula.id)} style={{cursor: 'pointer'}}>
+                            <td
+                              className={columnClass}
+                              onClick={e=>this.removeFormula(formula.formula_id)}
+                              style={{cursor: 'pointer'}}>
                               <i className="fas fa-trash"></i>
                             </td>
                           }

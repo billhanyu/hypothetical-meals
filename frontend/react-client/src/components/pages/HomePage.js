@@ -18,8 +18,13 @@ import SystemLog from '../homepage/systemlog/SystemLog';
 import ProductionRun from '../homepage/productionrun/ProductionRun';
 import RecallReport from '../homepage/recallreport/RecallReport';
 import Freshness from '../homepage/freshnessreport/Freshness';
+import FinalProductFreshness from '../homepage/finalproductfreshnessreport/FinalProductFreshness';
 import UserTable from '../homepage/user/UserTable';
 import ProductionLine from '../homepage/productionline/ProductionLine';
+import ProductInventory from '../homepage/productinventory/ProductInventory';
+import PropTypes from 'prop-types';
+import EfficiencyReport from '../homepage/efficiencyreport/EfficiencyReport';
+import ProfitabilityReport from '../homepage/profitabilityreport/ProfitabilityReport';
 
 class HomePage extends Component {
   constructor(props) {
@@ -90,6 +95,18 @@ class HomePage extends Component {
     else if (funcName == 'productionline') {
       return <ProductionLine />;
     }
+    else if (funcName == 'productinventory') {
+      return <ProductInventory />;
+    }
+    else if (funcName == 'efficiencyReport') {
+      return <EfficiencyReport />;
+    }
+    else if (funcName == 'finalProductFreshnessReport'){
+      return <FinalProductFreshness />;
+    }
+    else if (funcName == 'profitabilityReport') {
+      return <ProfitabilityReport />;
+    }
   }
 
   render() {
@@ -127,5 +144,9 @@ class HomePage extends Component {
     );
   }
 }
+
+HomePage.propTypes = {
+  history: PropTypes.object,
+};
 
 export default withRouter(HomePage);
