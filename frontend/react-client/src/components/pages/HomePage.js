@@ -18,8 +18,10 @@ import SystemLog from '../homepage/systemlog/SystemLog';
 import ProductionRun from '../homepage/productionrun/ProductionRun';
 import RecallReport from '../homepage/recallreport/RecallReport';
 import Freshness from '../homepage/freshnessreport/Freshness';
+import FinalProductFreshness from '../homepage/finalproductfreshnessreport/FinalProductFreshness';
 import UserTable from '../homepage/user/UserTable';
 import ProductionLine from '../homepage/productionline/ProductionLine';
+import ProfitabilityReport from '../homepage/profitabilityreport/ProfitabilityReport';
 
 class HomePage extends Component {
   constructor(props) {
@@ -89,6 +91,12 @@ class HomePage extends Component {
     }
     else if (funcName == 'productionline') {
       return <ProductionLine />;
+    }
+    else if (funcName == 'finalProductFreshnessReport'){
+      return <FinalProductFreshness />;
+    }
+    else if (funcName == 'profitabilityReport') {
+      return <ProfitabilityReport />;
     }
   }
 
