@@ -255,19 +255,22 @@ CREATE TABLE Orders(
 
 CREATE TABLE FinalProductInventories(
 	id int not null AUTO_INCREMENT,
+	productrun_id int not null,
 	formula_id int not null,
 	num_packages int not null DEFAULT 0,
 	created_at timestamp DEFAULT now() not null,
 
+	FOREIGN KEY (productrun_id) REFERENCES ProductRuns(id),
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
 	PRIMARY KEY (id)
 );
 
 CREATE TABLE Sales(
 	id int not null AUTO_INCREMENT,
-	formula_id int not null,
+	formula_id int not null UNIQUE,
 	num_packages int not null DEFAULT 0,
-	unit_price double not null DEFAULT 0,
+	total_cost double not null DEFAULT 0,
+	total_revenue double not null DEFAULT 0,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
 	PRIMARY KEY (id)
