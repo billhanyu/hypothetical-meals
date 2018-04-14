@@ -10,7 +10,7 @@ const formulasQueryString = 'SELECT * FROM Formulas';
 const finalProductInventoryQueryString = 'SELECT FinalProductInventories.*, ProductRuns.id AS product_run_id, ProductRuns.cost_for_run FROM FinalProductInventories INNER JOIN ProductRuns ON FinalProductInventories.productrun_id = ProductRuns.id';
 
 export function getAll(req, res, next) {
-  connection.query('SELECT * from Sales')
+  connection.query('SELECT Formulas.*, Sales.id AS sale_id, Sales.num_packages AS sale_num_packages, Sales.total_cost AS sale_total_cost, Sales.total_revenue AS sale_total_revenue FROM Formulas INNER JOIN Sales ON Formulas.id = Sales.formula_id')
     .then(results => res.status(200).send(results))
     .catch(err => handleError(err, res));
 }
