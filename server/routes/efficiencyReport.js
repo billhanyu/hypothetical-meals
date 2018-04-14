@@ -16,12 +16,19 @@ export function view(req, res, next) {
       myRes.occupancies = results;
       const startTimes = results.map(x => x.start_time);
       const endTimes = results.map(x => x.end_time);
+      results.forEach(x => {
+        delete x.busy;
+      });
+      const myEndTime = queryParams.to_date ? new Date(`${queryParams.to_date} 23:59:59`) : new Date();
       endTimes.forEach((value, i) => {
-        milliTime += getDate(value) - getDate(startTimes[i]);
+        const occupiedEndTime = new Date(`${queryParams.to_date} 23:59:59`) > new Date(value)
+          ? new Date(value) : new Date(`${queryParams.to_date} 23:59:59`);
+        milliTime += value == null ? myEndTime - new Date(startTimes[i])
+          : occupiedEndTime - new Date(startTimes[i]);
       });
       myRes.total_time = milliTime;
       return connection.query(`SELECT COUNT(1) FROM Productionlines 
-        WHERE created_at <= ${queryParams.to_date || new Date().toISOString().slice(0, 10)} 23:59:59`);
+        WHERE created_at <= '${queryParams.to_date || new Date().toISOString().slice(0, 10)} 23:59:59'`);
     })
     .then((lineNum) => {
       myRes.total_lines = lineNum[0]['COUNT(1)'];
@@ -42,16 +49,10 @@ export function getQueryString(queryParams) {
   let queryCases = [];
   Object.keys(queryParams).forEach(x => {
       if (x == 'from_date') {
-          queryCases.push(`end_time >= '${queryParams[x]} 00:00:00'`);
+          queryCases.push(`(end_time >= '${queryParams[x]} 00:00:00' OR end_time IS NULL)`);
       } else if (x == 'to_date') {
           queryCases.push(`start_time <= '${queryParams[x]} 23:59:59'`);
       }
   });
   return `${productionQuery} ${queryCases.length > 0 ? 'WHERE' : ''} ${queryCases.join(' AND ')}`;
-}
-
-function getDate(timestamp) {
-  const t = timestamp.split(/[- :]/);
-
-  return new Date(Date.UTC(t[0], t[1]-1, t[2], t[3], t[4], t[5]));
 }
