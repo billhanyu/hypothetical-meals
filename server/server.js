@@ -164,10 +164,7 @@ app.put('/productionlines', beAdmin, productionlines.modify);
 app.delete('/productionlines', beAdmin, productionlines.deleteProductionLine);
 
 app.get('/sales/all', beManager, sales.getAll);
-app.post('/sales/:final_inventory_id', beManager, sales.submitRequest);
-app.put('/sales/:sale_id/confirm', beManager, sales.confirmSale);
-app.delete('/sales/:sale_id', beManager, sales.cancelSale);
-
+app.post('/sales', beManager, sales.submit);
 
 const distDir = `${__dirname}/../frontend/react-client/dist`;
 app.use(express.static(distDir));
