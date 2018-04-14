@@ -274,6 +274,5 @@ CREATE TABLE Sales(
 	total_revenue double not null DEFAULT 0,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
-	FOREIGN KEY (sale_id) REFERENCES Sales(id),
 	PRIMARY KEY (id)
 );
