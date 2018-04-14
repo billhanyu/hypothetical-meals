@@ -25,7 +25,8 @@ class ProductionLineItem extends Component {
   }
 
   render() {
-    const { id, idx, name, description, formulas, productionrun_id } = this.props;
+    const { id, idx, name, description, formulas, occupancies } = this.props;
+    const busy = occupancies.filter(occupancy => occupancy.busy == 1).length > 0;
     const columnClass = "OneFifthWidth";
     return (
       <tbody>
@@ -34,7 +35,7 @@ class ProductionLineItem extends Component {
           <td className={columnClass}>{description}</td>
           <td className={columnClass}>
           {
-            productionrun_id > 0
+              busy > 0
             ?
               <div>
                 <span style={{ color: 'blue' }}>In Progress</span>
@@ -45,9 +46,7 @@ class ProductionLineItem extends Component {
                     style={{'margin-left': '10px'}}
                     className='btn btn-primary no-collapse'
                     onClick={() => {
-                      if (productionrun_id && global.user_group !== 'noob') {
-                        this.props.markComplete(id);
-                      }
+                      this.props.markComplete(id);
                     }}>
                     Mark Complete
                   </button>
@@ -94,7 +93,7 @@ class ProductionLineItem extends Component {
                   formulas.map((formula, idx) => {
                     return <tr key={idx}>
                       <td>
-                        <a href="javascript:void(0)" onClick={e => this.props.viewFormula(formula.id)}>{formula.name}</a>
+                        <a href="javascript:void(0)" onClick={e => this.props.viewFormula(formula.formula_id)}>{formula.name}</a>
                       </td>
                     </tr>;
                   })
@@ -119,7 +118,7 @@ ProductionLineItem.propTypes = {
   name: PropTypes.string,
   description: PropTypes.string,
   formulas: PropTypes.array,
-  productionrun_id: PropTypes.number,
+  occupancies: PropTypes.array,
   markComplete: PropTypes.func,
   edit: PropTypes.func,
   delete: PropTypes.func,

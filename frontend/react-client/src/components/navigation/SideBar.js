@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PermissionLink from './PermissionLink';
+import PropTypes from 'prop-types';
 
 class SideBar extends Component {
   constructor(props) {
@@ -215,6 +216,36 @@ class SideBar extends Component {
                   }}
                   text="Freshness Report"
                   permission="noob" />
+                <PermissionLink
+                  linkKey={"efficiencyReport"}
+                  setActive={this.setActive}
+                  activeKey={this.state.activeLink}
+                  action={e => {
+                    this.props.link('efficiencyReport');
+                    this.setActiveCategory("log");
+                  }}
+                  text="Efficiency Report"
+                  permission="noob" />
+                <PermissionLink
+                  linkKey={"finalProductFreshnessReport"}
+                  setActive={this.setActive}
+                  activeKey={this.state.activeLink}
+                  action={e => {
+                    this.props.link('finalProductFreshnessReport');
+                    this.setActiveCategory("log");
+                  }}
+                  text="Final Product Freshness Report"
+                  permission="noob" />
+                <PermissionLink
+                  linkKey={"profitabilityReport"}
+                  setActive={this.setActive}
+                  activeKey={this.state.activeLink}
+                  action={e => {
+                    this.props.link('profitabilityReport');
+                    this.setActiveCategory("log");
+                  }}
+                  text="Profitability Report"
+                  permission="noob" />
               </ul>
             </div>
           </li>
@@ -255,6 +286,22 @@ class SideBar extends Component {
           </li>
           <li className="nav-item">
             <a
+              href="javascript:void(0)"
+              role="button"
+              className={"nav-link PermissionCategory" + (this.state.activeCategory == "productinventory" ? "-Active" : "")}
+              id="user"
+              onClick={e => {
+                this.setActiveCategory("productinventory");
+                this.props.link('productinventory');
+                this.setActive("");
+              }}
+              data-parent="#SideBar"
+            >
+              Product Inventory
+              </a>
+          </li>
+          <li className="nav-item">
+            <a
               className="nav-link active PermissionCategory"
               href="javascript:void(0)"
               data-toggle="modal"
@@ -268,5 +315,9 @@ class SideBar extends Component {
     );
   }
 }
+
+SideBar.propTypes = {
+  link: PropTypes.func,
+};
 
 export default SideBar;
