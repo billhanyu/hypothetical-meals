@@ -9,20 +9,10 @@ Get all sales.
 response.body = [
   {
     id,
-    formula_id,
-    num_product,
-    user_id,
-    lot,
-    created_at,
-    ingredients: [
-      {
-        id,
-        productrun_id,
-        ingredient_name,
-        vendor_id,
-        lot
-      },
-    ],
+	  formula_id,
+    num_packages,
+    total_cost,
+    total_revenue,
   };
 ]
 ```

@@ -128,6 +128,7 @@ req.body: {
 
 {% endmethod %}
 
+{% method %}
 ## DELETE '/productionlines'
 
 Removes production lines. Will delete all formula production line mappings for that line. Will return error if production line is busy.
