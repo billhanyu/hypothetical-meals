@@ -21,6 +21,7 @@ import * as productionlog from './routes/productionlog';
 import * as recallReport from './routes/recallReport';
 import * as productionrun from './routes/productrun';
 import * as productionlines from './routes/productionLine';
+import * as sales from './routes/sales';
 import { adminRequired, noobRequired, managerRequired } from './authMiddleware';
 
 import getConfig from './getConfig';
@@ -161,6 +162,12 @@ app.post('/formulaproductionlines', beAdmin, productionlines.addFormulaToLine);
 app.delete('/formulaproductionlines', beAdmin, productionlines.deleteFormulaFromLine);
 app.put('/productionlines', beAdmin, productionlines.modify);
 app.delete('/productionlines', beAdmin, productionlines.deleteProductionLine);
+
+app.get('/sales/all', beManager, sales.getAll);
+app.post('/sales/:final_inventory_id', beManager, sales.submitRequest);
+app.put('/sales/:sale_id/confirm', beManager, sales.confirmSale);
+app.delete('/sales/:sale_id', beManager, sales.cancelSale);
+
 
 const distDir = `${__dirname}/../frontend/react-client/dist`;
 app.use(express.static(distDir));
