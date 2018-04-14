@@ -109,7 +109,7 @@ describe('ProductionLines', () => {
       return dbSetup.setupTestDatabase();
     });
 
-    xit('should add a formula to a line', (done) => {
+    it('should add a formula to a line', (done) => {
       chai.request(server)
         .post('/formulaproductionlines')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
