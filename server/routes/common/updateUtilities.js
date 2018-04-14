@@ -152,7 +152,7 @@ export function createUpdateString(tableName, updateKeys, updates) {
         updateKeys.forEach(key => {
             if (myUpdates == null || isNaN(myUpdates[key])) {
                 caseStruct[key].push(`when id = ${updateId} then '${myUpdates[key] || 'NULL'}'`);
-            } else if (key == 'created_at' || 'start_time' || 'end_time') {
+            } else if (key == 'created_at' || key == 'start_time' || key == 'end_time') {
                 caseStruct[key].push(`when id = ${updateId} then '${new Date(myUpdates[key]).toISOString().slice(0, 19).replace('T', ' ')}'`);
             } else {
                 caseStruct[key].push(`when id = ${updateId} then ${myUpdates[key]}`);
