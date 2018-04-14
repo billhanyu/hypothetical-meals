@@ -1,7 +1,7 @@
 # Efficiency Report API
 
 {% method %}
-## Get '/efficiency'
+## GET '/efficiency'
 
 This gives the line occupancies within the time period as well as the total time and total lines created during this time. Time is in milliseconds. To date does not have to be given. If to date is not given, the to date will be the "current time".
 
