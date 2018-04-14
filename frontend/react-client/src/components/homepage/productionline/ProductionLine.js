@@ -42,6 +42,7 @@ class ProductionLine extends Component {
       viewFormula: false,
       editing: false,
     });
+    this.reloadData();
   }
 
   add() {
@@ -62,7 +63,6 @@ class ProductionLine extends Component {
   }
 
   reloadData() {
-    /* waiting for backend api
     axios.get('/productionlines', {
       headers: { Authorization: "Token " + global.token }
     })
@@ -79,44 +79,6 @@ class ProductionLine extends Component {
           message: err.response.data
         });
       });
-    */
-    this.lines = [
-      {
-        id: 1,
-        name: 'line1',
-        description: 'des1',
-        productionrun_id: 1,
-        formulas: [
-          {
-            id: 1,
-            name: 'formula1',
-          },
-          {
-            id: 2,
-            name: 'formula2',
-          }
-        ],
-      },
-      {
-        id: 2,
-        name: 'line2',
-        description: 'des2',
-        formulas: [
-          {
-            id: 3,
-            name: 'formula3',
-          },
-          {
-            id: 4,
-            name: 'formula4',
-          }
-        ],
-      },
-    ];
-    this.selectPage(1);
-    this.setState({
-      pages: Math.ceil(this.lines.length / COUNT_PER_PAGE),
-    });
   }
 
   selectPage(idx) {
@@ -147,7 +109,6 @@ class ProductionLine extends Component {
         });
       })
       .catch(err => {
-        console.log(err);
         this.setState({
           open: true,
           message: 'Error retrieving formula data'
@@ -158,7 +119,7 @@ class ProductionLine extends Component {
   confirmDelete() {
     axios.delete('/productionlines', {
       data: {
-        ids: [this.state.toDelete]
+        lines: [this.state.toDelete]
       },
       headers: { Authorization: "Token " + global.token }
     })
