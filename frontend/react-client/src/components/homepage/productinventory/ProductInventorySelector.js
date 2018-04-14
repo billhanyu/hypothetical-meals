@@ -6,12 +6,13 @@ import '!style-loader!css-loader!react-select/dist/react-select.css';
 import Snackbar from 'material-ui/Snackbar';
 
 /*
- * selects a formula with removed = 0
- * props.changeFormulaId(newValue): changes the id selected
+ * selects a product in final product inventory
+ * props.changeFormulaId(newValue): changes the id selected, for sale request
+ * props.existing: what's already selected
 */
 
-const AvailableFormulaSelector = createClass({
-  displayName: 'Vendor',
+const ProductInventorySelector = createClass({
+  displayName: 'Product',
 
   getInitialState() {
     return {
@@ -20,38 +21,56 @@ const AvailableFormulaSelector = createClass({
       selectValue: '',
       clearable: true,
       rtl: false,
-      allFormulas: [],
+      inventories: [],
     };
   },
 
-  componentWillMount() {
-    axios.get('/formulas', {
+  componentDidMount() {
+    axios.get('/finalproductinventories', {
       headers: { Authorization: "Token " + global.token }
     })
       .then(response => {
-        const allFormulas = response.data.map(formula => {
-          formula.value = formula.id;
-          formula.label = formula.name;
-          return formula;
+        const inventories = [];
+        response.data.forEach(inventory => {
+          if (inventories.filter(el => el.value == inventory.formula_id).length == 0) {
+            inventories.push({
+              value: inventory.formula_id,
+              label: inventory.formula_name,
+            });
+          }
         });
-        const formulas = allFormulas.filter(formula => !this.props.existing.find(el => el.id == formula.id));
+        this.allInventories = inventories;
         this.setState({
-          allFormulas,
-          formulas,
+          inventories,
         });
       })
       .catch(err => {
         this.setState({
           open: true,
-          message: "Error retrieving formulas",
+          message: "Error retrieving products in inventory",
         });
       });
+
+    // placeholder
+    this.allInventories = [
+      {
+        value: 1,
+        label: 'cake',
+      },
+      {
+        value: 2,
+        label: 'shit',
+      },
+    ];
+    this.setState({
+      inventories: this.allInventories,
+    });
   },
 
   componentWillReceiveProps(newProps) {
-    const formulas = this.state.allFormulas.filter(formula => !newProps.existing.find(el => el.formula_id == formula.id));
+    const inventories = this.allInventories.filter(inventory => !newProps.existing.find(el => el.id == inventory.value));
     this.setState({
-      formulas,
+      inventories,
     });
   },
 
@@ -73,7 +92,7 @@ const AvailableFormulaSelector = createClass({
   },
 
   render() {
-    var options = this.state.formulas;
+    var options = this.state.inventories;
     return (
       <div className="section">
         <Snackbar
@@ -84,7 +103,7 @@ const AvailableFormulaSelector = createClass({
         />
         <Select
           id="state-select"
-          placeholder="Select Formula..."
+          placeholder="Select Product..."
           ref={(ref) => { this.select = ref; }}
           onBlurResetsInput={false}
           onSelectResetsInput={false}
@@ -104,4 +123,4 @@ const AvailableFormulaSelector = createClass({
   }
 });
 
-export default AvailableFormulaSelector;
+export default ProductInventorySelector;

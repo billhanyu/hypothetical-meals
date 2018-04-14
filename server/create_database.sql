@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS SalesEntries;
 DROP TABLE IF EXISTS Sales;
 DROP TABLE IF EXISTS FinalProductInventories;
 DROP TABLE IF EXISTS Orders;
@@ -273,5 +274,6 @@ CREATE TABLE Sales(
 	total_revenue double not null DEFAULT 0,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
+	FOREIGN KEY (sale_id) REFERENCES Sales(id),
 	PRIMARY KEY (id)
 );
