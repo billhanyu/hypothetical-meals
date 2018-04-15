@@ -423,6 +423,7 @@ export function completeProductionOnLine(req, res, next) {
       [[selectResults.product_runs_id, selectResults.formula_id, selectResults.product_runs_num_product / selectResults.formulas_num_product]]);
     }
   })
+  .then(() => connection.query(`UPDATE ProductRuns SET completed = 1 WHERE id = ?`, [selectResults.product_runs_id]))
   .then(() => logAction(req.payload.id, `Completed production on production line ${req.body.productionline_id}.`))
   .then(() => res.sendStatus(200))
   .catch((err) => handleError(err, res));

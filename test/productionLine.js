@@ -348,12 +348,12 @@ describe('#completeProductionOnLine()', () => {
       .post('/productionlines/complete')
       .set('Authorization', `Token ${testTokens.managerTestToken}`)
       .send({
-        'productionline_id': 2,
+        'productionline_id': 3,
       })
       .end((err, res) => {
         res.should.have.status(200);
         Promise.all([
-          connection.query(`SELECT * FROM ProductionlinesOccupancies WHERE productionline_id = 2 and busy = 1`),
+          connection.query(`SELECT * FROM ProductionlinesOccupancies WHERE productionline_id = 3 and busy = 1`),
           connection.query('SELECT * FROM Inventories WHERE id = 4 AND arrived = 1'),
         ])
           .then((results) => {
@@ -371,7 +371,7 @@ describe('#completeProductionOnLine()', () => {
       .post('/productionlines/complete')
       .set('Authorization', `Token ${testTokens.managerTestToken}`)
       .send({
-        'productionline_id': 3,
+        'productionline_id': 2,
       })
       .end((err, res) => {
         res.should.have.status(400);
