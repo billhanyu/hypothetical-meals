@@ -70,21 +70,5 @@ describe('RecallReport', () => {
           done();
         });
     });
-
-    it('should reject noob view', (done) => {
-      chai.request(server)
-        .get('/recall')
-        .set('Authorization', `Token ${testTokens.noobTestToken}`)
-        .query({
-          'recall': {
-            'ingredient_id': 1,
-            'lot': 'aaa',
-          },
-        })
-        .end((err, res) => {
-          res.should.have.status(401);
-          done();
-        });
-    });
   });
 });

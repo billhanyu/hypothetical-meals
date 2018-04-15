@@ -1,24 +1,6 @@
-DROP TABLE IF EXISTS SalesEntries;
-DROP TABLE IF EXISTS Sales;
-DROP TABLE IF EXISTS FinalProductInventories;
-DROP TABLE IF EXISTS Orders;
-DROP TABLE IF EXISTS ProductRunsEntries;
-DROP TABLE IF EXISTS ProductionlinesOccupancies;
-DROP TABLE IF EXISTS FormulaProductionLines;
-DROP TABLE IF EXISTS Productionlines;
-DROP TABLE IF EXISTS ProductRuns;
-DROP TABLE IF EXISTS SystemLogs;
-DROP TABLE IF EXISTS ProductionLogs;
-DROP TABLE IF EXISTS FormulaEntries;
-DROP TABLE IF EXISTS Formulas;
-DROP TABLE IF EXISTS SpendingLogs;
-DROP TABLE IF EXISTS Logs;
-DROP TABLE IF EXISTS Inventories;
-DROP TABLE IF EXISTS VendorsIngredients;
-DROP TABLE IF EXISTS Ingredients;
-DROP TABLE IF EXISTS Storages;
-DROP TABLE IF EXISTS Vendors;
-DROP TABLE IF EXISTS Users;
+DROP DATABASE IF EXISTS meals_test;
+CREATE DATABASE meals_test;
+USE meals_test;
 
 CREATE TABLE Users(
 	id int not null AUTO_INCREMENT,
@@ -90,6 +72,13 @@ CREATE TABLE VendorsIngredients(
 	PRIMARY KEY (id)
 );
 
+CREATE TABLE Orders(
+	id int not null AUTO_INCREMENT,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
+
+	PRIMARY KEY (id)
+);
+
 CREATE TABLE Inventories(
 	id int not null AUTO_INCREMENT,
 	ingredient_id int not null,
@@ -97,22 +86,13 @@ CREATE TABLE Inventories(
 	lot varchar(500) not null,
 	vendor_id int not null,
 	per_package_cost double not null,
+	order_id int,
+	arrived BIT DEFAULT 0,
 	created_at timestamp DEFAULT now() not null,
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	FOREIGN KEY (vendor_id) REFERENCES Vendors(id),
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE Logs(
-	id int not null AUTO_INCREMENT,
-	user_id int not null,
-	vendor_ingredient_id int not null,
-	quantity int not null,
-	created_at timestamp DEFAULT now() not null,
- 
-	FOREIGN KEY (user_id) REFERENCES Users(id),
-	FOREIGN KEY (vendor_ingredient_id) REFERENCES VendorsIngredients(id),
+	FOREIGN KEY (order_id) REFERENCES Orders(id),
 	PRIMARY KEY (id)
 );
 
@@ -195,6 +175,7 @@ CREATE TABLE Productionlines(
 	name varchar(70) not null, 
 	description text,
 	isactive varchar(1) DEFAULT 'Y',
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
 
 	UNIQUE(name, isactive),
 
@@ -240,17 +221,6 @@ CREATE TABLE ProductRunsEntries(
 	FOREIGN KEY (productrun_id) REFERENCES ProductRuns(id),
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	FOREIGN KEY (vendor_id) REFERENCES Vendors(id),
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE Orders(
-	id int not null AUTO_INCREMENT,
-	arrived bit not null DEFAULT 0,
-	vendoringredient_id int not null,
-	num_packages int not null,
-	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
-
-	FOREIGN KEY (vendoringredient_id) REFERENCES VendorsIngredients(id),
 	PRIMARY KEY (id)
 );
 
