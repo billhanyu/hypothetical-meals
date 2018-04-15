@@ -392,6 +392,42 @@ export function deleteProductionLine(req, res, next) {
     });
 }
 
+
+/* request body format:
+ * request.body = {
+ *   "productionline_id": productionline_id
+ * }
+ * example:
+ * {
+ *   "productionline_id": 3
+ * }
+ */
+export function completeProductionOnLine(req, res, next) {
+  let selectResults;
+  connection.query(`SELECT ProductionlinesOccupancies.intermediate_inventory_id, Formulas.intermediate AS formulas_intermediate, Formulas.num_product AS formulas_num_product, ProductRuns.num_product AS product_runs_num_product, Formulas.id AS formula_id, ProductRuns.id AS product_runs_id FROM ProductionlinesOccupancies
+  JOIN ProductRuns ON ProductionlinesOccupancies.productrun_id = ProductRuns.id
+  JOIN Formulas ON ProductionlinesOccupancies.formula_id = Formulas.id
+  WHERE ProductionlinesOccupancies.productionline_id = ? AND ProductionlinesOccupancies.busy = 1`,
+  [req.body.productionline_id])
+  .then((results) => {
+    if (results.length == 0) throw createError(`Production line with ID ${req.body.productionline_id} is not busy`);
+    selectResults = results[0];
+    return connection.query('UPDATE ProductionlinesOccupancies SET end_time = NOW(), busy = 0 WHERE productionline_id = ? and busy = 1', req.body.productionline_id);
+  })
+  .then(() => {
+    if (selectResults.formulas_intermediate == 1) {
+      return connection.query(`UPDATE Inventories SET arrived = 1 WHERE id = ?`, [selectResults.intermediate_inventory_id]);
+    }
+    else {
+      return connection.query('INSERT INTO FinalProductInventories(productrun_id, formula_id, num_packages) VALUES (?)',
+      [[selectResults.product_runs_id, selectResults.formula_id, selectResults.product_runs_num_product / selectResults.formulas_num_product]]);
+    }
+  })
+  .then(() => logAction(req.payload.id, `Completed production on production line ${req.body.productionline_id}.`))
+  .then(() => res.sendStatus(200))
+  .catch((err) => handleError(err, res));
+}
+
 /**
  * Checks that the production line request has name, description, and formulas.
  * Formulas can be empty array

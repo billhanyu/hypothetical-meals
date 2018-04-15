@@ -161,6 +161,7 @@ app.post('/formulaproductionlines', beAdmin, productionlines.addFormulaToLine);
 app.delete('/formulaproductionlines', beAdmin, productionlines.deleteFormulaFromLine);
 app.put('/productionlines', beAdmin, productionlines.modify);
 app.delete('/productionlines', beAdmin, productionlines.deleteProductionLine);
+app.post('/productionlines/complete', beManager, productionlines.completeProductionOnLine);
 
 app.get('/sales/all', beManager, sales.getAll);
 app.post('/sales', beManager, sales.submit);

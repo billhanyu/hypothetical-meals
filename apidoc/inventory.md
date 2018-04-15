@@ -101,10 +101,10 @@ Commits the cart for user.
 
 {% sample lang="js" %}
 ```js
-request.body.cart = {
-  '1': 100,
-  '2': 200,
-};
-# This requests 100 of inventory item 1 and 200 of inventory item 2 from the inventory.
+request.body = {
+  "formula_id": 3,
+  "num_products": 10,
+  "productionline_id": 1
+}
 ```
 {% endmethod %}
