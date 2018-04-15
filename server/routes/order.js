@@ -1,25 +1,75 @@
 import * as checkNumber from './common/checkNumber';
-import { addEntry } from './log';
 import { createError, handleError } from './common/customError';
 import { getSpace } from './common/packageUtilies';
 import { checkStoragePromise } from './common/storageUtilities';
 import success from './common/success';
 import { logAction } from './systemLogs';
+import { updateLogForIngredient } from './spendinglog';
+
+const pendingLotNumber = 'PENDING';
+
+const ordersQuery = `SELECT Inventories.*, Orders.id as order_id, Orders.created_at as order_start_time 
+  FROM Inventories JOIN Orders 
+  ON Inventories.order_id = Orders.id`;
+/**
+ * View orders with pending/unarrived ingredients
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export function viewPendingOrders(req, res, next) {
+  let myPendingOrders = {};
+  connection.query(`${ordersQuery} WHERE Inventories.arrived = 0`)
+    .then((results) => {
+      const orderIds = results.map(x => x.order_id);
+      orderIds.forEach(orderId => myPendingOrders[orderId] = []);
+      results.forEach(x => {
+        if (x.created_at) {
+          delete x.created_at;
+        }
+        myPendingOrders[x.order_id].push(x);
+      });
+      res.status(200).send(myPendingOrders);
+    })
+    .catch((err) => {
+      handleError(err, res);
+    });
+}
+
+/**
+ * View pending and completed orders
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export function viewAllOrders(req, res, next) {
+  let myOrders = {};
+  connection.query(`${ordersQuery}`)
+    .then((results) => {
+      const orderIds = results.map(x => x.order_id);
+      orderIds.forEach(orderId => myOrders[orderId] = []);
+      results.forEach(x => {
+        if (x.created_at && x.arrived == 0) {
+          delete x.created_at;
+        }
+        myOrders[x.order_id].push(x);
+      });
+      res.status(200).send(myOrders);
+    })
+    .catch((err) => {
+      handleError(err, res);
+    });
+}
 
 /* request body format:
  * example:
  * {
  *   '1': {
  *      'num_packages': 123,
- *      'lots': {
- *          'lot1': 10,
- *          'lot2': 113,
- *       }
+ *    },
  *   '2': {
  *      'num_packages': 456,
- *      'lots': {
- *          'lot1': 456,
- *       }
+ *    }
  * }
  * 1. check inventory capacities
  * 2. update inventory capacities/stock
@@ -34,12 +84,14 @@ function orderHelper(orders, req, res, next) {
   let requestedCapacities = {};
   let newIngredientCases = [];
   let ingredientsMap = {};
+  let spendingLogReq = {};
 
   if (!checkOrderParameters(orders, res)) {
     return;
   }
 
-  connection.query(`SELECT VendorsIngredients.id, VendorsIngredients.ingredient_id, Vendors.id as vendor_id, Ingredients.package_type, Ingredients.storage_id
+  connection.query(`SELECT VendorsIngredients.id, VendorsIngredients.price, VendorsIngredients.ingredient_id, Vendors.id as vendor_id, 
+    Ingredients.package_type, Ingredients.storage_id, Ingredients.num_native_units
     FROM VendorsIngredients JOIN Ingredients ON VendorsIngredients.ingredient_id = Ingredients.id 
     JOIN Vendors ON VendorsIngredients.vendor_id = Vendors.id
     WHERE VendorsIngredients.id IN (${Object.keys(orders).join(', ')})`)
@@ -48,27 +100,23 @@ function orderHelper(orders, req, res, next) {
         throw createError('Some id not in Vendor Ingredients');
       }
       ingredientIds = results.map(x => x.ingredient_id);
-      for (let result of results) {
-        ingredientsMap[result['ingredient_id']] = {
-          'package_type': result['package_type'],
-          'quantity': orders[result.id].num_packages,
-          'storage_id': result['storage_id'],
-          'vendor_ingredient_id': result['id'],
-          'vendor_id': result['vendor_id'],
-          'lots': orders[result.id].lots,
-        };
-      }
-
+      results.forEach(result => {
+        let quantity = orders[result.id].num_packages;
+        createIngredientsMap(ingredientsMap, result, quantity, orders);
+        createSpendingLogMap(spendingLogReq, result, quantity);
+      });
       findRequestedStorageQuantity(ingredientIds, ingredientsMap, requestedCapacities);
-      createInventoryCases(ingredientIds, newIngredientCases, ingredientsMap);
       return checkStoragePromise(requestedCapacities);
     })
     .then(() => {
-      return connection.query(`INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id, per_package_cost) VALUES ${newIngredientCases.join(', ')}`);
+      return addPendingOrder();
+    })
+    .then((lastOrder) => {
+      createInventoryCases(ingredientIds, newIngredientCases, ingredientsMap, lastOrder[0].id);
+      return connection.query(`INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id, per_package_cost, order_id) VALUES ${newIngredientCases.join(', ')}`);
     })
     .then(() => {
-      let logReq = Object.values(ingredientsMap);
-      return addEntry(logReq, req.payload.id);
+      return updateLogForIngredient(spendingLogReq);
     })
     .then(() => {
       let vendorIngredientIds = Object.keys(orders);
@@ -91,12 +139,27 @@ function orderHelper(orders, req, res, next) {
     });
 }
 
-function createInventoryCases(ingredientIds, newIngredientCases, ingredientsMap) {
+function createSpendingLogMap(spendingLogReq, result, quantity) {
+  spendingLogReq[result['ingredient_id']] = {
+    'total_weight': result['num_native_units'] * quantity,
+    'cost': quantity * result['price'],
+  };
+}
+
+function createIngredientsMap(ingredientsMap, result, quantity, orders) {
+  ingredientsMap[result['ingredient_id']] = {
+    'package_type': result['package_type'],
+    'quantity': quantity,
+    'package_price': result['price'],
+    'storage_id': result['storage_id'],
+    'vendor_ingredient_id': result['id'],
+    'vendor_id': result['vendor_id'],
+  };
+}
+
+function createInventoryCases(ingredientIds, newIngredientCases, ingredientsMap, orderId) {
   ingredientIds.forEach(ingredientId => {
-    Object.keys(ingredientsMap[ingredientId].lots).forEach(lotNumber => {
-      newIngredientCases.push(`(${ingredientId}, ${ingredientsMap[ingredientId]['lots'][lotNumber]}, '${lotNumber}', ${ingredientsMap[ingredientId]['vendor_id']}, 0)`);
-      // TODO: update the last per package cost later
-    });
+    newIngredientCases.push(`(${ingredientId}, ${ingredientsMap[ingredientId].quantity}, '${pendingLotNumber}', ${ingredientsMap[ingredientId]['vendor_id']}, ${ingredientsMap[ingredientId]['package_price']}, ${orderId})`);
   });
 }
 
@@ -111,6 +174,26 @@ function findRequestedStorageQuantity(ingredientIds, ingredientsMap, requestedCa
   });
 }
 
+function addPendingOrder() {
+  return createOrder()
+    .catch((err) => {
+      throw createError('Error creating pending order');
+    });
+}
+
+function createOrder() {
+  return connection.query(`INSERT INTO Orders VALUES ()`)
+    .then(() => {
+      return connection.query(`SELECT * FROM Orders ORDER BY ID DESC LIMIT 1`);
+    })
+    .then((lastOrder) => {
+      return Promise.resolve(lastOrder);
+    })
+    .catch((err) => {
+      throw createError('Error add orders and order entries');
+    });
+}
+
 function checkOrderParameters(orders, res) {
   if (!(Object.keys(orders).length > 0)) {
     handleError(createError('No orders given'), res);
@@ -120,30 +203,99 @@ function checkOrderParameters(orders, res) {
     if (!checkNumber.isPositiveInteger(x)) {
       handleError(createError('Gave invalid vendor ingredient id'), res);
       return false;
-    } else if (!('lots' in orders[x])) {
-      handleError(createError('Did not specify lots. Lots are mandatory'), res);
-      return false;
-    } else if ('' in orders[x].lots) {
-      handleError(createError('Did not specify lots. Lots are mandatory'), res);
-      return false;
     } else if (!(checkNumber.isPositiveInteger(orders[x].num_packages))) {
       handleError(createError('Gave invalid value for number of packages'), res);
       return false;
     } else {
-      let lotQuantitySum = 0;
-      Object.values(orders[x].lots).forEach(lotQuantity => {
-        if (!checkNumber.isPositiveInteger(lotQuantity)) {
-          handleError(createError('Did not give valid quantities for lots'), res);
-          return false;
-        }
-        lotQuantitySum += lotQuantity;
-      });
-      if (lotQuantitySum != orders[x].num_packages) {
-        handleError(createError('Lot quantities do not add up to number of packages'), res);
-        return false;
-      }
       return true;
     }
   });
 }
 
+/**
+ * Mark an ingredient in inventory as arrived and give lot numbers
+ * @param {*} req
+ * req.body.ingredients =
+ *  [{
+ *    'inventory_id': 1,
+ *    'lots': {
+ *      '1849abc': 1,
+ *      '18a82b': 1,
+ *     },
+ *  }]
+ * @param {*} res
+ * @param {*} next
+ */
+export function markIngredientArrived(req, res, next) {
+  let inventoryIngredients = req.body.ingredients;
+  let inventoryLotsMap = {};
+  inventoryIngredients.forEach(x => {
+    inventoryLotsMap[x.inventory_id] = {};
+    inventoryLotsMap[x.inventory_id].id = x.inventory_id;
+    inventoryLotsMap[x.inventory_id].lots = x.lots;
+  });
+
+  let inventoryMap = {};
+  const inventoryIds = Object.keys(inventoryLotsMap);
+  connection.query(`SELECT Inventories.*, Ingredients.name
+    FROM Inventories JOIN Ingredients ON Inventories.ingredient_id = Ingredients.id
+      WHERE Inventories.id IN (?)`, [inventoryIds])
+    .then((results) => {
+      results.forEach(x => {
+        inventoryMap[x.id] = {
+          'name': x.name,
+          'ingredient_id': x.ingredient_id,
+          'vendor_id': x.vendor_id,
+          'per_package_cost': x.per_package_cost,
+          'order_id': x.order_id,
+        };
+        inventoryLotsMap[x.id].order_total = x.num_packages;
+      });
+      return connection.query(`DELETE FROM Inventories WHERE id IN (?)`, [results.map(x => x.id)]);
+    })
+    .then(() => {
+      const lotSumsCorrect = Object.values(inventoryLotsMap).every(x => checkLotSums(x));
+      if (!lotSumsCorrect) {
+        throw createError('Lots assigned do not equal total packages ordered');
+      }
+      let newInventoryCases = [];
+      Object.values(inventoryLotsMap).forEach(ingredient => {
+        const ingredientData = inventoryMap[ingredient.id];
+        Object.keys(ingredient.lots).forEach(ingredientLot => {
+          const lotQuantity = inventoryLotsMap[ingredient.id]['lots'][ingredientLot];
+          newInventoryCases.push(
+            [ingredientData.ingredient_id, ingredientData.vendor_id,
+              ingredientData.per_package_cost, ingredientData.order_id,
+              ingredientLot, lotQuantity, 1, new Date().toISOString().slice(0, 19).replace('T', ' '),
+            ]);
+        });
+      });
+      return connection.query(`INSERT INTO Inventories
+        (ingredient_id, vendor_id, per_package_cost, order_id, lot, num_packages, arrived, created_at) 
+        VALUES ?`, [newInventoryCases]);
+    })
+    .then(() => {
+      const nameStrings = Object.values(inventoryMap).map(x => {
+        return `{${x.name}=ingredient_id=${x.ingredient_id}} from order ${x.order_id}`;
+      });
+      return logAction(req.payload.id, `Ingredient${nameStrings.length > 1 ? 's' : ''} ${nameStrings.join(', ')} arrived.`);
+    })
+    .then(() => success(res))
+    .catch((err) => {
+      handleError(err, res);
+    });
+}
+
+function checkLotSums(inventoryLots) {
+  let lotQuantitySum = 0;
+  Object.values(inventoryLots.lots).forEach(lotQuantity => {
+    if (!checkNumber.isPositiveInteger(lotQuantity)) {
+      return false;
+    }
+    lotQuantitySum += lotQuantity;
+  });
+  if (lotQuantitySum != inventoryLots.order_total) {
+    return false;
+  }
+  return true;
+}
