@@ -9,7 +9,6 @@ const path = require('path');
 import * as user from './routes/user';
 import * as ingredient from './routes/ingredient';
 import * as storage from './routes/storage';
-import * as log from './routes/log';
 import * as inventory from './routes/inventory';
 import * as vendor from './routes/vendor';
 import * as vendorIngredient from './routes/vendorIngredient';
@@ -21,6 +20,7 @@ import * as productionlog from './routes/productionlog';
 import * as recallReport from './routes/recallReport';
 import * as productionrun from './routes/productrun';
 import * as productionlines from './routes/productionLine';
+import * as sales from './routes/sales';
 import * as efficiencyReport from './routes/efficiencyReport';
 import { adminRequired, noobRequired, managerRequired } from './authMiddleware';
 
@@ -117,11 +117,10 @@ app.delete('/vendoringredients', beAdmin, vendorIngredient.deleteVendorIngredien
 app.get('/storages', beNoob, storage.view);
 app.put('/storages', beAdmin, storage.changeStorage);
 
-app.post('/order', beNoob, order.placeOrder);
-
-app.get('/logs/pages', beNoob, log.pages);
-app.get('/logs/page/:page_num', beNoob, log.view);
-app.get('/logs/ingredients/page/:page_num', beNoob, log.viewLogForIngredient);
+app.post('/order', beManager, order.placeOrder);
+app.put('/order', beManager, order.markIngredientArrived);
+app.get('/order/pending', beManager, order.viewPendingOrders);
+app.get('/order', beManager, order.viewAllOrders);
 
 app.get('/spendinglogs/pages', beNoob, spendinglog.pages);
 app.get('/spendinglogs/page/:page_num', beNoob, spendinglog.view);
@@ -162,6 +161,9 @@ app.post('/formulaproductionlines', beAdmin, productionlines.addFormulaToLine);
 app.delete('/formulaproductionlines', beAdmin, productionlines.deleteFormulaFromLine);
 app.put('/productionlines', beAdmin, productionlines.modify);
 app.delete('/productionlines', beAdmin, productionlines.deleteProductionLine);
+
+app.get('/sales/all', beManager, sales.getAll);
+app.post('/sales', beManager, sales.submit);
 
 app.get('/efficiency', beNoob, efficiencyReport.view);
 

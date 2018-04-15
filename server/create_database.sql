@@ -72,6 +72,13 @@ CREATE TABLE VendorsIngredients(
 	PRIMARY KEY (id)
 );
 
+CREATE TABLE Orders(
+	id int not null AUTO_INCREMENT,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
+
+	PRIMARY KEY (id)
+);
+
 CREATE TABLE Inventories(
 	id int not null AUTO_INCREMENT,
 	ingredient_id int not null,
@@ -79,22 +86,13 @@ CREATE TABLE Inventories(
 	lot varchar(500) not null,
 	vendor_id int not null,
 	per_package_cost double not null,
+	order_id int,
+	arrived BIT DEFAULT 0,
 	created_at timestamp DEFAULT now() not null,
 
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
 	FOREIGN KEY (vendor_id) REFERENCES Vendors(id),
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE Logs(
-	id int not null AUTO_INCREMENT,
-	user_id int not null,
-	vendor_ingredient_id int not null,
-	quantity int not null,
-	created_at timestamp DEFAULT now() not null,
- 
-	FOREIGN KEY (user_id) REFERENCES Users(id),
-	FOREIGN KEY (vendor_ingredient_id) REFERENCES VendorsIngredients(id),
+	FOREIGN KEY (order_id) REFERENCES Orders(id),
 	PRIMARY KEY (id)
 );
 
@@ -226,17 +224,6 @@ CREATE TABLE ProductRunsEntries(
 	PRIMARY KEY (id)
 );
 
-CREATE TABLE Orders(
-	id int not null AUTO_INCREMENT,
-	arrived bit not null DEFAULT 0,
-	vendoringredient_id int not null,
-	num_packages int not null,
-	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
-
-	FOREIGN KEY (vendoringredient_id) REFERENCES VendorsIngredients(id),
-	PRIMARY KEY (id)
-);
-
 CREATE TABLE FinalProductInventories(
 	id int not null AUTO_INCREMENT,
 	productrun_id int not null,
@@ -251,19 +238,11 @@ CREATE TABLE FinalProductInventories(
 
 CREATE TABLE Sales(
 	id int not null AUTO_INCREMENT,
-	created_at timestamp DEFAULT now() not null,
-
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE SalesEntries(
-	id int not null AUTO_INCREMENT,
-	sale_id int not null,
-	formula_id int not null,
+	formula_id int not null UNIQUE,
 	num_packages int not null DEFAULT 0,
-	unit_price double not null DEFAULT 0,
+	total_cost double not null DEFAULT 0,
+	total_revenue double not null DEFAULT 0,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
-	FOREIGN KEY (sale_id) REFERENCES Sales(id),
 	PRIMARY KEY (id)
 );
