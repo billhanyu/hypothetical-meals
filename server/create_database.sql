@@ -1,24 +1,6 @@
-DROP TABLE IF EXISTS SalesEntries;
-DROP TABLE IF EXISTS Sales;
-DROP TABLE IF EXISTS FinalProductInventories;
-DROP TABLE IF EXISTS Orders;
-DROP TABLE IF EXISTS ProductRunsEntries;
-DROP TABLE IF EXISTS ProductionlinesOccupancies;
-DROP TABLE IF EXISTS FormulaProductionLines;
-DROP TABLE IF EXISTS Productionlines;
-DROP TABLE IF EXISTS ProductRuns;
-DROP TABLE IF EXISTS SystemLogs;
-DROP TABLE IF EXISTS ProductionLogs;
-DROP TABLE IF EXISTS FormulaEntries;
-DROP TABLE IF EXISTS Formulas;
-DROP TABLE IF EXISTS SpendingLogs;
-DROP TABLE IF EXISTS Logs;
-DROP TABLE IF EXISTS Inventories;
-DROP TABLE IF EXISTS VendorsIngredients;
-DROP TABLE IF EXISTS Ingredients;
-DROP TABLE IF EXISTS Storages;
-DROP TABLE IF EXISTS Vendors;
-DROP TABLE IF EXISTS Users;
+DROP DATABASE IF EXISTS meals_test;
+CREATE DATABASE meals_test;
+USE meals_test;
 
 CREATE TABLE Users(
 	id int not null AUTO_INCREMENT,
@@ -195,6 +177,7 @@ CREATE TABLE Productionlines(
 	name varchar(70) not null, 
 	description text,
 	isactive varchar(1) DEFAULT 'Y',
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
 
 	UNIQUE(name, isactive),
 
