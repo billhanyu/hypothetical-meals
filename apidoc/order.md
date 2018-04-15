@@ -10,6 +10,7 @@ This retrieves all orders with ingredients that haven't arrived yet. Only return
 { '1':
    [ { id: 5, // INVENTORY ID
        ingredient_id: 3,
+       ingredient_name: 'something',
        num_packages: 20,
        lot: 'ff',
        vendor_id: 1,
@@ -22,6 +23,7 @@ This retrieves all orders with ingredients that haven't arrived yet. Only return
        num_packages: 2,
        lot: 'PENDING',
        vendor_id: 1,
+       vendor_name: 'something',
        per_package_cost: 10,
        order_id: 1,
        arrived: 0,
