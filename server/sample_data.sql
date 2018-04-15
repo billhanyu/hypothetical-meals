@@ -58,6 +58,7 @@ INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (6, 4, 'Use
 INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot, cost_for_run) VALUES (1, 1, 100, 1, 'aa', 100.9);
 INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot, cost_for_run) VALUES (2, 3, 6, 4, 'abc123', 121.3);
 INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot, cost_for_run) VALUES (3, 4, 6, 3, 'def123', 22.3);
+INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot, cost_for_run) VALUES (4, 3, 7, 4, 'aaaaa', 53.3);
 INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (1, 1, 3, 1, 'sb', 10);
 INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (2, 1, 4, 2, 'zz', 10);
 INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (3, 2, 3, 1, 'sb', 2);
@@ -71,3 +72,9 @@ INSERT INTO FormulaProductionLines (id, formula_id, productionline_id) VALUES (2
 INSERT INTO FormulaProductionLines (id, formula_id, productionline_id) VALUES (3, 4, 2);
 INSERT INTO ProductionlinesOccupancies (id, productionline_id, productrun_id, formula_id, start_time, busy) VALUES (1, 1, 1, 1, '2018.04.10 23:11:02.000', 1);
 INSERT INTO ProductionlinesOccupancies (id, productionline_id, productrun_id, formula_id, start_time, end_time, busy) VALUES (2, 2, 3, 4, '2018.01.02 00:00:00.000', '2018.01.10 23:11:02.000', 0);
+INSERT INTO FinalProductInventories (id, productrun_id, formula_id, num_packages, created_at) VALUES (1, 1, 1, 10, '2018.01.01 00:00:01.000');
+INSERT INTO FinalProductInventories (id, productrun_id, formula_id, num_packages, created_at) VALUES (2, 2, 3, 11, '2018.01.02 00:00:01.000');
+INSERT INTO FinalProductInventories (id, productrun_id, formula_id, num_packages, created_at) VALUES (3, 3, 4, 12, '2018.01.03 00:00:01.000');
+INSERT INTO FinalProductInventories (id, productrun_id, formula_id, num_packages, created_at) VALUES (4, 4, 3, 13, '2018.01.04 00:00:01.000');
+INSERT INTO Sales (id, formula_id, num_packages, total_cost, total_revenue) VALUES (2, 1, 6, 2, 2);
+INSERT INTO Sales (id, formula_id, num_packages, total_cost, total_revenue) VALUES (3, 4, 7, 3, 3);

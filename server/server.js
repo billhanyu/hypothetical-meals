@@ -20,6 +20,7 @@ import * as productionlog from './routes/productionlog';
 import * as recallReport from './routes/recallReport';
 import * as productionrun from './routes/productrun';
 import * as productionlines from './routes/productionLine';
+import * as sales from './routes/sales';
 import * as efficiencyReport from './routes/efficiencyReport';
 import { adminRequired, noobRequired, managerRequired } from './authMiddleware';
 
@@ -160,6 +161,9 @@ app.post('/formulaproductionlines', beAdmin, productionlines.addFormulaToLine);
 app.delete('/formulaproductionlines', beAdmin, productionlines.deleteFormulaFromLine);
 app.put('/productionlines', beAdmin, productionlines.modify);
 app.delete('/productionlines', beAdmin, productionlines.deleteProductionLine);
+
+app.get('/sales/all', beManager, sales.getAll);
+app.post('/sales', beManager, sales.submit);
 
 app.get('/efficiency', beNoob, efficiencyReport.view);
 

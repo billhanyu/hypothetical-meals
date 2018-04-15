@@ -238,19 +238,11 @@ CREATE TABLE FinalProductInventories(
 
 CREATE TABLE Sales(
 	id int not null AUTO_INCREMENT,
-	created_at timestamp DEFAULT now() not null,
-
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE SalesEntries(
-	id int not null AUTO_INCREMENT,
-	sale_id int not null,
-	formula_id int not null,
+	formula_id int not null UNIQUE,
 	num_packages int not null DEFAULT 0,
-	unit_price double not null DEFAULT 0,
+	total_cost double not null DEFAULT 0,
+	total_revenue double not null DEFAULT 0,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
-	FOREIGN KEY (sale_id) REFERENCES Sales(id),
 	PRIMARY KEY (id)
 );
