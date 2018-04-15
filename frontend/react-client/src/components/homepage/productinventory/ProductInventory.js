@@ -4,6 +4,8 @@ import Snackbar from 'material-ui/Snackbar';
 import AddSale from './AddSale';
 import Sales from './Sales';
 
+// TODO: add page bar
+
 class ProductInventory extends Component {
   constructor(props) {
     super(props);
