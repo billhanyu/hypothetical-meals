@@ -97,18 +97,18 @@ class DistributeLotItem extends Component {
       }
     });
 
-    axios.post('/order/complete', {
-      id: this.props.order.id,
-      lots,
+    axios.put('/order', {
+      ingredients: [
+        {
+          inventory_id: this.props.order.id,
+          lots
+        },
+      ],
     }, {
       headers: {Authorization: 'Token ' + global.token},
     })
       .then(response => {
-        this.setState({
-          open: true,
-          message: 'Order completed!',
-        });
-        this.props.back();
+        this.props.back('Order completed!');
       })
       .catch(err => {
         this.setState({
@@ -132,7 +132,7 @@ class DistributeLotItem extends Component {
           <form className="col-xl-6 col-lg-6 col-sm-8">
             <div className="form-group">
               <div className="col-*-8">
-                <label htmlFor="vendor">{this.props.order.ingredient.name} ---
+                <label htmlFor="vendor">{this.props.order.ingredient_name} ---
                 <span style={{ color: 'red' }}>{!this.state.noBlankLotNumbers ? 'Please assign lot numbers to all amounts: ' : ''}</span>
                   <span style={{ color: 'red' }}>{leftoverAllocation == 0 ? '' : `${leftoverAllocation} unallocated`}</span>
                 </label>
