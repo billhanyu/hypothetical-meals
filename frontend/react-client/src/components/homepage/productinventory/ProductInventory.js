@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import Snackbar from 'material-ui/Snackbar';
 import AddSale from './AddSale';
+import Sales from './Sales';
 
 class ProductInventory extends Component {
   constructor(props) {
@@ -11,8 +12,10 @@ class ProductInventory extends Component {
       open: false,
       message: '',
       newSale: false,
+      viewSales: false,
     };
     this.newSale = this.newSale.bind(this);
+    this.viewSales = this.viewSales.bind(this);
     this.back = this.back.bind(this);
     this.cancelSale = this.cancelSale.bind(this);
   }
@@ -26,12 +29,19 @@ class ProductInventory extends Component {
   back() {
     this.setState({
       newSale: false,
+      viewSales: false,
     });
   }
 
   newSale() {
     this.setState({
       newSale: true,
+    });
+  }
+
+  viewSales() {
+    this.setState({
+      viewSales: true,
     });
   }
 
@@ -89,16 +99,25 @@ class ProductInventory extends Component {
           onRequestClose={this.handleRequestClose.bind(this)}
         />
         <h2>Product Inventory</h2>
-        {
-          global.user_group !== 'noob' &&
+        <div className="btn-group" role="group" aria-label="Basic example">
+          {
+            global.user_group !== 'noob' &&
+            <button
+              type='button'
+              className='btn btn-primary'
+              onClick={this.newSale}
+            >
+              New Sale
+            </button>
+          }
           <button
             type='button'
-            className='btn btn-primary'
-            onClick={this.newSale}
+            className='btn btn-secondary'
+            onClick={this.viewSales}
           >
-            New Sale
+            Sales
           </button>
-        }
+        </div>
         <table className='table'>
           <thead>
             <tr>
@@ -121,9 +140,19 @@ class ProductInventory extends Component {
         </table>
       </div>;
     
-    const sales = <AddSale back={this.back} inventories={this.state.inventories} cancelSale={this.cancelSale} />;
+    const newSale = <AddSale back={this.back} inventories={this.state.inventories} cancelSale={this.cancelSale} />;
 
-    return this.state.newSale ? sales : main;
+    const sales = <Sales back={this.back} />;
+
+    if (this.state.newSale) {
+      return newSale;
+    }
+    else if (this.state.viewSales) {
+      return sales;
+    }
+    else {
+      return main;
+    }
   }
 }
 
