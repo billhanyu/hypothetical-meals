@@ -225,7 +225,6 @@ describe('User', () => {
           },
         })
         .end((err, res) => {
-          console.log(err);
           res.should.have.status(422); // error for user already registered
           done();
         });
