@@ -25,10 +25,17 @@ class Sales extends Component {
     });
   }
 
-  back() {
+  back(message) {
+    this.reloadData();
     this.setState({
       requesting: false,
     });
+    if (message) {
+      this.setState({
+        open: true,
+        message,
+      });
+    }
   }
 
   componentWillMount() {
@@ -36,34 +43,12 @@ class Sales extends Component {
   }
 
   reloadData() {
-    const sales = [
-      {
-        id: 1,
-        created_at: '2018-03-31T06:56:44.000Z',
-        products: [
-          {
-            sale_id: 1,
-            formula_id: 1,
-            num_packages: 2,
-            unit_price: 1,
-            formula_name: 'fuck',
-          },
-          {
-            sale_id: 1,
-            formula_id: 2,
-            num_packages: 3,
-            unit_price: 4,
-            formula_name: 'damn',
-          }
-        ]
-      }
-    ];
-    axios.get('/sales', {
+    axios.get('/sales/all', {
       headers: { Authorization: 'Token ' + global.token }
     })
       .then(response => {
         this.setState({
-          sales,
+          sales: response.data,
         });
       })
       .catch(err => {
@@ -72,9 +57,6 @@ class Sales extends Component {
           message: 'Error retrieving sales data',
         });
       });
-    this.setState({
-      sales,
-    });
   }
 
   handleRequestClose() {
@@ -84,10 +66,10 @@ class Sales extends Component {
   }
 
   render() {
-    const columnClass = 'OneThirdWidth';
+    const columnClass = 'OneFourthWidth';
     const main =
       <div>
-        <h2>Pending Sale Requests</h2>
+        <h2>Sales</h2>
         <div className="btn-group" role="group" aria-label="Basic example">
           <button
             type="button"
@@ -115,25 +97,28 @@ class Sales extends Component {
         <table className='table'>
           <thead>
             <tr>
-              <th className={columnClass}>Requested Time</th>
-              <th className={columnClass}>Total Revenue</th>
+              <th className={columnClass}>Product</th>
               <th className={columnClass}>Number of Products</th>
+              <th className={columnClass}>Total Cost</th>
+              <th className={columnClass}>Total Revenue</th>
             </tr>
           </thead>
-          {
-            this.state.sales.map((sale, idx) => {
-              return (
-                <SaleItem
-                  columnClass={columnClass}
-                  idx={idx}
-                  key={idx}
-                  sale={sale}
-                  cancel={this.cancel}
-                  confirm={this.confirm}
-                />
-              );
-            })
-          }
+          <tbody>
+            {
+              this.state.sales.map((sale, idx) => {
+                return (
+                  <SaleItem
+                    columnClass={columnClass}
+                    idx={idx}
+                    key={idx}
+                    sale={sale}
+                    cancel={this.cancel}
+                    confirm={this.confirm}
+                  />
+                );
+              })
+            }
+          </tbody>
         </table>
       </div>;
 
