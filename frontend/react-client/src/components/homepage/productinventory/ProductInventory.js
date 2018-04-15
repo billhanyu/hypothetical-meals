@@ -28,11 +28,17 @@ class ProductInventory extends Component {
     });
   }
 
-  back() {
+  back(message) {
     this.setState({
       newSale: false,
       viewSales: false,
     });
+    if (message) {
+      this.setState({
+        open: true,
+        message,
+      });
+    }
   }
 
   newSale() {
