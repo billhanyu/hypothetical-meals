@@ -1,7 +1,7 @@
 # Recall Report API
 
 {% method %}
-## Get '/recall'
+## GET '/recall'
 
 This check inventory capacities, update inventory capacities/stock, and adds to logs and spending logs.
 

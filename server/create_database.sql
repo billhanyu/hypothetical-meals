@@ -175,6 +175,7 @@ CREATE TABLE Productionlines(
 	name varchar(70) not null, 
 	description text,
 	isactive varchar(1) DEFAULT 'Y',
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
 
 	UNIQUE(name, isactive),
 

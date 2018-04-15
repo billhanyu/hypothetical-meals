@@ -20,6 +20,7 @@ import * as productionlog from './routes/productionlog';
 import * as recallReport from './routes/recallReport';
 import * as productionrun from './routes/productrun';
 import * as productionlines from './routes/productionLine';
+import * as efficiencyReport from './routes/efficiencyReport';
 import { adminRequired, noobRequired, managerRequired } from './authMiddleware';
 
 import getConfig from './getConfig';
@@ -150,7 +151,7 @@ app.delete('/formulas', beAdmin, formulas.deleteFormulas);
 app.post('/formulas/import/final', [auth.required, adminRequired, upload.single('bulk')], formulas.finalBulkImport);
 app.post('/formulas/import/intermediate', [auth.required, adminRequired, upload.single('bulk')], formulas.intermediateBulkImport);
 
-app.get('/recall', beManager, recallReport.getRecallForIngredient);
+app.get('/recall', beNoob, recallReport.getRecallForIngredient);
 
 app.get('/productionlines', beNoob, productionlines.view);
 app.get('/productionlines/id/:id', beNoob, productionlines.viewWithId);
@@ -159,6 +160,8 @@ app.post('/formulaproductionlines', beAdmin, productionlines.addFormulaToLine);
 app.delete('/formulaproductionlines', beAdmin, productionlines.deleteFormulaFromLine);
 app.put('/productionlines', beAdmin, productionlines.modify);
 app.delete('/productionlines', beAdmin, productionlines.deleteProductionLine);
+
+app.get('/efficiency', beNoob, efficiencyReport.view);
 
 const distDir = `${__dirname}/../frontend/react-client/dist`;
 app.use(express.static(distDir));

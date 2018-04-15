@@ -69,4 +69,5 @@ INSERT INTO Productionlines (id, name, description) VALUES (2, 'line2', 'second 
 INSERT INTO FormulaProductionLines (id, formula_id, productionline_id) VALUES (1, 1, 1);
 INSERT INTO FormulaProductionLines (id, formula_id, productionline_id) VALUES (2, 2, 1);
 INSERT INTO FormulaProductionLines (id, formula_id, productionline_id) VALUES (3, 4, 2);
-INSERT INTO ProductionlinesOccupancies (id, productionline_id, productrun_id, formula_id, busy) VALUES (1, 1, 1, 1, 1);
+INSERT INTO ProductionlinesOccupancies (id, productionline_id, productrun_id, formula_id, start_time, busy) VALUES (1, 1, 1, 1, '2018.04.10 23:11:02.000', 1);
+INSERT INTO ProductionlinesOccupancies (id, productionline_id, productrun_id, formula_id, start_time, end_time, busy) VALUES (2, 2, 3, 4, '2018.01.02 00:00:00.000', '2018.01.10 23:11:02.000', 0);
