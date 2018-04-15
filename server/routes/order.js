@@ -8,9 +8,14 @@ import { updateLogForIngredient } from './spendinglog';
 
 const pendingLotNumber = 'PENDING';
 
-const ordersQuery = `SELECT Inventories.*, Orders.id as order_id, Orders.created_at as order_start_time 
-  FROM Inventories JOIN Orders 
-  ON Inventories.order_id = Orders.id`;
+const ordersQuery = `SELECT Inventories.*, Ingredients.name as ingredient_name, Vendors.name as vendor_name,
+  Orders.id as order_id, Orders.created_at as order_start_time 
+  FROM Inventories JOIN Orders
+  ON Inventories.order_id = Orders.id
+  JOIN Ingredients
+  ON Inventories.ingredient_id = Ingredients.id
+  JOIN Vendors
+  ON Inventories.vendor_id = Vendors.id`;
 /**
  * View orders with pending/unarrived ingredients
  * @param {*} req
