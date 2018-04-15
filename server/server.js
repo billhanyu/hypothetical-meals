@@ -9,7 +9,6 @@ const path = require('path');
 import * as user from './routes/user';
 import * as ingredient from './routes/ingredient';
 import * as storage from './routes/storage';
-import * as log from './routes/log';
 import * as inventory from './routes/inventory';
 import * as vendor from './routes/vendor';
 import * as vendorIngredient from './routes/vendorIngredient';
@@ -117,11 +116,10 @@ app.delete('/vendoringredients', beAdmin, vendorIngredient.deleteVendorIngredien
 app.get('/storages', beNoob, storage.view);
 app.put('/storages', beAdmin, storage.changeStorage);
 
-app.post('/order', beNoob, order.placeOrder);
-
-app.get('/logs/pages', beNoob, log.pages);
-app.get('/logs/page/:page_num', beNoob, log.view);
-app.get('/logs/ingredients/page/:page_num', beNoob, log.viewLogForIngredient);
+app.post('/order', beManager, order.placeOrder);
+app.put('/order', beManager, order.markIngredientArrived);
+app.get('/order/pending', beManager, order.viewPendingOrders);
+app.get('/order', beManager, order.viewAllOrders);
 
 app.get('/spendinglogs/pages', beNoob, spendinglog.pages);
 app.get('/spendinglogs/page/:page_num', beNoob, spendinglog.view);
