@@ -140,3 +140,16 @@ req.body: {
 ```
 
 {% endmethod %}
+
+{% method %}
+## POST '/productionlines/complete'
+
+Complete production on a production line.
+{% sample lang="js" %}
+```js
+request.body = {
+  "productionline_id": productionline_id
+  }
+```
+
+{% endmethod %}

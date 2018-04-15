@@ -67,11 +67,16 @@ INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot
 INSERT INTO ProductRunsEntries (id, productrun_id, ingredient_id, vendor_id, lot, num_native_units) VALUES (6, 3, 1, 3, 'aaa', 2);
 INSERT INTO Productionlines (id, name, description) VALUES (1, 'line1', 'first line');
 INSERT INTO Productionlines (id, name, description) VALUES (2, 'line2', 'second line');
+INSERT INTO Productionlines (id, name, description) VALUES (3, 'line3', 'third line');
 INSERT INTO FormulaProductionLines (id, formula_id, productionline_id) VALUES (1, 1, 1);
 INSERT INTO FormulaProductionLines (id, formula_id, productionline_id) VALUES (2, 2, 1);
 INSERT INTO FormulaProductionLines (id, formula_id, productionline_id) VALUES (3, 4, 2);
+INSERT INTO FormulaProductionLines (id, formula_id, productionline_id) VALUES (4, 3, 2);
+INSERT INTO FormulaProductionLines (id, formula_id, productionline_id) VALUES (5, 1, 2);
+INSERT INTO FormulaProductionLines (id, formula_id, productionline_id) VALUES (6, 2, 2);
 INSERT INTO ProductionlinesOccupancies (id, productionline_id, productrun_id, formula_id, start_time, busy) VALUES (1, 1, 1, 1, '2018.04.10 23:11:02.000', 1);
 INSERT INTO ProductionlinesOccupancies (id, productionline_id, productrun_id, formula_id, start_time, end_time, busy) VALUES (2, 2, 3, 4, '2018.01.02 00:00:00.000', '2018.01.10 23:11:02.000', 0);
+INSERT INTO ProductionlinesOccupancies (id, productionline_id, productrun_id, formula_id, intermediate_inventory_id, start_time, busy) VALUES (3, 3, 2, 3, 4, '2018.04.10 23:11:02.000', 1);
 INSERT INTO FinalProductInventories (id, productrun_id, formula_id, num_packages, created_at) VALUES (1, 1, 1, 10, '2018.01.01 00:00:01.000');
 INSERT INTO FinalProductInventories (id, productrun_id, formula_id, num_packages, created_at) VALUES (2, 2, 3, 11, '2018.01.02 00:00:01.000');
 INSERT INTO FinalProductInventories (id, productrun_id, formula_id, num_packages, created_at) VALUES (3, 3, 4, 12, '2018.01.03 00:00:01.000');

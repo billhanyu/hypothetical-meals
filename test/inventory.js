@@ -280,6 +280,7 @@ describe('Inventory', () => {
         .send({
           'formula_id': 1,
           'num_products': 1,
+          'productionline_id': 2,
         })
         .end((err, res) => {
           res.should.have.status(200);
@@ -313,6 +314,7 @@ describe('Inventory', () => {
           .send({
             'formula_id': 3,
             'num_products': 100000,
+            'productionline_id': 2,
           })
           .end((err, res) => {
             res.should.have.status(400);
@@ -334,6 +336,7 @@ describe('Inventory', () => {
         .send({
           'formula_id': 3,
           'num_products': 30,
+          'productionline_id': 2,
         })
         .end((err, res) => {
           res.should.have.status(200);
@@ -360,6 +363,7 @@ describe('Inventory', () => {
             .send({
               'formula_id': 2,
               'num_products': 30,
+              'productionline_id': 2,
             })
             .end((err, res) => {
               res.should.have.status(200);
@@ -381,6 +385,7 @@ describe('Inventory', () => {
         .send({
           'formula_id': 2,
           'num_products': 30,
+          'productionline_id': 2,
         })
         .end((err, res) => {
           res.should.have.status(200);
@@ -420,6 +425,7 @@ describe('Inventory', () => {
         .send({
           'formula_id': 1,
           'num_products': 1,
+          'productionline_id': 2,
         })
         .end((err, res) => {
           res.should.have.status(200);
@@ -442,6 +448,7 @@ describe('Inventory', () => {
         .send({
           'formula_id': 1,
           'num_products': 400,
+          'productionline_id': 2,
         })
         .end((err, res) => {
           res.should.have.status(200);
@@ -471,6 +478,7 @@ describe('Inventory', () => {
         .send({
           'formula_id': 1,
           'num_products': 10000000,
+          'productionline_id': 1,
         })
         .end((err, res) => {
           res.should.have.status(400);
@@ -489,6 +497,7 @@ describe('Inventory', () => {
             .send({
               'formula_id': 10,
               'num_products': 1,
+              'productionline_id': 1,
             })
             .end((err, res) => {
               res.should.have.status(400);
@@ -505,6 +514,7 @@ describe('Inventory', () => {
         .send({
           'formula_id': '3a;',
           'num_products': 1,
+          'productionline_id': 1,
         })
         .end((err, res) => {
           res.should.have.status(400);
@@ -518,6 +528,7 @@ describe('Inventory', () => {
         .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .send({
           'num_products': 1,
+          'productionline_id': 1,
         })
         .end((err, res) => {
           res.should.have.status(400);
@@ -531,6 +542,21 @@ describe('Inventory', () => {
         .set('Authorization', `Token ${testTokens.managerTestToken}`)
         .send({
           'formula_id': 1,
+          'productionline_id': 1,
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('should decline empty production line id', (done) => {
+      chai.request(server)
+        .put('/inventory')
+        .set('Authorization', `Token ${testTokens.managerTestToken}`)
+        .send({
+          'formula_id': 1,
+          'num_products': 1,
         })
         .end((err, res) => {
           res.should.have.status(400);

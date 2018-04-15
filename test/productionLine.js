@@ -114,12 +114,12 @@ describe('ProductionLines', () => {
         .post('/formulaproductionlines')
         .set('Authorization', `Token ${testTokens.adminTestToken}`)
         .send({
-          'lineid': 2,
-          'formulaid': 2,
+          'lineid': 1,
+          'formulaid': 4,
         })
         .end((err, res) => {
           res.should.have.status(200);
-          connection.query(`SELECT * FROM FormulaProductionLines WHERE formula_id = 2 AND productionline_id = 2`)
+          connection.query(`SELECT * FROM FormulaProductionLines WHERE formula_id = 4 AND productionline_id = 1`)
             .then((result) => {
               assert.strictEqual(result.length, 1, 'Added formula production line mapping');
               done();
@@ -307,5 +307,75 @@ describe('ProductionLines', () => {
         done();
       });
     });
+  });
+});
+
+describe('#completeProductionOnLine()', () => {
+  beforeEach(() => {
+    return dbSetup.setupTestDatabase();
+  });
+
+  it('should complete production on a busy line with final product', (done) => {
+    chai.request(server)
+      .post('/productionlines/complete')
+      .set('Authorization', `Token ${testTokens.managerTestToken}`)
+      .send({
+        'productionline_id': 1,
+      })
+      .end((err, res) => {
+        res.should.have.status(200);
+        Promise.all([
+          connection.query(`SELECT * FROM ProductionlinesOccupancies WHERE productionline_id = 1 and busy = 1`),
+          connection.query('SELECT * FROM FinalProductInventories'),
+        ])
+          .then((results) => {
+            const [productLinesOccupancies, finalProductInventories] = results;
+            assert.strictEqual(productLinesOccupancies.length, 0, 'Production line id 1 is not busy');
+
+            const newFinalProductInventory = finalProductInventories[finalProductInventories.length - 1];
+            assert.strictEqual(newFinalProductInventory.productrun_id, 1, 'Product run ID is 1');
+            assert.strictEqual(newFinalProductInventory.formula_id, 1, 'Product run ID is 1');
+            assert.strictEqual(newFinalProductInventory.num_packages, 100, 'Number of packages is 100');
+            
+            done();
+          })
+          .catch((e) => console.log(e));
+      });
+  });
+
+  it('should complete production on a busy line with intermediate product', (done) => {
+    chai.request(server)
+      .post('/productionlines/complete')
+      .set('Authorization', `Token ${testTokens.managerTestToken}`)
+      .send({
+        'productionline_id': 2,
+      })
+      .end((err, res) => {
+        res.should.have.status(200);
+        Promise.all([
+          connection.query(`SELECT * FROM ProductionlinesOccupancies WHERE productionline_id = 2 and busy = 1`),
+          connection.query('SELECT * FROM Inventories WHERE id = 4 AND arrived = 1'),
+        ])
+          .then((results) => {
+            const [productLinesOccupancies, finalProductInventories] = results;
+            assert.strictEqual(productLinesOccupancies.length, 0, 'Production line id 2 is not busy');
+            assert.strictEqual(finalProductInventories.length, 1, 'Intermediate inventory item has arrived');
+            done();
+          })
+          .catch((e) => console.log(e));
+      });
+  });
+
+  it('should fail production on a non-busy line', (done) => {
+    chai.request(server)
+      .post('/productionlines/complete')
+      .set('Authorization', `Token ${testTokens.managerTestToken}`)
+      .send({
+        'productionline_id': 3,
+      })
+      .end((err, res) => {
+        res.should.have.status(400);
+        done();
+      });
   });
 });
