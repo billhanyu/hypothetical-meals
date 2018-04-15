@@ -164,6 +164,7 @@ CREATE TABLE ProductRuns(
 	lot VARCHAR(100) not null,
 	cost_for_run double not null,
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
+	completed BIT default 0,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
 	FOREIGN KEY (user_id) REFERENCES Users(id),
