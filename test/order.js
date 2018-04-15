@@ -25,8 +25,10 @@ describe('Order', () => {
               assert.strictEqual(orders['1'].length, 1, 'Total number of ingredients pending in order 1');
               assert.strictEqual(inventoryIngredient[0].id, 7, 'Inventory id of pending order 1 ingredient');
               assert.strictEqual(inventoryIngredient[0].ingredient_id, 1, 'Ingredient pending order 1');
+              assert.strictEqual(inventoryIngredient[0].ingredient_name, 'poop', 'Ingredient name');
               assert.strictEqual(inventoryIngredient[0].num_packages, 2, 'Number of packages of pending ingredient');
               assert.strictEqual(inventoryIngredient[0].vendor_id, 1, 'Vendor for pending ingredient');
+              assert.strictEqual(inventoryIngredient[0].vendor_name, 'Duke', 'Vendor name');
               assert.strictEqual(inventoryIngredient[0].per_package_cost, 10, 'Package cost of pending ingredient');
               assert.strictEqual(inventoryIngredient[0].order_id, 1, 'Order number of ingredient');
               assert.strictEqual(inventoryIngredient[0].arrived, 0, 'Status of ingredient');
