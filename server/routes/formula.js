@@ -668,3 +668,40 @@ function checkForIntermediateBulkImportFormattingErrors(data) {
     if (isNaN(data[i][8]) || data[i][8] <= 0) return `Invalid ingredient units: ${data[i][8]}`;
   }
 }
+
+export function freshness(req, res, next) {
+  connection.query('SELECT * FROM Formulas')
+    .then((results) => {
+      let worstDuration = 0;
+      let totalWeightedDuration = 0;
+      let totalNumProducts = 0;
+      for (let formula of results) {
+        formula.worstDuration = formula.worst_duration == 0 ? null : msToTime(formula.worst_duration);
+        formula.averageDuration = formula.total_num_products == 0 ? null : msToTime(formula.total_weighted_duration / formula.total_num_products);
+
+        worstDuration = Math.max(worstDuration, formula.worst_duration);
+        totalWeightedDuration += formula.total_weighted_duration;
+        totalNumProducts += formula.total_num_products;
+
+        delete formula.worst_duration;
+        delete formula.total_weighted_duration;
+        delete formula.total_num_products;
+      }
+      res.json({
+        freshnessData: {
+          worstDuration: worstDuration == 0 ? null : msToTime(worstDuration),
+          averageDuration: totalNumProducts == 0 ? null : msToTime(totalWeightedDuration / totalNumProducts),
+        },
+        formulas: results,
+      });
+    });
+}
+
+function msToTime(duration) {
+  const seconds = parseInt((duration/1000)%60);
+  const minutes = parseInt((duration/(1000*60))%60);
+  const hours = parseInt((duration/(1000*60*60))%24);
+  const days = parseInt(duration/(1000*60*60*24));
+
+  return `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+}

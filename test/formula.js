@@ -6,6 +6,35 @@ const supertest = require('supertest');
 const dbSetup = require('./common/dbSetup');
 
 describe('Formulas', () => {
+
+  describe('#freshness()', () => {
+    beforeEach(() => {
+      return dbSetup.setupTestDatabase();
+    });
+
+    it('should successfully return freshness', (done) => {
+      chai.request(server)
+        .get('/formulas-freshness')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          const response = res.body;
+    
+          assert.containsAllKeys(response, ['freshnessData', 'formulas']);
+  
+          assert.strictEqual(response.freshnessData.worstDuration, '1 days, 10 hours, 17 minutes, 36 seconds', 'Correct worst duration');
+          assert.strictEqual(response.freshnessData.averageDuration, '0 days, 16 hours, 20 minutes, 41 seconds', 'Correct average duration');
+          assert.strictEqual(response.formulas[0].worstDuration, '1 days, 10 hours, 17 minutes, 36 seconds', 'Correct worst duration for ingredient id 1');
+          assert.strictEqual(response.formulas[0].averageDuration, '1 days, 3 hours, 46 minutes, 40 seconds', 'Correct average duration for ingredient id 1');
+          assert.isNull(response.formulas[2].worstDuration, 'Ingredient id 2 worst duration is null');
+          assert.isNull(response.formulas[2].averageDuration, 'Ingredient id 2 average duration is null');
+          assert.strictEqual(response.formulas[1].worstDuration, '0 days, 0 hours, 2 minutes, 3 seconds', 'Correct worst duration for ingredient id 3');
+          assert.strictEqual(response.formulas[1].averageDuration, '0 days, 0 hours, 0 minutes, 42 seconds', 'Correct average duration for ingredient id 3');
+          done();
+        });
+    });
+  });
+
   describe('#pages()', () => {
     it('should return number of pages of data', (done) => {
       chai.request(server)
