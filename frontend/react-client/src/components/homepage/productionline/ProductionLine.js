@@ -155,6 +155,7 @@ class ProductionLine extends Component {
           open: true,
           message: 'Production Complete!',
         });
+        this.reloadData();
       })
       .catch(err => {
         this.setState({

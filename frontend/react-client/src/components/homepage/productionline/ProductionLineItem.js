@@ -38,7 +38,7 @@ class ProductionLineItem extends Component {
             busy.length > 0
             ?
               <div>
-                <span style={{ color: 'blue' }}>Producing {formulas.filter(formula=>formula.formula_id == busy[0].formula_id)[0].name}</span>
+                <span style={{ color: 'blue' }}>Producing {busy[0].formula_name}</span>
                 {
                   global.user_group !== 'noob' &&
                   <button

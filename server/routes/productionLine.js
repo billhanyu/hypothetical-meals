@@ -7,7 +7,7 @@ import { checkParamId } from './common/checkParams';
 
 
 const productionLineQuery = `SELECT * FROM Productionlines WHERE isactive = 'Y'`;
-const productionOccupanciesQuery = `SELECT * FROM ProductionlinesOccupancies`;
+const productionOccupanciesQuery = `SELECT ProductionlinesOccupancies.*, Formulas.name AS formula_name FROM ProductionlinesOccupancies JOIN Formulas ON ProductionlinesOccupancies.formula_id = Formulas.id`;
 const formulaProductionQuery = `SELECT FormulaProductionLines.*, Formulas.name as formula_name FROM FormulaProductionLines
   JOIN Formulas ON FormulaProductionLines.formula_id = Formulas.id`;
 
