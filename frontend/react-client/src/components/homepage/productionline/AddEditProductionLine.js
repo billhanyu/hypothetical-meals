@@ -162,7 +162,7 @@ class AddEditProductionLine extends Component {
         })
         .then(response => {
           this.setState({
-            id: response.data[0],
+            id: response.data[0].id,
           }, () => {
             this.setState({
               open: true,
