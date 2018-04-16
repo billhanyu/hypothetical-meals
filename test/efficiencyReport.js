@@ -16,10 +16,13 @@ describe('EfficiencyReport', () => {
         .end((err, res) => {
           res.should.have.status(200);
           const lines = res.body;
-          assert.strictEqual(lines.occupancies.length, 1, 'Occupancies within time span');
+          assert.strictEqual(lines.occupancies.length, 2, 'Occupancies within time span');
           assert.strictEqual(lines.occupancies[0].productionline_id, 1, 'Line occupied');
           assert.strictEqual(lines.occupancies[0].productrun_id, 1, 'Production run for line');
           assert.strictEqual(lines.occupancies[0].formula_id, 1, 'Formula used in line');
+          assert.strictEqual(lines.occupancies[1].productionline_id, 3, 'Line occupied');
+          assert.strictEqual(lines.occupancies[1].productrun_id, 2, 'Production run for line');
+          assert.strictEqual(lines.occupancies[1].formula_id, 3, 'Formula used in line');
           done();
         });
     });

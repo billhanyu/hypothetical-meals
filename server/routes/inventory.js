@@ -151,17 +151,20 @@ export function modifyQuantities(req, res, next) {
 /* request body format:
  * request.body = {
  *   "formula_id": formula_id,
- *   "num_products": num_products
+ *   "num_products": num_products,
+ *   "productionline_id": productionline_id
  * }
  * example:
  * {
  *   "formula_id": 3,
- *   "num_products": 10
+ *   "num_products": 10,
+ *   "productionline_id": 1
  * }
  */
 export function commitCart(req, res, next) {
   const formulaId = req.body.formula_id;
   const numProducts = req.body.num_products;
+  const productionLineId = req.body.productionline_id;
 
   let formula;
   let formulaEntries;
@@ -171,6 +174,7 @@ export function commitCart(req, res, next) {
   const changes = {};
   let intermediateIng;
   let totalCost = 0;
+  let intermediateInventoryId;
 
   const uniqueId = uuid();
   const productRunEntries = [];
@@ -180,6 +184,9 @@ export function commitCart(req, res, next) {
   }
   if (!checkNumber.isPositiveInteger(numProducts)) {
     return res.status(400).send('Invalid number of products');
+  }
+  if (!checkNumber.isPositiveInteger(productionLineId)) {
+    return res.status(400).send('Invalid production line ID');
   }
   connection.query(`SELECT * FROM Formulas WHERE id = ?`, [formulaId])
     .then((results) => {
@@ -237,7 +244,15 @@ export function commitCart(req, res, next) {
         freshness.push([ingredientId, 'poop', 'sack', 1, 'pounds', 10, worstDuration, totalWeightedDuration, reqNumPackages * inventory.ingredient_num_native_units]);
         if (numPackagesLeft > 0) throw createError(`Insufficient ingredients in inventory`);
       }
-
+      return Promise.all([
+        connection.query('SELECT * FROM FormulaProductionLines WHERE formula_id = ? AND productionline_id = ?', [formulaId, productionLineId]),
+        connection.query('SELECT * FROM ProductionlinesOccupancies WHERE productionline_id = ? AND busy = 1', [productionLineId]),
+      ]);
+    })
+    .then((results) => {
+      const [formulaProductionLines, productionlinesOccupancies] = results;
+      if (formulaProductionLines.length == 0) throw createError(`Formula is not allowed to run on production line ${productionLineId}`);
+      if (productionlinesOccupancies.length > 0) throw createError(`Production line with id ${productionLineId} is already busy`);
       return (formula.intermediate ? connection.query('SELECT * FROM Ingredients WHERE id = ?', [formula.ingredient_id]) : Promise.resolve());
     })
     .then(intermediateIngArr => {
@@ -246,7 +261,12 @@ export function commitCart(req, res, next) {
       return connection.query('INSERT INTO Inventories (ingredient_id, num_packages, lot, vendor_id, per_package_cost) VALUES (?)',
         [[intermediateIng.id, 0, uniqueId, 1, totalCost / numProducts]]);
     })
-    .then(() => {
+    .then(() => connection.query('SELECT * FROM Inventories WHERE lot = ?', [uniqueId]))
+    .then((results) => {
+      if (formula.intermediate) {
+        if (results.length != 1) throw createError('Database error');
+        intermediateInventoryId = results[0].id;
+      }
       if (!formula.intermediate) return Promise.resolve();
       return connection.query('SELECT id, num_packages FROM Inventories WHERE ingredient_id = ?', [intermediateIng.id]);
     })
@@ -282,8 +302,12 @@ export function commitCart(req, res, next) {
           entry.lot,
         ];
       });
-      return connection.query('INSERT INTO ProductRunsEntries (productrun_id, ingredient_id, vendor_id, num_native_units, lot) VALUES ?',
-        [entries]);
+      return Promise.all([
+        connection.query('INSERT INTO ProductRunsEntries (productrun_id, ingredient_id, vendor_id, num_native_units, lot) VALUES ?',
+        [entries]),
+        connection.query('INSERT INTO ProductionlinesOccupancies (productionline_id, productrun_id, formula_id, intermediate_inventory_id) VALUES (?)',
+        [[productionLineId, productRunId, formulaId, intermediateInventoryId]]),
+      ]);
     })
     .then(() => {
       return connection.query(`SELECT FormulaEntries.ingredient_id, FormulaEntries.num_native_units,
