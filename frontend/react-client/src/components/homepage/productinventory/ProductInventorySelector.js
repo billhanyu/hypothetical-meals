@@ -26,7 +26,7 @@ const ProductInventorySelector = createClass({
   },
 
   componentDidMount() {
-    axios.get('/finalproductinventories', {
+    axios.get('/inventory/final', {
       headers: { Authorization: "Token " + global.token }
     })
       .then(response => {
@@ -35,7 +35,7 @@ const ProductInventorySelector = createClass({
           if (inventories.filter(el => el.value == inventory.formula_id).length == 0) {
             inventories.push({
               value: inventory.formula_id,
-              label: inventory.formula_name,
+              label: inventory.name,
             });
           }
         });
@@ -50,21 +50,6 @@ const ProductInventorySelector = createClass({
           message: "Error retrieving products in inventory",
         });
       });
-
-    // placeholder
-    this.allInventories = [
-      {
-        value: 1,
-        label: 'cake',
-      },
-      {
-        value: 2,
-        label: 'shit',
-      },
-    ];
-    this.setState({
-      inventories: this.allInventories,
-    });
   },
 
   componentWillReceiveProps(newProps) {
