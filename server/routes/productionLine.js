@@ -150,8 +150,7 @@ function createProductionLineLogString(formulas, productionLines, myAddedLines) 
     productionFormulaMap[line.name] = formulasStrings;
   });
   let productionLineStrings = myAddedLines.map(addedLine => {
-    return `production line {${addedLine.name}=productionline_id=${addedLine.id}}
-        ${productionFormulaMap[addedLine.name].length > 0 ? ` with formula(s) ${productionFormulaMap[addedLine.name].join(', ')}` : ''}`;
+    return `production line {${addedLine.name}=productionline_id=${addedLine.id}} ${productionFormulaMap[addedLine.name].length > 0 ? ` with formula(s) ${productionFormulaMap[addedLine.name].join(', ')}` : ''}`;
   });
   return productionLineStrings;
 }
@@ -205,7 +204,7 @@ export function addFormulaToLine(req, res, next) {
   const formulaId = req.body.formulaid;
   connection.query(`INSERT INTO FormulaProductionLines (formula_id, productionline_id) VALUES (${formulaId}, ${lineId})`)
     .then(() => {
-      return getFormulaLineNames('MAX(FormulaProductionLines.id)', true);
+      return getFormulaLineNames('', true);
     })
     .then((names) => {
       const addString = `formula {${names[0].formula_name}=formula_id=${formulaId}} to production line {${names[0].line_name}=productionline_id=${lineId}}`;
@@ -217,12 +216,12 @@ export function addFormulaToLine(req, res, next) {
     });
 }
 
-function getFormulaLineNames(condition, having) {
+function getFormulaLineNames(condition, last) {
   return connection.query(`SELECT Formulas.name as formula_name, Productionlines.name as line_name 
       FROM FormulaProductionLines
       JOIN Formulas ON FormulaProductionLines.formula_id = Formulas.id
       JOIN Productionlines ON FormulaProductionLines.productionline_id = Productionlines.id
-      ${having ? 'HAVING' : 'WHERE'} ${condition}`);
+      ${last ? 'ORDER BY FormulaProductionLines.id DESC LIMIT 1' : `WHERE ${condition}`}`);
 }
 
 /**
@@ -402,9 +401,10 @@ export function deleteProductionLine(req, res, next) {
  */
 export function completeProductionOnLine(req, res, next) {
   let selectResults;
-  connection.query(`SELECT ProductionlinesOccupancies.intermediate_inventory_id, Formulas.intermediate AS formulas_intermediate, Formulas.num_product AS formulas_num_product, ProductRuns.num_product AS product_runs_num_product, Formulas.id AS formula_id, ProductRuns.id AS product_runs_id FROM ProductionlinesOccupancies
+  connection.query(`SELECT ProductionlinesOccupancies.intermediate_inventory_id, Formulas.intermediate AS formulas_intermediate, Formulas.num_product AS formulas_num_product, ProductRuns.num_product AS product_runs_num_product, Formulas.id AS formula_id, ProductRuns.id AS product_runs_id, Productionlines.name AS productionline_name FROM ProductionlinesOccupancies
   JOIN ProductRuns ON ProductionlinesOccupancies.productrun_id = ProductRuns.id
   JOIN Formulas ON ProductionlinesOccupancies.formula_id = Formulas.id
+  JOIN Productionlines ON ProductionlinesOccupancies.productionline_id = Productionlines.id
   WHERE ProductionlinesOccupancies.productionline_id = ? AND ProductionlinesOccupancies.busy = 1`,
   [req.body.productionline_id])
   .then((results) => {
@@ -422,7 +422,7 @@ export function completeProductionOnLine(req, res, next) {
     }
   })
   .then(() => connection.query(`UPDATE ProductRuns SET completed = 1 WHERE id = ?`, [selectResults.product_runs_id]))
-  .then(() => logAction(req.payload.id, `Completed production on production line ${req.body.productionline_id}.`))
+  .then(() => logAction(req.payload.id, `Completed production on production line {${selectResults.productionline_name}=productionline_id=${req.body.productionline_id}}.`))
   .then(() => res.sendStatus(200))
   .catch((err) => handleError(err, res));
 }
