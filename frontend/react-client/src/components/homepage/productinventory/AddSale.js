@@ -8,7 +8,7 @@ class AddSale extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      formulas: [], // 
+      formulas: [],
       formulaToAdd: '',
       open: false,
       message: '',
@@ -112,14 +112,6 @@ class AddSale extends Component {
         message = `${formula.name} has selling price < 0`;
         return false;
       }
-      const stockQuantity = this.props.inventories
-        .filter(inventory => inventory.formula_id == formula.id)
-        .reduce((val, inventory) => val + inventory.num_packages, 0);
-      if (formula.quantity > stockQuantity) {
-        valid = false;
-        message = `Requesting ${formula.quantity} for ${formula.name} while only ${stockQuantity} in stock`;
-        return false;
-      }
     });
     if (!valid) {
       this.setState({
@@ -134,10 +126,27 @@ class AddSale extends Component {
   }
 
   confirmSale() {
-    this.setState({
-      open: true,
-      message: 'Sale Confirmed!',
+    const products = this.state.formulas.map(formula => {
+      return {
+        formula_id: formula.id,
+        num_packages: formula.quantity,
+        sell_price_per_product: formula.price,
+      };
     });
+    axios.post('/sales', {
+      products,
+    }, {
+      headers: {Authorization: 'Token ' + global.token}
+    })
+      .then(response => {
+        this.props.back('Sale Confirmed!');
+      })
+      .catch(err => {
+        this.setState({
+          open: true,
+          message: err.response.data,
+        });
+      });
   }
 
   cancelSale() {

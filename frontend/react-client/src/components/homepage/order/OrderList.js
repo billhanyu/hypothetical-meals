@@ -36,50 +36,37 @@ class OrderList extends Component {
     });
   }
 
-  back() {
+  back(message) {
     this.setState({
       markingArrived: false,
     });
     this.reloadData();
+    if (message) {
+      this.setState({
+        open: true,
+        message,
+      });
+    }
   }
 
   reloadData() {
-    axios.get('/orders', {
+    axios.get('/order/pending', {
       headers: { Authorization: 'Token ' + global.token },
     })
       .then(response => {
+        const result = response.data;
+        let orders = [];
+        Object.values(result).forEach(v => {
+          orders = orders.concat(v);
+        });
         this.setState({
-          orders: response.data,
+          orders,
         });
       })
       .catch(err => {
         this.setState({
           open: true,
           message: 'Error retrieving past orders',
-          orders: [
-            {
-              ingredient: {
-                name: 'FUCK',
-              },
-              vendor: {
-                name: 'Duke',
-              },
-              created_at: '2018-03-31T06:56:44.000Z',
-              num_packages: 2,
-              arrived: 0,
-            },
-            {
-              ingredient: {
-                name: 'damn',
-              },
-              vendor: {
-                name: 'UNC',
-              },
-              created_at: '2018-04-01T06:56:44.000Z',
-              num_packages: 1,
-              arrived: 1,
-            },
-          ],
         });
       });
   }
@@ -94,7 +81,7 @@ class OrderList extends Component {
           autoHideDuration={2500}
           onRequestClose={this.handleRequestClose.bind(this)}
         />
-        <h2>All Orders</h2>
+        <h2>Pending Orders</h2>
         <button type='button' onClick={this.props.back} className='btn btn-secondary'>
           Back
         </button>

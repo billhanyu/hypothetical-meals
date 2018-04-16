@@ -182,9 +182,12 @@ class Order extends Component {
           !this.state.chooseVendor &&
           <div>
             <h2>Order</h2>
-            <button type='button' className='btn btn-primary' onClick={this.showOrders}>
-              All Orders
-            </button>
+            {
+              global.user_group !== 'noob' &&
+              <button type='button' className='btn btn-primary' onClick={this.showOrders}>
+                Pending Orders
+              </button>
+            }
             <IngredientList order={true} orderIngredient={this.orderIngredient} />
             <Cart cart={this.state.cart} setQuantity={this.setQuantity} removeItem={this.removeItem} order={this.order}/>
           </div>
