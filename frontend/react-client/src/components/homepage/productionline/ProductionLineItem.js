@@ -26,7 +26,7 @@ class ProductionLineItem extends Component {
 
   render() {
     const { id, idx, name, description, formulas, occupancies } = this.props;
-    const busy = occupancies.filter(occupancy => occupancy.busy == 1).length > 0;
+    const busy = occupancies.filter(occupancy => occupancy.busy == 1);
     const columnClass = "OneFifthWidth";
     return (
       <tbody>
@@ -35,10 +35,10 @@ class ProductionLineItem extends Component {
           <td className={columnClass}>{description}</td>
           <td className={columnClass}>
           {
-              busy > 0
+            busy.length > 0
             ?
               <div>
-                <span style={{ color: 'blue' }}>In Progress</span>
+                <span style={{ color: 'blue' }}>Producing {formulas.filter(formula=>formula.formula_id == busy[0].formula_id)[0].name}</span>
                 {
                   global.user_group !== 'noob' &&
                   <button
