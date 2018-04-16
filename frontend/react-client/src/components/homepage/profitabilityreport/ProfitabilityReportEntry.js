@@ -7,34 +7,25 @@ class ProfitabilityReportEntry extends Component {
   }
 
   render() {
-    const costs = 100;
-    const sales = 200;
-    const netProfit = 100;
-    const ingredient_name = "Dummy";
-    const sale_amount = "Dummy Amount";
+    const {name, total_cost, units_sold, average_wholesale_price, wholesale_revenue, total_profit, unit_profit, profit_margin,} = this.props;
     return(
       <tr>
         <td>
-          <a href="javascript:void(0)" onClick={e => this.props.viewIngredient(ingredient_id)}>{ingredient_name}</a>
+          <a href="javascript:void(0)" onClick={e => this.props.viewIngredient(ingredient_id)}>{name}</a>
         </td>
-        <td>{sale_amount}</td>
-        <td>${costs.toFixed(2)}</td>
-        <td>${sales.toFixed(2)}</td>
-        <td>${netProfit.toFixed(2)}</td>
+        <td>${total_cost.toFixed(2)}</td>
+        <td>${units_sold.toFixed(2)}</td>
+        <td>${average_wholesale_price.toFixed(2)}</td>
+        <td>${wholesale_revenue.toFixed(2)}</td>
+        <td>${total_profit.toFixed(2)}</td>
+        <td>${unit_profit.toFixed(2)}</td>
+        <td>${profit_margin.toFixed(2)}</td>
       </tr>
     );
   }
 }
 
 ProfitabilityReportEntry.propTypes = {
-  item: PropTypes.shape({
-    ingredient_id: PropTypes.number,
-    ingredient_name: PropTypes.string,
-    total_weight: PropTypes.number,
-    ingredient_native_unit: PropTypes.string,
-    total: PropTypes.number,
-    consumed: PropTypes.number,
-  }),
   viewIngredient: PropTypes.func,
 };
 
