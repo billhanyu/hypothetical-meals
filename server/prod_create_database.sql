@@ -1,14 +1,14 @@
-DROP DATABASE IF EXISTS meals_test;
-CREATE DATABASE meals_test;
-USE meals_test;
+DROP DATABASE IF EXISTS meals;
+CREATE DATABASE meals;
+USE meals;
 
 CREATE TABLE Users(
 	id int not null AUTO_INCREMENT,
 	username varchar(70) not null,
 	oauth BIT DEFAULT 0 not null,
 	name varchar(70) not null,
-	hash text(1024),
-	salt character(32),
+	hash text(1024), 
+	salt character(32), 
 	user_group enum('admin', 'manager', 'noob') not null DEFAULT 'noob',
 	removed BIT DEFAULT 0,
 	isactive varchar(1) DEFAULT 'Y',
@@ -24,7 +24,7 @@ CREATE TABLE Vendors(
 	code varchar(255) not null,
 	removed BIT DEFAULT 0,
 	isactive varchar(1) DEFAULT 'Y',
-
+	
 	UNIQUE(name, isactive),
 	UNIQUE(code, isactive),
 
@@ -35,7 +35,7 @@ CREATE TABLE Storages(
 	id int not null AUTO_INCREMENT,
 	name enum('freezer', 'refrigerator', 'warehouse') UNIQUE,
 	capacity double not null,
-
+	
 	PRIMARY KEY (id)
 );
 
@@ -164,7 +164,6 @@ CREATE TABLE ProductRuns(
 	lot VARCHAR(100) not null,
 	cost_for_run double not null,
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
-	completed BIT default 0,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
 	FOREIGN KEY (user_id) REFERENCES Users(id),
@@ -173,7 +172,7 @@ CREATE TABLE ProductRuns(
 
 CREATE TABLE Productionlines(
 	id int not null AUTO_INCREMENT,
-	name varchar(70) not null,
+	name varchar(70) not null, 
 	description text,
 	isactive varchar(1) DEFAULT 'Y',
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
@@ -189,10 +188,10 @@ CREATE TABLE FormulaProductionLines(
 	productionline_id int not null,
 
 	UNIQUE(formula_id, productionline_id),
-
+	
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
 	FOREIGN KEY (productionline_id) REFERENCES Productionlines(id),
-
+	
 	PRIMARY KEY (id)
 );
 
@@ -201,7 +200,6 @@ CREATE TABLE ProductionlinesOccupancies(
 	productionline_id int not null,
 	productrun_id int not null,
 	formula_id int not null,
-	intermediate_inventory_id int,
 	start_time timestamp DEFAULT now() not null,
 	end_time timestamp null,
 	busy BIT DEFAULT 1,

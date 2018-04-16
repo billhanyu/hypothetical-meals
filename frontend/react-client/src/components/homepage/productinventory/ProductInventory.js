@@ -4,8 +4,6 @@ import Snackbar from 'material-ui/Snackbar';
 import AddSale from './AddSale';
 import Sales from './Sales';
 
-// TODO: add page bar
-
 class ProductInventory extends Component {
   constructor(props) {
     super(props);
@@ -39,6 +37,7 @@ class ProductInventory extends Component {
         message,
       });
     }
+    this.reloadData();
   }
 
   newSale() {
@@ -58,24 +57,20 @@ class ProductInventory extends Component {
   }
 
   reloadData() {
-    const inventories = [
-      {
-        formula_id: 1,
-        formula_name: 'cake',
-        num_packages: 10,
-      },
-      {
-        formula_id: 2,
-        formula_name: 'shit',
-        num_packages: 20,
-      },
-    ];
-    axios.get('/finalproductinventories', {
+    axios.get('/inventory/final', {
       headers: {Authorization: 'Token ' + global.token}
     })
       .then(response => {
+        const mapping = {};
+        response.data.forEach(item => {
+          if (item.formula_id in mapping) {
+            mapping[item.formula_id].num_packages += item.num_packages;
+          } else {
+            mapping[item.formula_id] = item;
+          }
+        });
         this.setState({
-          inventories,
+          inventories: Object.values(mapping),
         });
       })
       .catch(err => {
@@ -84,9 +79,6 @@ class ProductInventory extends Component {
           message: 'Error getting inventory items',
         });
       });
-    this.setState({
-      inventories,
-    });
   }
 
   cancelSale() {
@@ -138,7 +130,7 @@ class ProductInventory extends Component {
               this.state.inventories.map((inventory, idx) => {
                 return (
                   <tr key={idx}>
-                    <td className={columnClass}>{inventory.formula_name}</td>
+                    <td className={columnClass}>{inventory.name}</td>
                     <td className={columnClass}>{inventory.num_packages}</td>
                   </tr>
                 );

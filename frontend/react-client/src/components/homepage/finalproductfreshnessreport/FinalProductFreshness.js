@@ -27,11 +27,11 @@ class FinalProductFreshness extends Component {
   }
 
   componentDidMount() {
-    axios.get('/ingredients/freshness', {
+    axios.get('/formulas-freshness', {
       headers: { Authorization: "Token " + global.token}
     })
       .then(response => {
-        const data = response.data.ingredients;
+        const data = response.data.formulas;
         this.filteredFresh = data;
         this.fresh = data;
         this.selectPage(1);
@@ -104,7 +104,7 @@ class FinalProductFreshness extends Component {
             </tr>
           </tbody>
         </table>
-        <h4>Ingredients</h4>
+        <h4>Formulas</h4>
         <table className='table'>
           <thead>
             <tr>

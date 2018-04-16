@@ -33,7 +33,7 @@ Kung Foods is a web application that is deployed on a Linux cloud server. We use
  - Run `sudo apt-get install mysql-server` to install MySQL
  - Run `mysql -u root -p` to access the MySQL server
  - Run `CREATE DATABASE meals;` to create meals database
- - Exit and run `mysql -u root -p meals < server/create_database.sql` to set up database tables
+ - Exit and run `mysql -u root -p meals < server/prod_create_database.sql` to set up database tables
  - Run `mysql -u root -p meals < server/data.sql` to populate database with initial data
  - Edit config.js file with correct parameters to access the MySQL database (especially password field)
 
