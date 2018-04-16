@@ -108,3 +108,21 @@ request.body = {
 }
 ```
 {% endmethod %}
+
+{% method %}
+## GET '/inventory/final' {#allFinal}
+
+Gets all final product inventory items.
+
+response.body = [
+  {
+    id: 1,
+    name: 'cake',
+	  productrun_id: 1,
+	  formula_id: 21,
+	  num_packages 123,
+	  created_at: timestamp,
+  },...
+]
+
+{% endmethod %}
