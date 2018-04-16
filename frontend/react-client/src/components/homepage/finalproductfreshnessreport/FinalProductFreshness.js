@@ -31,7 +31,6 @@ class FinalProductFreshness extends Component {
       headers: { Authorization: "Token " + global.token}
     })
       .then(response => {
-        console.log(response.data);
         const data = response.data.formulas;
         this.filteredFresh = data;
         this.fresh = data;
@@ -42,7 +41,6 @@ class FinalProductFreshness extends Component {
         });
       })
       .catch(err => {
-        console.log(err);
         alert('Error retrieving freshness report data');
       })
     ;
