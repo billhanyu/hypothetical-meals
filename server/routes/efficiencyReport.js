@@ -1,7 +1,7 @@
 import { createError, handleError } from './common/customError';
 import success from './common/success';
 
-const productionQuery = `SELECT ProductionlinesOccupancies.*, ProductionLines.name FROM ProductionlinesOccupancies JOIN ProductionLines ON ProductionlinesOccupancies.productionline_id = ProductionLines.id`;
+const productionQuery = `SELECT ProductionlinesOccupancies.*, Productionlines.name FROM ProductionlinesOccupancies JOIN Productionlines ON ProductionlinesOccupancies.productionline_id = Productionlines.id`;
 
 export function view(req, res, next) {
   const queryParams = req.query;
