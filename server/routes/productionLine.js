@@ -204,7 +204,7 @@ export function addFormulaToLine(req, res, next) {
   const formulaId = req.body.formulaid;
   connection.query(`INSERT INTO FormulaProductionLines (formula_id, productionline_id) VALUES (${formulaId}, ${lineId})`)
     .then(() => {
-      return getFormulaLineNames('MAX(FormulaProductionLines.id)', true);
+      return getFormulaLineNames('', true);
     })
     .then((names) => {
       const addString = `formula {${names[0].formula_name}=formula_id=${formulaId}} to production line {${names[0].line_name}=productionline_id=${lineId}}`;
@@ -216,12 +216,12 @@ export function addFormulaToLine(req, res, next) {
     });
 }
 
-function getFormulaLineNames(condition, having) {
+function getFormulaLineNames(condition, last) {
   return connection.query(`SELECT Formulas.name as formula_name, Productionlines.name as line_name 
       FROM FormulaProductionLines
       JOIN Formulas ON FormulaProductionLines.formula_id = Formulas.id
       JOIN Productionlines ON FormulaProductionLines.productionline_id = Productionlines.id
-      ${having ? 'HAVING' : 'WHERE'} ${condition}`);
+      ${last ? 'ORDER BY FormulaProductionLines.id DESC LIMIT 1' : `WHERE ${condition}`}`);
 }
 
 /**
