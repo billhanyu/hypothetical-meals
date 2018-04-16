@@ -37,8 +37,8 @@ INSERT INTO SpendingLogs (id, ingredient_id, total_weight, total, consumed) VALU
 INSERT INTO SpendingLogs (id, ingredient_id, total_weight, total, consumed) VALUES (2, 2, 500, 5000, 50);
 INSERT INTO SpendingLogs (id, ingredient_id, total_weight, total, consumed) VALUES (3, 3, 500, 5000, 50);
 INSERT INTO SpendingLogs (id, ingredient_id, total_weight, total, consumed) VALUES (4, 4, 500, 5000, 50);
-INSERT INTO Formulas (id, name, description, num_product) VALUES (1, 'cake', 'A simple cake', 1);
-INSERT INTO Formulas (id, name, description, num_product) VALUES (2, 'shit', 'just shit', 10);
+INSERT INTO Formulas (id, name, description, num_product, worst_duration, total_weighted_duration, total_num_products) VALUES (1, 'cake', 'A simple cake', 1, 123456789, 1000000000, 10);
+INSERT INTO Formulas (id, name, description, num_product, worst_duration, total_weighted_duration, total_num_products) VALUES (2, 'shit', 'just shit', 10, 123456, 300000, 7);
 INSERT INTO Formulas (id, name, description, num_product, intermediate, ingredient_id) VALUES (3, 'booploop', 'hehe', 2, 1, 6);
 INSERT INTO Formulas (id, name, description, num_product) VALUES (4, 'booploop final shit', 'hehe blah', 6);
 INSERT INTO FormulaEntries (id, ingredient_id, num_native_units, formula_id) VALUES (1, 3, 1, 1);
