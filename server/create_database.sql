@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS meals;
-CREATE DATABASE meals;
-USE meals;
+DROP DATABASE IF EXISTS meals_test;
+CREATE DATABASE meals_test;
+USE meals_test;
 
 CREATE TABLE Users(
 	id int not null AUTO_INCREMENT,
