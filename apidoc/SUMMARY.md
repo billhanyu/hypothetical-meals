@@ -11,6 +11,7 @@
 * [SpendingLog](spendinglog.md)
 * [SystemLog](systemLogs.md)
 * [Recall Report](recallReport.md)
+* [Profitability Report](profitReport.md)
 * [Sales](sales.md)
 * [Storage](storage.md)
 * [User](user.md)
