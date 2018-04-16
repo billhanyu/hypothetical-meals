@@ -12,8 +12,8 @@ class SaleItem extends Component {
       <tr>
         <td className={columnClass}>{sale.name}</td>
         <td className={columnClass}>{sale.sale_num_packages}</td>
-        <td className={columnClass}>{sale.sale_total_cost.toFixed(2)}</td>
-        <td className={columnClass}>{sale.sale_total_revenue}</td>
+        <td className={columnClass}>${sale.sale_total_cost.toFixed(2)}</td>
+        <td className={columnClass}>${sale.sale_total_revenue.toFixed(2)}</td>
       </tr>
     );
   }

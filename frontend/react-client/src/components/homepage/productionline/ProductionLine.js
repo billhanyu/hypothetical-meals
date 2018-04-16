@@ -145,8 +145,23 @@ class ProductionLine extends Component {
   }
 
   markComplete(id) {
-    // REQUEST
-    // then reload data
+    axios.post('/productionlines/complete', {
+      productionline_id: id,
+    }, {
+      headers: {Authorization: 'Token ' + global.token}
+    })
+      .then(response => {
+        this.setState({
+          open: true,
+          message: 'Production Complete!',
+        });
+      })
+      .catch(err => {
+        this.setState({
+          open: true,
+          message: err.response.data,
+        });
+      });
   }
 
   render() {
