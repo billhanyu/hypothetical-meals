@@ -14,6 +14,12 @@ export function all(req, res, next) {
     .catch(err => handleError(err, res));
 }
 
+export function allFinal(req, res, next) {
+  connection.query('SELECT FinalProductInventories.*, Formulas.name FROM FinalProductInventories JOIN Formulas ON FinalProductInventories.formula_id = Formulas.id')
+    .then(results => res.status(200).send(results))
+    .catch(err => handleError(err, res));
+}
+
 /* request body format:
  * req.body.ids = [
  *   1, 2, 3
