@@ -19,18 +19,21 @@ class ProfitabilityReport extends Component {
   }
 
   componentDidMount() {
-    axios.get('/sales/all', {
+    axios.get('/profitability', {
       headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
       const entries = [];
       response.data.forEach(element => {
         entries.push({
-          name: element.name,
-          quantity: element.sale_num_packages,
-          cost: element.sale_total_cost,
-          sell: element.sale_total_revenue,
-          profit: element.sale_total_revenue - element.sale_total_cost,
+          name: element.formula_name,
+          total_cost: element.total_ingredient_cost,
+          units_sold: element.units_sold,
+          average_wholesale_price: element.average_wholesale_price,
+          wholesale_revenue: element.wholesale_revenue,
+          total_profit: element.total_profit,
+          unit_profit: element.unit_profit,
+          profit_margin: element.profit_margin,
         });
       });
       this.setState({
@@ -67,7 +70,6 @@ class ProfitabilityReport extends Component {
         backToList={this.back}
         ingredient={this.state.ingredient}
       />;
-
     const main =
       <div>
         <h2>Spending Log</h2>
@@ -75,10 +77,13 @@ class ProfitabilityReport extends Component {
           <thead>
             <tr>
               <th>Ingredient Name</th>
-              <th>Total Num Packages</th>
-              <th>Cost</th>
-              <th>Sales Amount</th>
-              <th>Net Profit</th>
+              <th>Total Cost</th>
+              <th>Units Sold</th>
+              <th>Average Wholesale Price</th>
+              <th>Wholesale Revenue</th>
+              <th>Total Profit</th>
+              <th>Unit Profit</th>
+              <th>Profit Margin</th>
             </tr>
           </thead>
           <tbody>
