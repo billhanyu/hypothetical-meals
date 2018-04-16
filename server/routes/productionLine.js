@@ -125,7 +125,6 @@ export function add(req, res, next) {
        : Promise.resolve([]);
     })
     .then((formulas) => {
-      console.log(myAddedLines);
       let productionLineStrings = createProductionLineLogString(formulas, productionLines, myAddedLines);
       return logAction(req.payload.id, `Created ${productionLineStrings.join(',  ')}.`);
     })
@@ -152,8 +151,7 @@ function createProductionLineLogString(formulas, productionLines, myAddedLines) 
     productionFormulaMap[line.name] = formulasStrings;
   });
   let productionLineStrings = myAddedLines.map(addedLine => {
-    return `production line {${addedLine.name}=productionline_id=${addedLine.id}}
-        ${productionFormulaMap[addedLine.name].length > 0 ? ` with formula(s) ${productionFormulaMap[addedLine.name].join(', ')}` : ''}`;
+    return `production line {${addedLine.name}=productionline_id=${addedLine.id}} ${productionFormulaMap[addedLine.name].length > 0 ? ` with formula(s) ${productionFormulaMap[addedLine.name].join(', ')}` : ''}`;
   });
   return productionLineStrings;
 }
