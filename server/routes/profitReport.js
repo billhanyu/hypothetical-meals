@@ -1,4 +1,4 @@
-import handleError from './common/customError';
+import { handleError } from './common/customError';
 
 export function view(req, res, next) {
   let productMap = {};
@@ -23,7 +23,8 @@ export function view(req, res, next) {
           productMap[formulaId].total_ingredient_cost += product.cost_for_run;
         }
       });
-      return connection.query(`SELECT * FROM Sales WHERE formula_id IN (?)`, [productruns.map(x => x.formula_id)]);
+      return productruns.length > 0 ? connection.query(`SELECT * FROM Sales WHERE formula_id IN (?)`, [productruns.map(x => x.formula_id)]) 
+        : Promise.resolve([]);
     })
     .then((sales) => {
       sales.forEach(sale => {
@@ -37,9 +38,14 @@ export function view(req, res, next) {
         myProduct.unit_profit = myProduct.total_profit / myProduct.units_sold;
         myProduct.profit_margin = myProduct.wholesale_revenue / myProduct.total_ingredient_cost;
       });
-      return Promise.resolve(Object.values(productMap));
+      if (Object.keys(productMap).length > 0) {
+        res.status(200).send(Object.values(productMap));
+      } else {
+        res.status(200).send([]);
+      }
     })
     .catch((err) => {
+      console.log(err);
       handleError(err, res);
     });
 }
