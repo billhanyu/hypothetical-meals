@@ -366,7 +366,7 @@ export function deleteProductionLine(req, res, next) {
       oldLines = results;
     })
     .then(() => {
-      return connection.query(`${productionOccupanciesQuery} WHERE id IN (?) AND busy = 1`, [productionLineIds]);
+      return connection.query(`${productionOccupanciesQuery} WHERE productionline_id IN (?) AND busy = 1`, [productionLineIds]);
     })
     .then((occupancies) => {
       if (occupancies.length > 0) {
