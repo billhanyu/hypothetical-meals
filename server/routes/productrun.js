@@ -21,6 +21,12 @@ export function view(req, res, next) {
       results.forEach(entry => {
         productruns[entry.productrun_id].ingredients.push(entry);
       });
+      return connection.query('SELECT * FROM ProductionlinesOccupancies WHERE busy = 1');
+    })
+    .then(results => {
+      for (let result of results) {
+        productruns[result.productrun_id].productionLineId = result.productionline_id;
+      }
       return res.json(Object.values(productruns));
     })
     .catch(err => {
