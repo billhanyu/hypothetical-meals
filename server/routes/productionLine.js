@@ -401,9 +401,10 @@ export function deleteProductionLine(req, res, next) {
  */
 export function completeProductionOnLine(req, res, next) {
   let selectResults;
-  connection.query(`SELECT ProductionlinesOccupancies.intermediate_inventory_id, Formulas.intermediate AS formulas_intermediate, Formulas.num_product AS formulas_num_product, ProductRuns.num_product AS product_runs_num_product, Formulas.id AS formula_id, ProductRuns.id AS product_runs_id FROM ProductionlinesOccupancies
+  connection.query(`SELECT ProductionlinesOccupancies.intermediate_inventory_id, Formulas.intermediate AS formulas_intermediate, Formulas.num_product AS formulas_num_product, ProductRuns.num_product AS product_runs_num_product, Formulas.id AS formula_id, ProductRuns.id AS product_runs_id, Productionlines.name AS productionline_name FROM ProductionlinesOccupancies
   JOIN ProductRuns ON ProductionlinesOccupancies.productrun_id = ProductRuns.id
   JOIN Formulas ON ProductionlinesOccupancies.formula_id = Formulas.id
+  JOIN Productionlines ON ProductionlinesOccupancies.productionline_id = Productionlines.id
   WHERE ProductionlinesOccupancies.productionline_id = ? AND ProductionlinesOccupancies.busy = 1`,
   [req.body.productionline_id])
   .then((results) => {
@@ -421,7 +422,7 @@ export function completeProductionOnLine(req, res, next) {
     }
   })
   .then(() => connection.query(`UPDATE ProductRuns SET completed = 1 WHERE id = ?`, [selectResults.product_runs_id]))
-  .then(() => logAction(req.payload.id, `Completed production on production line ${req.body.productionline_id}.`))
+  .then(() => logAction(req.payload.id, `Completed production on production line {${selectResults.productionline_name}=productionline_id=${req.body.productionline_id}}.`))
   .then(() => res.sendStatus(200))
   .catch((err) => handleError(err, res));
 }
