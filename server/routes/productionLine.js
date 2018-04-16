@@ -7,7 +7,7 @@ import { checkParamId } from './common/checkParams';
 
 
 const productionLineQuery = `SELECT * FROM Productionlines WHERE isactive = 'Y'`;
-const productionOccupanciesQuery = `SELECT * FROM ProductionlinesOccupancies`;
+const productionOccupanciesQuery = `SELECT ProductionlinesOccupancies.*, Formulas.name AS formula_name FROM ProductionlinesOccupancies JOIN Formulas ON ProductionlinesOccupancies.formula_id = Formulas.id`;
 const formulaProductionQuery = `SELECT FormulaProductionLines.*, Formulas.name as formula_name FROM FormulaProductionLines
   JOIN Formulas ON FormulaProductionLines.formula_id = Formulas.id`;
 
@@ -129,10 +129,9 @@ export function add(req, res, next) {
       return logAction(req.payload.id, `Created ${productionLineStrings.join(',  ')}.`);
     })
     .then(() => {
-      success(res);
+      return res.json(myAddedLines);
     })
     .catch((err) => {
-      console.log(err);
       handleError(err, res);
     });
 }
@@ -364,7 +363,7 @@ export function deleteProductionLine(req, res, next) {
       oldLines = results;
     })
     .then(() => {
-      return connection.query(`${productionOccupanciesQuery} WHERE id IN (?) AND busy = 1`, [productionLineIds]);
+      return connection.query(`${productionOccupanciesQuery} WHERE productionline_id IN (?) AND busy = 1`, [productionLineIds]);
     })
     .then((occupancies) => {
       if (occupancies.length > 0) {

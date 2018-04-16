@@ -14,33 +14,30 @@ class ProfitabilityReport extends Component {
       ingredient: null,
       viewIngredient: false,
     };
-    this.selectPage = this.selectPage.bind(this);
     this.viewIngredient = this.viewIngredient.bind(this);
     this.back = this.back.bind(this);
   }
 
   componentDidMount() {
-    axios.get('/spendinglogs/pages', {
+    axios.get('/profitability', {
       headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
-      this.setState({
-        pages: response.data.numPages
+      const entries = [];
+      response.data.forEach(element => {
+        entries.push({
+          name: element.formula_name,
+          total_cost: element.total_ingredient_cost,
+          units_sold: element.units_sold,
+          average_wholesale_price: element.average_wholesale_price,
+          wholesale_revenue: element.wholesale_revenue,
+          total_profit: element.total_profit,
+          unit_profit: element.unit_profit,
+          profit_margin: element.profit_margin,
+        });
       });
-      this.selectPage(1);
-    });
-  }
-
-  selectPage(idx) {
-    this.setState({
-      currentPage: idx,
-    });
-    axios.get(`/spendinglogs/page/${idx}`, {
-      headers: { Authorization: "Token " + global.token }
-    })
-    .then(response => {
       this.setState({
-        entries: response.data
+        entries,
       });
     });
   }
@@ -73,7 +70,6 @@ class ProfitabilityReport extends Component {
         backToList={this.back}
         ingredient={this.state.ingredient}
       />;
-
     const main =
       <div>
         <h2>Spending Log</h2>
@@ -81,17 +77,20 @@ class ProfitabilityReport extends Component {
           <thead>
             <tr>
               <th>Ingredient Name</th>
-              <th>Total Unit Ordered</th>
-              <th>Cost</th>
-              <th>Sales Amount</th>
-              <th>Net Profit</th>
+              <th>Total Cost</th>
+              <th>Units Sold</th>
+              <th>Average Wholesale Price</th>
+              <th>Wholesale Revenue</th>
+              <th>Total Profit</th>
+              <th>Unit Profit</th>
+              <th>Profit Margin</th>
             </tr>
           </thead>
           <tbody>
             {
               this.state.entries.map((entry, key) =>
                 <ProfitabilityReportEntry
-                  item={entry}
+                  {...entry}
                   key={key}
                   viewIngredient={this.viewIngredient}
                 />
@@ -99,11 +98,6 @@ class ProfitabilityReport extends Component {
             }
           </tbody>
         </table>
-        <PageBar
-          pages={this.state.pages}
-          selectPage={this.selectPage}
-          currentPage={this.state.currentPage}
-        />
       </div>;
 
     return this.state.viewIngredient ? viewIngredient : main;
