@@ -164,6 +164,7 @@ CREATE TABLE ProductRuns(
 	lot VARCHAR(100) not null,
 	cost_for_run double not null,
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP not null,
+	completed BIT default 0,
 
 	FOREIGN KEY (formula_id) REFERENCES Formulas(id),
 	FOREIGN KEY (user_id) REFERENCES Users(id),
@@ -214,14 +215,12 @@ CREATE TABLE ProductRunsEntries(
 	id int not null AUTO_INCREMENT,
 	productrun_id int not null,
 	ingredient_id int not null,
-	inventory_id int,
 	vendor_id int not null,
 	num_native_units double not null,
 	lot VARCHAR(100) not null,
 
 	FOREIGN KEY (productrun_id) REFERENCES ProductRuns(id),
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id),
-	FOREIGN KEY (inventory_id) REFERENCES Inventories(id),
 	FOREIGN KEY (vendor_id) REFERENCES Vendors(id),
 	PRIMARY KEY (id)
 );

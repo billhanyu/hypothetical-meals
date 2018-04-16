@@ -55,7 +55,7 @@ INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (3, 6, 'Use
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (4, 6, 'User 6 did blah', '2018.01.02 23:11:02.000');
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (5, 6, 'User 6 did blah', '2018.01.03 13:11:02.000');
 INSERT INTO SystemLogs (id, user_id, description, created_at) VALUES (6, 4, 'User 4 added 1 {boop=ingredient_id=3}', '2018.01.03 12:00:00.000');
-INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot, cost_for_run) VALUES (1, 1, 100, 1, 'aa', 100.9);
+INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot, cost_for_run, completed) VALUES (1, 1, 100, 1, 'aa', 100.9, 1);
 INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot, cost_for_run) VALUES (2, 3, 6, 4, 'abc123', 121.3);
 INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot, cost_for_run) VALUES (3, 4, 6, 3, 'def123', 22.3);
 INSERT INTO ProductRuns (id, formula_id, num_product, user_id, lot, cost_for_run) VALUES (4, 3, 7, 4, 'aaaaa', 53.3);

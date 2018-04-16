@@ -22,6 +22,7 @@ import * as productionrun from './routes/productrun';
 import * as productionlines from './routes/productionLine';
 import * as sales from './routes/sales';
 import * as efficiencyReport from './routes/efficiencyReport';
+import * as profitReport from './routes/profitReport';
 import { adminRequired, noobRequired, managerRequired } from './authMiddleware';
 
 import getConfig from './getConfig';
@@ -166,6 +167,8 @@ app.get('/sales/all', beManager, sales.getAll);
 app.post('/sales', beManager, sales.submit);
 
 app.get('/efficiency', beNoob, efficiencyReport.view);
+
+app.get('/profitability', beNoob, profitReport.view);
 
 const distDir = `${__dirname}/../frontend/react-client/dist`;
 app.use(express.static(distDir));
