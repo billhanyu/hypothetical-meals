@@ -1,5 +1,4 @@
-import { createError, handleError } from './common/customError';
-import success from './common/success';
+import handleError from './common/customError';
 
 const productionQuery = `SELECT ProductionlinesOccupancies.*, Productionlines.name FROM ProductionlinesOccupancies JOIN Productionlines ON ProductionlinesOccupancies.productionline_id = Productionlines.id`;
 
