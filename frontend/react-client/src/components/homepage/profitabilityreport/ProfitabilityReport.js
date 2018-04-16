@@ -14,33 +14,27 @@ class ProfitabilityReport extends Component {
       ingredient: null,
       viewIngredient: false,
     };
-    this.selectPage = this.selectPage.bind(this);
     this.viewIngredient = this.viewIngredient.bind(this);
     this.back = this.back.bind(this);
   }
 
   componentDidMount() {
-    axios.get('/spendinglogs/pages', {
+    axios.get('/sales/all', {
       headers: { Authorization: "Token " + global.token }
     })
     .then(response => {
-      this.setState({
-        pages: response.data.numPages
+      const entries = [];
+      response.data.forEach(element => {
+        entries.push({
+          name: element.name,
+          quantity: element.sale_num_packages,
+          cost: element.sale_total_cost,
+          sell: element.sale_total_revenue,
+          profit: element.sale_total_revenue - element.sale_total_cost,
+        });
       });
-      this.selectPage(1);
-    });
-  }
-
-  selectPage(idx) {
-    this.setState({
-      currentPage: idx,
-    });
-    axios.get(`/spendinglogs/page/${idx}`, {
-      headers: { Authorization: "Token " + global.token }
-    })
-    .then(response => {
       this.setState({
-        entries: response.data
+        entries,
       });
     });
   }
@@ -81,7 +75,7 @@ class ProfitabilityReport extends Component {
           <thead>
             <tr>
               <th>Ingredient Name</th>
-              <th>Total Unit Ordered</th>
+              <th>Total Num Packages</th>
               <th>Cost</th>
               <th>Sales Amount</th>
               <th>Net Profit</th>
@@ -91,7 +85,7 @@ class ProfitabilityReport extends Component {
             {
               this.state.entries.map((entry, key) =>
                 <ProfitabilityReportEntry
-                  item={entry}
+                  {...entry}
                   key={key}
                   viewIngredient={this.viewIngredient}
                 />
@@ -99,11 +93,6 @@ class ProfitabilityReport extends Component {
             }
           </tbody>
         </table>
-        <PageBar
-          pages={this.state.pages}
-          selectPage={this.selectPage}
-          currentPage={this.state.currentPage}
-        />
       </div>;
 
     return this.state.viewIngredient ? viewIngredient : main;

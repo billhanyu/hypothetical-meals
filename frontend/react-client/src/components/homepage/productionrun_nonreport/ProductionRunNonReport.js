@@ -26,18 +26,24 @@ class ProductionRunNonReport extends Component {
   }
 
   reloadData() {
-    const lines = [
-      {
-        id: 1,
-        name: 'line1',
-        productionrun_id: 1,
-        status: 'Pending',
-        formula_name: 'Potatoes',
-        quantity: 3,
-      },
-    ];
-    this.setState({
-      lines,
+    const lines = [];
+    axios.get(`/productionlines`, {headers: {Authorization: "Token " + global.token}})
+    .then(response => {
+      response.data.forEach(element => {
+        console.log(element);
+        lines.push({
+          line_id: element.id,
+          name: element.name,
+          isactive: element.occupancies.length !== 0,
+          formula: element.occupancies.length === 0 ? 'N/A' : element.occupancies[0].formula_name
+        });
+      });
+      this.setState({
+        lines,
+      });
+    })
+    .catch(error => {
+      console.log(error);
     });
   }
 
@@ -49,9 +55,23 @@ class ProductionRunNonReport extends Component {
 
   _markProductionRun() {
     //Axios request to mark something as complete
-    this.setState({
-      modalOpen: false,
+    const productionline_id = this.state.markedId;
+    axios.post('/productionlines/complete', {productionline_id,}, {headers: {Authorization: "Token " + global.token},})
+    .then(response => {
+      this.setState({
+        modalOpen: false,
+        open: true,
+        message: 'Success!',
+      });
+    })
+    .catch(error => {
+      this.setState({
+        modalOpen: false,
+        open: true,
+        message: 'Error marking complete',
+      });
     });
+
   }
 
   _handleCompleteClick(id) {
@@ -107,7 +127,7 @@ class ProductionRunNonReport extends Component {
             <tr>
               <th>Name</th>
               <th>Formula</th>
-              <th>Status</th>
+              <th>ID</th>
               <th>Status</th>
               <th></th>
             </tr>
