@@ -17,6 +17,28 @@ describe('Inventory', () => {
     });
   });
 
+  describe('#allFinal()', () => {
+    it('should return final product inventory items with total quantities', (done) => {
+      chai.request(server)
+        .get('/inventory/final')
+        .set('Authorization', `Token ${testTokens.noobTestToken}`)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(4);
+
+          const inventoryItem = res.body[0];
+          inventoryItem.should.have.property('id');
+          inventoryItem.should.have.property('productrun_id');
+          inventoryItem.should.have.property('formula_id');
+          inventoryItem.should.have.property('num_packages');
+          inventoryItem.should.have.property('created_at');
+          inventoryItem.should.have.property('name');
+          done();
+        });
+    });
+  });
+
   describe('#getStock()', () => {
     it('should reject noobs', (done) => {
       chai.request(server)
