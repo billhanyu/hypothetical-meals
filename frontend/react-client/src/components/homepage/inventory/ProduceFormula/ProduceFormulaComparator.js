@@ -9,7 +9,7 @@ class ProduceFormulaComparator extends Component {
   constructor(props) {
     super(props);
     const productionLines = [];
-    const productionLinesAll = ["Line 1", "Line 2"];
+    const productionLinesAll = [];
     this.state = {
       open: false,
       productionLines,

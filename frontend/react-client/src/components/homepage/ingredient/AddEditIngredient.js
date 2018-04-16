@@ -15,6 +15,7 @@ class AddEditIngredient extends Component {
   constructor(props) {
     super(props);
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleComboBoxChange = this.handleComboBoxChange.bind(this);
     this.handleSubmitButtonClick = this.handleSubmitButtonClick.bind(this);
     const defaultIngredient = {
       name: '',
@@ -50,6 +51,12 @@ class AddEditIngredient extends Component {
     this.setState(newState);
   }
 
+  handleComboBoxChange(newValue, id) {
+    const newState = Object.assign({}, this.state);
+    newState[id] = newValue;
+    this.setState(newState);
+  }
+
   handleSubmitButtonClick(event) {
     event.preventDefault();
 
@@ -78,6 +85,7 @@ class AddEditIngredient extends Component {
       package_type: this.state.package_type,
       num_native_units: this.state.num_native_units,
     };
+    console.log(ingredient);
 
     if (this.state.mode == "edit") {
       const newIngredientObject = {};
@@ -156,6 +164,7 @@ class AddEditIngredient extends Component {
   }
 
   render() {
+    console.log(this.state);
     const header = "Ingredient: " + this.state.name;
     const readOnly = (global.user_group !== "admin") || (this.state.removed == 1);
     return (
@@ -202,11 +211,11 @@ class AddEditIngredient extends Component {
             </div>
             <div className="form-group">
               <label htmlFor="package_type">Package Type</label>
-              <ComboBox className="form-control" id="package_type" Options={packageTypes} onChange={this.handleInputChange} selected={this.state.package_type} readOnly={readOnly} />
+              <ComboBox className="form-control" id="package_type" Options={packageTypes} onChange={this.handleComboBoxChange} selected={this.state.package_type} readOnly={readOnly} />
             </div>
             <div className="form-group">
               <label htmlFor="storage">Temperature State</label>
-              <ComboBox className="form-control" id="storage" Options={["Frozen", "Refrigerated", "Room Temperature"]} onChange={this.handleInputChange} selected={this.state.storage} readOnly={readOnly} />
+              <ComboBox className="form-control" id="storage" Options={["Frozen", "Refrigerated", "Room Temperature"]} onChange={this.handleComboBoxChange} selected={this.state.storage} readOnly={readOnly} />
             </div>
             <div className="form-group">
               <label htmlFor="native_unit">Unit</label>
