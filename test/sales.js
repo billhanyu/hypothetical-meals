@@ -62,11 +62,11 @@ describe('Sales', () => {
             assert.strictEqual(formulas[0].id, 1);
             assert.isOk(formulas[0].worst_duration > 0);
             assert.isOk(formulas[0].total_weighted_duration > 0);
-            assert.strictEqual(formulas[0].total_num_products, 5);
+            assert.strictEqual(formulas[0].total_num_products, 15);
             assert.strictEqual(formulas[1].id, 2);
-            assert.strictEqual(formulas[1].worst_duration, 0);
-            assert.strictEqual(formulas[1].total_weighted_duration, 0);
-            assert.strictEqual(formulas[1].total_num_products, 0);
+            assert.isOk(formulas[1].worst_duration > 0);
+            assert.isOk(formulas[1].total_weighted_duration > 0);
+            assert.strictEqual(formulas[1].total_num_products, 7);
             assert.strictEqual(formulas[2].id, 3);
             assert.isOk(formulas[2].worst_duration > 0);
             assert.isOk(formulas[2].total_weighted_duration > 0);
