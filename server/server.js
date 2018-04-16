@@ -153,6 +153,7 @@ app.post('/formulas', beAdmin, formulas.add);
 app.delete('/formulas', beAdmin, formulas.deleteFormulas);
 app.post('/formulas/import/final', [auth.required, adminRequired, upload.single('bulk')], formulas.finalBulkImport);
 app.post('/formulas/import/intermediate', [auth.required, adminRequired, upload.single('bulk')], formulas.intermediateBulkImport);
+app.get('/formulas-freshness', beNoob, formulas.freshness);
 
 app.get('/recall', beNoob, recallReport.getRecallForIngredient);
 
