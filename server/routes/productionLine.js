@@ -125,15 +125,13 @@ export function add(req, res, next) {
        : Promise.resolve([]);
     })
     .then((formulas) => {
-      console.log(myAddedLines);
       let productionLineStrings = createProductionLineLogString(formulas, productionLines, myAddedLines);
       return logAction(req.payload.id, `Created ${productionLineStrings.join(',  ')}.`);
     })
     .then(() => {
-      success(res);
+      return res.json(myAddedLines);
     })
     .catch((err) => {
-      console.log(err);
       handleError(err, res);
     });
 }
