@@ -17,6 +17,8 @@ class ProduceFormulaComparator extends Component {
       snackbarMessage: "Finished",
     };
 
+    //formulaId (id)
+
     //ingredientIDtoAmountMap entry looks like:
       // ingredientid:
       // {
@@ -70,6 +72,33 @@ class ProduceFormulaComparator extends Component {
       if(leftoverStock < 0) {
         this.negativeEntries.push({elementId, leftoverStock, isIntermediate:this.ingredientIDtoAmountMap[elementId].intermediate });
       }
+    });
+  }
+
+  componentDidMount() {
+    axios.get(`/productionlines/id/${this.props.formulaId}`, {headers: {Authorization: "Token " + global.token}})
+    .then(response => {
+      const productionLinesAll = [];
+      const productionLineIdToNameMap = {};
+      response.data.forEach(element => {
+        if(element.occupancies.length === 0) {
+          productionLinesAll.push(element.name);
+        }
+        productionLineIdToNameMap[element.name] = element.id;
+        this.setState({
+          productionLinesAll,
+          productionLineIdToNameMap,
+        });
+      });
+      // this.setState({
+      //   productionLinesAll: response
+      // });
+    })
+    .catch(error => {
+      this.setState({
+        open: true,
+        snackbarMessage: 'Error retrieving data for formula lines'
+      });
     });
   }
 
@@ -133,10 +162,12 @@ class ProduceFormulaComparator extends Component {
 
   produceFormulas() {
     const promiseArray = [];
+    const selectedProductionLineId = this.state.productionLineIdToNameMap[this.state.productionLinesAll[0]];
     Object.keys(this.props.formulaToFormulaAmountTotalMap).forEach(formula_id => {
       promiseArray.push(axios.put(`/inventory`, {
         formula_id: Number(formula_id),
         num_products: this.props.formulaToFormulaAmountTotalMap[formula_id],
+        productionline_id: selectedProductionLineId,
       }, {
         headers: {Authorization: "Token " + global.token}
       }));
