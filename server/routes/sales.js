@@ -7,8 +7,7 @@ import { logAction } from './systemLogs';
 // import { uuid } from './common/uuid';
 
 const formulasQueryString = 'SELECT * FROM Formulas';
-const finalProductInventoryQueryString = 'SELECT FinalProductInventories.*, ProductRuns.id AS product_run_id, ProductRuns.cost_for_run FROM FinalProductInventories INNER JOIN ProductRuns ON FinalProductInventories.productrun_id = ProductRuns.id';
-
+const finalProductInventoryQueryString = 'SELECT FinalProductInventories.*, ProductRuns.id AS product_run_id, ProductRuns.cost_for_run, Formulas.num_product FROM FinalProductInventories JOIN ProductRuns ON FinalProductInventories.productrun_id = ProductRuns.id JOIN Formulas ON FinalProductInventories.formula_id = Formulas.id';
 export function getAll(req, res, next) {
   connection.query('SELECT Formulas.*, Sales.id AS sale_id, Sales.num_packages AS sale_num_packages, Sales.total_cost AS sale_total_cost, Sales.total_revenue AS sale_total_revenue FROM Formulas INNER JOIN Sales ON Formulas.id = Sales.formula_id')
     .then(results => res.status(200).send(results))
@@ -59,7 +58,7 @@ export function submit(req, res, next) {
       if (!req.body.products) throw createError('Missing products field');
       for (let product of req.body.products) {
         if (!product.formula_id || !product.num_packages || !product.sell_price_per_product) throw createError('Invalid request format');
-        if (!checkNumber.isNonNegativeInteger(product.num_packages)) throw createError('Invalid number of packages for a product');
+        if (!checkNumber.isNonNegativeInteger(product.num_packages)) throw createError('Invalid number of products: '+product.num_packages);
         if (!parseFloat(product.sell_price_per_product) || product.sell_price_per_product <= 0) throw createError('Invalid price per product: product.sell_price_per_product');
         const currFormulaEntries = finalProductInventory[product.formula_id];
         const formula = formulasDatabase.find(entry => entry.id == product.formula_id);
@@ -68,9 +67,11 @@ export function submit(req, res, next) {
         if (!formula) throw createError(`Missing formula with id ${product.formula_id}`);
 
         if (!currFormulaEntries) throw createError('Missing final product in final product inventory');
-        if (currFormulaEntries.totalPackages < product.num_packages) throw createError('Insufficient final product in inventory');
+        
+        let packagesToConsume = product.num_packages / currFormulaEntries.inventoryEntries[0].num_product;
+        
+        if (currFormulaEntries.totalPackages < packagesToConsume) throw createError('Insufficient final product in inventory');
       
-        let packagesToConsume = product.num_packages;
         let costForCurrFormula = 0;
         for (let currFormulaEntry of currFormulaEntries.inventoryEntries) {
           if (currFormulaEntry.num_packages <= packagesToConsume) {
