@@ -8,6 +8,7 @@ import { validStorageTypes } from './common/storageUtilities';
 import { checkIngredientProperties } from './ingredient';
 import { getSpace } from './common/packageUtilies';
 import { checkParamId } from './common/checkParams';
+import { addFormulasToLine } from './productionLine';
 
 const fs = require('fs');
 const Papa = require('papaparse');
@@ -84,7 +85,8 @@ function getFormulas(queryString, queryParams, req, res, next) {
  *          'ingredient_id': 1
  *          'num_native_units': 1,
  *          }],
- *      }]
+ *      }],
+ *      lines: [1, 2,..],
  * }
  * @param {*} res
  * @param {*} next
@@ -112,6 +114,27 @@ export function add(req, res, next) {
       return addFormulaEntries(formulas);
     })
     .then(() => {
+      return connection.query(`${dbFormulaNameCheck} (?)`, [formulas.map(x => x.name)]);
+    })
+    .then((dbFormulas) => {
+      let nameLineMap = {};
+      formulas.forEach(x => {
+        if ('lines' in x) {
+          nameLineMap[x.name] = x.lines;
+        } else {
+          nameLineMap[x.name] = [];
+        }
+      });
+      let lineArray = [];
+      dbFormulas.forEach(x => {
+        lineArray.push({
+          'formula_id': x.id,
+          'lines': nameLineMap[x.name],
+        });
+      });
+      return addFormulasToLine(req.payload.id, lineArray);
+    })
+    .then(() => {
       return connection.query(`${dbFormulaNameCheck} (${names.join(', ')})`);
     })
     .then((results) => {
@@ -124,6 +147,7 @@ export function add(req, res, next) {
       success(res);
     })
     .catch((err) => {
+      console.log(err);
       handleError(err, res);
     });
 }
@@ -275,6 +299,9 @@ export function modify(req, res, next) {
         if ('intermediate_properties' in newUpdate) {
           delete newUpdate.intermediate_properties;
         }
+        if ('lines' in newUpdate) {
+          delete newUpdate.lines;
+        }
         newUpdate['name'] = x.name || oldIdNameTuple[x.id];
         x['name'] = x.name || oldIdNameTuple[x.id];
         toUpdate.push(newUpdate);
@@ -308,6 +335,30 @@ export function modify(req, res, next) {
       return addFormulaEntries(formulas);
     })
     .then(() => {
+      return connection.query(`DELETE FROM FormulaProductionLines WHERE formula_id IN (${formulaIds.join(', ')})`);
+    })
+    .then(() => {
+      return connection.query(`SELECT * FROM Formulas WHERE id IN (?)`, [formulas.map(x => x.id)]);
+    })
+    .then((dbFormulas) => {
+      let nameLineMap = {};
+      formulas.forEach(x => {
+        if ('lines' in x) {
+          nameLineMap[x.id] = x.lines;
+        } else {
+          nameLineMap[x.id] = [];
+        }
+      });
+      let lineArray = [];
+      dbFormulas.forEach(x => {
+        lineArray.push({
+          'formula_id': x.id,
+          'lines': nameLineMap[x.id],
+        });
+      });
+      return addFormulasToLine(req.payload.id, lineArray);
+    })
+    .then(() => {
       return connection.query(`${formulaQueryString} AND id IN (${formulaIds.join(', ')})`);
     })
     .then((results) => {
@@ -320,6 +371,7 @@ export function modify(req, res, next) {
       success(res);
     })
     .catch((err) => {
+      console.log(err);
       handleError(err, res);
     });
 }

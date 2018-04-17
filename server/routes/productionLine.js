@@ -251,6 +251,36 @@ export function addFormulaToLine(req, res, next) {
     });
 }
 
+export function addFormulasToLine(userId, lineArray) {
+  let formulaMappings = [];
+  lineArray.forEach(x => {
+    x.lines.forEach(line => {
+      formulaMappings.push([x.formula_id, line]);
+    });
+  });
+  if (formulaMappings.length < 1) {
+    return Promise.resolve();
+  }
+  connection.query(`INSERT INTO FormulaProductionLines (formula_id, productionline_id) VALUES ?`, [formulaMappings])
+    .then(() => {
+      return connection.query(`SELECT Formulas.name as formula_name, Formulas.id as formula_id, Productionlines.id as productionline_id, Productionlines.name as line_name 
+      FROM FormulaProductionLines
+      JOIN Formulas ON FormulaProductionLines.formula_id = Formulas.id
+      JOIN Productionlines ON FormulaProductionLines.productionline_id = Productionlines.id
+      ORDER BY FormulaProductionLines.id DESC LIMIT ${formulaMappings.length}`);
+    })
+    .then((names) => {
+      const addStrings = names.map(name => {
+        return `formula {${name.formula_name}=formula_id=${name.formula_id}} to production line {${name.line_name}=productionline_id=${name.productionline_id}}`;
+      });
+      console.log(`Added ${addStrings.join(', ')}.`);
+      return logAction(userId, `Added ${addStrings.join(', ')}.`);
+    })
+    .catch((err) => {
+      throw err;
+    });
+}
+
 function getFormulaLineNames(condition, last) {
   return connection.query(`SELECT Formulas.name as formula_name, Productionlines.name as line_name 
       FROM FormulaProductionLines
