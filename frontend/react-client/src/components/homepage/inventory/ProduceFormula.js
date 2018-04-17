@@ -72,8 +72,6 @@ class ProduceFormula extends Component {
           delete inventoryStock[element];
         }
       });
-      console.log(response.data);
-      console.log(inventoryStock);
 
       this.setState({
         shouldShowSummaryTable: true,
