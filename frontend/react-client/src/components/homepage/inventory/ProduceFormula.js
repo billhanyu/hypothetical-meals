@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
 import ProduceFormulaHeader from './ProduceFormula/ProduceFormulaHeader.js';
 import ProduceFormulaListItem from './ProduceFormula/ProduceFormulaListItem.js';
-import ProduceFormulaButton from './ProduceFormula/ProduceFormulaButton.js';
 import ProduceFormulaComparator from './ProduceFormula/ProduceFormulaComparator.js';
-import ProduceFormulaReturn from './ProduceFormula/ProduceFormulaReturn';
 import FormulaListItem from './FormulaListItem';
 import axios from 'axios';
 import qs from 'qs';
 import Snackbar from 'material-ui/Snackbar';
-import FlatButton from 'material-ui/FlatButton';
 import ProductionRunNonReport from '../productionrun_nonreport/ProductionRunNonReport';
 
 class ProduceFormula extends Component {
@@ -29,23 +26,23 @@ class ProduceFormula extends Component {
 
   componentWillMount() {
     axios.get(`/formulas`, {
-      headers: {Authorization: "Token " + global.token}
+      headers: { Authorization: "Token " + global.token }
     })
-    .then(response => {
-      this.setState({
-        EditFormulaBoxes: response.data
+      .then(response => {
+        this.setState({
+          EditFormulaBoxes: response.data
+        });
       });
-    });
   }
 
   handleProduceFormulaClick() {
     let error = false;
     Object.keys(this.state.errorMap).forEach(element => {
-      if(this.state.errorMap[element] == true) {
+      if (this.state.errorMap[element] == true) {
         error = true;
       }
     });
-    if(error) {
+    if (error) {
       return this.setState({
         open: true,
       });
@@ -58,22 +55,22 @@ class ProduceFormula extends Component {
       });
     });
     axios.get(`/inventory/stock`, {
-      'params': {ids: [...inventoryIDs]},
-      'paramsSerializer': function(params) {
-         return qs.stringify(params, {arrayFormat: 'repeat'});
+      'params': { ids: [...inventoryIDs] },
+      'paramsSerializer': function (params) {
+        return qs.stringify(params, { arrayFormat: 'repeat' });
       },
-      headers: {Authorization: "Token " + global.token},
+      headers: { Authorization: "Token " + global.token },
     })
-    .then(response => {
-      this.setState({
-        shouldShowSummaryTable: true,
-        inventoryStock: response.data,
+      .then(response => {
+        this.setState({
+          shouldShowSummaryTable: true,
+          inventoryStock: response.data,
+        });
+      })
+      .catch(error => {
+        console.log(error);
+        console.log(error.response);
       });
-    })
-    .catch(error => {
-      console.log(error);
-      console.log(error.response);
-    });
   }
 
   handleNumChange(newFormulaAmount, formulaId, totalFormulaUnitsCreated, belowMinError) {
@@ -116,8 +113,8 @@ class ProduceFormula extends Component {
   }
 
   render() {
-    if(this.state.isShowingProductionRuns) {
-      return <ProductionRunNonReport onClick={() => {this.setState({isShowingProductionRuns: false,});}} />;
+    if (this.state.isShowingProductionRuns) {
+      return <ProductionRunNonReport onClick={() => { this.setState({ isShowingProductionRuns: false, }); }} />;
     }
     return (
       <div>
@@ -130,8 +127,8 @@ class ProduceFormula extends Component {
         <ProduceFormulaHeader />
         <button
           type='button'
-          className='btn btn-primary'
-          onClick={() => {this.setState({isShowingProductionRuns: true,});}}
+          className='btn btn-dark'
+          onClick={() => { this.setState({ isShowingProductionRuns: true, }); }}
         >
           See Production Runs
         </button>
@@ -146,34 +143,47 @@ class ProduceFormula extends Component {
               formulaToFormulaAmountMap={this.state.formulaToFormulaAmountMap}
               formulaToFormulaAmountTotalMap={this.state.formulaToFormulaAmountTotalMap}
             />
-           :
-           <div>
-           {
-             this.state.producing ?
-             <div>
-              <ProduceFormulaListItem name={this.state.formulaObject.element.name} num_product={this.state.formulaObject.element.num_product} ingredients={this.state.formulaObject.element.ingredients} handleNumChange={this.handleNumChange.bind(this)} id={this.state.formulaObject.element.id}/>
-              <ProduceFormulaButton onClick={this.handleProduceFormulaClick.bind(this)} />
-              <ProduceFormulaReturn onClick={this.returnClick.bind(this)} />
-             </div> :
-             <table className="table">
-               <thead>
-                 <tr>
-                   <th>Name</th>
-                   <th>Package Amount</th>
-                   <th>Number of Ingredients</th>
-                 </tr>
-               </thead>
-               <tbody>
-                 {
-                   this.state.EditFormulaBoxes.map((element, key) => {
-                     return <FormulaListItem onClick={this.handleFormulaClick.bind(this)} key={key} element={element} />
-                   })
-                 }
-               </tbody>
-             </table>
+            :
+            <div>
+              {
+                this.state.producing ?
+                  <div>
+                    <div>
+                      <button
+                        type='button'
+                        className='btn btn-primary'
+                        onClick={this.handleProduceFormulaClick.bind(this)}>
+                        Produce Formulas
+                      </button>
+                      <button
+                        type='button'
+                        className='btn btn-secondary'
+                        onClick={this.returnClick.bind(this)}>
+                        Back
+                      </button>
+                    </div>
+                    <ProduceFormulaListItem name={this.state.formulaObject.element.name} num_product={this.state.formulaObject.element.num_product} ingredients={this.state.formulaObject.element.ingredients} handleNumChange={this.handleNumChange.bind(this)} id={this.state.formulaObject.element.id} />
 
-            }
-           </div>
+                  </div> :
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Package Amount</th>
+                        <th>Number of Ingredients</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {
+                        this.state.EditFormulaBoxes.map((element, key) => {
+                          return <FormulaListItem onClick={this.handleFormulaClick.bind(this)} key={key} element={element} />
+                        })
+                      }
+                    </tbody>
+                  </table>
+
+              }
+            </div>
         }
       </div>
     );
