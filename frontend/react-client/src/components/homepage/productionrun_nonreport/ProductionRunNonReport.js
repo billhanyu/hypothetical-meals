@@ -33,7 +33,6 @@ class ProductionRunNonReport extends Component {
     const lines = [];
     axios.get(`/productionlines`, {headers: {Authorization: "Token " + global.token}})
     .then(response => {
-      console.log(response);
       response.data.forEach(element => {
         lines.push({
           time: element.created_at,
