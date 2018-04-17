@@ -72,7 +72,7 @@ class ProfitabilityReport extends Component {
       />;
     const main =
       <div>
-        <h2>Spending Log</h2>
+        <h2>Profitability Report</h2>
         <table className="table">
           <thead>
             <tr>
