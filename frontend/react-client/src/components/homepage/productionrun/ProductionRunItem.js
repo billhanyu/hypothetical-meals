@@ -14,6 +14,10 @@ class ProductionRunItem extends Component {
           <td className={columnClass}>{run.user_name}</td>
           <td className={columnClass}>
             <a href="javascript:void(0)" onClick={e => this.props.viewFormula(run.formula_id)}>{run.name}</a>
+            {
+              run.completed == 0 &&
+              <span style={{ 'margin-left': '10px' }} className="badge badge-secondary">Pending</span>
+            }
           </td>
           <td className={columnClass}>{run.num_product}</td>
           <td className={columnClass}>{run.lot}</td>

@@ -9,6 +9,7 @@ import FormulaWindow from '../Formula/FormulaWindow';
 import axios from 'axios';
 import Snackbar from 'material-ui/Snackbar';
 import PropTypes from 'prop-types';
+import Checkbox from 'material-ui/Checkbox';
 
 class ProductionRun extends Component {
   constructor(props) {
@@ -24,6 +25,8 @@ class ProductionRun extends Component {
       viewIngredient: false,
       viewVendor: false,
       viewFormula: false,
+      checkedActive: false,
+      checkedInactive: false,
     };
     this.runs = [];
     this.filteredRuns = [];
@@ -40,7 +43,7 @@ class ProductionRun extends Component {
     this.processData = this.processData.bind(this);
   }
 
-  componentDidMount() {
+  componentWillMount() {
     if (this.props.runs) {
       this.processData(this.props.runs);
       return;
@@ -67,6 +70,22 @@ class ProductionRun extends Component {
       pages,
     });
     this.selectPage(1);
+  }
+
+  updateCheckActive() {
+    this.setState({
+      checkedActive: !this.state.checkedActive,
+    }, () => {
+      this.search();
+    });
+  }
+
+  updateCheckInactive() {
+    this.setState({
+      checkedInactive: !this.state.checkedInactive,
+    }, () => {
+      this.search();
+    });
   }
 
   viewIngredient(id) {
@@ -157,6 +176,8 @@ class ProductionRun extends Component {
       filterName: '',
       filterStartTime: '',
       filterEndTime: '',
+      checkedActive: false,
+      checkedInactive: false,
     }, () => this.search());
   }
 
@@ -174,6 +195,16 @@ class ProductionRun extends Component {
     }
     if (this.state.filterEndTime) {
       newRuns = newRuns.filter(run => run.created_at.split('T')[0] <= this.state.filterEndTime);
+    }
+    if (this.state.checkedActive) {
+      newRuns = newRuns.filter(element => {
+        return element.completed == 0;
+      });
+    }
+    if (this.state.checkedInactive) {
+      newRuns = newRuns.filter(element => {
+        return element.completed == 1;
+      });
     }
     this.filteredRuns = newRuns;
     const newPageNum = Math.ceil(this.filteredRuns.length / COUNT_PER_PAGE);
@@ -243,6 +274,16 @@ class ProductionRun extends Component {
           changeStartTime={this.changeStartTime}
           changeEndTime={this.changeEndTime}
           clearFilter={this.clearFilter}
+        />
+        <Checkbox
+          label="Show Only Pending Runs"
+          checked={this.state.checkedActive}
+          onCheck={this.updateCheckActive.bind(this)}
+        />
+        <Checkbox
+          label="Show Only Completed Runs"
+          checked={this.state.checkedInactive}
+          onCheck={this.updateCheckInactive.bind(this)}
         />
         <table className="table">
           <thead>
