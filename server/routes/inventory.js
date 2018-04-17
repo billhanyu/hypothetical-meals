@@ -15,7 +15,7 @@ export function all(req, res, next) {
 }
 
 export function allFinal(req, res, next) {
-  connection.query('SELECT FinalProductInventories.*, Formulas.name FROM FinalProductInventories JOIN Formulas ON FinalProductInventories.formula_id = Formulas.id')
+  connection.query('SELECT FinalProductInventories.*, Formulas.name, Formulas.num_product FROM FinalProductInventories JOIN Formulas ON FinalProductInventories.formula_id = Formulas.id')
     .then(results => res.status(200).send(results))
     .catch(err => handleError(err, res));
 }

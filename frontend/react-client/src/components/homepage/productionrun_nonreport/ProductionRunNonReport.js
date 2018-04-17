@@ -55,7 +55,10 @@ class ProductionRunNonReport extends Component {
       });
     })
     .catch(error => {
-      console.log(error);
+      this.state({
+        open: true,
+        message: 'Error retrieving production runs data'
+      });
     });
   }
 
@@ -74,6 +77,8 @@ class ProductionRunNonReport extends Component {
         modalOpen: false,
         open: true,
         message: 'Success!',
+      }, () => {
+        this.reloadData();
       });
     })
     .catch(error => {
@@ -177,7 +182,12 @@ class ProductionRunNonReport extends Component {
           checked={this.state.checkedInactive}
           onCheck={this.updateCheckInactive.bind(this)}
         />
-        <FlatButton label="Back" backgroundColor='#377CC9' labelStyle={{color: '#FFF'}} hoverColor='#4694ec' onClick={this.props.onClick}/>
+        <button
+          type='button'
+          className='btn btn-secondary'
+          onClick={this.props.onClick}>
+          Back
+        </button>
         <table className="table">
           <thead>
             <tr>
