@@ -135,6 +135,7 @@ app.get('/productionlogs/pages', beNoob, productionlog.pages);
 app.get('/productionlogs/page/:page_num', beNoob, productionlog.view);
 
 app.get('/productruns', beNoob, productionrun.view);
+app.get('/productruns/id/:id', beNoob, productionrun.viewWithId);
 
 app.get('/inventory', beNoob, inventory.all);
 app.get('/inventory/final', beNoob, inventory.allFinal);
@@ -159,6 +160,7 @@ app.get('/recall', beNoob, recallReport.getRecallForIngredient);
 
 app.get('/productionlines', beNoob, productionlines.view);
 app.get('/productionlines/id/:id', beNoob, productionlines.viewWithId);
+app.get('/productionlines/formulaid/:id', beNoob, productionlines.viewWithFormulaId);
 app.post('/productionlines', beAdmin, productionlines.add);
 app.post('/formulaproductionlines', beAdmin, productionlines.addFormulaToLine);
 app.delete('/formulaproductionlines', beAdmin, productionlines.deleteFormulaFromLine);
