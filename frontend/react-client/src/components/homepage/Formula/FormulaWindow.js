@@ -22,7 +22,7 @@ class FormulaWindow extends Component {
     const idToQuantityMap = {};
     const values = [];
     const productionLines = [];
-    const productionLinesAll = ["Line 1", "Line 2"];
+    const productionLinesAll = [];
     const ingredientNameToQuantityMap = {};
     if (props.newFormulaObject != null) {
       Object.keys(props.newFormulaObject.ingredients).forEach(ingredient => {
