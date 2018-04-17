@@ -172,25 +172,19 @@ class FormulaWindow extends Component {
       });
 
       const id = this.props.activeId;
-      const promiseArray = [
-        axios.put(`/formulas`, {
-          'formulas': [
-            {
-              id,
-              name,
-              description: desc,
-              num_product: quantity,
-              ingredients,
-            }
-          ]
-        }, {
-            headers: { Authorization: "Token " + global.token }
-        }),
-        axios.put('/productionlines', {}, {
+      axios.put(`/formulas`, {
+        'formulas': [
+          {
+            id,
+            name,
+            description: desc,
+            num_product: quantity,
+            ingredients,
+          }
+        ]
+      }, {
           headers: { Authorization: "Token " + global.token }
-        })
-      ];
-      Promise.all(promiseArray).then(responses => {
+      }).then(responses => {
         this.setState({
           open: true,
           message: "Finished updating"
