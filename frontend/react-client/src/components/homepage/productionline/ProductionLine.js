@@ -155,8 +155,18 @@ class ProductionLine extends Component {
           open: true,
           message: 'Production Complete!',
         });
-        console.log(this.state.pagedLines.filter(line=>line.id == id)[0].occupancies.filter(item=>item.busy == 1)[0].productrun_id);
+        const runId = this.state.pagedLines.filter(line=>line.id == id)[0].occupancies.filter(item=>item.busy == 1)[0].productrun_id;
         this.reloadData();
+        return axios.get(`/productruns/id/${runId}`, {
+          headers: {Authorization: 'Token ' + global.token}
+        });
+      })
+      .then(response => {
+        this.setState({
+          productLot: response.data[0].lot,
+        }, () => {
+          $('#productLotModal').modal('show');
+        });
       })
       .catch(err => {
         this.setState({
@@ -231,7 +241,7 @@ class ProductionLine extends Component {
           <div className="modal-dialog" role="document">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title" id="exampleModalLabel">Confirm Delete</h5>
+                <h5 className="modal-title" id="exampleModalLabel">Lot Number</h5>
                 <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>

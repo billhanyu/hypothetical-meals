@@ -56,7 +56,7 @@ export function viewWithId(req, res, next) {
       results.forEach(entry => {
         productruns[entry.productrun_id].ingredients.push(entry);
       });
-      return connection.query('SELECT * FROM ProductionlinesOccupancies WHERE busy = 1 WHERE ProductionlinesOccupancies.productrun_id = ?', [req.params.id]);
+      return connection.query('SELECT * FROM ProductionlinesOccupancies WHERE busy = 1 AND ProductionlinesOccupancies.productrun_id = ?', [req.params.id]);
     })
     .then(results => {
       for (let result of results) {
