@@ -85,6 +85,7 @@ This adds formulas to the database. Only admins can add.
                             'num_native_units': 2,
                         },
                     ],
+                    'lines': [1, 2,..],
                 },
                 {
                     'name': 'Bill',
@@ -101,6 +102,7 @@ This adds formulas to the database. Only admins can add.
                             'num_native_units': 2,
                         },
                     ],
+                    'lines': [1, 2,..],
                 },
             ]
 ```
@@ -132,6 +134,7 @@ Modifies formulas. Request must contain for each formula every formula entry (ev
                             'num_native_units': 2,
                         },
                     ],
+                    'lines': [1, 2,..],
                 },
                 {
                     'id': 3,
@@ -148,6 +151,7 @@ Modifies formulas. Request must contain for each formula every formula entry (ev
                             'num_native_units': 2,
                         },
                     ],
+                    'lines': [1, 2,..],
                 },
             ]
 ```
