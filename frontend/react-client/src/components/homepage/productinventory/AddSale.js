@@ -112,6 +112,14 @@ class AddSale extends Component {
         message = `${formula.name} has selling price < 0`;
         return false;
       }
+      const stockQuantity = this.props.inventories
+        .filter(inventory => inventory.formula_id == formula.id)
+        .reduce((val, inventory) => val + inventory.num_packages, 0);
+      if (formula.quantity > stockQuantity) {
+        valid = false;
+        message = `Requesting ${formula.quantity} for ${formula.name} while only ${stockQuantity} in stock`;
+        return false;
+      }
     });
     if (!valid) {
       this.setState({
