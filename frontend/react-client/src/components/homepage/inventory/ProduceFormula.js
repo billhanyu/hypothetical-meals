@@ -128,7 +128,13 @@ class ProduceFormula extends Component {
           onRequestClose={this.handleRequestClose.bind(this)}
         />
         <ProduceFormulaHeader />
-        <FlatButton label="See Production Runs" backgroundColor='#377CC9' labelStyle={{color: '#FFF'}} hoverColor='#4694ec' onClick={() => {this.setState({isShowingProductionRuns: true,});}}/>
+        <button
+          type='button'
+          className='btn btn-primary'
+          onClick={() => {this.setState({isShowingProductionRuns: true,});}}
+        >
+          See Production Runs
+        </button>
         {
           this.state.shouldShowSummaryTable ?
             <ProduceFormulaComparator
