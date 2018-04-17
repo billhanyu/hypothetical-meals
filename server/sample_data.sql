@@ -27,10 +27,14 @@ INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (3, 
 INSERT INTO VendorsIngredients (id, ingredient_id, price, vendor_id) VALUES (4, 4, 30, 2);
 INSERT INTO Orders (id) VALUES (1);
 INSERT INTO Orders (id) VALUES (2);
-INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot, per_package_cost) VALUES (1, 1, 10, 1, 'ff', 1.1);
-INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot, per_package_cost) VALUES (2, 1, 20, 1, 'bb', 2.1);
-INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot, per_package_cost) VALUES (3, 1, 30, 1, 'cc', 3.1);
-INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot, per_package_cost) VALUES (4, 2, 20, 1, 'ff', 4.1);
+INSERT INTO Orders (id) VALUES (3);
+INSERT INTO Orders (id) VALUES (4);
+INSERT INTO Orders (id) VALUES (5);
+INSERT INTO Orders (id) VALUES (6);
+INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot, per_package_cost, order_id, arrived) VALUES (1, 1, 10, 1, 'ff', 1.1, 3, 1);
+INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot, per_package_cost, order_id, arrived) VALUES (2, 1, 20, 1, 'bb', 2.1, 4, 1);
+INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot, per_package_cost, order_id, arrived) VALUES (3, 1, 30, 1, 'cc', 3.1, 5, 1);
+INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot, per_package_cost, order_id, arrived) VALUES (4, 2, 20, 1, 'ff', 4.1, 6, 1);
 INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot, per_package_cost, order_id, arrived) VALUES (5, 3, 20, 1, 'ff', 5.1, 1, 1);
 INSERT INTO Inventories (id, ingredient_id, num_packages, vendor_id, lot, per_package_cost, order_id, arrived) VALUES (6, 4, 20, 2, 'ff', 6.1, 2, 1);
 INSERT INTO SpendingLogs (id, ingredient_id, total_weight, total, consumed) VALUES (1, 1, 500, 5000, 50);
