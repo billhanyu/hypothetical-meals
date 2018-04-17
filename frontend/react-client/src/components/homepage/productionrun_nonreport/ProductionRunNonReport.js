@@ -17,6 +17,7 @@ class ProductionRunNonReport extends Component {
       modalOpen: false,
       checkedActive: false,
       checkedInactive: false,
+      productLot: '',
     };
     this.reloadData = this.reloadData.bind(this);
   }
@@ -65,23 +66,33 @@ class ProductionRunNonReport extends Component {
     //Axios request to mark something as complete
     const productionline_id = this.state.markedId;
     axios.post('/productionlines/complete', {productionline_id,}, {headers: {Authorization: "Token " + global.token},})
-    .then(response => {
-      this.setState({
-        modalOpen: false,
-        open: true,
-        message: 'Success!',
-      }, () => {
-        this.reloadData();
+      .then(response => {
+        this.setState({
+          modalOpen: false,
+          open: true,
+          message: 'Success!',
+        }, () => {
+          this.reloadData();
+        });
+        const runId = this.state.filteredLines.filter(line => line.line_id == productionline_id)[0].occupancies.filter(item => item.busy == 1)[0].productrun_id;
+        return axios.get(`/productruns/id/${runId}`, {
+          headers: { Authorization: 'Token ' + global.token }
+        });
+      })
+      .then(response => {
+        this.setState({
+          productLot: response.data[0].lot,
+        }, () => {
+          $('#productLotModal').modal('show');
+        });
+      })
+      .catch(error => {
+        this.setState({
+          modalOpen: false,
+          open: true,
+          message: 'Error marking complete',
+        });
       });
-    })
-    .catch(error => {
-      this.setState({
-        modalOpen: false,
-        open: true,
-        message: 'Error marking complete',
-      });
-    });
-
   }
 
   _handleCompleteClick(id) {
@@ -110,7 +121,6 @@ class ProductionRunNonReport extends Component {
       checkedInactive: !this.state.checkedInactive,
     });
   }
-
 
   filterList(checkedActive, checkedInactive) {
     let filteredLines = this.state.lines;
@@ -205,6 +215,24 @@ class ProductionRunNonReport extends Component {
           }
           </tbody>
         </table>
+        <div className="modal fade" id="productLotModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">Lot Number</h5>
+                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Product Lot: {this.state.productLot}
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-primary" data-dismiss="modal">Acknowledged</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>;
   }
 }
