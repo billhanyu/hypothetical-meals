@@ -76,23 +76,21 @@ class ProduceFormulaComparator extends Component {
   }
 
   componentDidMount() {
-    axios.get(`/productionlines/id/${this.props.formulaId}`, {headers: {Authorization: "Token " + global.token}})
+    axios.get(`/productionlines/formulaid/${this.props.formulaId}`,
+      {headers: {Authorization: "Token " + global.token}})
     .then(response => {
       const productionLinesAll = [];
       const productionLineIdToNameMap = {};
       response.data.forEach(element => {
-        if(element.occupancies.length === 0) {
-          productionLinesAll.push(element.name);
+        if(element.busy === 0) {
+          productionLinesAll.push(element.productionline_name);
         }
-        productionLineIdToNameMap[element.name] = element.id;
+        productionLineIdToNameMap[element.productionline_name] = element.productionline_id;
         this.setState({
           productionLinesAll,
           productionLineIdToNameMap,
         });
       });
-      // this.setState({
-      //   productionLinesAll: response
-      // });
     })
     .catch(error => {
       this.setState({
