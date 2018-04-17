@@ -6,9 +6,9 @@ class ProduceFormulaHeader extends Component {
   }
   render() {
     return (
-      <div className="ProduceFormulaHeader">
+      <h2>
         Formula Production
-      </div>
+      </h2>
     );
   }
 }

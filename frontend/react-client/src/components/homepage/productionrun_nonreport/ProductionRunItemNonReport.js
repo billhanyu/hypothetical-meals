@@ -10,7 +10,18 @@ class ProductionRunItemNonReport extends Component {
         <td>{formula}</td>
         <td>{line_id}</td>
         <td>{isactive ? 'ACTIVE' : "INACTIVE"}</td>
-        <td><FlatButton label="Mark Complete" backgroundColor='#377CC9' labelStyle={{color: '#FFF'}} hoverColor='#4694ec' onClick={() => {this.props.handleClick(this.props.line_id);}}/></td>
+        <td>
+          {
+            isactive
+            ? <button 
+                type='button'
+                className='btn btn-primary'
+                onClick={() => {this.props.handleClick(this.props.line_id);}}>
+                Mark Complete
+              </button>
+            : ''
+          }
+        </td>
       </tr>
     );
   }

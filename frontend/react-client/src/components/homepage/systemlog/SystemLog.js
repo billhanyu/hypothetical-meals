@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import AddEditIngredient from '../ingredient/AddEditIngredient';
 import AddEditVendor from '../vendor/AddEditVendor';
+import AddEditProductionline from '../productionline/AddEditProductionLine';
 import FormulaWindow from '../Formula/FormulaWindow';
 import SystemLogFilterBar from './SystemLogFilterBar';
 import PageBar from '../../GeneralComponents/PageBar';
@@ -17,6 +18,7 @@ class SystemLog extends Component {
       vendor: null,
       viewVendor: false,
       formula: null,
+      productionline: null,
       viewFormula: false,
       pages: 0,
       filterUser: '',
@@ -34,6 +36,7 @@ class SystemLog extends Component {
     this.viewIngredient = this.viewIngredient.bind(this);
     this.viewVendor = this.viewVendor.bind(this);
     this.viewFormula = this.viewFormula.bind(this);
+    this.viewProductionline = this.viewProductionline.bind(this);
     this.back = this.back.bind(this);
     this.selectPage = this.selectPage.bind(this);
     this.clearFilter = this.clearFilter.bind(this);
@@ -73,6 +76,7 @@ class SystemLog extends Component {
       viewIngredient: false,
       viewVendor: false,
       viewFormula: false,
+      viewProductionline: false,
     });
   }
 
@@ -150,6 +154,21 @@ class SystemLog extends Component {
     });
   }
 
+  viewProductionline(id) {
+    axios.get(`/productionlines/id/${id}`, {
+      headers: { Authorization: "Token " + global.token }
+    })
+      .then(response => {
+        this.setState({
+          productionline: response.data[0],
+          viewProductionline: true,
+        });
+      })
+      .catch(err => {
+        alert('Error retrieving productionline data');
+      });
+  }
+
   viewVendor(id) {
     axios.get(`/vendors/id/${id}`, {
       headers: { Authorization: "Token " + global.token }
@@ -197,6 +216,8 @@ class SystemLog extends Component {
         parts.push(<a href="javascript:void(0)" onClick={e => this.viewFormula(id)}>{arr[0]}</a>);
       } else if (arr[1] == 'vendor_id') {
         parts.push(<a href="javascript:void(0)" onClick={e => this.viewVendor(id)}>{arr[0]}</a>);
+      } else if (arr[1] == 'productionline_id') {
+        parts.push(<a href="javascript:void(0)" onClick={e => this.viewProductionline(id)}>{arr[0]}</a>);
       }
       op = op.substring(indexClose+1);
     }
@@ -226,6 +247,13 @@ class SystemLog extends Component {
         onBackClick={this.back}
         newFormulaObject={this.state.formula}
         activeId={this.state.formula ? this.state.formula.id : 1}
+      />;
+    
+    const viewProductionline =
+      <AddEditProductionline
+        backToList={this.back}
+        line={this.state.productionline}
+        mode='edit'
       />;
 
     const systemlog =
@@ -273,6 +301,8 @@ class SystemLog extends Component {
       return viewVendor;
     } else if (this.state.viewFormula) {
       return viewFormula;
+    } else if (this.state.viewProductionline) {
+      return viewProductionline;
     } else {
       return systemlog;
     }

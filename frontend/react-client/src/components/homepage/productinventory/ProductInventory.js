@@ -63,6 +63,7 @@ class ProductInventory extends Component {
       .then(response => {
         const mapping = {};
         response.data.forEach(item => {
+          item.num_packages = item.num_packages * item.num_product;
           if (item.formula_id in mapping) {
             mapping[item.formula_id].num_packages += item.num_packages;
           } else {
@@ -122,7 +123,7 @@ class ProductInventory extends Component {
           <thead>
             <tr>
               <th className={columnClass}>Name</th>
-              <th className={columnClass}>Number of Packages</th>
+              <th className={columnClass}>Number of Products</th>
             </tr>
           </thead>
           <tbody>

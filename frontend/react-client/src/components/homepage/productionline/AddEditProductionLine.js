@@ -347,7 +347,6 @@ class AddEditProductionLine extends Component {
 AddEditProductionLine.propTypes = {
   line: PropTypes.object,
   backToList: PropTypes.func,
-  delete: PropTypes.func,
   mode: PropTypes.string,
 };
 
