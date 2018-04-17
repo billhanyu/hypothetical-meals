@@ -34,6 +34,7 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
  - Oauth 
  - User Group (authorization level)
  - Removed
+ - Active
 
 ### Vendor
  - **Id** 
@@ -41,6 +42,7 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
  - Contact:  Alphanumeric freight
  - Carrier code (unique, case-insensitive)
  - Removed
+ - Active
 
 ### Storages
 - **Id**
@@ -66,6 +68,7 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
  - Total weighted duration time
  - Total number of native units
  - Removed
+ - Active
  
 ### Vendor Ingredients
  - **Id**
@@ -73,6 +76,10 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
  - Price
  - *Vendor id*
  - Removed
+
+### Orders
+ - **Id**
+ - Created at
 	 
 ### Inventories
  - **Id**
@@ -81,6 +88,9 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
  - Number of packages
  - Lot
  - *Vendor id*
+ - Per package cost
+ - *Order id*
+ - Arrival status
  - Created at
 
 ### Formulas
@@ -90,21 +100,16 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
  - Name
  - Description
  - Number of products
+ - Total weighted duration
+ - Total number of products
  - Removed
+ - Active
 
 ### FormulaEntries
  - **Id**
  - *ingredient_id*
  - Number of native units
  - *Formula id*
-
-### Logs
-
- - **Id**
- - *User id*
- - *Vendor ingredient id*
- - Quantity (in pounds)
- - Created at (time stamp)
 
 ### Spending Logs
 
@@ -134,7 +139,30 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
  - Number of products
  - *User id*
  - lot
+ - Cost for production run
  - Created at
+ - Completed
+
+### Production lines
+ - **Id**
+ - Name
+ - Description
+ - Active
+ - Created at
+
+### Formula Production Lines
+ - **Id**
+ - *Formula id*
+ - *Production line id*
+
+### Production line occupancies
+ - **Id**
+ - *Production line id*
+ - *Formula id*
+ - Intermediate inventory id
+ - Start time
+ - End time
+ - Busy status
 
 ### Product Runs Entries
  - **Id**
@@ -143,6 +171,20 @@ Kung Foods' application uses React & React Router 4 and Node.js & Express for th
  - *Vendor id*
  - Number of native units
  - Lot
+
+### Final Product Inventories
+ - **Id**
+ - *Product run id*
+ - *Formula id*
+ - Number of packages
+ - Created at
+
+### Sales
+ - **Id**
+ - *Formula Id*
+ - Number of packages
+ - Total cost
+ - Total revenue
 
 *Primary key in bold
 **Foreign key in italics
