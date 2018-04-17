@@ -271,7 +271,7 @@ export function markIngredientArrived(req, res, next) {
           newInventoryCases.push(
             [ingredientData.ingredient_id, ingredientData.vendor_id,
               ingredientData.per_package_cost, ingredientData.order_id,
-              ingredientLot, lotQuantity, 1, new Date().toISOString().slice(0, 19).replace('T', ' '),
+              ingredientLot, lotQuantity, 1, new Date(),
             ]);
         });
       });
