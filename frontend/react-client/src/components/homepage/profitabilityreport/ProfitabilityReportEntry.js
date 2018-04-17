@@ -13,13 +13,13 @@ class ProfitabilityReportEntry extends Component {
         <td>
           <a href="javascript:void(0)" onClick={e => this.props.viewIngredient(ingredient_id)}>{name}</a>
         </td>
-        <td>${total_cost.toFixed(2)}</td>
-        <td>${units_sold.toFixed(2)}</td>
-        <td>${average_wholesale_price.toFixed(2)}</td>
-        <td>${wholesale_revenue.toFixed(2)}</td>
-        <td>${total_profit.toFixed(2)}</td>
-        <td>${unit_profit.toFixed(2)}</td>
-        <td>${profit_margin.toFixed(2)}</td>
+        <td>${total_cost}</td>
+        <td>${units_sold}</td>
+        <td>${average_wholesale_price}</td>
+        <td>${wholesale_revenue}</td>
+        <td>${total_profit}</td>
+        <td>${unit_profit}</td>
+        <td>${profit_margin}</td>
       </tr>
     );
   }
