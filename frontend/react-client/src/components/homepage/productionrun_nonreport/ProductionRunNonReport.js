@@ -33,14 +33,21 @@ class ProductionRunNonReport extends Component {
     const lines = [];
     axios.get(`/productionlines`, {headers: {Authorization: "Token " + global.token}})
     .then(response => {
+      console.log(response);
       response.data.forEach(element => {
         lines.push({
+          time: element.created_at,
           occupancies: element.occupancies,
           line_id: element.id,
           name: element.name,
           isactive: element.occupancies.length !== 0,
           formula: element.occupancies.length === 0 ? 'N/A' : element.occupancies[0].formula_name
         });
+      });
+      lines.sort((a, b) => {
+        const timeA = new Date(a.time).getTime();
+        const timeB = new Date(b.time).getTime();
+        return timeB - timeA;
       });
       this.setState({
         lines,
