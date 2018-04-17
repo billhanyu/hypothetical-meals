@@ -176,7 +176,7 @@ class ProduceFormulaComparator extends Component {
     .then(response => {
       this.setState({
         open: true,
-        snackbarMessage: "Produced Formulas",
+        snackbarMessage: "Began Formula Production",
       });
     }).catch(error => {
       this.setState({
