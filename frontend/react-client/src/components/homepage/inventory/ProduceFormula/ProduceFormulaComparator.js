@@ -160,7 +160,7 @@ class ProduceFormulaComparator extends Component {
 
   produceFormulas() {
     const promiseArray = [];
-    const selectedProductionLineId = this.state.productionLineIdToNameMap[this.state.productionLinesAll[0]];
+    const selectedProductionLineId = this.state.productionLineIdToNameMap[this.state.productionLines[0]];
     Object.keys(this.props.formulaToFormulaAmountTotalMap).forEach(formula_id => {
       promiseArray.push(axios.put(`/inventory`, {
         formula_id: Number(formula_id),
