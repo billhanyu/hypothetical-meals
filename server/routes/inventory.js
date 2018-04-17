@@ -46,7 +46,7 @@ export function getStock(req, res, next) {
 function getStockPromise(ids) {
   return new Promise((resolve, reject) => {
     const stock = {};
-    connection.query(`${basicViewQueryString} WHERE Ingredients.id IN (${ids.join(', ')})`)
+    connection.query(`${basicViewQueryString} WHERE Ingredients.id IN (${ids.join(', ')}) AND arrived = 1`)
       .then(results => {
         for (let result of results) {
           if (stock[result.ingredient_id]) {

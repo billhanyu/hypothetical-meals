@@ -135,6 +135,7 @@ app.get('/productionlogs/pages', beNoob, productionlog.pages);
 app.get('/productionlogs/page/:page_num', beNoob, productionlog.view);
 
 app.get('/productruns', beNoob, productionrun.view);
+app.get('/productruns/id/:id', beNoob, productionrun.viewWithId);
 
 app.get('/inventory', beNoob, inventory.all);
 app.get('/inventory/final', beNoob, inventory.allFinal);
