@@ -159,6 +159,7 @@ describe('Formulas', () => {
                     'num_native_units': 2,
                   },
                 ],
+                'lines': [1, 2],
               },
               {
                 'name': 'Bill',
@@ -175,6 +176,7 @@ describe('Formulas', () => {
                     'num_native_units': 2,
                   },
                 ],
+                'lines': [1, 2],
               },
             ],
           })
@@ -224,6 +226,7 @@ describe('Formulas', () => {
                   'num_native_units': 2,
                 },
               ],
+              'lines': [1, 2],
             },
           ],
         })
@@ -275,6 +278,7 @@ describe('Formulas', () => {
                   'num_native_units': 2,
                 },
               ],
+              'lines': [1, 2],
             },
             {
               'name': 'blob',
@@ -292,6 +296,7 @@ describe('Formulas', () => {
                   'num_native_units': 2,
                 },
               ],
+              'lines': [1, 2],
             },
           ],
         })
@@ -461,6 +466,7 @@ describe('Formulas', () => {
                   'num_native_units': 2,
                 },
               ],
+              'lines': [1, 2],
             },
             {
               'id': 2,
@@ -477,6 +483,7 @@ describe('Formulas', () => {
                   'num_native_units': 2,
                 },
               ],
+              'lines': [1, 2],
             },
           ],
         })
@@ -530,6 +537,7 @@ describe('Formulas', () => {
                   'num_native_units': 2,
                 },
               ],
+              'lines': [1, 2],
             },
             {
               'id': 2,
@@ -546,6 +554,7 @@ describe('Formulas', () => {
                   'num_native_units': 2,
                 },
               ],
+              'lines': [1, 2],
             },
           ],
         })
@@ -599,6 +608,7 @@ describe('Formulas', () => {
                   'num_native_units': 2,
                 },
               ],
+              'lines': [1, 2],
             },
             {
               'id': 2,
@@ -613,6 +623,7 @@ describe('Formulas', () => {
                   'num_native_units': 2,
                 },
               ],
+              'lines': [1, 2],
             },
           ],
         })
@@ -674,6 +685,7 @@ describe('Formulas', () => {
                   'num_native_units': 2,
                 },
               ],
+              'lines': [1, 2],
             },
           ],
         })
