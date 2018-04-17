@@ -9,7 +9,7 @@ class ProduceFormulaComparator extends Component {
   constructor(props) {
     super(props);
     const productionLines = [];
-    const productionLinesAll = ["Line 1", "Line 2"];
+    const productionLinesAll = [];
     this.state = {
       open: false,
       productionLines,
@@ -176,7 +176,7 @@ class ProduceFormulaComparator extends Component {
     .then(response => {
       this.setState({
         open: true,
-        snackbarMessage: "Produced Formulas",
+        snackbarMessage: "Began Formula Production",
       });
     }).catch(error => {
       this.setState({

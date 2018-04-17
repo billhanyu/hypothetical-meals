@@ -65,9 +65,13 @@ class ProduceFormula extends Component {
       headers: {Authorization: "Token " + global.token},
     })
     .then(response => {
+      console.log(response.data);
+      const inventoryStockArrived = response.data.filter(element => {
+        return element.arrived == 1;
+      });
       this.setState({
         shouldShowSummaryTable: true,
-        inventoryStock: response.data,
+        inventoryStock: inventoryStockArrived,
       });
     })
     .catch(error => {
