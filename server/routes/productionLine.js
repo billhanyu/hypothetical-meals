@@ -91,6 +91,41 @@ export function viewWithId(req, res, next) {
 /**
  *
  * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+export function viewWithFormulaId(req, res, next) {
+  if (!checkParamId(req, res, 'Invalid formula id')) {
+    return;
+  }
+  let lines = {};
+  connection.query(`SELECT FormulaProductionLines.*, Productionlines.name as productionline_name
+    FROM FormulaProductionLines JOIN FormulaProductionLines.productionline_id = Productionlines.id
+    WHERE FormulaProductionLines.formula_id = ${req.params.id}`)
+    .then((formulaLines) => {
+      formulaLines.forEach(x => {
+        lines[x.productionline_id] = {
+          'productionline_name': x.productionline_name,
+          'productionline_id': x.productionline_id,
+          'busy': 0,
+        };
+      });
+      return connection.query(`SELECT * FROM ProductionLinesOccupancies WHERE busy = 1 AND productionline_id IN (?)`, Object.keys(lines));
+    })
+    .then((productionLines) => {
+      productionLines.forEach(x => {
+        lines[x.productionline_id].busy = 1;
+      });
+      res.status(200).send(Object.values(lines));
+    })
+    .catch((err) => {
+      handleError(err, res);
+    });
+}
+
+/**
+ *
+ * @param {*} req
  * req.body.lines = [
  *  {
  *    'name': 'bleb',
