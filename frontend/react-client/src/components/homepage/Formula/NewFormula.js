@@ -53,6 +53,7 @@ class NewFormula extends Component {
             name,
             //BILL LOOK HERE
             //(christine's new parameter, name may change) production_line_ids: productionLineIDsThatMakeFormula,
+            lines: productionLineIDsThatMakeFormula,
             ingredient_name: name,
             description: desc,
             num_product: quantity,

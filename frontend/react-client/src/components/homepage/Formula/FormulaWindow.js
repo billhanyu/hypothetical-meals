@@ -159,9 +159,10 @@ class FormulaWindow extends Component {
     }
 
     if (this.props.isEditing) {
-      const { name, desc, quantity, idToQuantityMap } = this.state;
+      const { name, desc, quantity, idToQuantityMap,  productionLinesMap} = this.state;
       //PUT REQUEST HERE
       const ingredients = [];
+      const productionLineIds = Object.values(productionLinesMap);
       Object.keys(idToQuantityMap).forEach(key => {
         if (Number(idToQuantityMap[key]) > 0) {
           ingredients.push({
@@ -180,6 +181,7 @@ class FormulaWindow extends Component {
             description: desc,
             num_product: quantity,
             ingredients,
+            lines : productionLineIds,
           }
         ]
       }, {
