@@ -61,16 +61,15 @@ class ProduceFormula extends Component {
       },
       headers: { Authorization: "Token " + global.token },
     })
-      .then(response => {
-        this.setState({
-          shouldShowSummaryTable: true,
-          inventoryStock: response.data,
-        });
-      })
-      .catch(error => {
-        console.log(error);
-        console.log(error.response);
+    .then(response => {
+      const inventoryStockArrived = response.data.filter(element => {
+        return element.arrived == 1;
       });
+      this.setState({
+        shouldShowSummaryTable: true,
+        inventoryStock: inventoryStockArrived,
+      });
+    });
   }
 
   handleNumChange(newFormulaAmount, formulaId, totalFormulaUnitsCreated, belowMinError) {

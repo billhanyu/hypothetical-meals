@@ -4,6 +4,7 @@ import Snackbar from 'material-ui/Snackbar';
 import ProductionRunItemNonReport from './ProductionRunItemNonReport';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
+import Checkbox from 'material-ui/Checkbox';
 
 class ProductionRunNonReport extends Component {
   constructor(props) {
@@ -12,7 +13,10 @@ class ProductionRunNonReport extends Component {
       open: false,
       message: '',
       lines: [],
+      filteredLines: [],
       modalOpen: false,
+      checkedActive: false,
+      checkedInactive: false,
     };
     this.reloadData = this.reloadData.bind(this);
   }
@@ -31,6 +35,7 @@ class ProductionRunNonReport extends Component {
     .then(response => {
       response.data.forEach(element => {
         lines.push({
+          occupancies: element.occupancies,
           line_id: element.id,
           name: element.name,
           isactive: element.occupancies.length !== 0,
@@ -39,6 +44,7 @@ class ProductionRunNonReport extends Component {
       });
       this.setState({
         lines,
+        filteredLines: lines,
       });
     })
     .catch(error => {
@@ -91,6 +97,40 @@ class ProductionRunNonReport extends Component {
     });
   }
 
+  updateCheckActive() {
+    this.filterList(!this.state.checkedActive, this.state.checkedInactive);
+    this.setState({
+      checkedActive: !this.state.checkedActive,
+    });
+  }
+
+  updateCheckInactive() {
+    this.filterList(this.state.checkedActive, !this.state.checkedInactive);
+    this.setState({
+      checkedInactive: !this.state.checkedInactive,
+    });
+  }
+
+
+  filterList(checkedActive, checkedInactive) {
+    let filteredLines = this.state.lines;
+    let newList = this.state.lines;
+    if(checkedActive) {
+      newList = filteredLines.filter(element => {
+        return element.occupancies.length !== 0;
+      });
+    }
+    if(checkedInactive) {
+      newList = filteredLines.filter(element => {
+        return element.occupancies.length === 0;
+      });
+    }
+
+    this.setState({
+      filteredLines: newList,
+    });
+  }
+
   render() {
     const actions = [
       <FlatButton
@@ -125,6 +165,16 @@ class ProductionRunNonReport extends Component {
           Mark production run as complete?
         </Dialog>
         <h2>Production Runs</h2>
+        <Checkbox
+          label="Show Only Active Runs"
+          checked={this.state.checkedActive}
+          onCheck={this.updateCheckActive.bind(this)}
+        />
+        <Checkbox
+          label="Show Only Inactive Runs"
+          checked={this.state.checkedInactive}
+          onCheck={this.updateCheckInactive.bind(this)}
+        />
         <button
           type='button'
           className='btn btn-secondary'
@@ -143,7 +193,7 @@ class ProductionRunNonReport extends Component {
           </thead>
           <tbody>
           {
-            this.state.lines.map((line, key) => {
+            this.state.filteredLines.map((line, key) => {
               return (
                 <ProductionRunItemNonReport
                   key={key}

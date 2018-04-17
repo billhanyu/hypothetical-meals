@@ -86,6 +86,7 @@ class FormulaInput extends Component {
     this.setState({
       values: currentElements,
     });
+    this.props.onValueChange(currentElements);
   }
 
   render() {
