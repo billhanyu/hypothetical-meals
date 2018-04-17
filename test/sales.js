@@ -33,7 +33,7 @@ describe('Sales', () => {
           },
           {
             'formula_id': 3,
-            'num_packages': 20,
+            'num_packages': 40,
             'sell_price_per_product': 95,
           }],
         })
