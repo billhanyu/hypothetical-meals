@@ -19,7 +19,7 @@ class NewFormula extends Component {
   }
 
   onFinish(newFormulaObject) {
-    const {name, desc, quantity, idToQuantityMap, isIntermediate, num_native_units, native_unit, package_type, storage} = newFormulaObject;
+    const {name, desc, quantity, idToQuantityMap, isIntermediate, num_native_units, native_unit, package_type, storage, productionLines, productionLinesMap} = newFormulaObject;
     //POST REQUEST HERE
     const ingredients = [];
     const self = this;
@@ -31,6 +31,11 @@ class NewFormula extends Component {
         });
       }
     });
+    const productionLineIDsThatMakeFormula = [];
+    productionLines.forEach(element => {
+      productionLineIDsThatMakeFormula.push(productionLinesMap[element]);
+    });
+
     axios.get('/storages', {headers: {Authorization: "Token " + global.token}})
     .then(response => {
       let storage_id = 1;
@@ -46,6 +51,8 @@ class NewFormula extends Component {
       axios.post(`/formulas`, {'formulas':[
         {
             name,
+            //BILL LOOK HERE
+            //(christine's new parameter, name may change) production_line_ids: productionLineIDsThatMakeFormula,
             ingredient_name: name,
             description: desc,
             num_product: quantity,
