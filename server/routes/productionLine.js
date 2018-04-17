@@ -56,12 +56,14 @@ export function view(req, res, next) {
  * @param {*} next
  */
 export function viewWithId(req, res, next) {
+  console.log(req.params);
   if (!checkParamId(req, res, 'Invalid production line id')) {
     return;
   }
   let myProductionLine = [];
   connection.query(`${productionLineQuery} AND id = ${req.params.id}`)
     .then((productionLine) => {
+      console.log(productionLine);
       myProductionLine = productionLine;
       myProductionLine[0].occupancies = [];
       myProductionLine[0].formulas = [];
@@ -100,7 +102,7 @@ export function viewWithFormulaId(req, res, next) {
   }
   let lines = {};
   connection.query(`SELECT FormulaProductionLines.*, Productionlines.name as productionline_name
-    FROM FormulaProductionLines JOIN FormulaProductionLines.productionline_id = Productionlines.id
+    FROM FormulaProductionLines JOIN Productionlines ON FormulaProductionLines.productionline_id = Productionlines.id
     WHERE FormulaProductionLines.formula_id = ${req.params.id}`)
     .then((formulaLines) => {
       formulaLines.forEach(x => {
@@ -113,9 +115,11 @@ export function viewWithFormulaId(req, res, next) {
       return connection.query(`SELECT * FROM ProductionLinesOccupancies WHERE busy = 1 AND productionline_id IN (?)`, Object.keys(lines));
     })
     .then((productionLines) => {
+      console.log(productionLines);
       productionLines.forEach(x => {
         lines[x.productionline_id].busy = 1;
       });
+      console.log(Object.values(lines));
       res.status(200).send(Object.values(lines));
     })
     .catch((err) => {
