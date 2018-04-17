@@ -328,6 +328,7 @@ export function commitCart(req, res, next) {
     .then(() => success(res))
     .catch(err => {
       connection.query('DELETE FROM Inventories WHERE num_packages = 0')
+        .then(() => (formula && formula.intermediate ? connection.query('DELETE FROM Inventories WHERE lot=?', [uniqueId]) : Promise.resolve()))
         .then(() => {
           handleError(err, res);
         })

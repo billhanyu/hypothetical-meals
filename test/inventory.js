@@ -367,7 +367,7 @@ describe('Inventory', () => {
               assert.strictEqual(results.length, 1, 'Intermediate product added to inventory');
               const product = results[0];
               assert.isOk(Math.abs(product.per_package_cost-0.438 < 0.0001), 'Correct per package cost for intermediate product');
-              assert.strictEqual(product.num_packages, 1, 'One package of intermediate product added to inventory');
+              assert.strictEqual(product.num_packages, 15, 'One package of intermediate product added to inventory');
               assert.strictEqual(product.vendor_id, 1, 'Intermediate product vendor ID is us');
               done();
             })
