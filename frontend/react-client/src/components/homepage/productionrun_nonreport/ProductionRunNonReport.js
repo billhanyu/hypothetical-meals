@@ -194,6 +194,7 @@ class ProductionRunNonReport extends Component {
               <th>Formula</th>
               <th>ID</th>
               <th>Status</th>
+              <th>Created At</th>
               <th></th>
             </tr>
           </thead>
