@@ -100,7 +100,7 @@ export function viewWithFormulaId(req, res, next) {
   }
   let lines = {};
   connection.query(`SELECT FormulaProductionLines.*, Productionlines.name as productionline_name
-    FROM FormulaProductionLines JOIN FormulaProductionLines.productionline_id = Productionlines.id
+    FROM FormulaProductionLines JOIN Productionlines ON FormulaProductionLines.productionline_id = Productionlines.id
     WHERE FormulaProductionLines.formula_id = ${req.params.id}`)
     .then((formulaLines) => {
       formulaLines.forEach(x => {
@@ -290,7 +290,6 @@ export function deleteFormulaFromLine(req, res, next) {
       success(res);
     })
     .catch((err) => {
-      console.log(err);
       handleError(err, res);
     });
 }
@@ -366,7 +365,6 @@ export function modify(req, res, next) {
       success(res);
     })
     .catch((err) => {
-      console.log(err);
       handleError(err, res);
     });
 }
@@ -419,7 +417,6 @@ export function deleteProductionLine(req, res, next) {
       success(res);
     })
     .catch((err) => {
-      console.log(err);
       handleError(err, res);
     });
 }

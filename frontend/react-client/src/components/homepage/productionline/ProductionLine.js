@@ -155,6 +155,7 @@ class ProductionLine extends Component {
           open: true,
           message: 'Production Complete!',
         });
+        console.log(this.state.pagedLines.filter(line=>line.id == id)[0].occupancies.filter(item=>item.busy == 1)[0].productrun_id);
         this.reloadData();
       })
       .catch(err => {
@@ -221,6 +222,25 @@ class ProductionLine extends Component {
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.confirmDelete}>Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="modal fade" id="productLotModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">Confirm Delete</h5>
+                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Product Lot: {this.state.productLot}
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-primary" data-dismiss="modal">Acknowledged</button>
               </div>
             </div>
           </div>

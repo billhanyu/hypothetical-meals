@@ -336,7 +336,6 @@ describe('#completeProductionOnLine()', () => {
             assert.strictEqual(newFinalProductInventory.productrun_id, 1, 'Product run ID is 1');
             assert.strictEqual(newFinalProductInventory.formula_id, 1, 'Product run ID is 1');
             assert.strictEqual(newFinalProductInventory.num_packages, 100, 'Number of packages is 100');
-            
             done();
           })
           .catch((e) => console.log(e));
