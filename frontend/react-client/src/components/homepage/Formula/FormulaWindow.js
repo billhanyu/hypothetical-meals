@@ -24,6 +24,7 @@ class FormulaWindow extends Component {
     const productionLines = [];
     const productionLinesAll = [];
     const ingredientNameToQuantityMap = {};
+    const productionLinesMap = {};
     if (props.newFormulaObject != null) {
       Object.keys(props.newFormulaObject.ingredients).forEach(ingredient => {
         const element = props.newFormulaObject.ingredients[ingredient];
@@ -46,6 +47,7 @@ class FormulaWindow extends Component {
       quantity,
       productionLines,
       productionLinesAll,
+      productionLinesMap,
       removed,
       idToQuantityMap,
       values,
@@ -68,6 +70,28 @@ class FormulaWindow extends Component {
     3. newFormulaObject (JSON Formula Object)
     4. activeId (Number)
   ****/
+
+  componentDidMount() {
+    axios.get(`/productionlines`, {
+      headers: { Authorization: "Token " + global.token },
+    })
+    .then(response => {
+      const productionLinesAll = [];
+      const productionLinesMap = {};
+      response.data.forEach(element => {
+        productionLinesAll.push(element.name);
+        productionLinesMap[element.name] = element.id;
+      });
+      this.setState({
+        productionLinesAll,
+        productionLinesMap,
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      console.log(err.response);
+    });
+  }
 
   handleInputChange(newInput, id) {
     const newState = this.state;
@@ -124,11 +148,13 @@ class FormulaWindow extends Component {
     const isNameEmpty = this.state.name == '' || this.state.name == null;
     const isQuantityEmpty = this.state.quantity == '' || this.state.quantity == null || isNaN(Number(this.state.quantity)) || Number(this.state.quantity <= 0);
     const isIngredEmpty = this.state.values.length == 0;
-    if (isNameEmpty || isQuantityEmpty || isIngredEmpty) {
+    const isProductionLineEmpty = this.state.productionLines.length === 0;
+    if (isNameEmpty || isQuantityEmpty || isIngredEmpty || isProductionLineEmpty) {
       return this.setState({
         nameError: isNameEmpty,
         quantityError: isQuantityEmpty,
         ingredError: isIngredEmpty,
+        productionLineError: isProductionLineEmpty
       });
     }
 
@@ -146,31 +172,36 @@ class FormulaWindow extends Component {
       });
 
       const id = this.props.activeId;
-      axios.put(`/formulas`, {
-        'formulas': [
-          {
-            id,
-            name,
-            description: desc,
-            num_product: quantity,
-            ingredients,
-          }
-        ]
-      }, {
+      const promiseArray = [
+        axios.put(`/formulas`, {
+          'formulas': [
+            {
+              id,
+              name,
+              description: desc,
+              num_product: quantity,
+              ingredients,
+            }
+          ]
+        }, {
+            headers: { Authorization: "Token " + global.token }
+        }),
+        axios.put('/productionlines', {}, {
           headers: { Authorization: "Token " + global.token }
         })
-        .then(response => {
-          this.setState({
-            open: true,
-            message: "Finished updating"
-          });
-        })
-        .catch(err => {
-          this.setState({
-            open: true,
-            message: err.response.data,
-          });
+      ];
+      Promise.all(promiseArray).then(responses => {
+        this.setState({
+          open: true,
+          message: "Finished updating"
         });
+
+      }).catch(err => {
+        this.setState({
+          open: true,
+          message: err.response.data,
+        });
+      });
     } else {
       this.props.onFinish(this.state);
     }
@@ -245,6 +276,7 @@ class FormulaWindow extends Component {
             hintText="Select production lines"
             value={this.state.productionLines}
             onChange={this.selectedProductionLine.bind(this)}
+            errorText={this.state.productionLineError ? 'Select at least one production line' : null}
           >
             {this.productionItems(this.state.productionLines)}
           </SelectField>
