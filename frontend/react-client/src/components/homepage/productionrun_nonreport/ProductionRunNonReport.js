@@ -30,7 +30,6 @@ class ProductionRunNonReport extends Component {
     axios.get(`/productionlines`, {headers: {Authorization: "Token " + global.token}})
     .then(response => {
       response.data.forEach(element => {
-        console.log(element);
         lines.push({
           line_id: element.id,
           name: element.name,
@@ -43,7 +42,10 @@ class ProductionRunNonReport extends Component {
       });
     })
     .catch(error => {
-      console.log(error);
+      this.state({
+        open: true,
+        message: 'Error retrieving production runs data'
+      });
     });
   }
 
@@ -62,6 +64,8 @@ class ProductionRunNonReport extends Component {
         modalOpen: false,
         open: true,
         message: 'Success!',
+      }, () => {
+        this.reloadData();
       });
     })
     .catch(error => {
@@ -121,7 +125,12 @@ class ProductionRunNonReport extends Component {
           Mark production run as complete?
         </Dialog>
         <h2>Production Runs</h2>
-        <FlatButton label="Back" backgroundColor='#377CC9' labelStyle={{color: '#FFF'}} hoverColor='#4694ec' onClick={this.props.onClick}/>
+        <button
+          type='button'
+          className='btn btn-secondary'
+          onClick={this.props.onClick}>
+          Back
+        </button>
         <table className="table">
           <thead>
             <tr>
