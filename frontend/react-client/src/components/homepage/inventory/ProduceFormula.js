@@ -62,7 +62,7 @@ class ProduceFormula extends Component {
       headers: { Authorization: "Token " + global.token },
     })
     .then(response => {
-      const inventoryStockArrived = response.data.filter(element => {
+      const inventoryStockArrived = Object.values(response.data).filter(element => {
         return element.arrived == 1;
       });
       this.setState({
